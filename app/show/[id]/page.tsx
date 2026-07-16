@@ -1,0 +1,184 @@
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import {
+  userShows,
+  watchedEpisodes,
+  episodes,
+} from "@/lib/schema";
+import { eq, and } from "drizzle-orm";
+import { backdropUrl, posterUrl } from "@/lib/tmdb";
+import { ensureShow } from "@/lib/ensure";
+import { EpisodeRow, EpisodeData } from "@/components/episode-row";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
+
+export default async function ShowDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ season?: string }>;
+}) {
+  const { id } = await params;
+  const { season: seasonParam } = await searchParams;
+  const tmdbId = Number(id);
+
+  const session = await auth();
+  const userId = session!.user.id;
+
+  const show = await ensureShow(tmdbId);
+  if (!show) notFound();
+
+  const userShow = await db.query.userShows.findFirst({
+    where: and(eq(userShows.userId, userId), eq(userShows.tmdbId, tmdbId)),
+  });
+
+  const selectedSeason = seasonParam ? Number(seasonParam) : userShow?.lastSeason || 1;
+
+  const [seasonEpisodes, watched] = await Promise.all([
+    db
+      .select({
+        episodeNumber: episodes.episodeNumber,
+        seasonNumber: episodes.seasonNumber,
+        title: episodes.title,
+        overview: episodes.overview,
+        airDate: episodes.airDate,
+        stillPath: episodes.stillPath,
+        runtime: episodes.runtime,
+      })
+      .from(episodes)
+      .where(
+        and(
+          eq(episodes.showTmdbId, tmdbId),
+          eq(episodes.seasonNumber, selectedSeason)
+        )
+      ),
+    db
+      .select({ episodeNumber: watchedEpisodes.episodeNumber })
+      .from(watchedEpisodes)
+      .where(
+        and(
+          eq(watchedEpisodes.userId, userId),
+          eq(watchedEpisodes.showTmdbId, tmdbId),
+          eq(watchedEpisodes.seasonNumber, selectedSeason)
+        )
+      ),
+  ]);
+
+  const watchedSet = new Set(watched.map((w) => w.episodeNumber));
+
+  const episodeData: EpisodeData[] = seasonEpisodes
+    .sort((a, b) => a.episodeNumber - b.episodeNumber)
+    .map((ep) => ({
+      episodeNumber: ep.episodeNumber,
+      seasonNumber: ep.seasonNumber,
+      name: ep.title,
+      overview: ep.overview ?? undefined,
+      airDate: ep.airDate ?? undefined,
+      stillPath: ep.stillPath ?? null,
+      runtime: ep.runtime ?? undefined,
+      watched: watchedSet.has(ep.episodeNumber),
+    }));
+
+  const totalSeasons = show.numberOfSeasons || 1;
+  const seasons = Array.from({ length: totalSeasons }, (_, i) => i + 1);
+
+  return (
+    <div className="min-h-screen bg-black pb-20">
+      <div className="relative h-48 w-full overflow-hidden">
+        {show.backdropPath ? (
+          <img
+            src={backdropUrl(show.backdropPath, "w1280") ?? ""}
+            alt={show.title}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="h-full w-full bg-card" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
+        <Link
+          href="/shows"
+          className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </Link>
+      </div>
+
+      <div className="-mt-12 px-4">
+        <div className="flex gap-4">
+          <div className="h-36 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-secondary shadow-lg">
+            {show.posterPath ? (
+              <img
+                src={posterUrl(show.posterPath, "w342") ?? ""}
+                alt={show.title}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
+                No img
+              </div>
+            )}
+          </div>
+
+          <div className="flex-1 pt-12">
+            <h1 className="text-xl font-bold text-white">{show.title}</h1>
+            <div className="mt-1 flex flex-wrap gap-2 text-xs text-muted-foreground">
+              {show.firstAirDate && (
+                <span>{show.firstAirDate.slice(0, 4)}</span>
+              )}
+              {show.status && (
+                <>
+                  <span>·</span>
+                  <span>{show.status}</span>
+                </>
+              )}
+              {show.voteAverage && (
+                <>
+                  <span>·</span>
+                  <span className="text-primary">★ {show.voteAverage.toFixed(1)}</span>
+                </>
+              )}
+            </div>
+            {show.numberOfSeasons && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                {show.numberOfSeasons} seasons · {show.numberOfEpisodes} episodes
+              </p>
+            )}
+          </div>
+        </div>
+
+        {show.overview && (
+          <p className="mt-4 text-sm text-muted-foreground line-clamp-3">{show.overview}</p>
+        )}
+
+        <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
+          {seasons.map((s) => (
+            <Link
+              key={s}
+              href={`/show/${tmdbId}?season=${s}`}
+              className={`flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                s === selectedSeason
+                  ? "bg-primary text-black"
+                  : "bg-card text-muted-foreground hover:text-white"
+              }`}
+            >
+              Season {s}
+            </Link>
+          ))}
+        </div>
+
+        <div className="mt-4 space-y-2">
+          {episodeData.map((ep) => (
+            <EpisodeRow key={ep.episodeNumber} episode={ep} showTmdbId={tmdbId} />
+          ))}
+          {episodeData.length === 0 && (
+            <p className="py-8 text-center text-sm text-muted-foreground">
+              No episode data for this season
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
