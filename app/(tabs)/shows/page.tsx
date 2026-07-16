@@ -9,6 +9,8 @@ import { eq, and, inArray } from "drizzle-orm";
 import { ShowTabs } from "@/components/show-tabs";
 import { SectionLabel } from "@/components/section-label";
 import { ShowListItem, ShowListItemData } from "@/components/show-list-item";
+import { ShowCard } from "@/components/show-card";
+import { LayoutToggle } from "@/components/layout-toggle";
 import {
   computeNextEpisode,
   computeUpcomingEpisodes,
@@ -21,13 +23,42 @@ import { posterUrl } from "@/lib/tmdb";
 import Link from "next/link";
 import Image from "next/image";
 
+function relativeDateLabel(airDate: string): string {
+  const date = new Date(airDate);
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const diffMs = d.getTime() - now.getTime();
+  const diffDays = Math.round(diffMs / (24 * 60 * 60 * 1000));
+
+  if (diffDays < 1) return "Today";
+  if (diffDays === 1) return "Tomorrow";
+  if (diffDays <= 7) return "This week";
+  if (diffDays <= 14) return "Next week";
+  return "Later";
+}
+
+function countdownText(airDate: string): string {
+  const date = new Date(airDate);
+  const now = new Date();
+  const diffMs = date.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffMs / (24 * 60 * 60 * 1000));
+
+  if (diffDays < 0) return "Aired";
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Tomorrow";
+  return `in ${diffDays} days`;
+}
+
 export default async function ShowsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ view?: string }>;
+  searchParams: Promise<{ view?: string; layout?: string }>;
 }) {
-  const { view } = await searchParams;
+  const { view, layout } = await searchParams;
   const currentView = view === "upcoming" ? "upcoming" : "watchlist";
+  const listLayout = layout === "list";
 
   const userId = await requireAuth();
 
@@ -156,7 +187,7 @@ export default async function ShowsPage({
   }
 
   // UPCOMING VIEW
-  let upcomingItems: Array<{
+  type UpcomingItem = {
     tmdbId: number;
     title: string;
     posterPath: string | null;
@@ -164,7 +195,9 @@ export default async function ShowsPage({
     episodeNumber: number;
     episodeTitle: string;
     airDate: string;
-  }> = [];
+  };
+
+  let upcomingItems: UpcomingItem[] = [];
 
   if (currentView === "upcoming") {
     for (const show of watching) {
@@ -188,10 +221,25 @@ export default async function ShowsPage({
 
     upcomingItems.sort(
       (a, b) =>
-        new Date(b.airDate).getTime() - new Date(a.airDate).getTime()
+        new Date(a.airDate).getTime() - new Date(b.airDate).getTime()
     );
     upcomingItems = upcomingItems.slice(0, 50);
   }
+
+  const upcomingGroups = new Map<string, UpcomingItem[]>();
+  for (const item of upcomingItems) {
+    const label = relativeDateLabel(item.airDate);
+    let group = upcomingGroups.get(label);
+    if (!group) {
+      group = [];
+      upcomingGroups.set(label, group);
+    }
+    group.push(item);
+  }
+  const upcomingGroupOrder = ["Today", "Tomorrow", "This week", "Next week", "Later"];
+  const sortedGroupKeys = Array.from(upcomingGroups.keys()).sort(
+    (a, b) => upcomingGroupOrder.indexOf(a) - upcomingGroupOrder.indexOf(b)
+  );
 
   return (
     <div className="min-h-screen bg-black px-4 pb-24 pt-2">
@@ -202,6 +250,11 @@ export default async function ShowsPage({
             { value: "upcoming", label: "UPCOMING" },
           ]}
         />
+        {currentView === "watchlist" && (
+          <div className="mt-2 flex justify-end">
+            <LayoutToggle />
+          </div>
+        )}
       </div>
 
       {currentView === "watchlist" && (
@@ -211,11 +264,19 @@ export default async function ShowsPage({
               <div className="mb-3 flex justify-center">
                 <SectionLabel>Watch Next</SectionLabel>
               </div>
-              <div className="space-y-2">
-                {watchNext.map((show) => (
-                  <ShowListItem key={show.tmdbId} show={show} />
-                ))}
-              </div>
+              {listLayout ? (
+                <div className="space-y-2">
+                  {watchNext.map((show) => (
+                    <ShowListItem key={show.tmdbId} show={show} />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 gap-2">
+                  {watchNext.map((show) => (
+                    <ShowCard key={show.tmdbId} show={show} />
+                  ))}
+                </div>
+              )}
             </section>
           )}
 
@@ -224,11 +285,19 @@ export default async function ShowsPage({
               <div className="mb-3 flex justify-center">
                 <SectionLabel>Haven&apos;t watched for a while</SectionLabel>
               </div>
-              <div className="space-y-2">
-                {haventWatched.map((show) => (
-                  <ShowListItem key={show.tmdbId} show={show} />
-                ))}
-              </div>
+              {listLayout ? (
+                <div className="space-y-2">
+                  {haventWatched.map((show) => (
+                    <ShowListItem key={show.tmdbId} show={show} />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 gap-2">
+                  {haventWatched.map((show) => (
+                    <ShowCard key={show.tmdbId} show={show} />
+                  ))}
+                </div>
+              )}
             </section>
           )}
 
@@ -251,59 +320,64 @@ export default async function ShowsPage({
       {currentView === "upcoming" && (
         <>
           {upcomingItems.length > 0 ? (
-            <section>
-              <div className="mb-3 flex justify-center">
-                <SectionLabel>Recently aired</SectionLabel>
-              </div>
-              <div className="space-y-2">
-                {upcomingItems.map((item) => (
-                  <Link
-                    key={`${item.tmdbId}-${item.seasonNumber}-${item.episodeNumber}`}
-                    href={`/show/${item.tmdbId}`}
-                    className="flex items-center gap-3 rounded-xl bg-[#111112] p-3 transition-colors hover:bg-[#1c1c1e]"
-                  >
-                    <div
-                      className="relative flex-shrink-0 overflow-hidden rounded-lg bg-[#2c2c2e]"
-                      style={{ width: 56, height: 84 }}
-                    >
-                      {item.posterPath ? (
-                        <Image
-                          src={posterUrl(item.posterPath, "w154") ?? ""}
-                          alt={item.title}
-                          width={56}
-                          height={84}
-                          className="object-cover"
-                          unoptimized
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
-                          No img
+            <div className="space-y-6">
+              {sortedGroupKeys.map((group) => (
+                <section key={group}>
+                  <div className="mb-3 flex justify-center">
+                    <SectionLabel>{group}</SectionLabel>
+                  </div>
+                  <div className="space-y-2">
+                    {upcomingGroups.get(group)!.map((item) => (
+                      <Link
+                        key={`${item.tmdbId}-${item.seasonNumber}-${item.episodeNumber}`}
+                        href={`/show/${item.tmdbId}`}
+                        className="flex items-center gap-3 rounded-xl bg-[#111112] p-3 transition-colors hover:bg-[#1c1c1e]"
+                      >
+                        <div
+                          className="relative flex-shrink-0 overflow-hidden rounded-lg bg-[#2c2c2e]"
+                          style={{ width: 56, height: 84 }}
+                        >
+                          {item.posterPath ? (
+                            <Image
+                              src={posterUrl(item.posterPath, "w154") ?? ""}
+                              alt={item.title}
+                              width={56}
+                              height={84}
+                              className="object-cover"
+                              unoptimized
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
+                              No img
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="mb-1 truncate font-bold text-white">
-                        {item.title}
-                      </p>
-                      <p className="text-sm font-bold text-white">
-                        S{String(item.seasonNumber).padStart(2, "0")} | E
-                        {String(item.episodeNumber).padStart(2, "0")}
-                      </p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {item.episodeTitle}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(item.airDate).toLocaleDateString("en-US", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </section>
+                        <div className="min-w-0 flex-1">
+                          <p className="mb-1 truncate font-bold text-white">
+                            {item.title}
+                          </p>
+                          <p className="text-sm font-bold text-white">
+                            S{String(item.seasonNumber).padStart(2, "0")} | E
+                            {String(item.episodeNumber).padStart(2, "0")}
+                          </p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            {item.episodeTitle}
+                          </p>
+                          <p className="text-xs text-primary">
+                            {new Date(item.airDate).toLocaleDateString("en-US", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}{" "}
+                            · {countdownText(item.airDate)}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
           ) : (
             <div className="flex flex-col items-center justify-center pt-20">
               <p className="mb-4 text-muted-foreground">

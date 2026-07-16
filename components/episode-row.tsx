@@ -19,9 +19,11 @@ export type EpisodeData = {
 export function EpisodeRow({
   episode,
   showTmdbId,
+  onToggle,
 }: {
   episode: EpisodeData;
   showTmdbId: number;
+  onToggle?: (watched: boolean) => void | Promise<void>;
 }) {
   const [watched, setWatched] = useState(episode.watched);
   const [pending, startTransition] = useTransition();
@@ -31,16 +33,20 @@ export function EpisodeRow({
     setWatched(newValue);
     startTransition(async () => {
       try {
-        await fetch("/api/watch", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            showTmdbId,
-            seasonNumber: episode.seasonNumber,
-            episodeNumber: episode.episodeNumber,
-            watched: newValue,
-          }),
-        });
+        if (onToggle) {
+          await onToggle(newValue);
+        } else {
+          await fetch("/api/watch", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              showTmdbId,
+              seasonNumber: episode.seasonNumber,
+              episodeNumber: episode.episodeNumber,
+              watched: newValue,
+            }),
+          });
+        }
       } catch (err) {
         setWatched(!newValue);
       }

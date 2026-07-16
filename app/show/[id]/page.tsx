@@ -7,7 +7,8 @@ import {
 import { eq, and } from "drizzle-orm";
 import { backdropUrl, posterUrl } from "@/lib/tmdb";
 import { ensureShow, ensureEpisodes } from "@/lib/ensure";
-import { EpisodeRow, EpisodeData } from "@/components/episode-row";
+import { EpisodeData } from "@/components/episode-row";
+import { SeasonEpisodeList } from "@/components/season-episode-list";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -160,16 +161,7 @@ export default async function ShowDetailPage({
           ))}
         </div>
 
-        <div className="mt-4 space-y-2">
-          {episodeData.map((ep) => (
-            <EpisodeRow key={ep.episodeNumber} episode={ep} showTmdbId={tmdbId} />
-          ))}
-          {episodeData.length === 0 && (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              No episode data for this season
-            </p>
-          )}
-        </div>
+        <SeasonEpisodeList episodes={episodeData} showTmdbId={tmdbId} />
       </div>
     </div>
   );
