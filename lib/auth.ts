@@ -20,8 +20,10 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
-  // Required for tunnel/dev testing; set NEXTAUTH_URL for production
-  trustHost: true,
+  // Trust host only in non-production or when explicitly enabled (tunnels/dev).
+  trustHost:
+    process.env.AUTH_TRUST_HOST === "true" ||
+    process.env.NODE_ENV !== "production",
   providers: [
     Credentials({
       name: "credentials",

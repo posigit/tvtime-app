@@ -23,6 +23,7 @@ export default async function ShowDetailPage({
   const { id } = await params;
   const { season: seasonParam } = await searchParams;
   const tmdbId = Number(id);
+  if (!Number.isFinite(tmdbId)) notFound();
 
   const userId = await requireAuth();
 

@@ -28,11 +28,8 @@ export async function ensureShow(tmdbId: number) {
     tmdbData: details,
   };
 
-  // Save to DB in background — don't block rendering
-  db.insert(shows)
-    .values(show)
-    .onConflictDoNothing()
-    .catch(() => {});
+  // Save to DB before returning so dependent callers (e.g. ensureEpisodes) see the row
+  await db.insert(shows).values(show).onConflictDoNothing();
 
   return show;
 }
@@ -58,11 +55,8 @@ export async function ensureMovie(tmdbId: number) {
     tmdbData: details,
   };
 
-  // Save to DB in background — don't block rendering
-  db.insert(movies)
-    .values(movie)
-    .onConflictDoNothing()
-    .catch(() => {});
+  // Save to DB before returning so dependent callers see the row
+  await db.insert(movies).values(movie).onConflictDoNothing();
 
   return movie;
 }
@@ -132,14 +126,9 @@ export async function ensureEpisodes(
     }
   }
 
-  // Save to DB in background — don't block rendering
+  // Persist all episodes in one batch
   if (fetchedEpisodes.length > 0) {
-    for (const ep of fetchedEpisodes) {
-      db.insert(episodes)
-        .values(ep)
-        .onConflictDoNothing()
-        .catch(() => {});
-    }
+    await db.insert(episodes).values(fetchedEpisodes).onConflictDoNothing();
   }
 
   return fetchedEpisodes;

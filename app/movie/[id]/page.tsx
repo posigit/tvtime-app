@@ -17,6 +17,7 @@ export default async function MovieDetailPage({
 }) {
   const { id } = await params;
   const tmdbId = Number(id);
+  if (!Number.isFinite(tmdbId)) notFound();
 
   const userId = await requireAuth();
 
