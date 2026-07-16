@@ -28,8 +28,8 @@ export async function ensureShow(tmdbId: number) {
     tmdbData: details,
   };
 
-  // Save to DB before returning so dependent callers (e.g. ensureEpisodes) see the row
-  await db.insert(shows).values(show).onConflictDoNothing();
+  // Save to DB in the background — data is already in memory, don't block render
+  db.insert(shows).values(show).onConflictDoNothing().catch(() => {});
 
   return show;
 }
@@ -55,8 +55,8 @@ export async function ensureMovie(tmdbId: number) {
     tmdbData: details,
   };
 
-  // Save to DB before returning so dependent callers see the row
-  await db.insert(movies).values(movie).onConflictDoNothing();
+  // Save to DB in the background — data is already in memory, don't block render
+  db.insert(movies).values(movie).onConflictDoNothing().catch(() => {});
 
   return movie;
 }
@@ -73,6 +73,32 @@ export type EpisodeInfo = {
 };
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function saveEpisodesWithRetry(
+  tmdbId: number,
+  fetchedEpisodes: EpisodeInfo[],
+  attempts = 5,
+  delay = 100
+) {
+  if (fetchedEpisodes.length === 0) return;
+
+  db.insert(episodes)
+    .values(fetchedEpisodes)
+    .onConflictDoNothing()
+    .then(() => {
+      console.log(`Persisted ${fetchedEpisodes.length} episodes for show ${tmdbId}`);
+    })
+    .catch((err) => {
+      if (attempts > 0) {
+        setTimeout(
+          () => saveEpisodesWithRetry(tmdbId, fetchedEpisodes, attempts - 1, delay * 1.5),
+          delay
+        );
+      } else {
+        console.error(`Failed to persist episodes for show ${tmdbId}:`, err);
+      }
+    });
+}
 
 export async function ensureEpisodes(
   tmdbId: number,
@@ -126,10 +152,8 @@ export async function ensureEpisodes(
     }
   }
 
-  // Persist all episodes in one batch
-  if (fetchedEpisodes.length > 0) {
-    await db.insert(episodes).values(fetchedEpisodes).onConflictDoNothing();
-  }
+  // Persist in the background with retry so a slow parent-row insert doesn't block render
+  saveEpisodesWithRetry(tmdbId, fetchedEpisodes);
 
   return fetchedEpisodes;
 }
