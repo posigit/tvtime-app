@@ -1,16 +1,16 @@
-import { auth } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import {
   userShows,
   watchedEpisodes,
-  episodes,
 } from "@/lib/schema";
 import { eq, and } from "drizzle-orm";
 import { backdropUrl, posterUrl } from "@/lib/tmdb";
-import { ensureShow } from "@/lib/ensure";
+import { ensureShow, ensureEpisodes } from "@/lib/ensure";
 import { EpisodeRow, EpisodeData } from "@/components/episode-row";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
 
 export default async function ShowDetailPage({
@@ -24,8 +24,7 @@ export default async function ShowDetailPage({
   const { season: seasonParam } = await searchParams;
   const tmdbId = Number(id);
 
-  const session = await auth();
-  const userId = session!.user.id;
+  const userId = await requireAuth();
 
   const show = await ensureShow(tmdbId);
   if (!show) notFound();
@@ -36,24 +35,8 @@ export default async function ShowDetailPage({
 
   const selectedSeason = seasonParam ? Number(seasonParam) : userShow?.lastSeason || 1;
 
-  const [seasonEpisodes, watched] = await Promise.all([
-    db
-      .select({
-        episodeNumber: episodes.episodeNumber,
-        seasonNumber: episodes.seasonNumber,
-        title: episodes.title,
-        overview: episodes.overview,
-        airDate: episodes.airDate,
-        stillPath: episodes.stillPath,
-        runtime: episodes.runtime,
-      })
-      .from(episodes)
-      .where(
-        and(
-          eq(episodes.showTmdbId, tmdbId),
-          eq(episodes.seasonNumber, selectedSeason)
-        )
-      ),
+  const [allEpisodes, watched] = await Promise.all([
+    ensureEpisodes(tmdbId, show.numberOfSeasons),
     db
       .select({ episodeNumber: watchedEpisodes.episodeNumber })
       .from(watchedEpisodes)
@@ -66,6 +49,7 @@ export default async function ShowDetailPage({
       ),
   ]);
 
+  const seasonEpisodes = allEpisodes.filter((ep) => ep.seasonNumber === selectedSeason);
   const watchedSet = new Set(watched.map((w) => w.episodeNumber));
 
   const episodeData: EpisodeData[] = seasonEpisodes
@@ -88,10 +72,14 @@ export default async function ShowDetailPage({
     <div className="min-h-screen bg-black pb-20">
       <div className="relative h-48 w-full overflow-hidden">
         {show.backdropPath ? (
-          <img
+          <Image
             src={backdropUrl(show.backdropPath, "w1280") ?? ""}
             alt={show.title}
-            className="h-full w-full object-cover"
+            fill
+            sizes="100vw"
+            className="object-cover"
+            unoptimized
+            priority
           />
         ) : (
           <div className="h-full w-full bg-card" />
@@ -107,12 +95,15 @@ export default async function ShowDetailPage({
 
       <div className="-mt-12 px-4">
         <div className="flex gap-4">
-          <div className="h-36 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-secondary shadow-lg">
+          <div className="relative h-36 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-secondary shadow-lg">
             {show.posterPath ? (
-              <img
+              <Image
                 src={posterUrl(show.posterPath, "w342") ?? ""}
                 alt={show.title}
-                className="h-full w-full object-cover"
+                width={96}
+                height={144}
+                className="object-cover"
+                unoptimized
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">

@@ -59,6 +59,7 @@ export default function LoginPage() {
           <Button
             type="submit"
             disabled={!mounted || loading}
+            suppressHydrationWarning
             className="h-12 w-full bg-primary text-black hover:bg-primary/90"
           >
             {loading ? "Signing in..." : mounted ? "Sign In" : "Loading..."}

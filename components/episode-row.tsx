@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Image from "next/image";
 import { stillUrl } from "@/lib/tmdb";
 import { cn } from "@/lib/utils";
 
@@ -50,10 +51,13 @@ export function EpisodeRow({
     <div className="flex items-start gap-3 rounded-xl bg-card p-3">
       <div className="relative h-16 w-28 flex-shrink-0 overflow-hidden rounded-lg bg-secondary">
         {episode.stillPath ? (
-          <img
+          <Image
             src={stillUrl(episode.stillPath, "w300") ?? ""}
             alt={episode.name}
-            className="h-full w-full object-cover"
+            fill
+            sizes="112px"
+            className="object-cover"
+            unoptimized
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">

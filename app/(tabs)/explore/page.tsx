@@ -1,15 +1,15 @@
-import { auth } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { userShows, userMovies } from "@/lib/schema";
-import { eq, or } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { getTrendingTv, getPopularMovies, posterUrl } from "@/lib/tmdb";
 import { SearchBar } from "@/components/search-bar";
 import { SectionLabel } from "@/components/section-label";
 import Link from "next/link";
+import Image from "next/image";
 
 export default async function ExplorePage() {
-  const session = await auth();
-  const userId = session!.user.id;
+  const userId = await requireAuth();
 
   const trending = await getTrendingTv("week");
   const popularMovies = await getPopularMovies();
@@ -41,12 +41,15 @@ export default async function ExplorePage() {
               href={`/show/${show.id}`}
               className="relative overflow-hidden rounded-lg bg-card"
             >
-              <div style={{aspectRatio:"2 / 3"}} className="bg-secondary">
+              <div style={{aspectRatio:"2 / 3"}} className="relative bg-secondary">
                 {show.poster_path ? (
-                  <img
+                  <Image
                     src={posterUrl(show.poster_path, "w342") ?? ""}
                     alt={show.name}
-                    className="h-full w-full object-cover"
+                    fill
+                    sizes="(max-width: 768px) 33vw, 200px"
+                    className="object-cover"
+                    unoptimized
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-muted-foreground">
@@ -73,12 +76,15 @@ export default async function ExplorePage() {
               href={`/movie/${movie.id}`}
               className="relative overflow-hidden rounded-lg bg-card"
             >
-              <div style={{aspectRatio:"2 / 3"}} className="bg-secondary">
+              <div style={{aspectRatio:"2 / 3"}} className="relative bg-secondary">
                 {movie.poster_path ? (
-                  <img
+                  <Image
                     src={posterUrl(movie.poster_path, "w342") ?? ""}
                     alt={movie.title}
-                    className="h-full w-full object-cover"
+                    fill
+                    sizes="(max-width: 768px) 33vw, 200px"
+                    className="object-cover"
+                    unoptimized
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-muted-foreground">

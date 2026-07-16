@@ -1,11 +1,12 @@
-import { auth } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { movies, userMovies } from "@/lib/schema";
-import { eq, and, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { ViewToggle } from "@/components/view-toggle";
 import { SectionLabel } from "@/components/section-label";
 import { posterUrl } from "@/lib/tmdb";
 import Link from "next/link";
+import Image from "next/image";
 
 export default async function MoviesPage({
   searchParams,
@@ -15,8 +16,7 @@ export default async function MoviesPage({
   const { view } = await searchParams;
   const currentView = view === "upcoming" ? "upcoming" : "watchlist";
 
-  const session = await auth();
-  const userId = session!.user.id;
+  const userId = await requireAuth();
 
   const userMoviesList = await db
     .select({
@@ -64,12 +64,15 @@ export default async function MoviesPage({
                     href={`/movie/${movie.tmdbId}`}
                     className="overflow-hidden rounded-lg bg-card"
                   >
-                    <div style={{aspectRatio:"2 / 3"}} className="bg-secondary">
+                    <div style={{aspectRatio:"2 / 3"}} className="relative bg-secondary">
                       {movie.posterPath ? (
-                        <img
+                        <Image
                           src={posterUrl(movie.posterPath, "w342") ?? ""}
                           alt={movie.title}
-                          className="h-full w-full object-cover"
+                          fill
+                          sizes="(max-width: 768px) 33vw, 200px"
+                          className="object-cover"
+                          unoptimized
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-muted-foreground">
@@ -95,12 +98,15 @@ export default async function MoviesPage({
                     href={`/movie/${movie.tmdbId}`}
                     className="overflow-hidden rounded-lg bg-card"
                   >
-                    <div style={{aspectRatio:"2 / 3"}} className="bg-secondary">
+                    <div style={{aspectRatio:"2 / 3"}} className="relative bg-secondary">
                       {movie.posterPath ? (
-                        <img
+                        <Image
                           src={posterUrl(movie.posterPath, "w342") ?? ""}
                           alt={movie.title}
-                          className="h-full w-full object-cover"
+                          fill
+                          sizes="(max-width: 768px) 33vw, 200px"
+                          className="object-cover"
+                          unoptimized
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-muted-foreground">

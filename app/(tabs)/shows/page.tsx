@@ -1,10 +1,9 @@
-import { auth } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import {
   shows,
   userShows,
   watchedEpisodes,
-  episodes,
 } from "@/lib/schema";
 import { eq, and, inArray } from "drizzle-orm";
 import { ShowTabs } from "@/components/show-tabs";
@@ -17,8 +16,10 @@ import {
   EpisodeInfo,
   WatchedKey,
 } from "@/lib/show-progress";
+import { ensureEpisodes } from "@/lib/ensure";
 import { posterUrl } from "@/lib/tmdb";
 import Link from "next/link";
+import Image from "next/image";
 
 export default async function ShowsPage({
   searchParams,
@@ -28,8 +29,7 @@ export default async function ShowsPage({
   const { view } = await searchParams;
   const currentView = view === "upcoming" ? "upcoming" : "watchlist";
 
-  const session = await auth();
-  const userId = session!.user.id;
+  const userId = await requireAuth();
 
   const userShowsList = await db
     .select({
@@ -40,6 +40,7 @@ export default async function ShowsPage({
       lastSeason: userShows.lastSeason,
       lastEpisode: userShows.lastEpisode,
       lastWatchedAt: userShows.lastWatchedAt,
+      numberOfSeasons: shows.numberOfSeasons,
     })
     .from(userShows)
     .innerJoin(shows, eq(userShows.tmdbId, shows.tmdbId))
@@ -51,46 +52,33 @@ export default async function ShowsPage({
 
   const watchingIds = watching.map((s) => s.tmdbId);
 
-  // Single query for ALL episodes of ALL watching shows
+  // Ensure episodes exist for all watching shows (fetch from TMDB if missing)
   let allEpisodes: EpisodeInfo[] = [];
   let watchedByShow = new Map<number, Set<WatchedKey>>();
 
-  if (watchingIds.length > 0) {
-    const [eps, watched] = await Promise.all([
-      db
-        .select({
-          showTmdbId: episodes.showTmdbId,
-          seasonNumber: episodes.seasonNumber,
-          episodeNumber: episodes.episodeNumber,
-          title: episodes.title,
-          airDate: episodes.airDate,
-          stillPath: episodes.stillPath,
-        })
-        .from(episodes)
-        .where(inArray(episodes.showTmdbId, watchingIds)),
-      db
-        .select({
-          showTmdbId: watchedEpisodes.showTmdbId,
-          seasonNumber: watchedEpisodes.seasonNumber,
-          episodeNumber: watchedEpisodes.episodeNumber,
-        })
-        .from(watchedEpisodes)
-        .where(
-          and(
-            eq(watchedEpisodes.userId, userId),
-            inArray(watchedEpisodes.showTmdbId, watchingIds)
-          )
-        ),
+  if (watching.length > 0) {
+    const [episodesByShowResults, watched] = await Promise.all([
+      Promise.all(
+        watching.map((show) => ensureEpisodes(show.tmdbId, show.numberOfSeasons))
+      ),
+      watchingIds.length > 0
+        ? db
+            .select({
+              showTmdbId: watchedEpisodes.showTmdbId,
+              seasonNumber: watchedEpisodes.seasonNumber,
+              episodeNumber: watchedEpisodes.episodeNumber,
+            })
+            .from(watchedEpisodes)
+            .where(
+              and(
+                eq(watchedEpisodes.userId, userId),
+                inArray(watchedEpisodes.showTmdbId, watchingIds)
+              )
+            )
+        : Promise.resolve([]),
     ]);
 
-    allEpisodes = eps.map((e) => ({
-      showTmdbId: e.showTmdbId,
-      seasonNumber: e.seasonNumber,
-      episodeNumber: e.episodeNumber,
-      title: e.title,
-      airDate: e.airDate,
-      stillPath: e.stillPath,
-    }));
+    allEpisodes = episodesByShowResults.flat();
 
     for (const w of watched) {
       let set = watchedByShow.get(w.showTmdbId);
@@ -275,15 +263,17 @@ export default async function ShowsPage({
                     className="flex items-center gap-3 rounded-xl bg-[#111112] p-3 transition-colors hover:bg-[#1c1c1e]"
                   >
                     <div
-                      className="flex-shrink-0 overflow-hidden rounded-lg bg-[#2c2c2e]"
+                      className="relative flex-shrink-0 overflow-hidden rounded-lg bg-[#2c2c2e]"
                       style={{ width: 56, height: 84 }}
                     >
                       {item.posterPath ? (
-                        <img
+                        <Image
                           src={posterUrl(item.posterPath, "w154") ?? ""}
                           alt={item.title}
-                          className="h-full w-full object-cover"
-                          style={{ width: 56, height: 84 }}
+                          width={56}
+                          height={84}
+                          className="object-cover"
+                          unoptimized
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">

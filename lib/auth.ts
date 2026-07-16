@@ -1,9 +1,18 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { redirect } from "next/navigation";
 import { db } from "./db";
 import { users } from "./schema";
 import { eq } from "drizzle-orm";
+
+export async function requireAuth(): Promise<string> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+  return session.user.id;
+}
 
 export const {
   handlers: { GET, POST },

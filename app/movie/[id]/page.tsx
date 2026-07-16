@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { userMovies } from "@/lib/schema";
 import { eq, and } from "drizzle-orm";
@@ -6,6 +6,7 @@ import { backdropUrl, posterUrl } from "@/lib/tmdb";
 import { ensureMovie } from "@/lib/ensure";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
 import { MovieWatchButton } from "@/components/movie-watch-button";
 
@@ -17,8 +18,7 @@ export default async function MovieDetailPage({
   const { id } = await params;
   const tmdbId = Number(id);
 
-  const session = await auth();
-  const userId = session!.user.id;
+  const userId = await requireAuth();
 
   const movie = await ensureMovie(tmdbId);
   if (!movie) notFound();
@@ -31,10 +31,14 @@ export default async function MovieDetailPage({
     <div className="min-h-screen bg-black pb-20">
       <div className="relative h-48 w-full overflow-hidden">
         {movie.backdropPath ? (
-          <img
+          <Image
             src={backdropUrl(movie.backdropPath, "w1280") ?? ""}
             alt={movie.title}
-            className="h-full w-full object-cover"
+            fill
+            sizes="100vw"
+            className="object-cover"
+            unoptimized
+            priority
           />
         ) : (
           <div className="h-full w-full bg-card" />
@@ -50,12 +54,15 @@ export default async function MovieDetailPage({
 
       <div className="-mt-12 px-4">
         <div className="flex gap-4">
-          <div className="h-36 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-secondary shadow-lg">
+          <div className="relative h-36 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-secondary shadow-lg">
             {movie.posterPath ? (
-              <img
+              <Image
                 src={posterUrl(movie.posterPath, "w342") ?? ""}
                 alt={movie.title}
-                className="h-full w-full object-cover"
+                width={96}
+                height={144}
+                className="object-cover"
+                unoptimized
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">

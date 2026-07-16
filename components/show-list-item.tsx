@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { posterUrl } from "@/lib/tmdb";
 import { MarkWatchedButton } from "./mark-watched-button";
 
@@ -26,11 +27,13 @@ export function ShowListItem({ show }: { show: ShowListItemData }) {
           style={{ width: 56, height: 84 }}
         >
           {imgUrl ? (
-            <img
+            <Image
               src={imgUrl}
               alt={show.title}
-              className="h-full w-full object-cover"
-              style={{ width: 56, height: 84 }}
+              width={56}
+              height={84}
+              className="object-cover"
+              unoptimized
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">

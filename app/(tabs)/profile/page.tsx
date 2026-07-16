@@ -1,14 +1,15 @@
-import { auth } from "@/lib/auth";
+import { auth, requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { shows, movies, userShows, userMovies, watchedEpisodes, userLists } from "@/lib/schema";
 import { eq, sql, count } from "drizzle-orm";
 import { posterUrl } from "@/lib/tmdb";
 import Link from "next/link";
+import Image from "next/image";
 import { Bell, Heart } from "lucide-react";
 
 export default async function ProfilePage() {
+  const userId = await requireAuth();
   const session = await auth();
-  const userId = session!.user.id;
 
   const [showCount] = await db
     .select({ value: count() })
@@ -118,12 +119,15 @@ export default async function ProfilePage() {
                 href={`/show/${show.tmdbId}`}
                 className="flex-shrink-0"
               >
-                <div className="h-32 w-20 overflow-hidden rounded-lg bg-card">
+                <div className="relative h-32 w-20 overflow-hidden rounded-lg bg-card">
                   {show.posterPath ? (
-                    <img
+                    <Image
                       src={posterUrl(show.posterPath, "w185") ?? ""}
                       alt={show.title}
-                      className="h-full w-full object-cover"
+                      width={80}
+                      height={128}
+                      className="object-cover"
+                      unoptimized
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center p-1 text-center text-[10px] text-muted-foreground">
@@ -150,12 +154,15 @@ export default async function ProfilePage() {
                 href={`/movie/${movie.tmdbId}`}
                 className="flex-shrink-0"
               >
-                <div className="h-32 w-20 overflow-hidden rounded-lg bg-card">
+                <div className="relative h-32 w-20 overflow-hidden rounded-lg bg-card">
                   {movie.posterPath ? (
-                    <img
+                    <Image
                       src={posterUrl(movie.posterPath, "w185") ?? ""}
                       alt={movie.title}
-                      className="h-full w-full object-cover"
+                      width={80}
+                      height={128}
+                      className="object-cover"
+                      unoptimized
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center p-1 text-center text-[10px] text-muted-foreground">

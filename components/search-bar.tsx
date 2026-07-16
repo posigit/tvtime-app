@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { posterUrl } from "@/lib/tmdb";
 import Link from "next/link";
 
@@ -74,12 +75,15 @@ export function SearchBar() {
                 href={isMovie ? `/movie/${result.id}` : `/show/${result.id}`}
                 className="flex items-center gap-3 border-b border-white/5 p-2 transition-colors hover:bg-secondary"
               >
-                <div className="h-14 w-10 flex-shrink-0 overflow-hidden rounded bg-secondary">
+                <div className="relative h-14 w-10 flex-shrink-0 overflow-hidden rounded bg-secondary">
                   {result.poster_path ? (
-                    <img
+                    <Image
                       src={posterUrl(result.poster_path, "w92") ?? ""}
                       alt={title}
-                      className="h-full w-full object-cover"
+                      width={40}
+                      height={56}
+                      className="object-cover"
+                      unoptimized
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">

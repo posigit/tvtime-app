@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { posterUrl } from "@/lib/tmdb";
@@ -207,12 +208,15 @@ function MappingCard({
                 : "bg-secondary hover:bg-muted"
             }`}
           >
-            <div className="h-16 w-12 flex-shrink-0 overflow-hidden rounded bg-muted">
+            <div className="relative h-16 w-12 flex-shrink-0 overflow-hidden rounded bg-muted">
               {candidate.posterPath ? (
-                <img
+                <Image
                   src={posterUrl(candidate.posterPath, "w92") || ""}
                   alt={candidate.title}
-                  className="h-full w-full object-cover"
+                  width={48}
+                  height={64}
+                  className="object-cover"
+                  unoptimized
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
