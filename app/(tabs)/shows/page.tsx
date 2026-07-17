@@ -1,9 +1,10 @@
 import { requireAuth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { db, withDbRetry, mapPool } from "@/lib/db";
 import {
   shows,
   userShows,
   watchedEpisodes,
+  episodes,
 } from "@/lib/schema";
 import { eq, and, inArray } from "drizzle-orm";
 import { ShowTabs } from "@/components/show-tabs";
@@ -19,36 +20,45 @@ import {
   WatchedKey,
 } from "@/lib/show-progress";
 import { ensureEpisodes } from "@/lib/ensure";
-import { posterUrl } from "@/lib/tmdb";
+import { UpcomingList, UpcomingGroup } from "@/components/upcoming-list";
 import Link from "next/link";
-import Image from "next/image";
 
-function relativeDateLabel(airDate: string): string {
-  const date = new Date(airDate);
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  const d = new Date(date);
+/** Calendar header like original TV Time: "3 JUL 2026" */
+function calendarDateLabel(airDate: string): string {
+  const date = new Date(airDate + "T12:00:00");
+  const day = date.getDate();
+  const month = date
+    .toLocaleDateString("en-GB", { month: "short" })
+    .toUpperCase();
+  const year = date.getFullYear();
+  return `${day} ${month} ${year}`;
+}
+
+function dateKey(airDate: string): string {
+  return airDate.slice(0, 10);
+}
+
+function isAiredDate(airDate: string): boolean {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const d = new Date(airDate + "T12:00:00");
   d.setHours(0, 0, 0, 0);
-  const diffMs = d.getTime() - now.getTime();
-  const diffDays = Math.round(diffMs / (24 * 60 * 60 * 1000));
-
-  if (diffDays < 1) return "Today";
-  if (diffDays === 1) return "Tomorrow";
-  if (diffDays <= 7) return "This week";
-  if (diffDays <= 14) return "Next week";
-  return "Later";
+  return d <= today;
 }
 
 function countdownText(airDate: string): string {
-  const date = new Date(airDate);
-  const now = new Date();
-  const diffMs = date.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffMs / (24 * 60 * 60 * 1000));
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const d = new Date(airDate + "T12:00:00");
+  d.setHours(0, 0, 0, 0);
+  const diffDays = Math.round(
+    (d.getTime() - today.getTime()) / (24 * 60 * 60 * 1000)
+  );
 
   if (diffDays < 0) return "Aired";
   if (diffDays === 0) return "Today";
-  if (diffDays === 1) return "Tomorrow";
-  return `in ${diffDays} days`;
+  if (diffDays === 1) return "1 day";
+  return `${diffDays} days`;
 }
 
 export default async function ShowsPage({
@@ -62,20 +72,23 @@ export default async function ShowsPage({
 
   const userId = await requireAuth();
 
-  const userShowsList = await db
-    .select({
-      tmdbId: shows.tmdbId,
-      title: shows.title,
-      posterPath: shows.posterPath,
-      status: userShows.status,
-      lastSeason: userShows.lastSeason,
-      lastEpisode: userShows.lastEpisode,
-      lastWatchedAt: userShows.lastWatchedAt,
-      numberOfSeasons: shows.numberOfSeasons,
-    })
-    .from(userShows)
-    .innerJoin(shows, eq(userShows.tmdbId, shows.tmdbId))
-    .where(eq(userShows.userId, userId));
+  // Retry: Railway cold starts / brief disconnects
+  const userShowsList = await withDbRetry(() =>
+    db
+      .select({
+        tmdbId: shows.tmdbId,
+        title: shows.title,
+        posterPath: shows.posterPath,
+        status: userShows.status,
+        lastSeason: userShows.lastSeason,
+        lastEpisode: userShows.lastEpisode,
+        lastWatchedAt: userShows.lastWatchedAt,
+        numberOfSeasons: shows.numberOfSeasons,
+      })
+      .from(userShows)
+      .innerJoin(shows, eq(userShows.tmdbId, shows.tmdbId))
+      .where(eq(userShows.userId, userId))
+  );
 
   const watching = userShowsList.filter(
     (s) => s.status === "watching" || s.status === "for_later"
@@ -83,33 +96,70 @@ export default async function ShowsPage({
 
   const watchingIds = watching.map((s) => s.tmdbId);
 
-  // Ensure episodes exist for all watching shows (fetch from TMDB if missing)
+  // Fast path: 2 bulk DB queries (episodes + watched). Only TMDB-fill shows missing rows.
   let allEpisodes: EpisodeInfo[] = [];
   let watchedByShow = new Map<number, Set<WatchedKey>>();
 
   if (watching.length > 0) {
-    const [episodesByShowResults, watched] = await Promise.all([
-      Promise.all(
-        watching.map((show) => ensureEpisodes(show.tmdbId, show.numberOfSeasons))
+    const [episodeRows, watched] = await Promise.all([
+      withDbRetry(() =>
+        db
+          .select({
+            showTmdbId: episodes.showTmdbId,
+            seasonNumber: episodes.seasonNumber,
+            episodeNumber: episodes.episodeNumber,
+            title: episodes.title,
+            airDate: episodes.airDate,
+            stillPath: episodes.stillPath,
+          })
+          .from(episodes)
+          .where(inArray(episodes.showTmdbId, watchingIds))
       ),
-      watchingIds.length > 0
-        ? db
-            .select({
-              showTmdbId: watchedEpisodes.showTmdbId,
-              seasonNumber: watchedEpisodes.seasonNumber,
-              episodeNumber: watchedEpisodes.episodeNumber,
-            })
-            .from(watchedEpisodes)
-            .where(
-              and(
-                eq(watchedEpisodes.userId, userId),
-                inArray(watchedEpisodes.showTmdbId, watchingIds)
-              )
+      withDbRetry(() =>
+        db
+          .select({
+            showTmdbId: watchedEpisodes.showTmdbId,
+            seasonNumber: watchedEpisodes.seasonNumber,
+            episodeNumber: watchedEpisodes.episodeNumber,
+          })
+          .from(watchedEpisodes)
+          .where(
+            and(
+              eq(watchedEpisodes.userId, userId),
+              inArray(watchedEpisodes.showTmdbId, watchingIds)
             )
-        : Promise.resolve([]),
+          )
+      ),
     ]);
 
-    allEpisodes = episodesByShowResults.flat();
+    allEpisodes = episodeRows;
+
+    const showsWithEpisodes = new Set(episodeRows.map((e) => e.showTmdbId));
+    const missing = watching.filter((s) => !showsWithEpisodes.has(s.tmdbId));
+
+    // Only fetch TMDB for shows with no cached episodes (not all 150 every load)
+    if (missing.length > 0) {
+      // Cap first paint work: fill up to 12 missing shows; rest stay empty until detail/open
+      const toFill = missing.slice(0, 12);
+      const filled = await mapPool(toFill, 3, (show) =>
+        ensureEpisodes(show.tmdbId, show.numberOfSeasons).catch((err) => {
+          console.error(
+            `ensureEpisodes failed for ${show.tmdbId}:`,
+            err instanceof Error ? err.message : err
+          );
+          return [] as EpisodeInfo[];
+        })
+      );
+      allEpisodes = allEpisodes.concat(filled.flat());
+
+      // Background: fill remaining missing shows without blocking the response
+      const rest = missing.slice(12);
+      if (rest.length > 0) {
+        void mapPool(rest, 2, (show) =>
+          ensureEpisodes(show.tmdbId, show.numberOfSeasons).catch(() => [])
+        );
+      }
+    }
 
     for (const w of watched) {
       let set = watchedByShow.get(w.showTmdbId);
@@ -149,6 +199,12 @@ export default async function ShowsPage({
         showWatched
       );
 
+      // Caught up: every aired episode is watched → leave Watch List
+      // (still followed; new eps show under Upcoming when they air)
+      if (showEpisodes.length > 0 && !nextEpisode) {
+        continue;
+      }
+
       const item: ShowListItemData = {
         tmdbId: show.tmdbId,
         title: show.title,
@@ -163,6 +219,7 @@ export default async function ShowsPage({
         remaining,
       };
 
+      // No episode catalog yet → keep visible so user can open the show
       if (show.lastWatchedAt && show.lastWatchedAt > twoWeeksAgo) {
         watchNext.push(item);
       } else {
@@ -195,6 +252,9 @@ export default async function ShowsPage({
     episodeNumber: number;
     episodeTitle: string;
     airDate: string;
+    isPremiere: boolean;
+    isLatest: boolean;
+    aired: boolean;
   };
 
   let upcomingItems: UpcomingItem[] = [];
@@ -206,7 +266,28 @@ export default async function ShowsPage({
 
       const upcoming = computeUpcomingEpisodes(showEpisodes, showWatched);
 
+      // LATEST = most recent already-aired unwatched ep for this show in the list
+      let latestKey: string | null = null;
+      let latestTime = -Infinity;
       for (const ep of upcoming) {
+        if (!ep.airDate || !isAiredDate(ep.airDate)) continue;
+        const t = new Date(ep.airDate).getTime();
+        if (
+          t > latestTime ||
+          (t === latestTime &&
+            latestKey !== null &&
+            (ep.seasonNumber * 1000 + ep.episodeNumber >
+              Number(latestKey.split(":")[0]) * 1000 +
+                Number(latestKey.split(":")[1])))
+        ) {
+          latestTime = t;
+          latestKey = `${ep.seasonNumber}:${ep.episodeNumber}`;
+        }
+      }
+
+      for (const ep of upcoming) {
+        if (!ep.airDate) continue;
+        const key = `${ep.seasonNumber}:${ep.episodeNumber}`;
         upcomingItems.push({
           tmdbId: show.tmdbId,
           title: show.title,
@@ -214,7 +295,10 @@ export default async function ShowsPage({
           seasonNumber: ep.seasonNumber,
           episodeNumber: ep.episodeNumber,
           episodeTitle: ep.title,
-          airDate: ep.airDate || "",
+          airDate: ep.airDate,
+          isPremiere: ep.episodeNumber === 1,
+          isLatest: latestKey === key,
+          aired: isAiredDate(ep.airDate),
         });
       }
     }
@@ -223,23 +307,33 @@ export default async function ShowsPage({
       (a, b) =>
         new Date(a.airDate).getTime() - new Date(b.airDate).getTime()
     );
-    upcomingItems = upcomingItems.slice(0, 50);
+    // Cap size but keep enough past+future for scroll-to-today
+    upcomingItems = upcomingItems.slice(0, 120);
   }
 
-  const upcomingGroups = new Map<string, UpcomingItem[]>();
+  const upcomingGroupMap = new Map<string, UpcomingItem[]>();
   for (const item of upcomingItems) {
-    const label = relativeDateLabel(item.airDate);
-    let group = upcomingGroups.get(label);
+    const key = dateKey(item.airDate);
+    let group = upcomingGroupMap.get(key);
     if (!group) {
       group = [];
-      upcomingGroups.set(label, group);
+      upcomingGroupMap.set(key, group);
     }
     group.push(item);
   }
-  const upcomingGroupOrder = ["Today", "Tomorrow", "This week", "Next week", "Later"];
-  const sortedGroupKeys = Array.from(upcomingGroups.keys()).sort(
-    (a, b) => upcomingGroupOrder.indexOf(a) - upcomingGroupOrder.indexOf(b)
-  );
+  const upcomingGroups: UpcomingGroup[] = Array.from(upcomingGroupMap.keys())
+    .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+    .map((key) => {
+      const items = upcomingGroupMap.get(key)!;
+      return {
+        dateKey: key,
+        label: calendarDateLabel(items[0].airDate),
+        items: items.map((item) => ({
+          ...item,
+          countdown: countdownText(item.airDate),
+        })),
+      };
+    });
 
   return (
     <div className="min-h-screen bg-black px-4 pb-24 pt-2">
@@ -319,65 +413,8 @@ export default async function ShowsPage({
 
       {currentView === "upcoming" && (
         <>
-          {upcomingItems.length > 0 ? (
-            <div className="space-y-6">
-              {sortedGroupKeys.map((group) => (
-                <section key={group}>
-                  <div className="mb-3 flex justify-center">
-                    <SectionLabel>{group}</SectionLabel>
-                  </div>
-                  <div className="space-y-2">
-                    {upcomingGroups.get(group)!.map((item) => (
-                      <Link
-                        key={`${item.tmdbId}-${item.seasonNumber}-${item.episodeNumber}`}
-                        href={`/show/${item.tmdbId}`}
-                        className="flex items-center gap-3 rounded-xl bg-[#111112] p-3 transition-colors hover:bg-[#1c1c1e]"
-                      >
-                        <div
-                          className="relative flex-shrink-0 overflow-hidden rounded-lg bg-[#2c2c2e]"
-                          style={{ width: 56, height: 84 }}
-                        >
-                          {item.posterPath ? (
-                            <Image
-                              src={posterUrl(item.posterPath, "w154") ?? ""}
-                              alt={item.title}
-                              width={56}
-                              height={84}
-                              className="object-cover"
-                              unoptimized
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
-                              No img
-                            </div>
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="mb-1 truncate font-bold text-white">
-                            {item.title}
-                          </p>
-                          <p className="text-sm font-bold text-white">
-                            S{String(item.seasonNumber).padStart(2, "0")} | E
-                            {String(item.episodeNumber).padStart(2, "0")}
-                          </p>
-                          <p className="truncate text-xs text-muted-foreground">
-                            {item.episodeTitle}
-                          </p>
-                          <p className="text-xs text-primary">
-                            {new Date(item.airDate).toLocaleDateString("en-US", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}{" "}
-                            · {countdownText(item.airDate)}
-                          </p>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
+          {upcomingGroups.length > 0 ? (
+            <UpcomingList groups={upcomingGroups} />
           ) : (
             <div className="flex flex-col items-center justify-center pt-20">
               <p className="mb-4 text-muted-foreground">

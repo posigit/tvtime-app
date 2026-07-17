@@ -11,7 +11,9 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:create-user": "tsx scripts/create-user.ts"
+    "db:create-user": "tsx scripts/create-user.ts",
+    "db:keepalive": "tsx scripts/db-keepalive.ts",
+    "db:rename-user": "tsx scripts/rename-user.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

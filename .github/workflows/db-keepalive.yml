@@ -1,0 +1,40 @@
+# Pings the deployed app health endpoint so Railway Postgres stays warm.
+# Requires repo secrets:
+#   APP_URL              e.g. https://your-app.up.railway.app  (no trailing slash)
+#   HEALTH_CRON_SECRET   optional; must match env on the app if you set it
+#
+# Schedule: every 10 minutes. Adjust as needed (min GitHub interval is every 5 min).
+
+name: DB keep-alive
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch: # manual run from Actions tab
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /api/health
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          HEALTH_CRON_SECRET: ${{ secrets.HEALTH_CRON_SECRET }}
+        run: |
+          if [ -z "$APP_URL" ]; then
+            echo "Set repository secret APP_URL to your deployed app origin."
+            exit 1
+          fi
+          URL="${APP_URL%/}/api/health"
+          if [ -n "$HEALTH_CRON_SECRET" ]; then
+            URL="${URL}?secret=${HEALTH_CRON_SECRET}"
+          fi
+          echo "GET $APP_URL/api/health"
+          code=$(curl -sS -o /tmp/health.json -w "%{http_code}" --max-time 60 "$URL" || true)
+          cat /tmp/health.json || true
+          echo ""
+          if [ "$code" != "200" ]; then
+            echo "Health check failed with HTTP $code"
+            exit 1
+          fi
+          echo "OK"

@@ -1,8 +1,9 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { watchedEpisodes, userShows } from "@/lib/schema";
-import { eq, and, sql } from "drizzle-orm";
+import { watchedEpisodes, userShows, episodes } from "@/lib/schema";
+import { eq, and } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { isEpisodeAired } from "@/lib/show-progress";
 
 type WatchItem = {
   showTmdbId: number;
@@ -26,15 +27,49 @@ export async function POST(request: Request) {
 
   const showTmdbId = items[0].showTmdbId;
 
-  for (const { showTmdbId: sid, seasonNumber, episodeNumber, watched } of items) {
-    if (sid !== showTmdbId) {
+  for (const item of items) {
+    if (item.showTmdbId !== showTmdbId) {
       return NextResponse.json(
         { error: "All batch items must belong to the same show" },
         { status: 400 }
       );
     }
+  }
 
+  // Load air dates for any mark-watched requests so we reject unaired eps
+  const toMark = items.filter((i) => i.watched);
+  const airDateByKey = new Map<string, string | null>();
+
+  if (toMark.length > 0) {
+    const showEps = await db
+      .select({
+        seasonNumber: episodes.seasonNumber,
+        episodeNumber: episodes.episodeNumber,
+        airDate: episodes.airDate,
+      })
+      .from(episodes)
+      .where(eq(episodes.showTmdbId, showTmdbId));
+
+    for (const ep of showEps) {
+      airDateByKey.set(
+        `${ep.seasonNumber}:${ep.episodeNumber}`,
+        ep.airDate
+      );
+    }
+  }
+
+  const skippedUnaired: string[] = [];
+
+  for (const { showTmdbId: sid, seasonNumber, episodeNumber, watched } of items) {
     if (watched) {
+      const key = `${seasonNumber}:${episodeNumber}`;
+      const airDate = airDateByKey.get(key);
+      // If we have catalog data and it hasn't aired, skip (don't mark)
+      if (airDateByKey.has(key) && !isEpisodeAired(airDate)) {
+        skippedUnaired.push(`S${seasonNumber}E${episodeNumber}`);
+        continue;
+      }
+
       await db
         .insert(watchedEpisodes)
         .values({
@@ -82,11 +117,14 @@ export async function POST(request: Request) {
     );
 
   const count = watchedRows.length;
-  const lastWatched = watchedRows.sort(
-    (a, b) =>
-      a.seasonNumber * 1000 + a.episodeNumber -
-      (b.seasonNumber * 1000 + b.episodeNumber)
-  ).at(-1);
+  const lastWatched = watchedRows
+    .sort(
+      (a, b) =>
+        a.seasonNumber * 1000 +
+        a.episodeNumber -
+        (b.seasonNumber * 1000 + b.episodeNumber)
+    )
+    .at(-1);
 
   await db
     .update(userShows)
@@ -97,7 +135,15 @@ export async function POST(request: Request) {
       episodesWatched: count,
       updatedAt: new Date(),
     })
-    .where(and(eq(userShows.userId, session.user.id), eq(userShows.tmdbId, showTmdbId)));
+    .where(
+      and(
+        eq(userShows.userId, session.user.id),
+        eq(userShows.tmdbId, showTmdbId)
+      )
+    );
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({
+    success: true,
+    skippedUnaired: skippedUnaired.length > 0 ? skippedUnaired : undefined,
+  });
 }

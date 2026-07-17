@@ -10,5 +10,14 @@ export function Providers({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  return <SessionProvider>{children}</SessionProvider>;
+  return (
+    <SessionProvider
+      // Avoid spamming GET /api/auth/session on every focus/nav
+      refetchOnWindowFocus={false}
+      refetchWhenOffline={false}
+      refetchInterval={0}
+    >
+      {children}
+    </SessionProvider>
+  );
 }

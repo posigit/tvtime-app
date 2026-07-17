@@ -2,18 +2,33 @@
 
 import { useState } from "react";
 import { EpisodeRow, EpisodeData } from "./episode-row";
+import {
+  compareEpisodeOrder,
+  isEpisodeAired,
+} from "@/lib/show-progress";
+
+function watchKey(seasonNumber: number, episodeNumber: number) {
+  return `${seasonNumber}:${episodeNumber}`;
+}
 
 export function SeasonEpisodeList({
   episodes,
+  allEpisodes,
   showTmdbId,
 }: {
+  /** Episodes for the currently selected season (UI list). */
   episodes: EpisodeData[];
+  /**
+   * All seasons' episodes for this show — used so "Mark previous" can cover
+   * S1E1 … S{n}E{m}, not only the current season.
+   */
+  allEpisodes: EpisodeData[];
   showTmdbId: number;
 }) {
-  const [watchedMap, setWatchedMap] = useState<Record<number, boolean>>(() => {
-    const map: Record<number, boolean> = {};
-    for (const ep of episodes) {
-      map[ep.episodeNumber] = ep.watched;
+  const [watchedMap, setWatchedMap] = useState<Record<string, boolean>>(() => {
+    const map: Record<string, boolean> = {};
+    for (const ep of allEpisodes) {
+      map[watchKey(ep.seasonNumber, ep.episodeNumber)] = ep.watched;
     }
     return map;
   });
@@ -21,11 +36,20 @@ export function SeasonEpisodeList({
   const [targetEpisode, setTargetEpisode] = useState<EpisodeData | null>(null);
   const [pending, setPending] = useState(false);
 
-  const openDialog = (episode: EpisodeData) => {
-    const previousUnwatched = episodes.filter(
-      (ep) => ep.episodeNumber < episode.episodeNumber && !watchedMap[ep.episodeNumber]
+  const isWatched = (ep: EpisodeData) =>
+    watchedMap[watchKey(ep.seasonNumber, ep.episodeNumber)] ?? false;
+
+  /** All earlier episodes (any season) that are aired and still unwatched. */
+  const getPreviousUnwatchedAired = (episode: EpisodeData) =>
+    allEpisodes.filter(
+      (ep) =>
+        compareEpisodeOrder(ep, episode) < 0 &&
+        !isWatched(ep) &&
+        isEpisodeAired(ep.airDate)
     );
-    if (previousUnwatched.length === 0) {
+
+  const openDialog = (episode: EpisodeData) => {
+    if (getPreviousUnwatchedAired(episode).length === 0) {
       return false;
     }
     setTargetEpisode(episode);
@@ -33,66 +57,120 @@ export function SeasonEpisodeList({
     return true;
   };
 
-  const handleToggle = async (episode: EpisodeData, watched: boolean) => {
-    if (watched && openDialog(episode)) {
-      // Dialog will handle the actual API call if confirmed
+  const postWatch = async (
+    items: {
+      showTmdbId: number;
+      seasonNumber: number;
+      episodeNumber: number;
+      watched: boolean;
+    }[]
+  ) => {
+    const res = await fetch("/api/watch", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(
+        items.length === 1 ? items[0] : { episodes: items }
+      ),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || "Failed to update watch status");
+    }
+  };
+
+  const markSingle = async (episode: EpisodeData, watched: boolean) => {
+    if (watched && !isEpisodeAired(episode.airDate)) {
       return;
     }
 
-    setWatchedMap((prev) => ({ ...prev, [episode.episodeNumber]: watched }));
-    await fetch("/api/watch", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        showTmdbId,
-        seasonNumber: episode.seasonNumber,
-        episodeNumber: episode.episodeNumber,
-        watched,
-      }),
-    });
+    const key = watchKey(episode.seasonNumber, episode.episodeNumber);
+    setWatchedMap((prev) => ({ ...prev, [key]: watched }));
+
+    try {
+      await postWatch([
+        {
+          showTmdbId,
+          seasonNumber: episode.seasonNumber,
+          episodeNumber: episode.episodeNumber,
+          watched,
+        },
+      ]);
+    } catch {
+      setWatchedMap((prev) => ({
+        ...prev,
+        [key]: episode.watched,
+      }));
+    }
+  };
+
+  const handleToggle = async (episode: EpisodeData, watched: boolean) => {
+    if (watched && !isEpisodeAired(episode.airDate)) {
+      return;
+    }
+
+    if (watched && openDialog(episode)) {
+      // Dialog will mark single or range
+      return;
+    }
+
+    await markSingle(episode, watched);
+  };
+
+  const markJustTarget = async () => {
+    if (!targetEpisode) return;
+    setPending(true);
+    setDialogOpen(false);
+    try {
+      await markSingle(targetEpisode, true);
+    } finally {
+      setPending(false);
+      setTargetEpisode(null);
+    }
   };
 
   const markPrevious = async () => {
     if (!targetEpisode) return;
+    if (!isEpisodeAired(targetEpisode.airDate)) {
+      setDialogOpen(false);
+      setTargetEpisode(null);
+      return;
+    }
+
     setPending(true);
 
-    const items = episodes
+    // S1E1 … target (inclusive), aired only, currently unwatched
+    const items = allEpisodes
       .filter(
         (ep) =>
-          ep.episodeNumber <= targetEpisode.episodeNumber &&
-          !watchedMap[ep.episodeNumber]
+          compareEpisodeOrder(ep, targetEpisode) <= 0 &&
+          !isWatched(ep) &&
+          isEpisodeAired(ep.airDate)
       )
       .map((ep) => ({
         showTmdbId,
         seasonNumber: ep.seasonNumber,
         episodeNumber: ep.episodeNumber,
-        watched: true,
+        watched: true as const,
       }));
 
     const nextMap = { ...watchedMap };
-    for (const ep of episodes) {
-      if (ep.episodeNumber <= targetEpisode.episodeNumber) {
-        nextMap[ep.episodeNumber] = true;
-      }
+    for (const item of items) {
+      nextMap[watchKey(item.seasonNumber, item.episodeNumber)] = true;
     }
     setWatchedMap(nextMap);
     setDialogOpen(false);
 
     try {
-      await fetch("/api/watch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ episodes: items }),
-      });
-    } catch (err) {
-      // Revert on error
+      if (items.length > 0) {
+        await postWatch(items);
+      }
+    } catch {
+      // Revert optimistic updates for this batch
       setWatchedMap((prev) => {
         const reverted = { ...prev };
-        for (const ep of episodes) {
-          if (ep.episodeNumber <= targetEpisode.episodeNumber) {
-            reverted[ep.episodeNumber] = episodes.find(
-              (e) => e.episodeNumber === ep.episodeNumber
-            )?.watched ?? false;
+        for (const ep of allEpisodes) {
+          if (compareEpisodeOrder(ep, targetEpisode) <= 0) {
+            reverted[watchKey(ep.seasonNumber, ep.episodeNumber)] = ep.watched;
           }
         }
         return reverted;
@@ -104,18 +182,30 @@ export function SeasonEpisodeList({
   };
 
   const previousCount = targetEpisode
-    ? episodes.filter(
-        (ep) => ep.episodeNumber < targetEpisode.episodeNumber && !watchedMap[ep.episodeNumber]
-      ).length
+    ? getPreviousUnwatchedAired(targetEpisode).length
     : 0;
+
+  const previousLabel =
+    targetEpisode && previousCount > 0
+      ? (() => {
+          const prev = getPreviousUnwatchedAired(targetEpisode);
+          const first = prev[0];
+          return first
+            ? `from S${first.seasonNumber}E${first.episodeNumber} through S${targetEpisode.seasonNumber}E${targetEpisode.episodeNumber}`
+            : "";
+        })()
+      : "";
 
   return (
     <>
       <div className="mt-4 space-y-2">
         {episodes.map((ep) => (
           <EpisodeRow
-            key={ep.episodeNumber}
-            episode={{ ...ep, watched: watchedMap[ep.episodeNumber] ?? false }}
+            key={`${ep.seasonNumber}-${ep.episodeNumber}`}
+            episode={{
+              ...ep,
+              watched: isWatched(ep),
+            }}
             showTmdbId={showTmdbId}
             onToggle={(watched) => handleToggle(ep, watched)}
           />
@@ -134,26 +224,29 @@ export function SeasonEpisodeList({
               Mark previous episodes?
             </p>
             <p className="mb-6 text-sm text-muted-foreground">
-              You watched episode {targetEpisode.episodeNumber} but there are{" "}
-              {previousCount} earlier unwatched episodes. Mark them as watched too?
+              You&apos;re marking S{targetEpisode.seasonNumber}E
+              {targetEpisode.episodeNumber}, but there {previousCount === 1 ? "is" : "are"}{" "}
+              {previousCount} earlier unwatched episode
+              {previousCount === 1 ? "" : "s"}
+              {previousLabel ? ` (${previousLabel})` : ""}. Mark them as watched
+              too? Only episodes that have already aired will be marked.
             </p>
             <div className="flex gap-3">
               <button
-                onClick={() => {
-                  setDialogOpen(false);
-                  setTargetEpisode(null);
-                }}
+                type="button"
+                onClick={markJustTarget}
                 disabled={pending}
                 className="flex-1 rounded-full border border-white/20 py-3 text-sm font-medium text-white"
               >
-                No
+                Just this one
               </button>
               <button
+                type="button"
                 onClick={markPrevious}
                 disabled={pending}
                 className="flex-1 rounded-full bg-primary py-3 text-sm font-bold text-black"
               >
-                Yes
+                Yes, mark all
               </button>
             </div>
           </div>

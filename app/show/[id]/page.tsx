@@ -41,22 +41,30 @@ export default async function ShowDetailPage({
   const [allEpisodes, watched] = await Promise.all([
     ensureEpisodes(tmdbId, show.numberOfSeasons),
     db
-      .select({ episodeNumber: watchedEpisodes.episodeNumber })
+      .select({
+        seasonNumber: watchedEpisodes.seasonNumber,
+        episodeNumber: watchedEpisodes.episodeNumber,
+      })
       .from(watchedEpisodes)
       .where(
         and(
           eq(watchedEpisodes.userId, userId),
-          eq(watchedEpisodes.showTmdbId, tmdbId),
-          eq(watchedEpisodes.seasonNumber, selectedSeason)
+          eq(watchedEpisodes.showTmdbId, tmdbId)
         )
       ),
   ]);
 
-  const seasonEpisodes = allEpisodes.filter((ep) => ep.seasonNumber === selectedSeason);
-  const watchedSet = new Set(watched.map((w) => w.episodeNumber));
+  const watchedSet = new Set(
+    watched.map((w) => `${w.seasonNumber}:${w.episodeNumber}`)
+  );
 
-  const episodeData: EpisodeData[] = seasonEpisodes
-    .sort((a, b) => a.episodeNumber - b.episodeNumber)
+  const allEpisodeData: EpisodeData[] = allEpisodes
+    .slice()
+    .sort((a, b) =>
+      a.seasonNumber !== b.seasonNumber
+        ? a.seasonNumber - b.seasonNumber
+        : a.episodeNumber - b.episodeNumber
+    )
     .map((ep) => ({
       episodeNumber: ep.episodeNumber,
       seasonNumber: ep.seasonNumber,
@@ -65,8 +73,12 @@ export default async function ShowDetailPage({
       airDate: ep.airDate ?? undefined,
       stillPath: ep.stillPath ?? null,
       runtime: ep.runtime ?? undefined,
-      watched: watchedSet.has(ep.episodeNumber),
+      watched: watchedSet.has(`${ep.seasonNumber}:${ep.episodeNumber}`),
     }));
+
+  const episodeData = allEpisodeData.filter(
+    (ep) => ep.seasonNumber === selectedSeason
+  );
 
   const totalSeasons = show.numberOfSeasons || 1;
   const seasons = Array.from({ length: totalSeasons }, (_, i) => i + 1);
@@ -169,7 +181,11 @@ export default async function ShowDetailPage({
           ))}
         </div>
 
-        <SeasonEpisodeList episodes={episodeData} showTmdbId={tmdbId} />
+        <SeasonEpisodeList
+          episodes={episodeData}
+          allEpisodes={allEpisodeData}
+          showTmdbId={tmdbId}
+        />
       </div>
     </div>
   );

@@ -8,6 +8,60 @@ import { posterUrl } from "@/lib/tmdb";
 import Link from "next/link";
 import Image from "next/image";
 
+function PopcornEmptyState({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center pt-24 text-center">
+      {/* Popcorn-style illustration (CSS/SVG, matches snapshot empty state vibe) */}
+      <div className="relative mb-6 flex h-28 w-28 items-center justify-center">
+        <div className="absolute inset-0 rounded-full bg-emerald-500/90" />
+        <svg
+          width="72"
+          height="72"
+          viewBox="0 0 72 72"
+          className="relative z-10"
+          aria-hidden
+        >
+          {/* Bucket */}
+          <path
+            d="M18 30 L22 62 H50 L54 30 Z"
+            fill="#e11d2e"
+            stroke="#fff"
+            strokeWidth="1.5"
+          />
+          <path d="M22 30 L25 62 H33 L30 30 Z" fill="#fff" opacity="0.95" />
+          <path d="M39 30 L42 62 H50 L47 30 Z" fill="#fff" opacity="0.95" />
+          <ellipse cx="36" cy="30" rx="20" ry="6" fill="#e11d2e" />
+          {/* Popcorn kernels */}
+          <circle cx="28" cy="22" r="5" fill="#fbbf24" />
+          <circle cx="36" cy="18" r="6" fill="#fcd34d" />
+          <circle cx="44" cy="22" r="5" fill="#fbbf24" />
+          <circle cx="32" cy="26" r="4" fill="#fde68a" />
+          <circle cx="40" cy="26" r="4" fill="#fcd34d" />
+          {/* Sparkles */}
+          <circle cx="16" cy="16" r="2" fill="#a3e635" />
+          <circle cx="56" cy="14" r="2" fill="#c084fc" />
+          <circle cx="52" cy="28" r="1.5" fill="#f472b6" />
+          <circle cx="20" cy="28" r="1.5" fill="#38bdf8" />
+        </svg>
+      </div>
+      <h2 className="mb-2 text-lg font-bold text-white">{title}</h2>
+      <p className="mb-6 max-w-xs text-sm text-muted-foreground">{description}</p>
+      <Link
+        href="/explore"
+        className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-black"
+      >
+        BROWSE ALL MOVIES
+      </Link>
+    </div>
+  );
+}
+
 export default async function MoviesPage({
   searchParams,
 }: {
@@ -64,7 +118,7 @@ export default async function MoviesPage({
                     href={`/movie/${movie.tmdbId}`}
                     className="overflow-hidden rounded-lg bg-card"
                   >
-                    <div style={{aspectRatio:"2 / 3"}} className="relative bg-secondary">
+                    <div style={{ aspectRatio: "2 / 3" }} className="relative bg-secondary">
                       {movie.posterPath ? (
                         <Image
                           src={posterUrl(movie.posterPath, "w342") ?? ""}
@@ -98,7 +152,7 @@ export default async function MoviesPage({
                     href={`/movie/${movie.tmdbId}`}
                     className="overflow-hidden rounded-lg bg-card"
                   >
-                    <div style={{aspectRatio:"2 / 3"}} className="relative bg-secondary">
+                    <div style={{ aspectRatio: "2 / 3" }} className="relative bg-secondary">
                       {movie.posterPath ? (
                         <Image
                           src={posterUrl(movie.posterPath, "w342") ?? ""}
@@ -121,69 +175,19 @@ export default async function MoviesPage({
           )}
 
           {userMoviesList.length === 0 && (
-            <div className="flex flex-col items-center justify-center pt-24 text-center">
-              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-card">
-                <svg
-                  width="32"
-                  height="32"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className="text-muted-foreground"
-                >
-                  <rect x="2" y="2" width="20" height="20" rx="2.18" />
-                  <line x1="7" y1="2" x2="7" y2="22" />
-                  <line x1="17" y1="2" x2="17" y2="22" />
-                  <line x1="2" y1="12" x2="22" y2="12" />
-                  <line x1="2" y1="7" x2="7" y2="7" />
-                  <line x1="2" y1="17" x2="7" y2="17" />
-                  <line x1="17" y1="17" x2="22" y2="17" />
-                  <line x1="17" y1="7" x2="22" y2="7" />
-                </svg>
-              </div>
-              <h2 className="mb-2 text-lg font-bold text-white">No movies yet</h2>
-              <p className="mb-6 max-w-xs text-sm text-muted-foreground">
-                Browse popular movies and add them to your watch list.
-              </p>
-              <Link
-                href="/explore"
-                className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-black"
-              >
-                BROWSE ALL MOVIES
-              </Link>
-            </div>
+            <PopcornEmptyState
+              title="Your watch list is empty!"
+              description="Add movies you want to watch."
+            />
           )}
         </>
       )}
 
       {currentView === "upcoming" && (
-        <div className="flex flex-col items-center justify-center pt-24 text-center">
-          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-card">
-            <svg
-              width="32"
-              height="32"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              className="text-muted-foreground"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12 6 12 12 16 14" />
-            </svg>
-          </div>
-          <h2 className="mb-2 text-lg font-bold text-white">No upcoming movies</h2>
-          <p className="mb-6 max-w-xs text-sm text-muted-foreground">
-            Movies you want to watch will appear here.
-          </p>
-          <Link
-            href="/explore"
-            className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-black"
-          >
-            BROWSE ALL MOVIES
-          </Link>
-        </div>
+        <PopcornEmptyState
+          title="Your upcoming list is empty!"
+          description="Add movies you want to watch."
+        />
       )}
     </div>
   );

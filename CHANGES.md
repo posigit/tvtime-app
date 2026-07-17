@@ -150,3 +150,32 @@ npm run dev
 - `components/movie-watch-button.tsx`
 - `components/search-bar.tsx`
 - `components/show-list-item.tsx`
+
+---
+
+## Parity pass (post-review vs original plan + `/snapshots`)
+
+Closes gaps found when comparing Chunks 1–3 to the original Phases 1–8 plan and the original TV Time screenshots in `../snapshots/`.
+
+### Shows Upcoming (Phase 4)
+- Calendar date headers (`3 JUL 2026` style) instead of relative buckets.
+- **Premiere** badge on E01; **Latest** badge on most-recent already-aired row per show.
+- Future episodes show a countdown chip instead of mark-watched.
+- Already-aired unwatched episodes keep mark-watched.
+- `computeUpcomingEpisodes` now includes future air dates plus recently aired (last 7 days) so users can scroll back.
+
+### Movies empty (Phase 6)
+- Popcorn-style empty illustration + copy + **BROWSE ALL MOVIES** when watchlist/upcoming is empty.
+
+### Profile (Phase 7)
+- Snapshot-like layout: centered username header, lists CTA, horizontal **Shows** / **Favorite shows** / **Movies** / **Favorite movies** carousels.
+- Personal stats only (no social following/followers/feed — intentional non-goal).
+
+### Hardening
+- `ensure.ts`: background parent-show ensure before episode insert; on FK failure re-insert parent then retry episodes.
+- `search-bar.tsx`: module-level LRU cache (20 queries) for debounced TMDB search.
+
+### Intentional non-goals
+- No social FEED / GROUPS / ACTIVITY (original Explore feed often fails; out of scope).
+- Movies Upcoming remains an empty stub until a real release-date pipeline is added.
+- Username rename: run `npx tsx scripts/rename-user.ts admin posi` when needed (script already exists).

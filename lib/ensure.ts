@@ -1,17 +1,40 @@
-import { db } from "./db";
+import { db, withDbRetry } from "./db";
 import { shows, movies, episodes } from "./schema";
 import { getTvDetails, getMovieDetails, getTvSeason } from "./tmdb";
 import { eq } from "drizzle-orm";
 
-export async function ensureShow(tmdbId: number) {
-  const existing = await db.query.shows.findFirst({
-    where: eq(shows.tmdbId, tmdbId),
-  });
-  if (existing) return existing;
+type ShowRow = {
+  tmdbId: number;
+  title: string;
+  posterPath: string | null;
+  backdropPath: string | null;
+  firstAirDate: string | null;
+  lastAirDate: string | null;
+  status: string | null;
+  overview: string | null;
+  networks: string[] | null;
+  numberOfSeasons: number | null;
+  numberOfEpisodes: number | null;
+  episodeRuntime: number | null;
+  voteAverage: number | null;
+  tmdbData: unknown;
+};
 
-  const details = await getTvDetails(tmdbId);
+type MovieRow = {
+  tmdbId: number;
+  title: string;
+  posterPath: string | null;
+  backdropPath: string | null;
+  releaseDate: string | null;
+  runtime: number | null;
+  status: string | null;
+  overview: string | null;
+  voteAverage: number | null;
+  tmdbData: unknown;
+};
 
-  const show = {
+function showFromTmdb(tmdbId: number, details: Awaited<ReturnType<typeof getTvDetails>>): ShowRow {
+  return {
     tmdbId,
     title: details.name,
     posterPath: details.poster_path ?? null,
@@ -27,22 +50,13 @@ export async function ensureShow(tmdbId: number) {
     voteAverage: details.vote_average ?? null,
     tmdbData: details,
   };
-
-  // Save to DB in the background — data is already in memory, don't block render
-  db.insert(shows).values(show).onConflictDoNothing().catch(() => {});
-
-  return show;
 }
 
-export async function ensureMovie(tmdbId: number) {
-  const existing = await db.query.movies.findFirst({
-    where: eq(movies.tmdbId, tmdbId),
-  });
-  if (existing) return existing;
-
-  const details = await getMovieDetails(tmdbId);
-
-  const movie = {
+function movieFromTmdb(
+  tmdbId: number,
+  details: Awaited<ReturnType<typeof getMovieDetails>>
+): MovieRow {
+  return {
     tmdbId,
     title: details.title,
     posterPath: details.poster_path ?? null,
@@ -54,9 +68,72 @@ export async function ensureMovie(tmdbId: number) {
     voteAverage: details.vote_average ?? null,
     tmdbData: details,
   };
+}
 
-  // Save to DB in the background — data is already in memory, don't block render
-  db.insert(movies).values(movie).onConflictDoNothing().catch(() => {});
+function persistShow(show: ShowRow) {
+  return db.insert(shows).values(show).onConflictDoNothing();
+}
+
+function persistMovie(movie: MovieRow) {
+  return db.insert(movies).values(movie).onConflictDoNothing();
+}
+
+/**
+ * Return show from DB cache or TMDB.
+ * Transient DB failures are retried; if DB stays down, still returns TMDB data
+ * so the page does not hard-crash (render-first).
+ */
+export async function ensureShow(tmdbId: number) {
+  try {
+    const existing = await withDbRetry(() =>
+      db.query.shows.findFirst({
+        where: eq(shows.tmdbId, tmdbId),
+      })
+    );
+    if (existing) return existing;
+  } catch (err) {
+    console.error(
+      `ensureShow: DB lookup failed for ${tmdbId}, falling back to TMDB:`,
+      err instanceof Error ? err.message : err
+    );
+  }
+
+  const details = await getTvDetails(tmdbId);
+  const show = showFromTmdb(tmdbId, details);
+
+  // Background save — do not block render
+  void withDbRetry(() => persistShow(show))
+    .then(() => undefined)
+    .catch((err) => {
+      console.error(`Failed to persist show ${tmdbId}:`, err);
+    });
+
+  return show;
+}
+
+export async function ensureMovie(tmdbId: number) {
+  try {
+    const existing = await withDbRetry(() =>
+      db.query.movies.findFirst({
+        where: eq(movies.tmdbId, tmdbId),
+      })
+    );
+    if (existing) return existing;
+  } catch (err) {
+    console.error(
+      `ensureMovie: DB lookup failed for ${tmdbId}, falling back to TMDB:`,
+      err instanceof Error ? err.message : err
+    );
+  }
+
+  const details = await getMovieDetails(tmdbId);
+  const movie = movieFromTmdb(tmdbId, details);
+
+  void withDbRetry(() => persistMovie(movie))
+    .then(() => undefined)
+    .catch((err) => {
+      console.error(`Failed to persist movie ${tmdbId}:`, err);
+    });
 
   return movie;
 }
@@ -74,11 +151,16 @@ export type EpisodeInfo = {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/**
+ * Persist episodes in the background. On FK failure (parent show not ready),
+ * re-fetch/insert the parent show once, then retry episodes with backoff.
+ */
 function saveEpisodesWithRetry(
   tmdbId: number,
   fetchedEpisodes: EpisodeInfo[],
   attempts = 5,
-  delay = 100
+  delay = 100,
+  triedParent = false
 ) {
   if (fetchedEpisodes.length === 0) return;
 
@@ -88,10 +170,38 @@ function saveEpisodesWithRetry(
     .then(() => {
       console.log(`Persisted ${fetchedEpisodes.length} episodes for show ${tmdbId}`);
     })
-    .catch((err) => {
+    .catch(async (err) => {
+      if (!triedParent) {
+        try {
+          const details = await getTvDetails(tmdbId);
+          await withDbRetry(() => persistShow(showFromTmdb(tmdbId, details)));
+        } catch (parentErr) {
+          console.error(`Failed to re-persist parent show ${tmdbId}:`, parentErr);
+        }
+        setTimeout(
+          () =>
+            saveEpisodesWithRetry(
+              tmdbId,
+              fetchedEpisodes,
+              attempts - 1,
+              delay * 1.5,
+              true
+            ),
+          delay
+        );
+        return;
+      }
+
       if (attempts > 0) {
         setTimeout(
-          () => saveEpisodesWithRetry(tmdbId, fetchedEpisodes, attempts - 1, delay * 1.5),
+          () =>
+            saveEpisodesWithRetry(
+              tmdbId,
+              fetchedEpisodes,
+              attempts - 1,
+              delay * 1.5,
+              true
+            ),
           delay
         );
       } else {
@@ -100,32 +210,10 @@ function saveEpisodesWithRetry(
     });
 }
 
-export async function ensureEpisodes(
+async function fetchEpisodesFromTmdb(
   tmdbId: number,
-  numberOfSeasons: number | null
+  numberOfSeasons: number
 ): Promise<EpisodeInfo[]> {
-  const existing = await db
-    .select({
-      showTmdbId: episodes.showTmdbId,
-      seasonNumber: episodes.seasonNumber,
-      episodeNumber: episodes.episodeNumber,
-      title: episodes.title,
-      overview: episodes.overview,
-      airDate: episodes.airDate,
-      stillPath: episodes.stillPath,
-      runtime: episodes.runtime,
-    })
-    .from(episodes)
-    .where(eq(episodes.showTmdbId, tmdbId));
-
-  if (existing.length > 0) {
-    return existing;
-  }
-
-  if (!numberOfSeasons || numberOfSeasons <= 0) {
-    return [];
-  }
-
   const fetchedEpisodes: EpisodeInfo[] = [];
 
   for (let seasonNumber = 1; seasonNumber <= numberOfSeasons; seasonNumber++) {
@@ -152,8 +240,63 @@ export async function ensureEpisodes(
     }
   }
 
-  // Persist in the background with retry so a slow parent-row insert doesn't block render
-  saveEpisodesWithRetry(tmdbId, fetchedEpisodes);
+  return fetchedEpisodes;
+}
+
+export async function ensureEpisodes(
+  tmdbId: number,
+  numberOfSeasons: number | null
+): Promise<EpisodeInfo[]> {
+  try {
+    const existing = await withDbRetry(() =>
+      db
+        .select({
+          showTmdbId: episodes.showTmdbId,
+          seasonNumber: episodes.seasonNumber,
+          episodeNumber: episodes.episodeNumber,
+          title: episodes.title,
+          overview: episodes.overview,
+          airDate: episodes.airDate,
+          stillPath: episodes.stillPath,
+          runtime: episodes.runtime,
+        })
+        .from(episodes)
+        .where(eq(episodes.showTmdbId, tmdbId))
+    );
+
+    if (existing.length > 0) {
+      return existing;
+    }
+  } catch (err) {
+    console.error(
+      `ensureEpisodes: DB lookup failed for ${tmdbId}, falling back to TMDB:`,
+      err instanceof Error ? err.message : err
+    );
+  }
+
+  if (!numberOfSeasons || numberOfSeasons <= 0) {
+    return [];
+  }
+
+  const fetchedEpisodes = await fetchEpisodesFromTmdb(tmdbId, numberOfSeasons);
+
+  // Ensure parent exists first in background chain, then episodes with retry
+  void (async () => {
+    try {
+      const existingShow = await withDbRetry(() =>
+        db.query.shows.findFirst({
+          where: eq(shows.tmdbId, tmdbId),
+        })
+      );
+      if (!existingShow) {
+        const details = await getTvDetails(tmdbId);
+        await withDbRetry(() => persistShow(showFromTmdb(tmdbId, details)));
+      }
+    } catch (err) {
+      console.error(`Background parent ensure failed for ${tmdbId}:`, err);
+    }
+    saveEpisodesWithRetry(tmdbId, fetchedEpisodes);
+  })();
 
   return fetchedEpisodes;
 }

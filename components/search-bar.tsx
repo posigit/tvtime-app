@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { posterUrl } from "@/lib/tmdb";
 import Link from "next/link";
@@ -18,16 +17,36 @@ type SearchResult = {
   media_type?: string;
 };
 
+/** Module-level cache so remounts still hit recent queries */
+const searchCache = new Map<string, SearchResult[]>();
+const SEARCH_CACHE_MAX = 20;
+
+function cacheSearchResults(key: string, results: SearchResult[]) {
+  if (searchCache.has(key)) searchCache.delete(key);
+  searchCache.set(key, results);
+  if (searchCache.size > SEARCH_CACHE_MAX) {
+    const oldest = searchCache.keys().next().value;
+    if (oldest !== undefined) searchCache.delete(oldest);
+  }
+}
+
 export function SearchBar() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
-    if (query.trim().length < 2) {
+    const q = query.trim().toLowerCase();
+    if (q.length < 2) {
       setResults([]);
+      return;
+    }
+
+    const cached = searchCache.get(q);
+    if (cached) {
+      setResults(cached);
+      setLoading(false);
       return;
     }
 
@@ -35,14 +54,14 @@ export function SearchBar() {
       setLoading(true);
       try {
         const res = await fetch(
-          `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY || ""}&query=${encodeURIComponent(query)}`
+          `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY || ""}&query=${encodeURIComponent(query.trim())}`
         );
         const data = await res.json();
-        setResults(
-          (data.results || [])
-            .filter((r: SearchResult) => r.media_type === "tv" || r.media_type === "movie")
-            .slice(0, 10)
-        );
+        const next = (data.results || [])
+          .filter((r: SearchResult) => r.media_type === "tv" || r.media_type === "movie")
+          .slice(0, 10);
+        cacheSearchResults(q, next);
+        setResults(next);
       } catch (err) {
         console.error("Search failed:", err);
       } finally {
