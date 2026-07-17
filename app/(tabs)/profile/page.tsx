@@ -1,11 +1,12 @@
 import { auth, requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { shows, movies, userShows, userMovies, watchedEpisodes, userLists } from "@/lib/schema";
-import { eq, sql, count } from "drizzle-orm";
+import { eq, sql, count, desc } from "drizzle-orm";
 import { posterUrl } from "@/lib/tmdb";
 import Link from "next/link";
 import Image from "next/image";
-import { Bell, Heart } from "lucide-react";
+import { Bell, Heart, Film, Tv, Clock, Settings } from "lucide-react";
+import { LogoutButton } from "@/components/logout-button";
 
 export default async function ProfilePage() {
   const userId = await requireAuth();
@@ -42,9 +43,9 @@ export default async function ProfilePage() {
     })
     .from(userShows)
     .innerJoin(shows, eq(userShows.tmdbId, shows.tmdbId))
-    .where(eq(userShows.userId, userId));
-
-  const favShows = favoriteShows.filter((s) => true).slice(0, 12);
+    .where(eq(userShows.userId, userId))
+    .orderBy(desc(userShows.updatedAt))
+    .limit(12);
 
   const favoriteMovies = await db
     .select({
@@ -54,78 +55,115 @@ export default async function ProfilePage() {
     })
     .from(userMovies)
     .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
-    .where(eq(userMovies.userId, userId));
-
-  const favMovies = favoriteMovies.slice(0, 12);
+    .where(eq(userMovies.userId, userId))
+    .orderBy(desc(userMovies.updatedAt))
+    .limit(12);
 
   const lists = await db
     .select()
     .from(userLists)
     .where(eq(userLists.userId, userId));
 
+  const initial = session?.user?.name?.[0]?.toUpperCase() || "U";
+  const name = session?.user?.name || "User";
+
   return (
-    <div className="min-h-screen bg-black px-4 py-4">
+    <div className="min-h-screen bg-black px-4 py-4 pb-24">
+      {/* Header */}
       <div className="mb-6 flex items-center justify-between">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary">
-          <Bell className="h-5 w-5 text-black" />
-        </div>
+        <h1 className="text-lg font-bold text-white">Profile</h1>
+        <button className="flex h-10 w-10 items-center justify-center rounded-full bg-card text-muted-foreground">
+          <Bell className="h-5 w-5" />
+        </button>
       </div>
 
+      {/* Avatar + Name */}
       <div className="mb-6 flex flex-col items-center">
-        <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-card text-3xl font-bold text-primary">
-          {session?.user?.name?.[0]?.toUpperCase() || "U"}
+        <div className="mb-3 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/5 text-3xl font-bold text-primary ring-2 ring-primary/20">
+          {initial}
         </div>
-        <h1 className="text-xl font-bold text-white">{session?.user?.name || "User"}</h1>
+        <h2 className="text-xl font-bold text-white">{name}</h2>
+        <p className="text-sm text-muted-foreground">TV Time member</p>
       </div>
 
-      <div className="mb-6 grid grid-cols-3 gap-3">
-        <div className="rounded-xl bg-card p-4 text-center">
-          <p className="text-2xl font-bold text-primary">{showCount?.value || 0}</p>
-          <p className="text-xs text-muted-foreground">Shows</p>
+      {/* Stats */}
+      <div className="mb-6 grid grid-cols-4 gap-2">
+        <div className="rounded-xl bg-card p-3 text-center">
+          <p className="text-lg font-bold text-primary">{showCount?.value || 0}</p>
+          <p className="text-[10px] text-muted-foreground">Shows</p>
         </div>
-        <div className="rounded-xl bg-card p-4 text-center">
-          <p className="text-2xl font-bold text-primary">{movieCount?.value || 0}</p>
-          <p className="text-xs text-muted-foreground">Movies</p>
+        <div className="rounded-xl bg-card p-3 text-center">
+          <p className="text-lg font-bold text-primary">{movieCount?.value || 0}</p>
+          <p className="text-[10px] text-muted-foreground">Movies</p>
         </div>
-        <div className="rounded-xl bg-card p-4 text-center">
-          <p className="text-2xl font-bold text-primary">{hoursWatched}</p>
-          <p className="text-xs text-muted-foreground">Hours</p>
+        <div className="rounded-xl bg-card p-3 text-center">
+          <p className="text-lg font-bold text-primary">{watchedCount?.value || 0}</p>
+          <p className="text-[10px] text-muted-foreground">Eps</p>
+        </div>
+        <div className="rounded-xl bg-card p-3 text-center">
+          <p className="text-lg font-bold text-primary">{hoursWatched}</p>
+          <p className="text-[10px] text-muted-foreground">Hours</p>
         </div>
       </div>
 
+      {/* Quick Actions */}
       <div className="mb-6 grid grid-cols-2 gap-3">
-        <div className="rounded-xl bg-card p-4 text-center">
-          <p className="text-2xl font-bold text-white">{watchedCount?.value || 0}</p>
-          <p className="text-xs text-muted-foreground">Episodes Watched</p>
-        </div>
+        <Link
+          href="/shows"
+          className="flex items-center gap-3 rounded-xl bg-card p-4 text-white transition-colors hover:bg-secondary"
+        >
+          <Tv className="h-5 w-5 text-primary" />
+          <span className="text-sm font-medium">My Shows</span>
+        </Link>
+        <Link
+          href="/movies"
+          className="flex items-center gap-3 rounded-xl bg-card p-4 text-white transition-colors hover:bg-secondary"
+        >
+          <Film className="h-5 w-5 text-primary" />
+          <span className="text-sm font-medium">My Movies</span>
+        </Link>
         <Link
           href="/import"
-          className="flex items-center justify-center rounded-xl border border-primary p-4 text-center text-sm font-medium text-primary"
+          className="flex items-center gap-3 rounded-xl bg-card p-4 text-white transition-colors hover:bg-secondary"
         >
-          Import Data
+          <Clock className="h-5 w-5 text-primary" />
+          <span className="text-sm font-medium">Import Data</span>
+        </Link>
+        <Link
+          href="/explore"
+          className="flex items-center gap-3 rounded-xl bg-card p-4 text-white transition-colors hover:bg-secondary"
+        >
+          <Settings className="h-5 w-5 text-primary" />
+          <span className="text-sm font-medium">Explore</span>
         </Link>
       </div>
 
-      {favShows.length > 0 && (
+      {/* Favorite Shows */}
+      {favoriteShows.length > 0 && (
         <section className="mb-6">
-          <div className="mb-3 flex items-center gap-2">
-            <Heart className="h-4 w-4 fill-red-500 text-red-500" />
-            <h2 className="text-sm font-semibold text-white">Shows</h2>
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+              <h2 className="text-sm font-semibold text-white">Shows</h2>
+            </div>
+            <Link href="/shows" className="text-xs text-primary">
+              See all
+            </Link>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2">
-            {favShows.map((show) => (
+            {favoriteShows.map((show) => (
               <Link
                 key={show.tmdbId}
                 href={`/show/${show.tmdbId}`}
                 className="flex-shrink-0"
               >
-                <div className="relative h-32 w-20 overflow-hidden rounded-lg bg-card">
+                <div className="relative h-36 w-24 overflow-hidden rounded-lg bg-card">
                   {show.posterPath ? (
                     <Image
                       src={posterUrl(show.posterPath, "w185") ?? ""}
                       alt={show.title}
-                      width={80}
-                      height={128}
+                      width={96}
+                      height={144}
                       className="object-cover"
                       unoptimized
                     />
@@ -141,26 +179,32 @@ export default async function ProfilePage() {
         </section>
       )}
 
-      {favMovies.length > 0 && (
+      {/* Favorite Movies */}
+      {favoriteMovies.length > 0 && (
         <section className="mb-6">
-          <div className="mb-3 flex items-center gap-2">
-            <Heart className="h-4 w-4 fill-red-500 text-red-500" />
-            <h2 className="text-sm font-semibold text-white">Movies</h2>
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+              <h2 className="text-sm font-semibold text-white">Movies</h2>
+            </div>
+            <Link href="/movies" className="text-xs text-primary">
+              See all
+            </Link>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2">
-            {favMovies.map((movie) => (
+            {favoriteMovies.map((movie) => (
               <Link
                 key={movie.tmdbId}
                 href={`/movie/${movie.tmdbId}`}
                 className="flex-shrink-0"
               >
-                <div className="relative h-32 w-20 overflow-hidden rounded-lg bg-card">
+                <div className="relative h-36 w-24 overflow-hidden rounded-lg bg-card">
                   {movie.posterPath ? (
                     <Image
                       src={posterUrl(movie.posterPath, "w185") ?? ""}
                       alt={movie.title}
-                      width={80}
-                      height={128}
+                      width={96}
+                      height={144}
                       className="object-cover"
                       unoptimized
                     />
@@ -176,9 +220,11 @@ export default async function ProfilePage() {
         </section>
       )}
 
+      {/* Lists */}
       <section className="mb-6">
-        <div className="mb-3">
+        <div className="mb-3 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-white">Lists</h2>
+          <span className="text-xs text-muted-foreground">{lists.length}</span>
         </div>
         <div className="space-y-2">
           {lists.map((list) => (
@@ -201,6 +247,9 @@ export default async function ProfilePage() {
           )}
         </div>
       </section>
+
+      {/* Logout */}
+      <LogoutButton />
     </div>
   );
 }

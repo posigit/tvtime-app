@@ -9,6 +9,7 @@ import { backdropUrl, posterUrl } from "@/lib/tmdb";
 import { ensureShow, ensureEpisodes } from "@/lib/ensure";
 import { EpisodeData } from "@/components/episode-row";
 import { SeasonEpisodeList } from "@/components/season-episode-list";
+import { ShowFollowButton } from "@/components/show-follow-button";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -144,6 +145,13 @@ export default async function ShowDetailPage({
         {show.overview && (
           <p className="mt-4 text-sm text-muted-foreground line-clamp-3">{show.overview}</p>
         )}
+
+        <div className="mt-4">
+          <ShowFollowButton
+            tmdbId={tmdbId}
+            initialFollowing={!!userShow}
+          />
+        </div>
 
         <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
           {seasons.map((s) => (

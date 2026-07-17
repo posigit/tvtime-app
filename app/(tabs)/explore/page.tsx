@@ -5,6 +5,8 @@ import { eq } from "drizzle-orm";
 import { getTrendingTv, getPopularMovies, posterUrl } from "@/lib/tmdb";
 import { SearchBar } from "@/components/search-bar";
 import { SectionLabel } from "@/components/section-label";
+import { ShowFollowButton } from "@/components/show-follow-button";
+import { MovieWatchButton } from "@/components/movie-watch-button";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -21,10 +23,11 @@ export default async function ExplorePage() {
   const followedShowIds = new Set(followedShows.map((s) => s.tmdbId));
 
   const followedMovies = await db
-    .select({ tmdbId: userMovies.tmdbId })
+    .select({ tmdbId: userMovies.tmdbId, status: userMovies.status })
     .from(userMovies)
     .where(eq(userMovies.userId, userId));
   const followedMovieIds = new Set(followedMovies.map((m) => m.tmdbId));
+  const movieStatusById = new Map(followedMovies.map((m) => [m.tmdbId, m.status]));
 
   return (
     <div className="min-h-screen bg-black px-4 py-4">
@@ -36,31 +39,36 @@ export default async function ExplorePage() {
         </div>
         <div className="grid grid-cols-3 gap-2">
           {trending.results.slice(0, 9).map((show) => (
-            <Link
+            <div
               key={show.id}
-              href={`/show/${show.id}`}
               className="relative overflow-hidden rounded-lg bg-card"
             >
-              <div style={{aspectRatio:"2 / 3"}} className="relative bg-secondary">
-                {show.poster_path ? (
-                  <Image
-                    src={posterUrl(show.poster_path, "w342") ?? ""}
-                    alt={show.name}
-                    fill
-                    sizes="(max-width: 768px) 33vw, 200px"
-                    className="object-cover"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-muted-foreground">
-                    {show.name}
-                  </div>
-                )}
-              </div>
-              {followedShowIds.has(show.id) && (
+              <Link href={`/show/${show.id}`}>
+                <div style={{aspectRatio:"2 / 3"}} className="relative bg-secondary">
+                  {show.poster_path ? (
+                    <Image
+                      src={posterUrl(show.poster_path, "w342") ?? ""}
+                      alt={show.name}
+                      fill
+                      sizes="(max-width: 768px) 33vw, 200px"
+                      className="object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-muted-foreground">
+                      {show.name}
+                    </div>
+                  )}
+                </div>
+              </Link>
+              {followedShowIds.has(show.id) ? (
                 <div className="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary" />
+              ) : (
+                <div className="absolute bottom-0 left-0 right-0 p-2">
+                  <ShowFollowButton tmdbId={show.id} initialFollowing={false} />
+                </div>
               )}
-            </Link>
+            </div>
           ))}
         </div>
       </section>
@@ -71,31 +79,39 @@ export default async function ExplorePage() {
         </div>
         <div className="grid grid-cols-3 gap-2">
           {popularMovies.results.slice(0, 9).map((movie) => (
-            <Link
+            <div
               key={movie.id}
-              href={`/movie/${movie.id}`}
               className="relative overflow-hidden rounded-lg bg-card"
             >
-              <div style={{aspectRatio:"2 / 3"}} className="relative bg-secondary">
-                {movie.poster_path ? (
-                  <Image
-                    src={posterUrl(movie.poster_path, "w342") ?? ""}
-                    alt={movie.title}
-                    fill
-                    sizes="(max-width: 768px) 33vw, 200px"
-                    className="object-cover"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-muted-foreground">
-                    {movie.title}
-                  </div>
-                )}
-              </div>
-              {followedMovieIds.has(movie.id) && (
+              <Link href={`/movie/${movie.id}`}>
+                <div style={{aspectRatio:"2 / 3"}} className="relative bg-secondary">
+                  {movie.poster_path ? (
+                    <Image
+                      src={posterUrl(movie.poster_path, "w342") ?? ""}
+                      alt={movie.title}
+                      fill
+                      sizes="(max-width: 768px) 33vw, 200px"
+                      className="object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-muted-foreground">
+                      {movie.title}
+                    </div>
+                  )}
+                </div>
+              </Link>
+              {followedMovieIds.has(movie.id) ? (
                 <div className="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary" />
+              ) : (
+                <div className="absolute bottom-0 left-0 right-0 p-2">
+                  <MovieWatchButton
+                    tmdbId={movie.id}
+                    initialStatus={movieStatusById.get(movie.id) || null}
+                  />
+                </div>
               )}
-            </Link>
+            </div>
           ))}
         </div>
       </section>
