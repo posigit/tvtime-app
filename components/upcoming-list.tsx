@@ -5,7 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { SectionLabel } from "@/components/section-label";
 import { MarkWatchedButton } from "@/components/mark-watched-button";
-import { posterUrl } from "@/lib/tmdb";
+import { posterUrl, stillUrl } from "@/lib/tmdb";
+import { ChevronRight } from "lucide-react";
 
 export type UpcomingListItem = {
   tmdbId: number;
@@ -14,11 +15,12 @@ export type UpcomingListItem = {
   seasonNumber: number;
   episodeNumber: number;
   episodeTitle: string;
+  stillPath: string | null;
   airDate: string;
   isPremiere: boolean;
   isLatest: boolean;
   aired: boolean;
-  countdown: string;
+  daysUntil: number;
 };
 
 export type UpcomingGroup = {
@@ -36,8 +38,9 @@ function todayKey(): string {
 }
 
 /**
- * Upcoming episodes grouped by calendar day.
- * On mount, scrolls so today's group (or nearest upcoming day) is in view.
+ * Upcoming episodes grouped by calendar day (snapshot 2).
+ * Unaired rows show the big "N DAYS" counter on the right (e2 style);
+ * aired rows get the white check circle.
  */
 export function UpcomingList({ groups }: { groups: UpcomingGroup[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -46,7 +49,6 @@ export function UpcomingList({ groups }: { groups: UpcomingGroup[] }) {
   useEffect(() => {
     if (groups.length === 0) return;
 
-    // Prefer exact today; else first day on/after today; else last group (all past)
     let targetKey = groups.find((g) => g.dateKey === today)?.dateKey;
     if (!targetKey) {
       targetKey = groups.find((g) => g.dateKey >= today)?.dateKey;
@@ -56,13 +58,10 @@ export function UpcomingList({ groups }: { groups: UpcomingGroup[] }) {
     }
     if (!targetKey) return;
 
-    // Wait a frame so layout is ready
     const id = requestAnimationFrame(() => {
       const el = document.getElementById(`upcoming-date-${targetKey}`);
       if (!el) return;
-      // Offset for sticky tabs (~100px)
-      const top =
-        el.getBoundingClientRect().top + window.scrollY - 100;
+      const top = el.getBoundingClientRect().top + window.scrollY - 100;
       window.scrollTo({ top: Math.max(0, top), behavior: "auto" });
     });
 
@@ -78,91 +77,108 @@ export function UpcomingList({ groups }: { groups: UpcomingGroup[] }) {
           data-date={group.dateKey}
         >
           <div className="mb-3 flex justify-center">
-            <SectionLabel>
-              {group.dateKey === today ? `Today · ${group.label}` : group.label}
-            </SectionLabel>
+            <SectionLabel>{group.label}</SectionLabel>
           </div>
           <div className="space-y-2">
-            {group.items.map((item) => (
-              <div
-                key={`${item.tmdbId}-${item.seasonNumber}-${item.episodeNumber}`}
-                className="flex items-center gap-3 rounded-xl bg-[#111112] p-3"
-              >
-                <Link
-                  href={`/show/${item.tmdbId}`}
-                  className="relative flex-shrink-0 overflow-hidden rounded-lg bg-[#2c2c2e]"
-                  style={{ width: 56, height: 84 }}
+            {group.items.map((item) => {
+              const still = stillUrl(item.stillPath, "w300");
+              const poster = posterUrl(item.posterPath, "w154");
+              return (
+                <div
+                  key={`${item.tmdbId}-${item.seasonNumber}-${item.episodeNumber}`}
+                  className="flex items-center gap-3 rounded-xl bg-[#101011] p-2.5"
                 >
-                  {item.posterPath ? (
-                    <Image
-                      src={posterUrl(item.posterPath, "w154") ?? ""}
-                      alt={item.title}
-                      width={56}
-                      height={84}
-                      className="object-cover"
-                      unoptimized
+                  <Link
+                    href={`/show/${item.tmdbId}`}
+                    className="relative h-[72px] w-[116px] flex-shrink-0 overflow-hidden rounded-lg bg-[#2c2c2e]"
+                  >
+                    {still ? (
+                      <Image
+                        src={still}
+                        alt={item.title}
+                        fill
+                        sizes="116px"
+                        className="object-cover"
+                        unoptimized
+                      />
+                    ) : poster ? (
+                      <Image
+                        src={poster}
+                        alt={item.title}
+                        fill
+                        sizes="116px"
+                        className="object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
+                        No img
+                      </div>
+                    )}
+                  </Link>
+
+                  <Link
+                    href={`/show/${item.tmdbId}`}
+                    className="min-w-0 flex-1 py-0.5"
+                  >
+                    <div className="mb-1.5 inline-flex max-w-full items-center gap-0.5 rounded-full border border-white/90 px-2.5 py-[3px]">
+                      <span className="truncate text-[11px] font-bold uppercase tracking-wide text-white">
+                        {item.title}
+                      </span>
+                      <ChevronRight
+                        className="h-3 w-3 flex-shrink-0 text-white"
+                        strokeWidth={2.5}
+                      />
+                    </div>
+                    <p className="text-[15px] font-bold leading-tight text-white">
+                      S{String(item.seasonNumber).padStart(2, "0")} | E
+                      {String(item.episodeNumber).padStart(2, "0")}
+                    </p>
+                    <p className="truncate text-[13px] leading-tight text-muted-foreground">
+                      {item.episodeTitle}
+                    </p>
+                    {(item.isPremiere || item.isLatest) && (
+                      <div className="mt-1.5 flex flex-wrap gap-1.5">
+                        {item.isPremiere && (
+                          <span className="rounded-md bg-white px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-black">
+                            Premiere
+                          </span>
+                        )}
+                        {item.isLatest && (
+                          <span className="rounded-md bg-white px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-black">
+                            Latest
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </Link>
+
+                  {item.aired ? (
+                    <MarkWatchedButton
+                      showTmdbId={item.tmdbId}
+                      seasonNumber={item.seasonNumber}
+                      episodeNumber={item.episodeNumber}
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
-                      No img
-                    </div>
-                  )}
-                </Link>
-                <Link
-                  href={`/show/${item.tmdbId}`}
-                  className="min-w-0 flex-1"
-                >
-                  <div className="mb-1.5 inline-flex items-center gap-1 rounded-full border border-white/80 px-2.5 py-0.5 text-xs font-bold text-white">
-                    {item.title}
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
+                    <div
+                      className="flex w-14 flex-shrink-0 flex-col items-center justify-center"
+                      title={
+                        item.daysUntil === 0
+                          ? "Today"
+                          : `${item.daysUntil} day${item.daysUntil === 1 ? "" : "s"}`
+                      }
                     >
-                      <polyline points="9 18 15 12 9 6" />
-                    </svg>
-                  </div>
-                  <p className="text-sm font-bold text-white">
-                    S{String(item.seasonNumber).padStart(2, "0")} | E
-                    {String(item.episodeNumber).padStart(2, "0")}
-                  </p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    {item.episodeTitle}
-                  </p>
-                  {(item.isPremiere || item.isLatest) && (
-                    <div className="mt-1.5 flex flex-wrap gap-1.5">
-                      {item.isPremiere && (
-                        <span className="rounded border border-white/40 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
-                          Premiere
-                        </span>
-                      )}
-                      {item.isLatest && (
-                        <span className="rounded border border-white/40 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
-                          Latest
-                        </span>
-                      )}
+                      <span className="text-2xl font-black leading-none text-white">
+                        {item.daysUntil}
+                      </span>
+                      <span className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        {item.daysUntil === 1 ? "day" : "days"}
+                      </span>
                     </div>
                   )}
-                </Link>
-                {item.aired ? (
-                  <MarkWatchedButton
-                    showTmdbId={item.tmdbId}
-                    seasonNumber={item.seasonNumber}
-                    episodeNumber={item.episodeNumber}
-                  />
-                ) : (
-                  <div
-                    className="flex h-10 min-w-10 flex-shrink-0 items-center justify-center rounded-full border border-white/20 px-1 text-center text-[9px] font-medium leading-tight text-muted-foreground"
-                    title={item.countdown}
-                  >
-                    {item.countdown}
-                  </div>
-                )}
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         </section>
       ))}

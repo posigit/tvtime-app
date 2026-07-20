@@ -1,6 +1,13 @@
 import { db, withDbRetry } from "./db";
 import { shows, movies, episodes } from "./schema";
-import { getTvDetails, getMovieDetails, getTvSeason } from "./tmdb";
+import {
+  getTvDetails,
+  getMovieDetails,
+  getTvSeason,
+  getTvExternalIds,
+  getMovieExternalIds,
+} from "./tmdb";
+import { getRottenTomatoesScore } from "./omdb";
 import { eq } from "drizzle-orm";
 
 type ShowRow = {
@@ -17,6 +24,8 @@ type ShowRow = {
   numberOfEpisodes: number | null;
   episodeRuntime: number | null;
   voteAverage: number | null;
+  rtScore?: number | null;
+  imdbId?: string | null;
   tmdbData: unknown;
 };
 
@@ -30,6 +39,8 @@ type MovieRow = {
   status: string | null;
   overview: string | null;
   voteAverage: number | null;
+  rtScore?: number | null;
+  imdbId?: string | null;
   tmdbData: unknown;
 };
 
@@ -78,6 +89,51 @@ function persistMovie(movie: MovieRow) {
   return db.insert(movies).values(movie).onConflictDoNothing();
 }
 
+// ---------- Rotten Tomatoes background fill ----------
+
+const rtInFlight = new Set<string>();
+
+/**
+ * Fetch + cache the RT Tomatometer for a title (via TMDB external_ids → OMDb).
+ * `imdbId` doubles as the "attempted" marker: once set, we never refetch,
+ * so titles without an RT score don't burn the daily OMDb quota.
+ */
+async function fillRtScore(tmdbId: number, type: "tv" | "movie") {
+  try {
+    const ids =
+      type === "tv"
+        ? await getTvExternalIds(tmdbId)
+        : await getMovieExternalIds(tmdbId);
+    const imdbId = ids.imdb_id ?? null;
+    const rtScore = imdbId ? await getRottenTomatoesScore(imdbId) : null;
+
+    const table = type === "tv" ? shows : movies;
+    await withDbRetry(() =>
+      db
+        .update(table)
+        .set({ imdbId, ...(rtScore !== null ? { rtScore } : {}) })
+        .where(eq(table.tmdbId, tmdbId))
+    );
+  } catch (err) {
+    console.error(
+      `fillRtScore failed for ${type} ${tmdbId}:`,
+      err instanceof Error ? err.message : err
+    );
+  }
+}
+
+/** Kick off a background RT fill if we haven't attempted this title yet. */
+function ensureRtScore(
+  row: { tmdbId: number; rtScore?: number | null; imdbId?: string | null },
+  type: "tv" | "movie"
+) {
+  if (row.rtScore != null || row.imdbId != null) return;
+  const key = `${type}:${row.tmdbId}`;
+  if (rtInFlight.has(key)) return;
+  rtInFlight.add(key);
+  void fillRtScore(row.tmdbId, type).finally(() => rtInFlight.delete(key));
+}
+
 /**
  * Return show from DB cache or TMDB.
  * Transient DB failures are retried; if DB stays down, still returns TMDB data
@@ -90,7 +146,10 @@ export async function ensureShow(tmdbId: number) {
         where: eq(shows.tmdbId, tmdbId),
       })
     );
-    if (existing) return existing;
+    if (existing) {
+      ensureRtScore(existing, "tv");
+      return existing;
+    }
   } catch (err) {
     console.error(
       `ensureShow: DB lookup failed for ${tmdbId}, falling back to TMDB:`,
@@ -103,7 +162,7 @@ export async function ensureShow(tmdbId: number) {
 
   // Background save — do not block render
   void withDbRetry(() => persistShow(show))
-    .then(() => undefined)
+    .then(() => ensureRtScore({ ...show, tmdbId }, "tv"))
     .catch((err) => {
       console.error(`Failed to persist show ${tmdbId}:`, err);
     });
@@ -118,7 +177,10 @@ export async function ensureMovie(tmdbId: number) {
         where: eq(movies.tmdbId, tmdbId),
       })
     );
-    if (existing) return existing;
+    if (existing) {
+      ensureRtScore(existing, "movie");
+      return existing;
+    }
   } catch (err) {
     console.error(
       `ensureMovie: DB lookup failed for ${tmdbId}, falling back to TMDB:`,
@@ -130,7 +192,7 @@ export async function ensureMovie(tmdbId: number) {
   const movie = movieFromTmdb(tmdbId, details);
 
   void withDbRetry(() => persistMovie(movie))
-    .then(() => undefined)
+    .then(() => ensureRtScore({ ...movie, tmdbId }, "movie"))
     .catch((err) => {
       console.error(`Failed to persist movie ${tmdbId}:`, err);
     });

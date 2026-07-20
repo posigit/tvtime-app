@@ -84,18 +84,32 @@ export function SearchBar() {
 
   return (
     <div className="relative">
-      <input
-        type="text"
-        placeholder="Search shows and movies..."
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setTimeout(() => setFocused(false), 200)}
-        className="h-12 w-full rounded-xl border border-white/10 bg-card px-4 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-      />
+      <div className="flex h-11 w-full items-center gap-3 border-b border-white/15 px-1">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          className="flex-shrink-0 text-muted-foreground"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setTimeout(() => setFocused(false), 200)}
+          className="w-full bg-transparent text-[15px] text-white placeholder:text-muted-foreground focus:outline-none"
+        />
+      </div>
 
       {focused && (
-        <div className="absolute left-0 right-0 top-14 z-50 max-h-96 overflow-y-auto rounded-xl border border-white/10 bg-card shadow-xl">
+        <div className="absolute left-0 right-0 top-12 z-50 max-h-96 overflow-y-auto rounded-xl border border-white/10 bg-card shadow-xl">
           {loading && (
             <div className="p-4 text-center text-sm text-muted-foreground">
               Searching…

@@ -2,62 +2,108 @@ import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { movies, userMovies } from "@/lib/schema";
 import { eq } from "drizzle-orm";
-import { ViewToggle } from "@/components/view-toggle";
+import { ShowTabs } from "@/components/show-tabs";
 import { SectionLabel } from "@/components/section-label";
 import { posterUrl } from "@/lib/tmdb";
 import Link from "next/link";
 import Image from "next/image";
 
-function PopcornEmptyState({
+function PopcornIllustration() {
+  return (
+    <div className="relative my-8 flex h-44 w-44 items-center justify-center">
+      <div className="absolute inset-0 rounded-full bg-[#8ac249]" />
+      <svg
+        width="120"
+        height="120"
+        viewBox="0 0 120 120"
+        className="relative z-10"
+        aria-hidden
+      >
+        {/* Bucket */}
+        <path
+          d="M32 52 L39 100 H81 L88 52 Z"
+          fill="#e0202e"
+          stroke="#0f0f0f"
+          strokeWidth="2"
+        />
+        <path d="M40 52 L45 100 H55 L52 52 Z" fill="#fff" />
+        <path d="M65 52 L68 100 H78 L75 52 Z" fill="#fff" />
+        {/* Popcorn */}
+        <circle cx="42" cy="42" r="9" fill="#f6e7c8" stroke="#0f0f0f" strokeWidth="2" />
+        <circle cx="56" cy="34" r="10" fill="#fdf3dd" stroke="#0f0f0f" strokeWidth="2" />
+        <circle cx="70" cy="40" r="9" fill="#f6e7c8" stroke="#0f0f0f" strokeWidth="2" />
+        <circle cx="80" cy="48" r="8" fill="#fdf3dd" stroke="#0f0f0f" strokeWidth="2" />
+        <circle cx="36" cy="50" r="7" fill="#fdf3dd" stroke="#0f0f0f" strokeWidth="2" />
+        <circle cx="62" cy="46" r="8" fill="#f6e7c8" stroke="#0f0f0f" strokeWidth="2" />
+        <circle cx="50" cy="48" r="7" fill="#f9edd4" stroke="#0f0f0f" strokeWidth="2" />
+      </svg>
+      {/* Sparkles */}
+      <span className="absolute -left-6 top-6 text-2xl text-[#b455f6]">✦</span>
+      <span className="absolute -left-10 top-16 text-xl text-[#7ed321]">✦</span>
+      <span className="absolute -right-6 top-8 text-2xl text-[#f5a623]">✦</span>
+      <span className="absolute -right-9 bottom-12 text-lg text-[#7ed321]">✕</span>
+      <span className="absolute -left-8 bottom-8 text-lg text-[#f5a623]">●</span>
+      <span className="absolute -left-4 bottom-16 text-sm text-[#f5c518]">＋</span>
+      <span className="absolute -top-3 right-8 text-lg text-[#b455f6]">●</span>
+    </div>
+  );
+}
+
+function EmptyState({
   title,
   description,
+  cta,
 }: {
   title: string;
   description: string;
+  cta: string;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center pt-24 text-center">
-      {/* Popcorn-style illustration (CSS/SVG, matches snapshot empty state vibe) */}
-      <div className="relative mb-6 flex h-28 w-28 items-center justify-center">
-        <div className="absolute inset-0 rounded-full bg-emerald-500/90" />
-        <svg
-          width="72"
-          height="72"
-          viewBox="0 0 72 72"
-          className="relative z-10"
-          aria-hidden
-        >
-          {/* Bucket */}
-          <path
-            d="M18 30 L22 62 H50 L54 30 Z"
-            fill="#e11d2e"
-            stroke="#fff"
-            strokeWidth="1.5"
-          />
-          <path d="M22 30 L25 62 H33 L30 30 Z" fill="#fff" opacity="0.95" />
-          <path d="M39 30 L42 62 H50 L47 30 Z" fill="#fff" opacity="0.95" />
-          <ellipse cx="36" cy="30" rx="20" ry="6" fill="#e11d2e" />
-          {/* Popcorn kernels */}
-          <circle cx="28" cy="22" r="5" fill="#fbbf24" />
-          <circle cx="36" cy="18" r="6" fill="#fcd34d" />
-          <circle cx="44" cy="22" r="5" fill="#fbbf24" />
-          <circle cx="32" cy="26" r="4" fill="#fde68a" />
-          <circle cx="40" cy="26" r="4" fill="#fcd34d" />
-          {/* Sparkles */}
-          <circle cx="16" cy="16" r="2" fill="#a3e635" />
-          <circle cx="56" cy="14" r="2" fill="#c084fc" />
-          <circle cx="52" cy="28" r="1.5" fill="#f472b6" />
-          <circle cx="20" cy="28" r="1.5" fill="#38bdf8" />
-        </svg>
-      </div>
-      <h2 className="mb-2 text-lg font-bold text-white">{title}</h2>
-      <p className="mb-6 max-w-xs text-sm text-muted-foreground">{description}</p>
+    <div className="flex flex-col items-center justify-center pt-16 text-center">
+      <h2 className="text-2xl font-bold text-white">{title}</h2>
+      <PopcornIllustration />
+      <p className="mb-8 max-w-xs text-[15px] text-white/80">{description}</p>
       <Link
         href="/explore"
-        className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-black"
+        className="rounded-full bg-primary px-8 py-3.5 text-sm font-black uppercase tracking-wide text-black"
       >
-        BROWSE ALL MOVIES
+        {cta}
       </Link>
+    </div>
+  );
+}
+
+function MovieGrid({
+  items,
+}: {
+  items: { tmdbId: number; title: string; posterPath: string | null }[];
+}) {
+  return (
+    <div className="grid grid-cols-3 gap-2">
+      {items.map((movie) => (
+        <Link
+          key={movie.tmdbId}
+          href={`/movie/${movie.tmdbId}`}
+          className="overflow-hidden rounded-md bg-card"
+        >
+          <div style={{ aspectRatio: "2 / 3" }} className="relative bg-secondary">
+            {movie.posterPath ? (
+              <Image
+                src={posterUrl(movie.posterPath, "w342") ?? ""}
+                alt={movie.title}
+                fill
+                sizes="(max-width: 768px) 33vw, 200px"
+                className="object-cover"
+                unoptimized
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-muted-foreground">
+                {movie.title}
+              </div>
+            )}
+          </div>
+        </Link>
+      ))}
     </div>
   );
 }
@@ -94,10 +140,10 @@ export default async function MoviesPage({
     .sort((a, b) => (b.watchedAt?.getTime() ?? 0) - (a.watchedAt?.getTime() ?? 0));
 
   return (
-    <div className="min-h-screen bg-black px-4 py-4">
-      <div className="mb-6 sticky top-0 z-10 bg-black pb-2 pt-2">
-        <ViewToggle
-          segments={[
+    <div className="min-h-screen bg-black px-4 pb-24 pt-2">
+      <div className="sticky top-0 z-10 bg-black pb-1 pt-2">
+        <ShowTabs
+          tabs={[
             { value: "watchlist", label: "WATCH LIST" },
             { value: "upcoming", label: "UPCOMING" },
           ]}
@@ -108,85 +154,45 @@ export default async function MoviesPage({
         <>
           {wantToWatch.length > 0 && (
             <section className="mb-6">
-              <div className="mb-3">
+              <div className="relative mb-3 mt-2 flex justify-center">
                 <SectionLabel>Watch Next</SectionLabel>
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 p-1 text-primary">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="3" y="3" width="8" height="8" rx="1.5" />
+                    <rect x="13" y="3" width="8" height="8" rx="1.5" />
+                    <rect x="3" y="13" width="8" height="8" rx="1.5" />
+                    <rect x="13" y="13" width="8" height="8" rx="1.5" />
+                  </svg>
+                </div>
               </div>
-              <div className="grid grid-cols-3 gap-2">
-                {wantToWatch.map((movie) => (
-                  <Link
-                    key={movie.tmdbId}
-                    href={`/movie/${movie.tmdbId}`}
-                    className="overflow-hidden rounded-lg bg-card"
-                  >
-                    <div style={{ aspectRatio: "2 / 3" }} className="relative bg-secondary">
-                      {movie.posterPath ? (
-                        <Image
-                          src={posterUrl(movie.posterPath, "w342") ?? ""}
-                          alt={movie.title}
-                          fill
-                          sizes="(max-width: 768px) 33vw, 200px"
-                          className="object-cover"
-                          unoptimized
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-muted-foreground">
-                          {movie.title}
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                ))}
-              </div>
+              <MovieGrid items={wantToWatch} />
             </section>
           )}
 
           {watched.length > 0 && (
             <section className="mb-6">
-              <div className="mb-3">
+              <div className="mb-3 flex justify-center">
                 <SectionLabel>Recently Watched</SectionLabel>
               </div>
-              <div className="grid grid-cols-3 gap-2">
-                {watched.slice(0, 30).map((movie) => (
-                  <Link
-                    key={movie.tmdbId}
-                    href={`/movie/${movie.tmdbId}`}
-                    className="overflow-hidden rounded-lg bg-card"
-                  >
-                    <div style={{ aspectRatio: "2 / 3" }} className="relative bg-secondary">
-                      {movie.posterPath ? (
-                        <Image
-                          src={posterUrl(movie.posterPath, "w342") ?? ""}
-                          alt={movie.title}
-                          fill
-                          sizes="(max-width: 768px) 33vw, 200px"
-                          className="object-cover"
-                          unoptimized
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-muted-foreground">
-                          {movie.title}
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                ))}
-              </div>
+              <MovieGrid items={watched.slice(0, 30)} />
             </section>
           )}
 
           {userMoviesList.length === 0 && (
-            <PopcornEmptyState
+            <EmptyState
               title="Your watch list is empty!"
               description="Add movies you want to watch."
+              cta="Browse all movies"
             />
           )}
         </>
       )}
 
       {currentView === "upcoming" && (
-        <PopcornEmptyState
+        <EmptyState
           title="Your upcoming list is empty!"
           description="Add movies you want to watch."
+          cta="Browse all movies"
         />
       )}
     </div>

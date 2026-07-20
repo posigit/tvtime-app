@@ -132,6 +132,14 @@ export async function getMovieDetails(tmdbId: number) {
   }>(`/movie/${tmdbId}`);
 }
 
+export async function getTvExternalIds(tmdbId: number) {
+  return tmdbFetch<{ imdb_id?: string | null }>(`/tv/${tmdbId}/external_ids`);
+}
+
+export async function getMovieExternalIds(tmdbId: number) {
+  return tmdbFetch<{ imdb_id?: string | null }>(`/movie/${tmdbId}/external_ids`);
+}
+
 export async function getTrendingTv(timeWindow: "day" | "week" = "week") {
   return tmdbFetch<{
     results: Array<{

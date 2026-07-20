@@ -84,12 +84,21 @@ export default async function MovieDetailPage({
                   <span>{Math.floor(movie.runtime / 60)}h {movie.runtime % 60}m</span>
                 </>
               )}
-              {movie.voteAverage && (
+              {movie.rtScore != null ? (
                 <>
                   <span>·</span>
-                  <span className="text-primary">★ {movie.voteAverage.toFixed(1)}</span>
+                  <span className="text-primary" title="Rotten Tomatoes">
+                    🍅 {movie.rtScore}%
+                  </span>
                 </>
-              )}
+              ) : movie.voteAverage ? (
+                <>
+                  <span>·</span>
+                  <span className="text-primary" title="TMDB score">
+                    T {movie.voteAverage.toFixed(1)}/10
+                  </span>
+                </>
+              ) : null}
             </div>
           </div>
         </div>

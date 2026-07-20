@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { Check } from "lucide-react";
 
+/** White filled circle check button (snapshot 1/2 style) */
 export function MarkWatchedButton({
   showTmdbId,
   seasonNumber,
@@ -48,14 +50,12 @@ export function MarkWatchedButton({
       onClick={handleClick}
       disabled={loading}
       className={cn(
-        "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-white/30 text-white transition-colors active:bg-white active:text-black",
-        loading && "opacity-50"
+        "flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-white text-black transition-transform active:scale-90",
+        loading && "opacity-60"
       )}
       aria-label="Mark as watched"
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-        <polyline points="20 6 9 17 4 12" />
-      </svg>
+      <Check className="h-5 w-5" strokeWidth={3} />
     </button>
   );
 }

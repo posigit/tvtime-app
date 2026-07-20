@@ -25,6 +25,8 @@ export const shows = pgTable("shows", {
   numberOfEpisodes: integer("number_of_episodes"),
   episodeRuntime: integer("episode_runtime"),
   voteAverage: real("vote_average"),
+  rtScore: integer("rt_score"),
+  imdbId: text("imdb_id"),
   tmdbData: jsonb("tmdb_data"),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -40,6 +42,8 @@ export const movies = pgTable("movies", {
   status: text("status"),
   overview: text("overview"),
   voteAverage: real("vote_average"),
+  rtScore: integer("rt_score"),
+  imdbId: text("imdb_id"),
   tmdbData: jsonb("tmdb_data"),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -136,6 +140,26 @@ export const watchedEpisodes = pgTable(
   (table) => [
     primaryKey({
       columns: [table.userId, table.showTmdbId, table.seasonNumber, table.episodeNumber],
+    }),
+  ]
+);
+
+export const seasonRewatches = pgTable(
+  "season_rewatches",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    showTmdbId: integer("show_tmdb_id")
+      .notNull()
+      .references(() => shows.tmdbId, { onDelete: "cascade" }),
+    seasonNumber: integer("season_number").notNull(),
+    count: integer("count").notNull().default(0),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.userId, table.showTmdbId, table.seasonNumber],
     }),
   ]
 );

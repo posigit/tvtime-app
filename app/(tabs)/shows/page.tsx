@@ -46,19 +46,12 @@ function isAiredDate(airDate: string): boolean {
   return d <= today;
 }
 
-function countdownText(airDate: string): string {
+function daysUntilDate(airDate: string): number {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const d = new Date(airDate + "T12:00:00");
   d.setHours(0, 0, 0, 0);
-  const diffDays = Math.round(
-    (d.getTime() - today.getTime()) / (24 * 60 * 60 * 1000)
-  );
-
-  if (diffDays < 0) return "Aired";
-  if (diffDays === 0) return "Today";
-  if (diffDays === 1) return "1 day";
-  return `${diffDays} days`;
+  return Math.round((d.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
 }
 
 export default async function ShowsPage({
@@ -68,7 +61,8 @@ export default async function ShowsPage({
 }) {
   const { view, layout } = await searchParams;
   const currentView = view === "upcoming" ? "upcoming" : "watchlist";
-  const listLayout = layout === "list";
+  // Snapshot 1 default = list; grid only when explicitly requested
+  const gridLayout = layout === "grid";
 
   const userId = await requireAuth();
 
@@ -98,7 +92,7 @@ export default async function ShowsPage({
 
   // Fast path: 2 bulk DB queries (episodes + watched). Only TMDB-fill shows missing rows.
   let allEpisodes: EpisodeInfo[] = [];
-  let watchedByShow = new Map<number, Set<WatchedKey>>();
+  const watchedByShow = new Map<number, Set<WatchedKey>>();
 
   if (watching.length > 0) {
     const [episodeRows, watched] = await Promise.all([
@@ -182,8 +176,8 @@ export default async function ShowsPage({
   }
 
   // WATCH LIST VIEW
-  let watchNext: ShowListItemData[] = [];
-  let haventWatched: ShowListItemData[] = [];
+  const watchNext: ShowListItemData[] = [];
+  const haventWatched: ShowListItemData[] = [];
 
   if (currentView === "watchlist") {
     const now = new Date();
@@ -214,6 +208,7 @@ export default async function ShowsPage({
               seasonNumber: nextEpisode.seasonNumber,
               episodeNumber: nextEpisode.episodeNumber,
               title: nextEpisode.title,
+              stillPath: nextEpisode.stillPath,
             }
           : null,
         remaining,
@@ -251,6 +246,7 @@ export default async function ShowsPage({
     seasonNumber: number;
     episodeNumber: number;
     episodeTitle: string;
+    stillPath: string | null;
     airDate: string;
     isPremiere: boolean;
     isLatest: boolean;
@@ -295,6 +291,7 @@ export default async function ShowsPage({
           seasonNumber: ep.seasonNumber,
           episodeNumber: ep.episodeNumber,
           episodeTitle: ep.title,
+          stillPath: ep.stillPath ?? null,
           airDate: ep.airDate,
           isPremiere: ep.episodeNumber === 1,
           isLatest: latestKey === key,
@@ -330,44 +327,42 @@ export default async function ShowsPage({
         label: calendarDateLabel(items[0].airDate),
         items: items.map((item) => ({
           ...item,
-          countdown: countdownText(item.airDate),
+          daysUntil: daysUntilDate(item.airDate),
         })),
       };
     });
 
   return (
     <div className="min-h-screen bg-black px-4 pb-24 pt-2">
-      <div className="sticky top-0 z-10 bg-black pb-2 pt-2">
+      <div className="sticky top-0 z-10 bg-black pb-1 pt-2">
         <ShowTabs
           tabs={[
             { value: "watchlist", label: "WATCH LIST" },
             { value: "upcoming", label: "UPCOMING" },
           ]}
         />
-        {currentView === "watchlist" && (
-          <div className="mt-2 flex justify-end">
-            <LayoutToggle />
-          </div>
-        )}
       </div>
 
       {currentView === "watchlist" && (
         <>
           {watchNext.length > 0 && (
             <section className="mb-6">
-              <div className="mb-3 flex justify-center">
+              <div className="relative mb-3 mt-2 flex justify-center">
                 <SectionLabel>Watch Next</SectionLabel>
-              </div>
-              {listLayout ? (
-                <div className="space-y-2">
-                  {watchNext.map((show) => (
-                    <ShowListItem key={show.tmdbId} show={show} />
-                  ))}
+                <div className="absolute right-0 top-1/2 -translate-y-1/2">
+                  <LayoutToggle />
                 </div>
-              ) : (
+              </div>
+              {gridLayout ? (
                 <div className="grid grid-cols-3 gap-2">
                   {watchNext.map((show) => (
                     <ShowCard key={show.tmdbId} show={show} />
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {watchNext.map((show) => (
+                    <ShowListItem key={show.tmdbId} show={show} />
                   ))}
                 </div>
               )}
@@ -376,19 +371,28 @@ export default async function ShowsPage({
 
           {haventWatched.length > 0 && (
             <section className="mb-6">
-              <div className="mb-3 flex justify-center">
+              <div
+                className={`relative mb-3 flex justify-center ${
+                  watchNext.length === 0 ? "mt-2" : ""
+                }`}
+              >
                 <SectionLabel>Haven&apos;t watched for a while</SectionLabel>
+                {watchNext.length === 0 && (
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2">
+                    <LayoutToggle />
+                  </div>
+                )}
               </div>
-              {listLayout ? (
-                <div className="space-y-2">
-                  {haventWatched.map((show) => (
-                    <ShowListItem key={show.tmdbId} show={show} />
-                  ))}
-                </div>
-              ) : (
+              {gridLayout ? (
                 <div className="grid grid-cols-3 gap-2">
                   {haventWatched.map((show) => (
                     <ShowCard key={show.tmdbId} show={show} />
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {haventWatched.map((show) => (
+                    <ShowListItem key={show.tmdbId} show={show} />
                   ))}
                 </div>
               )}
