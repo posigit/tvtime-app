@@ -8,7 +8,7 @@ import {
   getMovieExternalIds,
 } from "./tmdb";
 import { getRottenTomatoesScore } from "./omdb";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 type ShowRow = {
   tmdbId: number;
@@ -81,8 +81,33 @@ function movieFromTmdb(
   };
 }
 
+/**
+ * Upsert show metadata. Returning series change over time (new seasons,
+ * status flips to Ended), so a cached row must not stay frozen forever.
+ */
 function persistShow(show: ShowRow) {
-  return db.insert(shows).values(show).onConflictDoNothing();
+  return db
+    .insert(shows)
+    .values(show)
+    .onConflictDoUpdate({
+      target: shows.tmdbId,
+      set: {
+        title: show.title,
+        posterPath: show.posterPath,
+        backdropPath: show.backdropPath,
+        firstAirDate: show.firstAirDate,
+        lastAirDate: show.lastAirDate,
+        status: show.status,
+        overview: show.overview,
+        networks: show.networks,
+        numberOfSeasons: show.numberOfSeasons,
+        numberOfEpisodes: show.numberOfEpisodes,
+        episodeRuntime: show.episodeRuntime,
+        voteAverage: show.voteAverage,
+        tmdbData: show.tmdbData,
+        updatedAt: new Date(),
+      },
+    });
 }
 
 function persistMovie(movie: MovieRow) {
@@ -228,7 +253,21 @@ function saveEpisodesWithRetry(
 
   db.insert(episodes)
     .values(fetchedEpisodes)
-    .onConflictDoNothing()
+    .onConflictDoUpdate({
+      target: [
+        episodes.showTmdbId,
+        episodes.seasonNumber,
+        episodes.episodeNumber,
+      ],
+      set: {
+        title: sql`excluded.title`,
+        overview: sql`excluded.overview`,
+        airDate: sql`excluded.air_date`,
+        stillPath: sql`excluded.still_path`,
+        runtime: sql`excluded.runtime`,
+        updatedAt: new Date(),
+      },
+    })
     .then(() => {
       console.log(`Persisted ${fetchedEpisodes.length} episodes for show ${tmdbId}`);
     })
@@ -305,6 +344,112 @@ async function fetchEpisodesFromTmdb(
   return fetchedEpisodes;
 }
 
+const EPISODE_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const catalogRefreshInFlight = new Set<number>();
+
+/**
+ * Refetch show details + the seasons that can still change, upserting rows.
+ * The latest cached season can still roll out weekly; anything above the old
+ * season count is brand new. Older seasons are considered immutable.
+ */
+async function refreshShowCatalog(tmdbId: number) {
+  const details = await getTvDetails(tmdbId);
+  const show = showFromTmdb(tmdbId, details);
+  await withDbRetry(() => persistShow(show));
+
+  const numberOfSeasons = show.numberOfSeasons ?? 0;
+  if (numberOfSeasons <= 0) return;
+
+  const seasonRows = await withDbRetry(() =>
+    db
+      .select({ seasonNumber: episodes.seasonNumber })
+      .from(episodes)
+      .where(eq(episodes.showTmdbId, tmdbId))
+  );
+  const maxCached = seasonRows.reduce(
+    (m, r) => Math.max(m, r.seasonNumber),
+    0
+  );
+  const fromSeason = Math.max(1, maxCached);
+
+  const fetchedEpisodes: EpisodeInfo[] = [];
+  for (
+    let seasonNumber = fromSeason;
+    seasonNumber <= numberOfSeasons;
+    seasonNumber++
+  ) {
+    try {
+      const season = await getTvSeason(tmdbId, seasonNumber);
+      for (const ep of season.episodes) {
+        fetchedEpisodes.push({
+          showTmdbId: tmdbId,
+          seasonNumber: ep.season_number,
+          episodeNumber: ep.episode_number,
+          title: ep.name || `Episode ${ep.episode_number}`,
+          overview: ep.overview ?? null,
+          airDate: ep.air_date ?? null,
+          stillPath: ep.still_path ?? null,
+          runtime: ep.runtime ?? null,
+        });
+      }
+      await sleep(50);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (!message.includes("404")) {
+        console.error(
+          `Refresh: failed season ${seasonNumber} for ${tmdbId}:`,
+          message
+        );
+      }
+    }
+  }
+
+  if (fetchedEpisodes.length > 0) {
+    saveEpisodesWithRetry(tmdbId, fetchedEpisodes);
+  }
+}
+
+/**
+ * Kick a background catalog refresh when the cached episodes go stale (>24h).
+ * Only "alive" shows refresh — ended/canceled catalogs are static, so a show
+ * you were caught up on re-enters the Watch List when a new episode airs.
+ */
+function maybeRefreshShowCatalog(
+  tmdbId: number,
+  cached: { updatedAt: Date }[]
+) {
+  if (catalogRefreshInFlight.has(tmdbId)) return;
+
+  const newest = cached.reduce(
+    (m, r) => Math.max(m, r.updatedAt?.getTime?.() ?? 0),
+    0
+  );
+  if (Date.now() - newest < EPISODE_CACHE_TTL_MS) return;
+
+  catalogRefreshInFlight.add(tmdbId);
+  void (async () => {
+    try {
+      const show = await withDbRetry(() =>
+        db.query.shows.findFirst({ where: eq(shows.tmdbId, tmdbId) })
+      );
+      const alive =
+        !show?.status ||
+        show.status === "Returning Series" ||
+        show.status === "In Production" ||
+        show.status === "Planned";
+      if (!alive) return;
+      await refreshShowCatalog(tmdbId);
+    } catch (err) {
+      console.error(
+        `Catalog refresh failed for ${tmdbId}:`,
+        err instanceof Error ? err.message : err
+      );
+    } finally {
+      catalogRefreshInFlight.delete(tmdbId);
+    }
+  })();
+}
+
 export async function ensureEpisodes(
   tmdbId: number,
   numberOfSeasons: number | null
@@ -321,12 +466,15 @@ export async function ensureEpisodes(
           airDate: episodes.airDate,
           stillPath: episodes.stillPath,
           runtime: episodes.runtime,
+          updatedAt: episodes.updatedAt,
         })
         .from(episodes)
         .where(eq(episodes.showTmdbId, tmdbId))
     );
 
     if (existing.length > 0) {
+      // Render-first: serve the cache now, refresh stale catalogs in background
+      maybeRefreshShowCatalog(tmdbId, existing);
       return existing;
     }
   } catch (err) {

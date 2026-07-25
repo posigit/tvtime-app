@@ -40,14 +40,15 @@ function PosterCarousel({
           href={`${hrefPrefix}/${item.tmdbId}`}
           className="flex-shrink-0"
         >
-          <div className="relative h-40 w-28 overflow-hidden rounded-lg bg-card">
+          {/* 4-across on mobile: (viewport - 2rem page padding - 3 gaps) / 4 */}
+          <div className="relative aspect-[2/3] w-[calc((100vw-3.5rem)/4)] overflow-hidden rounded-lg bg-card">
             {item.posterPath ? (
               <Image
                 src={posterUrl(item.posterPath, "w185") ?? ""}
                 alt={item.title}
-                width={112}
-                height={160}
-                className="h-full w-full object-cover"
+                fill
+                sizes="25vw"
+                className="object-cover"
                 unoptimized
               />
             ) : (

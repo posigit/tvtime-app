@@ -179,3 +179,40 @@ Closes gaps found when comparing Chunks 1–3 to the original Phases 1–8 plan 
 - No social FEED / GROUPS / ACTIVITY (original Explore feed often fails; out of scope).
 - Movies Upcoming remains an empty stub until a real release-date pipeline is added.
 - Username rename: run `npx tsx scripts/rename-user.ts admin posi` when needed (script already exists).
+
+---
+
+## Watchlist semantics, episode-catalog freshness, profile density, and ratings
+
+### Movie watchlist fixes (auto-watch bug)
+- **Root cause:** `MovieWatchButton` was a single watched/unwatched toggle — the button labeled "Want to Watch" actually saved `watched`, and on Explore the button vanished after one tap, making watchlist-add impossible there.
+- Rewrote `components/movie-watch-button.tsx` with two distinct actions and three variants:
+  - Watchlist toggle (`null ↔ want_to_watch`) — never marks watched.
+  - Watched toggle (`watched ↔ want_to_watch`), plus Remove, on the detail page (`variant="full"`).
+  - `variant="overlay"` (round +/✓ for poster corners) and `variant="compact"` (search rows) are add-to-watchlist only; once in the library they show a static ✓.
+- `/api/movie-watch` now accepts `status: null` → deletes the row (removal from library possible for the first time) and validates input.
+- Explore `PosterTile`: replaced the full-width bottom action bar (oversized on mobile) with a small circular +/✓ overlay on the poster's top-right corner.
+- `/api/search` joins `userMovies`/`userShows` for returned ids; search results now show real library state instead of hardcoded empty state.
+- Movie detail page: explicit `[Want to Watch]` / `[Mark Watched]` buttons.
+- `ShowFollowButton` gained matching `overlay`/`compact` variants (follow-only on small surfaces; unfollow stays on the show page menu because it deletes watch history).
+
+### Episode/show catalog freshness (shows not re-entering the Watch List)
+- **Root cause:** `ensureEpisodes()` returned cached catalogs forever (`if (existing.length > 0) return existing`) and `persistShow()` was `onConflictDoNothing`, so episodes/seasons TMDB added after first cache never entered the DB — shows computed "caught up" and silently dropped from the Watch List.
+- `persistShow` now upserts show metadata (status, season counts, last air date, …).
+- Episode saves now upsert title/overview/airDate/stillPath/runtime (schedule changes land).
+- New background `refreshShowCatalog()`: refetches show details + only the seasons that can change (`maxCachedSeason..numberOfSeasons`).
+- `ensureEpisodes()` keeps render-first behavior but kicks a deduped background refresh when the cache is >24h old and the show is still alive (Returning Series / In Production / Planned). Result: a released unwatched episode re-enters the Watch List automatically.
+
+### Profile density
+- `PosterCarousel` posters changed from fixed `h-40 w-28` to responsive `aspect-[2/3] w-[calc((100vw-3.5rem)/4)]` — exactly 4 posters across on mobile (matches original TV Time).
+
+### Ratings (5 stars, half steps)
+- Storage: integers **1–10** (= 0.5–5 stars × 2) in the existing `user_movies.rating` and `watched_episodes.rating` columns — zero schema changes. Show-level rating intentionally pended (TV Time model: rate episodes/movies).
+- New `components/star-rating.tsx`: `StarRatingInput` (half-star hit zones; tap current value to clear), `StarRatingDisplay`, `RatingBadge` (poster chip), connected `MovieRating` and `EpisodeRating` controls.
+- New `POST /api/rate` (`kind: "movie" | "episode"`, `rating: 1–10 | null`) — gated: movie must be in library, episode must be watched.
+- UI: movie detail rating control; watched-episode rows get a ★ chip with popover picker; show detail header shows a **derived show score** (avg of your episode ratings, read-only); rating badges on Movies-tab and profile-list poster grids.
+- Note: imported TV Time emotion votes (`episode_reactions`/`movie_reactions`, 28 + 33 rows) are preserved but untouched — emoji reactions remain a separate roadmap item.
+
+### Verification
+- `npm run build --webpack` passes; routes smoke-tested (401 auth gates, `/login` 200).
+- Freshness verified against production DB: stale "Rick and Morty" cache triggered a background refresh that upserted season 9; "Breaking Bad" (Ended) was correctly skipped.

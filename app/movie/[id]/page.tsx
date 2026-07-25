@@ -9,6 +9,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
 import { MovieWatchButton } from "@/components/movie-watch-button";
+import { MovieRating } from "@/components/star-rating";
 
 export default async function MovieDetailPage({
   params,
@@ -113,6 +114,15 @@ export default async function MovieDetailPage({
             initialStatus={userMovie?.status || null}
           />
         </div>
+
+        {userMovie && (
+          <div className="mt-6">
+            <MovieRating
+              tmdbId={tmdbId}
+              initialRating={userMovie.rating ?? null}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

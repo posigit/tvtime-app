@@ -2,53 +2,142 @@
 
 import { useState, useTransition } from "react";
 import { cn } from "@/lib/utils";
+import { Check, Plus } from "lucide-react";
 
+export type MovieStatus = "want_to_watch" | "watched" | null;
+
+/**
+ * Movie library actions.
+ *
+ * Semantics (fixed): "Want to Watch" adds to the watchlist
+ * (status = want_to_watch) — it never marks a movie watched.
+ * Small surfaces (overlay/compact) are add-to-watchlist only and turn into a
+ * static check once the movie is in the library; the full watch/unwatch and
+ * remove controls live on the movie detail page (variant="full").
+ */
 export function MovieWatchButton({
   tmdbId,
   initialStatus,
-  compact,
+  variant = "full",
 }: {
   tmdbId: number;
   initialStatus: string | null;
-  compact?: boolean;
+  variant?: "overlay" | "compact" | "full";
 }) {
-  const [status, setStatus] = useState(initialStatus);
+  // Tolerate legacy statuses (e.g. for_later): any non-null value = in library
+  const normalize = (s: string | null): MovieStatus =>
+    s === "watched" ? "watched" : s ? "want_to_watch" : null;
+  const [status, setStatus] = useState<MovieStatus>(() =>
+    normalize(initialStatus)
+  );
   const [pending, startTransition] = useTransition();
 
-  const toggle = () => {
-    const newStatus = status === "watched" ? "want_to_watch" : "watched";
-    setStatus(newStatus);
+  const update = (next: MovieStatus) => {
+    const prev = status;
+    setStatus(next);
     startTransition(async () => {
       try {
-        await fetch("/api/movie-watch", {
+        const res = await fetch("/api/movie-watch", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            tmdbId,
-            status: newStatus,
-          }),
+          body: JSON.stringify({ tmdbId, status: next }),
         });
-      } catch (err) {
-        setStatus(initialStatus);
+        if (!res.ok) throw new Error("save failed");
+      } catch {
+        setStatus(prev);
       }
     });
   };
 
-  const isWatched = status === "watched";
+  // ----- overlay: round + / ✓ on poster corners (explore grids) -----
+  if (variant === "overlay") {
+    if (status) {
+      return (
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-black shadow">
+          <Check className="h-4 w-4" strokeWidth={3} />
+        </span>
+      );
+    }
+    return (
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          update("want_to_watch");
+        }}
+        disabled={pending}
+        aria-label="Add to watchlist"
+        className="flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white shadow backdrop-blur-sm transition-colors hover:bg-black/80"
+      >
+        <Plus className="h-4 w-4" strokeWidth={3} />
+      </button>
+    );
+  }
+
+  // ----- compact: small round + / ✓ in search result rows -----
+  if (variant === "compact") {
+    if (status) {
+      return (
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-black">
+          <Check className="h-3.5 w-3.5" strokeWidth={3} />
+        </span>
+      );
+    }
+    return (
+      <button
+        onClick={() => update("want_to_watch")}
+        disabled={pending}
+        aria-label="Add to watchlist"
+        className="flex h-7 w-7 items-center justify-center rounded-full bg-card text-white transition-colors hover:bg-secondary"
+      >
+        <Plus className="h-3.5 w-3.5" strokeWidth={3} />
+      </button>
+    );
+  }
+
+  // ----- full: movie detail page, explicit watchlist vs watched -----
+  if (status === "watched") {
+    return (
+      <div className="flex gap-2">
+        <button
+          onClick={() => update("want_to_watch")}
+          disabled={pending}
+          className="flex-1 rounded-xl bg-primary py-3 text-sm font-bold text-black transition-colors"
+        >
+          ✓ Watched
+        </button>
+        <button
+          onClick={() => update(null)}
+          disabled={pending}
+          className="rounded-xl border border-white/25 px-4 py-3 text-sm font-bold text-white/80 transition-colors hover:bg-card"
+        >
+          Remove
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <button
-      onClick={toggle}
-      disabled={pending}
-      className={cn(
-        "rounded-xl font-bold transition-colors",
-        compact ? "px-2 py-1 text-[10px]" : "w-full py-3 text-sm",
-        isWatched
-          ? "bg-primary text-black"
-          : "bg-card text-white hover:bg-secondary"
-      )}
-    >
-      {isWatched ? (compact ? "✓" : "✓ Watched") : compact ? "+" : "Want to Watch"}
-    </button>
+    <div className="flex gap-2">
+      <button
+        onClick={() => update(status === "want_to_watch" ? null : "want_to_watch")}
+        disabled={pending}
+        className={cn(
+          "flex-1 rounded-xl py-3 text-sm font-bold transition-colors",
+          status === "want_to_watch"
+            ? "bg-primary text-black"
+            : "bg-card text-white hover:bg-secondary"
+        )}
+      >
+        {status === "want_to_watch" ? "✓ On Watchlist" : "+ Want to Watch"}
+      </button>
+      <button
+        onClick={() => update("watched")}
+        disabled={pending}
+        className="flex-1 rounded-xl bg-card py-3 text-sm font-bold text-white transition-colors hover:bg-secondary"
+      >
+        Mark Watched
+      </button>
+    </div>
   );
 }

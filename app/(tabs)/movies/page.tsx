@@ -4,6 +4,7 @@ import { movies, userMovies } from "@/lib/schema";
 import { eq } from "drizzle-orm";
 import { ShowTabs } from "@/components/show-tabs";
 import { SectionLabel } from "@/components/section-label";
+import { RatingBadge } from "@/components/star-rating";
 import { posterUrl } from "@/lib/tmdb";
 import Link from "next/link";
 import Image from "next/image";
@@ -76,7 +77,12 @@ function EmptyState({
 function MovieGrid({
   items,
 }: {
-  items: { tmdbId: number; title: string; posterPath: string | null }[];
+  items: {
+    tmdbId: number;
+    title: string;
+    posterPath: string | null;
+    rating?: number | null;
+  }[];
 }) {
   return (
     <div className="grid grid-cols-3 gap-2">
@@ -87,6 +93,7 @@ function MovieGrid({
           className="overflow-hidden rounded-md bg-card"
         >
           <div style={{ aspectRatio: "2 / 3" }} className="relative bg-secondary">
+            {movie.rating != null && <RatingBadge value={movie.rating} />}
             {movie.posterPath ? (
               <Image
                 src={posterUrl(movie.posterPath, "w342") ?? ""}
@@ -126,6 +133,7 @@ export default async function MoviesPage({
       releaseDate: movies.releaseDate,
       status: userMovies.status,
       watchedAt: userMovies.watchedAt,
+      rating: userMovies.rating,
     })
     .from(userMovies)
     .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))

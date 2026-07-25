@@ -12,6 +12,27 @@ export async function POST(request: Request) {
 
   const { tmdbId, status } = await request.json();
 
+  if (!Number.isFinite(tmdbId)) {
+    return NextResponse.json({ error: "Invalid tmdbId" }, { status: 400 });
+  }
+
+  // status === null → remove from library entirely
+  if (status === null) {
+    await db
+      .delete(userMovies)
+      .where(
+        and(
+          eq(userMovies.userId, session.user.id),
+          eq(userMovies.tmdbId, tmdbId)
+        )
+      );
+    return NextResponse.json({ success: true });
+  }
+
+  if (status !== "watched" && status !== "want_to_watch") {
+    return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+  }
+
   await db
     .insert(userMovies)
     .values({

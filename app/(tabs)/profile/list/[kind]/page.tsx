@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { shows, movies, userShows, userMovies } from "@/lib/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { posterUrl } from "@/lib/tmdb";
+import { RatingBadge } from "@/components/star-rating";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -28,12 +29,20 @@ export default async function ProfileListPage({
 
   const userId = await requireAuth();
 
-  const items = config.movies
+  type GridItem = {
+    tmdbId: number;
+    title: string;
+    posterPath: string | null;
+    rating?: number | null;
+  };
+
+  const items: GridItem[] = config.movies
     ? await db
         .select({
           tmdbId: movies.tmdbId,
           title: movies.title,
           posterPath: movies.posterPath,
+          rating: userMovies.rating,
         })
         .from(userMovies)
         .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
@@ -99,6 +108,7 @@ export default async function ProfileListPage({
                 style={{ aspectRatio: "2 / 3" }}
                 className="relative bg-secondary"
               >
+                {item.rating != null && <RatingBadge value={item.rating} />}
                 {item.posterPath ? (
                   <Image
                     src={posterUrl(item.posterPath, "w342") ?? ""}

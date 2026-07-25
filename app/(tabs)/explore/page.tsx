@@ -21,13 +21,11 @@ function PosterTile({
   title,
   posterPath,
   href,
-  followed,
   action,
 }: {
   title: string;
   posterPath?: string;
   href: string;
-  followed: boolean;
   action: React.ReactNode;
 }) {
   return (
@@ -50,11 +48,8 @@ function PosterTile({
           )}
         </div>
       </Link>
-      {followed ? (
-        <div className="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary" />
-      ) : (
-        <div className="absolute bottom-0 left-0 right-0 p-2">{action}</div>
-      )}
+      {/* Corner add-to-watchlist control (small surfaces are add-only) */}
+      <div className="absolute right-1.5 top-1.5">{action}</div>
     </div>
   );
 }
@@ -79,7 +74,6 @@ export default async function ExplorePage() {
     .select({ tmdbId: userMovies.tmdbId, status: userMovies.status })
     .from(userMovies)
     .where(eq(userMovies.userId, userId));
-  const followedMovieIds = new Set(followedMovies.map((m) => m.tmdbId));
   const movieStatusById = new Map(followedMovies.map((m) => [m.tmdbId, m.status]));
 
   const feed = (
@@ -95,9 +89,12 @@ export default async function ExplorePage() {
               title={show.name}
               posterPath={show.poster_path}
               href={`/show/${show.id}`}
-              followed={followedShowIds.has(show.id)}
               action={
-                <ShowFollowButton tmdbId={show.id} initialFollowing={false} />
+                <ShowFollowButton
+                  tmdbId={show.id}
+                  initialFollowing={followedShowIds.has(show.id)}
+                  variant="overlay"
+                />
               }
             />
           ))}
@@ -115,11 +112,11 @@ export default async function ExplorePage() {
               title={movie.title}
               posterPath={movie.poster_path}
               href={`/movie/${movie.id}`}
-              followed={followedMovieIds.has(movie.id)}
               action={
                 <MovieWatchButton
                   tmdbId={movie.id}
                   initialStatus={movieStatusById.get(movie.id) || null}
+                  variant="overlay"
                 />
               }
             />
@@ -142,9 +139,12 @@ export default async function ExplorePage() {
               title={show.name}
               posterPath={show.poster_path}
               href={`/show/${show.id}`}
-              followed={followedShowIds.has(show.id)}
               action={
-                <ShowFollowButton tmdbId={show.id} initialFollowing={false} />
+                <ShowFollowButton
+                  tmdbId={show.id}
+                  initialFollowing={followedShowIds.has(show.id)}
+                  variant="overlay"
+                />
               }
             />
           ))}
@@ -162,9 +162,12 @@ export default async function ExplorePage() {
               title={show.name}
               posterPath={show.poster_path}
               href={`/show/${show.id}`}
-              followed={followedShowIds.has(show.id)}
               action={
-                <ShowFollowButton tmdbId={show.id} initialFollowing={false} />
+                <ShowFollowButton
+                  tmdbId={show.id}
+                  initialFollowing={followedShowIds.has(show.id)}
+                  variant="overlay"
+                />
               }
             />
           ))}

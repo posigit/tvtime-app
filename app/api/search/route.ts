@@ -1,4 +1,7 @@
 import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { userMovies, userShows } from "@/lib/schema";
+import { and, eq, inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 /**
@@ -49,7 +52,55 @@ export async function GET(request: Request) {
       )
       .slice(0, 10);
 
-    return NextResponse.json({ results });
+    // Join the user's library so result rows show real add state
+    const movieIds = results
+      .filter((r: { media_type?: string }) => r.media_type === "movie")
+      .map((r: { id: number }) => r.id);
+    const showIds = results
+      .filter((r: { media_type?: string }) => r.media_type === "tv")
+      .map((r: { id: number }) => r.id);
+
+    const [movieRows, showRows] = await Promise.all([
+      movieIds.length > 0
+        ? db
+            .select({ tmdbId: userMovies.tmdbId, status: userMovies.status })
+            .from(userMovies)
+            .where(
+              and(
+                eq(userMovies.userId, session.user.id!),
+                inArray(userMovies.tmdbId, movieIds)
+              )
+            )
+        : Promise.resolve([]),
+      showIds.length > 0
+        ? db
+            .select({ tmdbId: userShows.tmdbId })
+            .from(userShows)
+            .where(
+              and(
+                eq(userShows.userId, session.user.id!),
+                inArray(userShows.tmdbId, showIds)
+              )
+            )
+        : Promise.resolve([]),
+    ]);
+
+    const movieStatusById = new Map(movieRows.map((r) => [r.tmdbId, r.status]));
+    const followedShowIds = new Set(showRows.map((r) => r.tmdbId));
+
+    const enriched = results.map(
+      (r: { id: number; media_type?: string }) => ({
+        ...r,
+        userStatus:
+          r.media_type === "movie"
+            ? (movieStatusById.get(r.id) ?? null)
+            : null,
+        isFollowing:
+          r.media_type === "tv" ? followedShowIds.has(r.id) : false,
+      })
+    );
+
+    return NextResponse.json({ results: enriched });
   } catch (err) {
     console.error("Search API failed:", err);
     return NextResponse.json(

@@ -7,6 +7,7 @@ import { backdropUrl, stillUrl } from "@/lib/tmdb";
 import { cn } from "@/lib/utils";
 import { isEpisodeAired } from "@/lib/show-progress";
 import { Confetti } from "@/components/confetti";
+import { EpisodeRating, StarRatingDisplay } from "@/components/star-rating";
 import { Check, ChevronDown, MoreHorizontal } from "lucide-react";
 
 export type DetailEpisode = {
@@ -77,11 +78,15 @@ export function ShowDetailClient({
   episodes,
   rewatchCounts: initialRewatchCounts,
   initialFollowing,
+  episodeRatings,
+  derivedScore,
 }: {
   show: DetailShow;
   episodes: DetailEpisode[];
   rewatchCounts: Record<number, number>;
   initialFollowing: boolean;
+  episodeRatings: Record<string, number>;
+  derivedScore: { value: number; count: number } | null;
 }) {
   const router = useRouter();
 
@@ -478,6 +483,20 @@ export function ShowDetailClient({
         </div>
       </div>
 
+      {/* ---------- Your score (avg of your episode ratings) ---------- */}
+      {derivedScore && (
+        <div className="flex items-center gap-2 border-b border-white/10 px-4 py-2.5">
+          <StarRatingDisplay value={derivedScore.value} size={16} />
+          <span className="text-sm font-bold text-primary">
+            {(derivedScore.value / 2).toFixed(1)}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            your avg · {derivedScore.count} episode
+            {derivedScore.count === 1 ? "" : "s"} rated
+          </span>
+        </div>
+      )}
+
       {/* ---------- Tabs (ABOUT / EPISODES) ---------- */}
       <div className="sticky top-0 z-20 flex border-b border-white/10 bg-black">
         {(
@@ -789,6 +808,18 @@ export function ShowDetailClient({
                                     </span>
                                   )}
                                 </p>
+                              )}
+                              {watched && (
+                                <EpisodeRating
+                                  showTmdbId={show.tmdbId}
+                                  seasonNumber={ep.seasonNumber}
+                                  episodeNumber={ep.episodeNumber}
+                                  initialRating={
+                                    episodeRatings[
+                                      watchKey(ep.seasonNumber, ep.episodeNumber)
+                                    ] ?? null
+                                  }
+                                />
                               )}
                             </div>
                             <button

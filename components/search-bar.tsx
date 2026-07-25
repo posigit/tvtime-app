@@ -15,6 +15,8 @@ type SearchResult = {
   first_air_date?: string;
   release_date?: string;
   media_type?: string;
+  userStatus?: string | null;
+  isFollowing?: boolean;
 };
 
 /** Module-level cache so remounts still hit recent queries */
@@ -175,14 +177,14 @@ export function SearchBar() {
                   {isMovie ? (
                     <MovieWatchButton
                       tmdbId={result.id}
-                      initialStatus={null}
-                      compact
+                      initialStatus={result.userStatus ?? null}
+                      variant="compact"
                     />
                   ) : (
                     <ShowFollowButton
                       tmdbId={result.id}
-                      initialFollowing={false}
-                      compact
+                      initialFollowing={result.isFollowing ?? false}
+                      variant="compact"
                     />
                   )}
                 </div>

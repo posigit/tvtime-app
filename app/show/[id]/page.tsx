@@ -32,6 +32,7 @@ export default async function ShowDetailPage({
       .select({
         seasonNumber: watchedEpisodes.seasonNumber,
         episodeNumber: watchedEpisodes.episodeNumber,
+        rating: watchedEpisodes.rating,
       })
       .from(watchedEpisodes)
       .where(
@@ -57,6 +58,22 @@ export default async function ShowDetailPage({
   const watchedSet = new Set(
     watched.map((w) => `${w.seasonNumber}:${w.episodeNumber}`)
   );
+
+  // Episode ratings + derived show score (avg of your episode ratings)
+  const episodeRatings: Record<string, number> = {};
+  let ratingSum = 0;
+  let ratingCount = 0;
+  for (const w of watched) {
+    if (w.rating != null) {
+      episodeRatings[`${w.seasonNumber}:${w.episodeNumber}`] = w.rating;
+      ratingSum += w.rating;
+      ratingCount++;
+    }
+  }
+  const derivedScore =
+    ratingCount > 0
+      ? { value: Math.round(ratingSum / ratingCount), count: ratingCount }
+      : null;
 
   const episodes: DetailEpisode[] = allEpisodes
     .slice()
@@ -101,6 +118,8 @@ export default async function ShowDetailPage({
       episodes={episodes}
       rewatchCounts={rewatchCounts}
       initialFollowing={!!userShow}
+      episodeRatings={episodeRatings}
+      derivedScore={derivedScore}
     />
   );
 }
