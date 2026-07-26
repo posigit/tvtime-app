@@ -618,47 +618,69 @@ export default async function ProfilePage() {
     };
   });
 
-  const initial = session?.user?.name?.[0]?.toUpperCase() || "U";
-  const name = session?.user?.name || "User";
+  const rawName = session?.user?.name?.trim() || "User";
+  const name =
+    rawName.length > 0
+      ? rawName.charAt(0).toUpperCase() + rawName.slice(1)
+      : "User";
+  const initial = name.charAt(0).toUpperCase() || "U";
 
   return (
     <div className="min-h-screen bg-black pb-24">
-      {/* ---------- Hero banner ---------- */}
-      <div className="relative h-40 w-full overflow-hidden">
-        {bannerBackdrop ? (
-          <Image
-            src={backdropUrl(bannerBackdrop, "w1280") ?? ""}
-            alt=""
-            fill
-            sizes="100vw"
-            className="object-cover"
-            unoptimized
-            priority
-          />
-        ) : (
-          <div className="h-full w-full bg-gradient-to-br from-primary/40 via-[#1c1c1e] to-black" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10" />
-        <div className="absolute right-4 top-4">
-          <ProfileMenu />
+      {/*
+        Hero + identity in one relative stack so the avatar can overlap the
+        banner without being clipped by overflow-hidden on the image box.
+        (On iPhone that clipping was cutting the avatar in half and eating the name.)
+      */}
+      <div className="relative mb-6">
+        <div className="relative h-44 w-full overflow-hidden">
+          {bannerBackdrop ? (
+            <Image
+              src={backdropUrl(bannerBackdrop, "w1280") ?? ""}
+              alt=""
+              fill
+              sizes="100vw"
+              className="object-cover"
+              unoptimized
+              priority
+            />
+          ) : (
+            <div className="h-full w-full bg-gradient-to-br from-primary/40 via-[#1c1c1e] to-black" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20" />
+          <div className="absolute right-3 top-3 z-20">
+            <ProfileMenu />
+          </div>
+        </div>
+
+        {/* Sits on top of the banner edge — outside the overflow-hidden image box */}
+        <div className="relative z-10 -mt-12 flex items-end gap-3 px-4">
+          <div
+            className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/40 text-4xl font-bold text-white shadow-lg ring-4 ring-black"
+            aria-hidden
+          >
+            {initial}
+          </div>
+          <div className="min-w-0 flex-1 pb-1">
+            <h1 className="truncate text-2xl font-bold leading-tight text-white drop-shadow-sm">
+              {name}
+            </h1>
+            <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
+              {since ? (
+                <>
+                  Watching since {since}
+                  <span className="text-muted-foreground/50"> · </span>
+                </>
+              ) : null}
+              {showCount?.value ?? 0} shows
+              <span className="text-muted-foreground/50"> · </span>
+              {movieTotal?.value ?? 0} movies
+            </p>
+          </div>
         </div>
       </div>
 
       <div className="px-4">
-        {/* Avatar + identity (overlapping the banner) */}
-        <div className="-mt-10 mb-6 flex items-end gap-4">
-          <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary/60 to-primary/20 text-3xl font-bold text-white ring-4 ring-black">
-            {initial}
-          </div>
-          <div className="min-w-0 pb-1">
-            <h1 className="truncate text-2xl font-bold text-white">{name}</h1>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              {since ? `Watching since ${since} · ` : ""}
-              {showCount?.value ?? 0} shows · {movieTotal?.value ?? 0} movies
-            </p>
-          </div>
-        </div>
-
         {/* ---------- Stats (one consolidated card) ---------- */}
         <section className="mb-8">
           <SectionHeader title="Stats" />

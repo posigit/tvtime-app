@@ -15,6 +15,7 @@ import { LayoutToggle } from "@/components/layout-toggle";
 import {
   computeNextEpisode,
   computeUpcomingEpisodes,
+  effectiveLastWatchedAt,
   makeWatchedKey,
   EpisodeInfo,
   WatchedKey,
@@ -93,6 +94,8 @@ export default async function ShowsPage({
   // Fast path: 2 bulk DB queries (episodes + watched). Only TMDB-fill shows missing rows.
   let allEpisodes: EpisodeInfo[] = [];
   const watchedByShow = new Map<number, Set<WatchedKey>>();
+  /** Per-show watch timestamps (for bulk-mark demotion in Watch Next). */
+  const watchedAtsByShow = new Map<number, Date[]>();
 
   if (watching.length > 0) {
     const [episodeRows, watched] = await Promise.all([
@@ -115,6 +118,7 @@ export default async function ShowsPage({
             showTmdbId: watchedEpisodes.showTmdbId,
             seasonNumber: watchedEpisodes.seasonNumber,
             episodeNumber: watchedEpisodes.episodeNumber,
+            watchedAt: watchedEpisodes.watchedAt,
           })
           .from(watchedEpisodes)
           .where(
@@ -162,6 +166,15 @@ export default async function ShowsPage({
         watchedByShow.set(w.showTmdbId, set);
       }
       set.add(makeWatchedKey(w.seasonNumber, w.episodeNumber));
+
+      if (w.watchedAt) {
+        let ats = watchedAtsByShow.get(w.showTmdbId);
+        if (!ats) {
+          ats = [];
+          watchedAtsByShow.set(w.showTmdbId, ats);
+        }
+        ats.push(w.watchedAt);
+      }
     }
   }
 
@@ -182,6 +195,8 @@ export default async function ShowsPage({
   if (currentView === "watchlist") {
     const now = new Date();
     const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    /** Effective last activity (bulk-mark demoted) for sort + section split. */
+    const activityByShow = new Map<number, Date | null>();
 
     for (const show of watching) {
       const showEpisodes = episodesByShow.get(show.tmdbId) ?? [];
@@ -214,28 +229,45 @@ export default async function ShowsPage({
         remaining,
       };
 
-      // No episode catalog yet → keep visible so user can open the show
-      if (show.lastWatchedAt && show.lastWatchedAt > twoWeeksAgo) {
+      // Prefer episode timestamps (detect bulk import/"mark previous" stamps).
+      // Fall back to user_shows.lastWatchedAt when no episode rows exist yet.
+      const fromEpisodes = effectiveLastWatchedAt(
+        watchedAtsByShow.get(show.tmdbId) ?? []
+      );
+      const effective =
+        fromEpisodes ??
+        (watchedAtsByShow.has(show.tmdbId)
+          ? null // had only bulk-stamped watches → inactive
+          : show.lastWatchedAt);
+      activityByShow.set(show.tmdbId, effective);
+
+      // "For later" is intentional parking — never Watch Next.
+      // Recent *real* activity (not bulk stamp) → Watch Next; else dormant.
+      const isRecent = effective != null && effective > twoWeeksAgo;
+      if (show.status !== "for_later" && isRecent) {
         watchNext.push(item);
       } else {
         haventWatched.push(item);
       }
     }
 
+    const activityTime = (id: number) =>
+      activityByShow.get(id)?.getTime() ??
+      watching.find((s) => s.tmdbId === id)?.lastWatchedAt?.getTime() ??
+      0;
+
     watchNext.sort(
-      (a, b) =>
-        (watching.find((s) => s.tmdbId === b.tmdbId)?.lastWatchedAt?.getTime() ??
-          0) -
-        (watching.find((s) => s.tmdbId === a.tmdbId)?.lastWatchedAt?.getTime() ??
-          0)
+      (a, b) => activityTime(b.tmdbId) - activityTime(a.tmdbId)
     );
-    haventWatched.sort(
-      (a, b) =>
-        (watching.find((s) => s.tmdbId === a.tmdbId)?.lastWatchedAt?.getTime() ??
-          0) -
-        (watching.find((s) => s.tmdbId === b.tmdbId)?.lastWatchedAt?.getTime() ??
-          0)
-    );
+    // Dormant: oldest activity first (longest neglected at top), nulls last
+    haventWatched.sort((a, b) => {
+      const ta = activityByShow.get(a.tmdbId)?.getTime();
+      const tb = activityByShow.get(b.tmdbId)?.getTime();
+      if (ta == null && tb == null) return 0;
+      if (ta == null) return 1;
+      if (tb == null) return -1;
+      return ta - tb;
+    });
   }
 
   // UPCOMING VIEW

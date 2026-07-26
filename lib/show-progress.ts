@@ -48,6 +48,46 @@ export function compareEpisodeOrder(
   return a.episodeNumber - b.episodeNumber;
 }
 
+/**
+ * "Real" last-watch time for Watch Next vs Haven't-watched-for-a-while.
+ *
+ * Bulk marks (import fill-previous, "mark previous as watched") stamp many
+ * episodes with nearly identical timestamps. Those shouldn't keep a show in
+ * Watch Next for two weeks. If the newest activity is a bulk cluster
+ * (≥3 watches within 2s), fall back to the most recent watch *before* that
+ * cluster; if none, return null → treat as inactive.
+ */
+export function effectiveLastWatchedAt(
+  watchedAts: Array<Date | string | null | undefined>
+): Date | null {
+  const times = watchedAts
+    .map((v) => {
+      if (v == null) return null;
+      const d = v instanceof Date ? v : new Date(v);
+      return Number.isNaN(d.getTime()) ? null : d;
+    })
+    .filter((d): d is Date => d != null)
+    .sort((a, b) => b.getTime() - a.getTime());
+
+  if (times.length === 0) return null;
+
+  const newest = times[0];
+  const BULK_WINDOW_MS = 2000;
+  const BULK_MIN_COUNT = 3;
+  const bulkCount = times.filter(
+    (t) => newest.getTime() - t.getTime() <= BULK_WINDOW_MS
+  ).length;
+
+  if (bulkCount >= BULK_MIN_COUNT) {
+    const older = times.find(
+      (t) => newest.getTime() - t.getTime() > BULK_WINDOW_MS
+    );
+    return older ?? null;
+  }
+
+  return newest;
+}
+
 export function computeNextEpisode(
   episodes: EpisodeInfo[],
   lastWatched: { seasonNumber: number | null; episodeNumber: number | null },

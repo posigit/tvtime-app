@@ -63,12 +63,17 @@ export const {
     jwt: async ({ token, user }) => {
       if (user) {
         token.sub = user.id;
+        // Keep username on the token so session.user.name survives refreshes
+        if (user.name) token.name = user.name;
       }
       return token;
     },
     session: async ({ session, token }) => {
       if (token?.sub) {
         session.user.id = token.sub;
+      }
+      if (token?.name) {
+        session.user.name = token.name as string;
       }
       return session;
     },
