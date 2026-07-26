@@ -74,6 +74,39 @@ function EmptyState({
   );
 }
 
+function MoviePoster({
+  title,
+  posterPath,
+  rating,
+}: {
+  title: string;
+  posterPath: string | null;
+  rating?: number | null;
+}) {
+  return (
+    <div
+      style={{ aspectRatio: "2 / 3" }}
+      className="relative w-full overflow-hidden bg-secondary"
+    >
+      {rating != null && <RatingBadge value={rating} />}
+      {posterPath ? (
+        <Image
+          src={posterUrl(posterPath, "w342") ?? ""}
+          alt={title}
+          fill
+          sizes="(max-width: 768px) 33vw, 200px"
+          className="object-cover"
+          unoptimized
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center bg-[#3a7bd5] p-2 text-center">
+          <span className="text-xs font-medium text-white">{title}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MovieGrid({
   items,
 }: {
@@ -92,23 +125,55 @@ function MovieGrid({
           href={`/movie/${movie.tmdbId}`}
           className="overflow-hidden rounded-md bg-card"
         >
-          <div style={{ aspectRatio: "2 / 3" }} className="relative bg-secondary">
-            {movie.rating != null && <RatingBadge value={movie.rating} />}
-            {movie.posterPath ? (
-              <Image
-                src={posterUrl(movie.posterPath, "w342") ?? ""}
-                alt={movie.title}
-                fill
-                sizes="(max-width: 768px) 33vw, 200px"
-                className="object-cover"
-                unoptimized
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-muted-foreground">
-                {movie.title}
-              </div>
-            )}
-          </div>
+          <MoviePoster
+            title={movie.title}
+            posterPath={movie.posterPath}
+            rating={movie.rating}
+          />
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+function formatReleaseDate(releaseDate: string): string {
+  return new Date(releaseDate + "T12:00:00").toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+/** Upcoming (unreleased) movie tiles with the release date under the poster. */
+function UpcomingMovieGrid({
+  items,
+}: {
+  items: {
+    tmdbId: number;
+    title: string;
+    posterPath: string | null;
+    releaseDate: string | null;
+    rating?: number | null;
+  }[];
+}) {
+  return (
+    <div className="grid grid-cols-3 gap-2">
+      {items.map((movie) => (
+        <Link
+          key={movie.tmdbId}
+          href={`/movie/${movie.tmdbId}`}
+          className="overflow-hidden rounded-md bg-card"
+        >
+          <MoviePoster
+            title={movie.title}
+            posterPath={movie.posterPath}
+            rating={movie.rating}
+          />
+          {movie.releaseDate && (
+            <p className="px-1.5 py-1.5 text-center text-[10px] font-bold uppercase tracking-wide text-primary">
+              {formatReleaseDate(movie.releaseDate)}
+            </p>
+          )}
         </Link>
       ))}
     </div>
@@ -139,9 +204,39 @@ export default async function MoviesPage({
     .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
     .where(eq(userMovies.userId, userId));
 
-  const wantToWatch = userMoviesList
-    .filter((m) => m.status === "want_to_watch" || m.status === "for_later")
+  // Local YYYY-MM-DD for ISO date-string comparison
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const isUnreleased = (m: { releaseDate: string | null }) =>
+    m.releaseDate != null && m.releaseDate > todayStr;
+
+  const wantToWatchAll = userMoviesList.filter(
+    (m) => m.status === "want_to_watch" || m.status === "for_later"
+  );
+
+  // Watch Next = released (or undated) movies you can actually watch now.
+  // Unreleased ones belong to the Upcoming tab.
+  const wantToWatch = wantToWatchAll
+    .filter((m) => !isUnreleased(m))
     .sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+
+  const upcomingMovies = wantToWatchAll
+    .filter(isUnreleased)
+    .sort((a, b) =>
+      (a.releaseDate || "").localeCompare(b.releaseDate || "") ||
+      (a.title || "").localeCompare(b.title || "")
+    );
+
+  // Group upcoming by release month ("DECEMBER 2026")
+  const upcomingGroups = new Map<string, typeof upcomingMovies>();
+  for (const m of upcomingMovies) {
+    const key = new Date(m.releaseDate! + "T12:00:00")
+      .toLocaleDateString("en-US", { month: "long", year: "numeric" })
+      .toUpperCase();
+    const arr = upcomingGroups.get(key);
+    if (arr) arr.push(m);
+    else upcomingGroups.set(key, [m]);
+  }
 
   const watched = userMoviesList
     .filter((m) => m.status === "watched")
@@ -197,11 +292,24 @@ export default async function MoviesPage({
       )}
 
       {currentView === "upcoming" && (
-        <EmptyState
-          title="Your upcoming list is empty!"
-          description="Add movies you want to watch."
-          cta="Browse all movies"
-        />
+        <>
+          {upcomingMovies.length > 0 ? (
+            Array.from(upcomingGroups.entries()).map(([label, items]) => (
+              <section key={label} className="mb-6">
+                <div className="mb-3 mt-2 flex justify-center">
+                  <SectionLabel>{label}</SectionLabel>
+                </div>
+                <UpcomingMovieGrid items={items} />
+              </section>
+            ))
+          ) : (
+            <EmptyState
+              title="Your upcoming list is empty!"
+              description="Movies you want to watch that haven't released yet will show up here."
+              cta="Browse all movies"
+            />
+          )}
+        </>
       )}
     </div>
   );

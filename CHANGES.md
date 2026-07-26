@@ -216,3 +216,27 @@ Closes gaps found when comparing Chunks 1–3 to the original Phases 1–8 plan 
 ### Verification
 - `npm run build --webpack` passes; routes smoke-tested (401 auth gates, `/login` 200).
 - Freshness verified against production DB: stale "Rick and Morty" cache triggered a background refresh that upserted season 9; "Breaking Bad" (Ended) was correctly skipped.
+
+---
+
+## Profile / movies poster & favorites fixes (2026-07-26)
+
+- **Favorite rails empty:** favorites were filtered from a `limit(20)` "recently updated" library query, so most favorites never appeared. Now queried with their own `favorite = true` selects.
+- **Watching since year:** uses earliest episode/movie `watched_at` (your data starts **Jan 2022**). Account creation (2026) is intentionally ignored.
+- **Recently watched / Top rated posters:** shared `PosterTile` with width + aspect on the same box; recently watched deduped by show/movie so ≥4 distinct posters show when available.
+- **Lists:** Favorite Movies / Favorite Shows cards show poster previews and link into `/profile/list/favorite-*`.
+- **Movies tab:** shared poster cell for Watch List + Upcoming (today only Spider-Man: Beyond the Spider-Verse is still unreleased on the want list).
+
+---
+
+## Profile redesign
+
+Structure reworked around real activity instead of placeholders:
+
+- **Removed dead weight:** the all-zeros social strip (following/followers/comments — social is a documented non-goal), the placeholder notification bell, and the non-functional EDIT button.
+- **Hero banner:** backdrop of your most recently watched item (gradient fallback), avatar overlapping the banner edge (original TV Time `e1` style), name + "Watching since Mon YYYY · X shows · Y movies".
+- **Stats consolidated:** 7 floating cards → one card with a 2×3 grid (day streak with flame, episodes this month, time watching TV, episodes watched, time watching movies, movies watched). Show count moved into the identity line.
+- **New "Recently watched" rail:** episodes (with SxxExx captions) + movies (with ★ caption when rated), merged by `watchedAt`, top 12, 4-across tiles.
+- **New "Top rated" rail:** your rated movies + shows (derived from episode-rating averages with rated-episode counts), merged by score, top 12. Hidden until you rate something.
+- Kept: Lists, Shows / Favorite shows / Movies / Favorite movies rails (4-across), ProfileMenu (import + sign out).
+- Verified against production DB: banner uses the most-recent backdrop (Rick and Morty), merged rails and `AVG(rating)::float` derived scores return correctly.

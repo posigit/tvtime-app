@@ -10,6 +10,7 @@ import {
   watchedEpisodes,
 } from "@/lib/schema";
 import { getMovieDetails, getTvDetails } from "@/lib/tmdb";
+import { and, eq, inArray } from "drizzle-orm";
 import { ParsedGdprData } from "./parser";
 import { TmdbMappingResult } from "./tmdb-mapper";
 
@@ -287,5 +288,23 @@ export async function importLists(
           items: mappedItems,
         },
       });
+
+    // Mirror favorite lists onto the library rows' favorite flag so the
+    // Favorite rails / pages populate (the flag is the app's source of truth).
+    if (list.type === "favorite_shows" || list.type === "favorite_movies") {
+      const tmdbIds = mappedItems
+        .map((item) => item?.tmdbId)
+        .filter((id): id is number => Number.isFinite(id));
+      if (tmdbIds.length > 0) {
+        const table =
+          list.type === "favorite_shows" ? userShows : userMovies;
+        await db
+          .update(table)
+          .set({ favorite: true })
+          .where(
+            and(eq(table.userId, userId), inArray(table.tmdbId, tmdbIds))
+          );
+      }
+    }
   }
 }
