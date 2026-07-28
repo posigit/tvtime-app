@@ -112,6 +112,7 @@ export default async function ShowDetailPage({
         numberOfEpisodes: show.numberOfEpisodes,
         episodeRuntime: show.episodeRuntime,
         voteAverage: show.voteAverage,
+        // -1 = OMDb checked with no RT; pass through so client falls back to TMDB
         rtScore: show.rtScore ?? null,
         firstAirDate: show.firstAirDate,
       }}

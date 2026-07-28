@@ -394,9 +394,10 @@ export function ShowDetailClient({
   if (show.status) metaParts.push(show.status);
   if (show.networks && show.networks.length > 0) metaParts.push(show.networks[0]);
 
-  /** Rating badge: raw Tomatometer (96%) when RT exists, else TMDB X.X/10. */
+  /** Rating badge: raw Tomatometer (96%) when RT exists, else TMDB X.X/10.
+   *  `rt_score = -1` means "checked, no RT" — fall through to TMDB. */
   const rating =
-    show.rtScore != null
+    show.rtScore != null && show.rtScore >= 0
       ? { icon: "rt" as const, text: `${show.rtScore}%` }
       : show.voteAverage
         ? { icon: "tmdb" as const, text: `${show.voteAverage.toFixed(1)}/10` }

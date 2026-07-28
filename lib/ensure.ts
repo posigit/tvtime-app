@@ -10,6 +10,9 @@ import {
 import { getRottenTomatoesScore } from "./omdb";
 import { eq, sql } from "drizzle-orm";
 
+/** Stored in `rt_score` when OMDb was checked and has no Tomatometer (stops retries). */
+const RT_NONE = -1;
+
 type ShowRow = {
   tmdbId: number;
   title: string;
@@ -120,23 +123,55 @@ const rtInFlight = new Set<string>();
 
 /**
  * Fetch + cache the RT Tomatometer for a title (via TMDB external_ids → OMDb).
- * `imdbId` doubles as the "attempted" marker: once set, we never refetch,
- * so titles without an RT score don't burn the daily OMDb quota.
+ *
+ * Persistence rules:
+ * - Real score (0–100) when OMDb includes Rotten Tomatoes
+ * - `rt_score = -1` when OMDb answered successfully but has no RT entry
+ *   (stops retries so we don't burn the free-tier quota)
+ * - Leave `rt_score` null on failure / rate limit so the next visit retries
  */
-async function fillRtScore(tmdbId: number, type: "tv" | "movie") {
+async function fillRtScore(
+  tmdbId: number,
+  type: "tv" | "movie",
+  existingImdbId?: string | null
+) {
   try {
-    const ids =
-      type === "tv"
-        ? await getTvExternalIds(tmdbId)
-        : await getMovieExternalIds(tmdbId);
-    const imdbId = ids.imdb_id ?? null;
-    const rtScore = imdbId ? await getRottenTomatoesScore(imdbId) : null;
+    let imdbId = existingImdbId ?? null;
+    if (!imdbId) {
+      const ids =
+        type === "tv"
+          ? await getTvExternalIds(tmdbId)
+          : await getMovieExternalIds(tmdbId);
+      imdbId = ids.imdb_id ?? null;
+    }
 
     const table = type === "tv" ? shows : movies;
+
+    // No IMDb id → cannot query OMDb; mark checked so we stop retrying.
+    if (!imdbId) {
+      await withDbRetry(() =>
+        db
+          .update(table)
+          .set({ imdbId: null, rtScore: RT_NONE })
+          .where(eq(table.tmdbId, tmdbId))
+      );
+      return;
+    }
+
+    const { score, checked } = await getRottenTomatoesScore(imdbId);
+
+    if (!checked) {
+      // Keep imdb for next try; leave rt_score null so ensureRtScore retries.
+      await withDbRetry(() =>
+        db.update(table).set({ imdbId }).where(eq(table.tmdbId, tmdbId))
+      );
+      return;
+    }
+
     await withDbRetry(() =>
       db
         .update(table)
-        .set({ imdbId, ...(rtScore !== null ? { rtScore } : {}) })
+        .set({ imdbId, rtScore: score ?? RT_NONE })
         .where(eq(table.tmdbId, tmdbId))
     );
   } catch (err) {
@@ -147,16 +182,23 @@ async function fillRtScore(tmdbId: number, type: "tv" | "movie") {
   }
 }
 
-/** Kick off a background RT fill if we haven't attempted this title yet. */
+/**
+ * Kick off a background RT fill when we do not yet have a resolved score.
+ * `rt_score = -1` means "checked, no RT" and is treated as resolved.
+ */
 function ensureRtScore(
   row: { tmdbId: number; rtScore?: number | null; imdbId?: string | null },
   type: "tv" | "movie"
 ) {
-  if (row.rtScore != null || row.imdbId != null) return;
+  // null = never resolved (or failed last time) → try again
+  // number (incl. -1) = done
+  if (row.rtScore != null) return;
   const key = `${type}:${row.tmdbId}`;
   if (rtInFlight.has(key)) return;
   rtInFlight.add(key);
-  void fillRtScore(row.tmdbId, type).finally(() => rtInFlight.delete(key));
+  void fillRtScore(row.tmdbId, type, row.imdbId).finally(() =>
+    rtInFlight.delete(key)
+  );
 }
 
 /**

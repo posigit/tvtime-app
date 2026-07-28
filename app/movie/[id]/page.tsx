@@ -85,7 +85,7 @@ export default async function MovieDetailPage({
                   <span>{Math.floor(movie.runtime / 60)}h {movie.runtime % 60}m</span>
                 </>
               )}
-              {movie.rtScore != null ? (
+              {movie.rtScore != null && movie.rtScore >= 0 ? (
                 <>
                   <span>·</span>
                   <span className="text-primary" title="Rotten Tomatoes">
