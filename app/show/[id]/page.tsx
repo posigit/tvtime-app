@@ -7,6 +7,12 @@ import {
   ShowDetailClient,
   DetailEpisode,
 } from "@/components/show-detail-client";
+import { filterNewMedia } from "@/lib/recommend";
+import {
+  getTvRecommendations,
+  getTvSimilar,
+  getWatchProviders,
+} from "@/lib/tmdb";
 import { notFound } from "next/navigation";
 
 export default async function ShowDetailPage({
@@ -23,43 +29,62 @@ export default async function ShowDetailPage({
   const show = await ensureShow(tmdbId);
   if (!show) notFound();
 
-  const [userShow, allEpisodes, watched, rewatches] = await Promise.all([
-    db.query.userShows.findFirst({
-      where: and(eq(userShows.userId, userId), eq(userShows.tmdbId, tmdbId)),
-    }),
-    ensureEpisodes(tmdbId, show.numberOfSeasons),
-    db
-      .select({
-        seasonNumber: watchedEpisodes.seasonNumber,
-        episodeNumber: watchedEpisodes.episodeNumber,
-        rating: watchedEpisodes.rating,
-      })
-      .from(watchedEpisodes)
-      .where(
-        and(
-          eq(watchedEpisodes.userId, userId),
-          eq(watchedEpisodes.showTmdbId, tmdbId)
-        )
-      ),
-    db
-      .select({
-        seasonNumber: seasonRewatches.seasonNumber,
-        count: seasonRewatches.count,
-      })
-      .from(seasonRewatches)
-      .where(
-        and(
-          eq(seasonRewatches.userId, userId),
-          eq(seasonRewatches.showTmdbId, tmdbId)
-        )
-      ),
+  const [userShow, allEpisodes, watched, rewatches, ownedShows] =
+    await Promise.all([
+      db.query.userShows.findFirst({
+        where: and(eq(userShows.userId, userId), eq(userShows.tmdbId, tmdbId)),
+      }),
+      ensureEpisodes(tmdbId, show.numberOfSeasons),
+      db
+        .select({
+          seasonNumber: watchedEpisodes.seasonNumber,
+          episodeNumber: watchedEpisodes.episodeNumber,
+          rating: watchedEpisodes.rating,
+        })
+        .from(watchedEpisodes)
+        .where(
+          and(
+            eq(watchedEpisodes.userId, userId),
+            eq(watchedEpisodes.showTmdbId, tmdbId)
+          )
+        ),
+      db
+        .select({
+          seasonNumber: seasonRewatches.seasonNumber,
+          count: seasonRewatches.count,
+        })
+        .from(seasonRewatches)
+        .where(
+          and(
+            eq(seasonRewatches.userId, userId),
+            eq(seasonRewatches.showTmdbId, tmdbId)
+          )
+        ),
+      db
+        .select({ tmdbId: userShows.tmdbId })
+        .from(userShows)
+        .where(eq(userShows.userId, userId)),
+    ]);
+
+  const ownedIds = new Set(ownedShows.map((s) => s.tmdbId));
+
+  const [similarRaw, recsRaw, providers] = await Promise.all([
+    getTvSimilar(tmdbId).catch(() => []),
+    getTvRecommendations(tmdbId).catch(() => []),
+    getWatchProviders(tmdbId, "tv").catch(() => ({
+      flatrate: [],
+      rent: [],
+      buy: [],
+    })),
   ]);
+
+  const moreLikeThis = filterNewMedia(similarRaw, ownedIds, 12);
+  const recommended = filterNewMedia(recsRaw, ownedIds, 12);
 
   const watchedSet = new Set(
     watched.map((w) => `${w.seasonNumber}:${w.episodeNumber}`)
   );
 
-  // Episode ratings + derived show score (avg of your episode ratings)
   const episodeRatings: Record<string, number> = {};
   let ratingSum = 0;
   let ratingCount = 0;
@@ -112,7 +137,6 @@ export default async function ShowDetailPage({
         numberOfEpisodes: show.numberOfEpisodes,
         episodeRuntime: show.episodeRuntime,
         voteAverage: show.voteAverage,
-        // -1 = OMDb checked with no RT; pass through so client falls back to TMDB
         rtScore: show.rtScore ?? null,
         firstAirDate: show.firstAirDate,
       }}
@@ -121,6 +145,9 @@ export default async function ShowDetailPage({
       initialFollowing={!!userShow}
       episodeRatings={episodeRatings}
       derivedScore={derivedScore}
+      moreLikeThis={moreLikeThis}
+      recommended={recommended}
+      providers={providers}
     />
   );
 }

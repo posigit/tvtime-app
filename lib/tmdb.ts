@@ -184,3 +184,190 @@ export async function getOnTheAir() {
     }>;
   }>("/tv/on_the_air");
 }
+
+export type TmdbMediaCard = {
+  id: number;
+  title: string;
+  poster_path?: string | null;
+  mediaType: "tv" | "movie";
+  vote_average?: number;
+};
+
+type TmdbListItem = {
+  id: number;
+  name?: string;
+  title?: string;
+  poster_path?: string | null;
+  vote_average?: number;
+};
+
+function mapList(
+  results: TmdbListItem[],
+  mediaType: "tv" | "movie"
+): TmdbMediaCard[] {
+  return results.map((r) => ({
+    id: r.id,
+    title: (mediaType === "tv" ? r.name : r.title) || "Untitled",
+    poster_path: r.poster_path,
+    mediaType,
+    vote_average: r.vote_average,
+  }));
+}
+
+export async function getTvRecommendations(tmdbId: number) {
+  const data = await tmdbFetch<{ results: TmdbListItem[] }>(
+    `/tv/${tmdbId}/recommendations`
+  );
+  return mapList(data.results ?? [], "tv");
+}
+
+export async function getTvSimilar(tmdbId: number) {
+  const data = await tmdbFetch<{ results: TmdbListItem[] }>(
+    `/tv/${tmdbId}/similar`
+  );
+  return mapList(data.results ?? [], "tv");
+}
+
+export async function getMovieRecommendations(tmdbId: number) {
+  const data = await tmdbFetch<{ results: TmdbListItem[] }>(
+    `/movie/${tmdbId}/recommendations`
+  );
+  return mapList(data.results ?? [], "movie");
+}
+
+export async function getMovieSimilar(tmdbId: number) {
+  const data = await tmdbFetch<{ results: TmdbListItem[] }>(
+    `/movie/${tmdbId}/similar`
+  );
+  return mapList(data.results ?? [], "movie");
+}
+
+export async function getTopRatedTv() {
+  const data = await tmdbFetch<{ results: TmdbListItem[] }>("/tv/top_rated");
+  return mapList(data.results ?? [], "tv");
+}
+
+export async function getTopRatedMovies() {
+  const data = await tmdbFetch<{ results: TmdbListItem[] }>("/movie/top_rated");
+  return mapList(data.results ?? [], "movie");
+}
+
+export async function getNowPlayingMovies() {
+  const data = await tmdbFetch<{ results: TmdbListItem[] }>("/movie/now_playing");
+  return mapList(data.results ?? [], "movie");
+}
+
+export async function getPopularTv() {
+  const data = await tmdbFetch<{ results: TmdbListItem[] }>("/tv/popular");
+  return mapList(data.results ?? [], "tv");
+}
+
+export async function discoverTvByGenre(genreId: number, page = 1) {
+  const data = await tmdbFetch<{ results: TmdbListItem[] }>("/discover/tv", {
+    with_genres: String(genreId),
+    sort_by: "popularity.desc",
+    page: String(page),
+  });
+  return mapList(data.results ?? [], "tv");
+}
+
+export async function discoverMoviesByGenre(genreId: number, page = 1) {
+  const data = await tmdbFetch<{ results: TmdbListItem[] }>("/discover/movie", {
+    with_genres: String(genreId),
+    sort_by: "popularity.desc",
+    page: String(page),
+  });
+  return mapList(data.results ?? [], "movie");
+}
+
+export type WatchProvider = {
+  provider_id: number;
+  provider_name: string;
+  logo_path: string | null;
+};
+
+export type WatchProvidersResult = {
+  link?: string;
+  flatrate: WatchProvider[];
+  rent: WatchProvider[];
+  buy: WatchProvider[];
+};
+
+function mapProviders(
+  list:
+    | Array<{
+        provider_id: number;
+        provider_name: string;
+        logo_path?: string | null;
+      }>
+    | undefined
+): WatchProvider[] {
+  return (list ?? []).map((p) => ({
+    provider_id: p.provider_id,
+    provider_name: p.provider_name,
+    logo_path: p.logo_path ?? null,
+  }));
+}
+
+/** Where to watch. Region from WATCH_REGION env (default US). */
+export async function getWatchProviders(
+  tmdbId: number,
+  type: "tv" | "movie"
+): Promise<WatchProvidersResult> {
+  const region = (process.env.WATCH_REGION || "US").toUpperCase();
+  const data = await tmdbFetch<{
+    results?: Record<
+      string,
+      {
+        link?: string;
+        flatrate?: Array<{
+          provider_id: number;
+          provider_name: string;
+          logo_path?: string | null;
+        }>;
+        rent?: Array<{
+          provider_id: number;
+          provider_name: string;
+          logo_path?: string | null;
+        }>;
+        buy?: Array<{
+          provider_id: number;
+          provider_name: string;
+          logo_path?: string | null;
+        }>;
+      }
+    >;
+  }>(`/${type}/${tmdbId}/watch/providers`);
+
+  const entry = data.results?.[region] ?? data.results?.US;
+  if (!entry) return { flatrate: [], rent: [], buy: [] };
+  return {
+    link: entry.link,
+    flatrate: mapProviders(entry.flatrate),
+    rent: mapProviders(entry.rent),
+    buy: mapProviders(entry.buy),
+  };
+}
+
+export function providerLogoUrl(path: string | null | undefined) {
+  if (!path) return null;
+  return `${TMDB_IMAGE_BASE_URL}/w92${path}`;
+}
+
+export const TV_GENRES = [
+  { id: 10765, name: "Sci-Fi & Fantasy" },
+  { id: 80, name: "Crime" },
+  { id: 18, name: "Drama" },
+  { id: 35, name: "Comedy" },
+  { id: 16, name: "Animation" },
+  { id: 10759, name: "Action & Adventure" },
+] as const;
+
+export const MOVIE_GENRES = [
+  { id: 28, name: "Action" },
+  { id: 878, name: "Science Fiction" },
+  { id: 80, name: "Crime" },
+  { id: 18, name: "Drama" },
+  { id: 35, name: "Comedy" },
+  { id: 27, name: "Horror" },
+] as const;

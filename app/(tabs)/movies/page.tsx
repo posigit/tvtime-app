@@ -10,6 +10,7 @@ import {
   isUnreleased,
   splitWatchNextAndLater,
 } from "@/lib/movie-watchlist";
+import { WatchLaterTools } from "@/components/watch-later-tools";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -200,6 +201,8 @@ export default async function MoviesPage({
       title: movies.title,
       posterPath: movies.posterPath,
       releaseDate: movies.releaseDate,
+      runtime: movies.runtime,
+      rtScore: movies.rtScore,
       status: userMovies.status,
       watchedAt: userMovies.watchedAt,
       rating: userMovies.rating,
@@ -270,12 +273,17 @@ export default async function MoviesPage({
           )}
 
           {watchLater.length > 0 && (
-            <section className="mb-6">
-              <div className="mb-3 mt-2 flex justify-center">
-                <SectionLabel>Watch Later</SectionLabel>
-              </div>
-              <MovieGrid items={watchLater} />
-            </section>
+            <WatchLaterTools
+              items={watchLater.map((m) => ({
+                tmdbId: m.tmdbId,
+                title: m.title,
+                posterPath: m.posterPath,
+                releaseDate: m.releaseDate,
+                runtime: m.runtime,
+                rtScore: m.rtScore,
+                rating: m.rating,
+              }))}
+            />
           )}
 
           {watched.length > 0 && (

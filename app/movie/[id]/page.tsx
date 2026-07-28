@@ -2,14 +2,23 @@ import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { userMovies } from "@/lib/schema";
 import { eq, and } from "drizzle-orm";
-import { backdropUrl, posterUrl } from "@/lib/tmdb";
+import {
+  backdropUrl,
+  posterUrl,
+  getMovieRecommendations,
+  getMovieSimilar,
+  getWatchProviders,
+} from "@/lib/tmdb";
 import { ensureMovie } from "@/lib/ensure";
+import { filterNewMedia } from "@/lib/recommend";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
 import { MovieWatchButton } from "@/components/movie-watch-button";
 import { MovieRating } from "@/components/star-rating";
+import { DiscoverRail } from "@/components/discover-rail";
+import { WatchProviders } from "@/components/watch-providers";
 
 export default async function MovieDetailPage({
   params,
@@ -25,9 +34,30 @@ export default async function MovieDetailPage({
   const movie = await ensureMovie(tmdbId);
   if (!movie) notFound();
 
-  const userMovie = await db.query.userMovies.findFirst({
-    where: and(eq(userMovies.userId, userId), eq(userMovies.tmdbId, tmdbId)),
-  });
+  const [userMovie, ownedMovies] = await Promise.all([
+    db.query.userMovies.findFirst({
+      where: and(eq(userMovies.userId, userId), eq(userMovies.tmdbId, tmdbId)),
+    }),
+    db
+      .select({ tmdbId: userMovies.tmdbId })
+      .from(userMovies)
+      .where(eq(userMovies.userId, userId)),
+  ]);
+
+  const ownedIds = new Set(ownedMovies.map((m) => m.tmdbId));
+
+  const [similarRaw, recsRaw, providers] = await Promise.all([
+    getMovieSimilar(tmdbId).catch(() => []),
+    getMovieRecommendations(tmdbId).catch(() => []),
+    getWatchProviders(tmdbId, "movie").catch(() => ({
+      flatrate: [],
+      rent: [],
+      buy: [],
+    })),
+  ]);
+
+  const moreLikeThis = filterNewMedia(similarRaw, ownedIds, 12);
+  const recommended = filterNewMedia(recsRaw, ownedIds, 12);
 
   return (
     <div className="min-h-screen bg-black pb-20">
@@ -82,7 +112,9 @@ export default async function MovieDetailPage({
               {movie.runtime && (
                 <>
                   <span>·</span>
-                  <span>{Math.floor(movie.runtime / 60)}h {movie.runtime % 60}m</span>
+                  <span>
+                    {Math.floor(movie.runtime / 60)}h {movie.runtime % 60}m
+                  </span>
                 </>
               )}
               {movie.rtScore != null && movie.rtScore >= 0 ? (
@@ -123,6 +155,16 @@ export default async function MovieDetailPage({
             />
           </div>
         )}
+
+        <WatchProviders providers={providers} />
+
+        <div className="mt-6">
+          <DiscoverRail
+            label={`More like ${movie.title}`}
+            items={moreLikeThis}
+          />
+          <DiscoverRail label="Recommended for you" items={recommended} />
+        </div>
       </div>
     </div>
   );

@@ -8,6 +8,9 @@ import { cn } from "@/lib/utils";
 import { isEpisodeAired } from "@/lib/show-progress";
 import { Confetti } from "@/components/confetti";
 import { EpisodeRating, StarRatingDisplay } from "@/components/star-rating";
+import { DiscoverRail } from "@/components/discover-rail";
+import { WatchProviders } from "@/components/watch-providers";
+import type { TmdbMediaCard, WatchProvidersResult } from "@/lib/tmdb";
 import { Check, ChevronDown, MoreHorizontal } from "lucide-react";
 
 export type DetailEpisode = {
@@ -80,6 +83,9 @@ export function ShowDetailClient({
   initialFollowing,
   episodeRatings,
   derivedScore,
+  moreLikeThis = [],
+  recommended = [],
+  providers = null,
 }: {
   show: DetailShow;
   episodes: DetailEpisode[];
@@ -87,6 +93,9 @@ export function ShowDetailClient({
   initialFollowing: boolean;
   episodeRatings: Record<string, number>;
   derivedScore: { value: number; count: number } | null;
+  moreLikeThis?: TmdbMediaCard[];
+  recommended?: TmdbMediaCard[];
+  providers?: WatchProvidersResult | null;
 }) {
   const router = useRouter();
 
@@ -585,6 +594,16 @@ export function ShowDetailClient({
           >
             {following ? "✓ In your watch list" : "Add to watch list"}
           </button>
+
+          {providers && <WatchProviders providers={providers} />}
+
+          <div className="mt-6">
+            <DiscoverRail
+              label={`More like ${show.title}`}
+              items={moreLikeThis}
+            />
+            <DiscoverRail label="Recommended for you" items={recommended} />
+          </div>
         </div>
       )}
 
