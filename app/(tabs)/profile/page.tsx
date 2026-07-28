@@ -9,13 +9,35 @@ import {
   watchedEpisodes,
   userLists,
 } from "@/lib/schema";
-import { eq, and, sql, count, desc, gte, isNotNull, inArray } from "drizzle-orm";
+import {
+  eq,
+  and,
+  sql,
+  count,
+  desc,
+  gte,
+  lt,
+  isNotNull,
+  inArray,
+} from "drizzle-orm";
 import { posterUrl, backdropUrl } from "@/lib/tmdb";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight, Flame, Heart, Plus } from "lucide-react";
 import { ProfileMenu } from "@/components/profile-menu";
+import { ProfileHeatmap } from "@/components/profile-heatmap";
+import { ProfileTaste } from "@/components/profile-taste";
+import { ProfileYearRecap } from "@/components/profile-year-recap";
+import {
+  aggregateGenres,
+  currentStreak as calcCurrentStreak,
+  genresFromTmdbData,
+  longestStreak,
+  type DayCount,
+  type TasteSnapshot,
+  type YearRecap,
+} from "@/lib/profile-insights";
 
 // ---------- shared bits ----------
 
@@ -276,24 +298,52 @@ export default async function ProfilePage() {
       )
     );
 
-  // Day streak: consecutive watch days ending today (or yesterday)
-  const watchDays = await db
-    .select({ day: sql<string>`TO_CHAR(${watchedEpisodes.watchedAt}, 'YYYY-MM-DD')` })
-    .from(watchedEpisodes)
-    .where(eq(watchedEpisodes.userId, userId))
-    .groupBy(sql`TO_CHAR(${watchedEpisodes.watchedAt}, 'YYYY-MM-DD')`);
+  // Activity by day (episodes + movies) for streak + heatmap
+  const [epDays, movieDays] = await Promise.all([
+    db
+      .select({
+        day: sql<string>`TO_CHAR(${watchedEpisodes.watchedAt}, 'YYYY-MM-DD')`,
+        cnt: sql<number>`count(*)::int`,
+      })
+      .from(watchedEpisodes)
+      .where(
+        and(
+          eq(watchedEpisodes.userId, userId),
+          isNotNull(watchedEpisodes.watchedAt)
+        )
+      )
+      .groupBy(sql`TO_CHAR(${watchedEpisodes.watchedAt}, 'YYYY-MM-DD')`),
+    db
+      .select({
+        day: sql<string>`TO_CHAR(${userMovies.watchedAt}, 'YYYY-MM-DD')`,
+        cnt: sql<number>`count(*)::int`,
+      })
+      .from(userMovies)
+      .where(
+        and(
+          eq(userMovies.userId, userId),
+          eq(userMovies.status, "watched"),
+          isNotNull(userMovies.watchedAt)
+        )
+      )
+      .groupBy(sql`TO_CHAR(${userMovies.watchedAt}, 'YYYY-MM-DD')`),
+  ]);
 
-  const daySet = new Set(watchDays.map((r) => r.day));
-  const dayKey = (d: Date) =>
-    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-  const cursor = new Date();
-  cursor.setHours(0, 0, 0, 0);
-  if (!daySet.has(dayKey(cursor))) cursor.setDate(cursor.getDate() - 1);
-  let dayStreak = 0;
-  while (daySet.has(dayKey(cursor))) {
-    dayStreak++;
-    cursor.setDate(cursor.getDate() - 1);
+  const dayCountMap = new Map<string, number>();
+  for (const r of epDays) {
+    if (!r.day) continue;
+    dayCountMap.set(r.day, (dayCountMap.get(r.day) ?? 0) + Number(r.cnt));
   }
+  for (const r of movieDays) {
+    if (!r.day) continue;
+    dayCountMap.set(r.day, (dayCountMap.get(r.day) ?? 0) + Number(r.cnt));
+  }
+  const dayCounts: DayCount[] = [...dayCountMap.entries()].map(
+    ([day, count]) => ({ day, count })
+  );
+  const daySet = new Set(dayCountMap.keys());
+  const dayStreak = calcCurrentStreak(daySet);
+  const bestStreak = longestStreak(daySet);
 
   // ----- identity -----
   // "Watching since" = earliest watch activity in your data (import included),
@@ -493,6 +543,229 @@ export default async function ProfilePage() {
     .sort((a, b) => b.score - a.score)
     .slice(0, 12)
     .map(({ score: _s, ...item }) => ({ ...item, subAccent: true }));
+
+  // ----- Taste snapshot (avg scores + genres from tmdb_data) -----
+  const [showRatingAgg, movieRatingAgg, showGenreRows, movieGenreRows] =
+    await Promise.all([
+      db
+        .select({
+          avg: sql<number>`AVG(${watchedEpisodes.rating})::float`,
+          cnt: sql<number>`count(*)::int`,
+        })
+        .from(watchedEpisodes)
+        .where(
+          and(
+            eq(watchedEpisodes.userId, userId),
+            isNotNull(watchedEpisodes.rating)
+          )
+        )
+        .then((r) => r[0]),
+      db
+        .select({
+          avg: sql<number>`AVG(${userMovies.rating})::float`,
+          cnt: sql<number>`count(*)::int`,
+        })
+        .from(userMovies)
+        .where(
+          and(
+            eq(userMovies.userId, userId),
+            isNotNull(userMovies.rating)
+          )
+        )
+        .then((r) => r[0]),
+      // Genres weighted by rated episodes per show
+      db
+        .select({
+          tmdbData: shows.tmdbData,
+          scoreSum: sql<number>`COALESCE(SUM(${watchedEpisodes.rating}), 0)::float`,
+          scoreCount: sql<number>`count(${watchedEpisodes.rating})::int`,
+          weight: sql<number>`count(*)::int`,
+        })
+        .from(watchedEpisodes)
+        .innerJoin(shows, eq(watchedEpisodes.showTmdbId, shows.tmdbId))
+        .where(eq(watchedEpisodes.userId, userId))
+        .groupBy(shows.tmdbId, shows.tmdbData),
+      db
+        .select({
+          tmdbData: movies.tmdbData,
+          rating: userMovies.rating,
+        })
+        .from(userMovies)
+        .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
+        .where(
+          and(
+            eq(userMovies.userId, userId),
+            eq(userMovies.status, "watched")
+          )
+        ),
+    ]);
+
+  const taste: TasteSnapshot = {
+    avgShowScore: showRatingAgg?.avg ?? null,
+    avgMovieScore: movieRatingAgg?.avg ?? null,
+    ratedEpisodes: showRatingAgg?.cnt ?? 0,
+    ratedMovies: movieRatingAgg?.cnt ?? 0,
+    genres: aggregateGenres([
+      ...showGenreRows.map((r) => ({
+        genres: genresFromTmdbData(r.tmdbData),
+        weight: Number(r.weight) || 1,
+        scoreSum: Number(r.scoreSum) || 0,
+        scoreCount: Number(r.scoreCount) || 0,
+      })),
+      ...movieGenreRows.map((r) => ({
+        genres: genresFromTmdbData(r.tmdbData),
+        weight: 1,
+        scoreSum: r.rating != null ? Number(r.rating) : 0,
+        scoreCount: r.rating != null ? 1 : 0,
+      })),
+    ]),
+    topTitles: topRatedItems.slice(0, 8).map((t) => ({
+      key: t.key,
+      href: t.href,
+      title: t.title,
+      posterPath: t.posterPath,
+      scoreLabel: t.sub.split(" · ")[0] || t.sub,
+    })),
+  };
+
+  // ----- Year recap (calendar year) -----
+  const year = new Date().getFullYear();
+  const yearStart = new Date(year, 0, 1);
+  const yearEnd = new Date(year + 1, 0, 1);
+
+  const [
+    yearEpStats,
+    yearMovieStats,
+    yearTopShowRows,
+    yearTopMovieRows,
+    yearShowGenreRows,
+  ] = await Promise.all([
+    db
+      .select({
+        episodes: sql<number>`count(*)::int`,
+        minutes: sql<number>`COALESCE(SUM(${shows.episodeRuntime}), 0)::int`,
+      })
+      .from(watchedEpisodes)
+      .innerJoin(shows, eq(watchedEpisodes.showTmdbId, shows.tmdbId))
+      .where(
+        and(
+          eq(watchedEpisodes.userId, userId),
+          isNotNull(watchedEpisodes.watchedAt),
+          gte(watchedEpisodes.watchedAt, yearStart),
+          lt(watchedEpisodes.watchedAt, yearEnd)
+        )
+      )
+      .then((r) => r[0]),
+    db
+      .select({
+        movies: sql<number>`count(*)::int`,
+        minutes: sql<number>`COALESCE(SUM(${movies.runtime}), 0)::int`,
+      })
+      .from(userMovies)
+      .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
+      .where(
+        and(
+          eq(userMovies.userId, userId),
+          eq(userMovies.status, "watched"),
+          isNotNull(userMovies.watchedAt),
+          gte(userMovies.watchedAt, yearStart),
+          lt(userMovies.watchedAt, yearEnd)
+        )
+      )
+      .then((r) => r[0]),
+    db
+      .select({
+        title: shows.title,
+        posterPath: shows.posterPath,
+        episodes: sql<number>`count(*)::int`,
+      })
+      .from(watchedEpisodes)
+      .innerJoin(shows, eq(watchedEpisodes.showTmdbId, shows.tmdbId))
+      .where(
+        and(
+          eq(watchedEpisodes.userId, userId),
+          isNotNull(watchedEpisodes.watchedAt),
+          gte(watchedEpisodes.watchedAt, yearStart),
+          lt(watchedEpisodes.watchedAt, yearEnd)
+        )
+      )
+      .groupBy(shows.tmdbId, shows.title, shows.posterPath)
+      .orderBy(desc(sql`count(*)`))
+      .limit(1),
+    db
+      .select({
+        title: movies.title,
+        posterPath: movies.posterPath,
+        rating: userMovies.rating,
+      })
+      .from(userMovies)
+      .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
+      .where(
+        and(
+          eq(userMovies.userId, userId),
+          eq(userMovies.status, "watched"),
+          isNotNull(userMovies.watchedAt),
+          gte(userMovies.watchedAt, yearStart),
+          lt(userMovies.watchedAt, yearEnd)
+        )
+      )
+      .orderBy(desc(userMovies.rating), desc(userMovies.watchedAt))
+      .limit(1),
+    db
+      .select({
+        tmdbData: shows.tmdbData,
+        weight: sql<number>`count(*)::int`,
+      })
+      .from(watchedEpisodes)
+      .innerJoin(shows, eq(watchedEpisodes.showTmdbId, shows.tmdbId))
+      .where(
+        and(
+          eq(watchedEpisodes.userId, userId),
+          isNotNull(watchedEpisodes.watchedAt),
+          gte(watchedEpisodes.watchedAt, yearStart),
+          lt(watchedEpisodes.watchedAt, yearEnd)
+        )
+      )
+      .groupBy(shows.tmdbId, shows.tmdbData),
+  ]);
+
+  const yearActiveDays = [...dayCountMap.keys()].filter((d) => {
+    const y = Number(d.slice(0, 4));
+    return y === year;
+  }).length;
+
+  const yearGenres = aggregateGenres(
+    yearShowGenreRows.map((r) => ({
+      genres: genresFromTmdbData(r.tmdbData),
+      weight: Number(r.weight) || 1,
+      scoreSum: 0,
+      scoreCount: 0,
+    }))
+  );
+
+  const yearRecap: YearRecap = {
+    year,
+    episodes: yearEpStats?.episodes ?? 0,
+    movies: yearMovieStats?.movies ?? 0,
+    tvMinutes: yearEpStats?.minutes ?? 0,
+    movieMinutes: yearMovieStats?.minutes ?? 0,
+    activeDays: yearActiveDays,
+    topShow: yearTopShowRows[0]
+      ? {
+          title: yearTopShowRows[0].title,
+          posterPath: yearTopShowRows[0].posterPath,
+          episodes: Number(yearTopShowRows[0].episodes),
+        }
+      : null,
+    topMovie: yearTopMovieRows[0]
+      ? {
+          title: yearTopMovieRows[0].title,
+          posterPath: yearTopMovieRows[0].posterPath,
+          rating: yearTopMovieRows[0].rating,
+        }
+      : null,
+    topGenre: yearGenres[0]?.name ?? null,
+  };
 
   // ----- library carousels -----
   // Favorites must be their own queries. Filtering favorites out of a
@@ -700,6 +973,7 @@ export default async function ProfilePage() {
                   {dayStreak}
                   <span className="text-[11px] font-semibold text-muted-foreground">
                     {dayStreak === 1 ? "day" : "days"}
+                    {bestStreak > dayStreak ? ` · best ${bestStreak}` : ""}
                   </span>
                 </p>
               </StatCell>
@@ -720,6 +994,28 @@ export default async function ProfilePage() {
               </StatCell>
             </div>
           </div>
+        </section>
+
+        {/* ---------- Year in review ---------- */}
+        <section className="mb-8">
+          <SectionHeader title={`${year} so far`} />
+          <ProfileYearRecap recap={yearRecap} />
+        </section>
+
+        {/* ---------- Watch heatmap ---------- */}
+        <section className="mb-8">
+          <SectionHeader title="Activity" />
+          <ProfileHeatmap
+            dayCounts={dayCounts}
+            currentStreak={dayStreak}
+            longestStreak={bestStreak}
+          />
+        </section>
+
+        {/* ---------- Taste snapshot ---------- */}
+        <section className="mb-8">
+          <SectionHeader title="Your taste" />
+          <ProfileTaste taste={taste} />
         </section>
 
         {/* ---------- Recently watched ---------- */}
