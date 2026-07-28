@@ -271,12 +271,13 @@ export async function ensureShow(tmdbId: number) {
   const details = await getTvDetails(tmdbId);
   const show = showFromTmdb(tmdbId, details);
 
-  // Background save — do not block render
-  void withDbRetry(() => persistShow(show))
-    .then(() => ensureRtScore({ ...show, tmdbId }, "tv"))
-    .catch((err) => {
-      console.error(`Failed to persist show ${tmdbId}:`, err);
-    });
+  // Await parent row so follow / FK writes never race a background insert
+  try {
+    await withDbRetry(() => persistShow(show));
+    ensureRtScore({ ...show, tmdbId }, "tv");
+  } catch (err) {
+    console.error(`Failed to persist show ${tmdbId}:`, err);
+  }
 
   return show;
 }
@@ -302,11 +303,12 @@ export async function ensureMovie(tmdbId: number) {
   const details = await getMovieDetails(tmdbId);
   const movie = movieFromTmdb(tmdbId, details);
 
-  void withDbRetry(() => persistMovie(movie))
-    .then(() => ensureRtScore({ ...movie, tmdbId }, "movie"))
-    .catch((err) => {
-      console.error(`Failed to persist movie ${tmdbId}:`, err);
-    });
+  try {
+    await withDbRetry(() => persistMovie(movie));
+    ensureRtScore({ ...movie, tmdbId }, "movie");
+  } catch (err) {
+    console.error(`Failed to persist movie ${tmdbId}:`, err);
+  }
 
   return movie;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Check, Plus } from "lucide-react";
 
@@ -24,6 +25,7 @@ export function MovieWatchButton({
   initialStatus: string | null;
   variant?: "overlay" | "compact" | "full";
 }) {
+  const router = useRouter();
   // Tolerate legacy statuses (e.g. for_later): any non-null value = in library
   const normalize = (s: string | null): MovieStatus =>
     s === "watched" ? "watched" : s ? "want_to_watch" : null;
@@ -43,6 +45,7 @@ export function MovieWatchButton({
           body: JSON.stringify({ tmdbId, status: next }),
         });
         if (!res.ok) throw new Error("save failed");
+        router.refresh();
       } catch {
         setStatus(prev);
       }

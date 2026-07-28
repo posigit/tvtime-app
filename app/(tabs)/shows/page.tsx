@@ -78,6 +78,8 @@ export default async function ShowsPage({
         lastSeason: userShows.lastSeason,
         lastEpisode: userShows.lastEpisode,
         lastWatchedAt: userShows.lastWatchedAt,
+        followedAt: userShows.followedAt,
+        updatedAt: userShows.updatedAt,
         numberOfSeasons: shows.numberOfSeasons,
       })
       .from(userShows)
@@ -241,20 +243,35 @@ export default async function ShowsPage({
           : show.lastWatchedAt);
       activityByShow.set(show.tmdbId, effective);
 
+      // Newly followed (or re-followed) shows land in Watch Next even with
+      // zero watches — followedAt / updatedAt stamp from the + button.
+      const followedAt = show.followedAt ?? show.updatedAt ?? null;
+      const isNewlyFollowed =
+        followedAt != null &&
+        followedAt > twoWeeksAgo &&
+        !watchedAtsByShow.has(show.tmdbId);
+
       // "For later" is intentional parking — never Watch Next.
-      // Recent *real* activity (not bulk stamp) → Watch Next; else dormant.
+      // Recent *real* activity OR just added → Watch Next; else dormant.
       const isRecent = effective != null && effective > twoWeeksAgo;
-      if (show.status !== "for_later" && isRecent) {
+      if (show.status !== "for_later" && (isRecent || isNewlyFollowed)) {
         watchNext.push(item);
       } else {
         haventWatched.push(item);
       }
     }
 
-    const activityTime = (id: number) =>
-      activityByShow.get(id)?.getTime() ??
-      watching.find((s) => s.tmdbId === id)?.lastWatchedAt?.getTime() ??
-      0;
+    const activityTime = (id: number) => {
+      const act = activityByShow.get(id)?.getTime() ?? 0;
+      if (act > 0) return act;
+      const row = watching.find((s) => s.tmdbId === id);
+      return (
+        row?.followedAt?.getTime() ??
+        row?.updatedAt?.getTime() ??
+        row?.lastWatchedAt?.getTime() ??
+        0
+      );
+    };
 
     watchNext.sort(
       (a, b) => activityTime(b.tmdbId) - activityTime(a.tmdbId)
