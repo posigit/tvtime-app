@@ -55,15 +55,15 @@ export function ProfileYearRecap({ recap }: { recap: YearRecap }) {
           <div className="flex gap-3">
             {recap.topShow && (
               <Highlight
-                kind="Most-watched show"
+                kind="Most watched (real days)"
                 title={recap.topShow.title}
                 posterPath={recap.topShow.posterPath}
-                sub={`${recap.topShow.episodes} ep${recap.topShow.episodes === 1 ? "" : "s"}`}
+                sub={`${recap.topShow.episodes} ep${recap.topShow.episodes === 1 ? "" : "s"} logged`}
               />
             )}
             {recap.topMovie && (
               <Highlight
-                kind="Top movie"
+                kind="Highest rated movie"
                 title={recap.topMovie.title}
                 posterPath={recap.topMovie.posterPath}
                 sub={

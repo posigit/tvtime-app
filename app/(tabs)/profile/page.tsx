@@ -636,7 +636,7 @@ export default async function ProfilePage() {
   const [
     yearEpStats,
     yearMovieStats,
-    yearTopShowRows,
+    yearShowCandidates,
     yearTopMovieRows,
     yearShowGenreRows,
   ] = await Promise.all([
@@ -673,11 +673,14 @@ export default async function ProfilePage() {
         )
       )
       .then((r) => r[0]),
+    // Per-show year totals + time span (for bulk-import demotion)
     db
       .select({
         title: shows.title,
         posterPath: shows.posterPath,
         episodes: sql<number>`count(*)::int`,
+        days: sql<number>`count(DISTINCT TO_CHAR(${watchedEpisodes.watchedAt}, 'YYYY-MM-DD'))::int`,
+        spanSec: sql<number>`EXTRACT(EPOCH FROM (max(${watchedEpisodes.watchedAt}) - min(${watchedEpisodes.watchedAt})))::float`,
       })
       .from(watchedEpisodes)
       .innerJoin(shows, eq(watchedEpisodes.showTmdbId, shows.tmdbId))
@@ -689,9 +692,8 @@ export default async function ProfilePage() {
           lt(watchedEpisodes.watchedAt, yearEnd)
         )
       )
-      .groupBy(shows.tmdbId, shows.title, shows.posterPath)
-      .orderBy(desc(sql`count(*)`))
-      .limit(1),
+      .groupBy(shows.tmdbId, shows.title, shows.posterPath),
+    // Highest-rated movie watched this year (must have a rating)
     db
       .select({
         title: movies.title,
@@ -705,6 +707,7 @@ export default async function ProfilePage() {
           eq(userMovies.userId, userId),
           eq(userMovies.status, "watched"),
           isNotNull(userMovies.watchedAt),
+          isNotNull(userMovies.rating),
           gte(userMovies.watchedAt, yearStart),
           lt(userMovies.watchedAt, yearEnd)
         )
@@ -728,6 +731,23 @@ export default async function ProfilePage() {
       )
       .groupBy(shows.tmdbId, shows.tmdbData),
   ]);
+
+  // Prefer non-bulk shows: bulk = ≥3 eps all stamped within 2 seconds (import dump)
+  const yearTopShowRows = [...yearShowCandidates]
+    .map((s) => {
+      const eps = Number(s.episodes);
+      const days = Number(s.days);
+      const span = Number(s.spanSec) || 0;
+      const isBulk = eps >= 3 && span <= 2;
+      return {
+        title: s.title,
+        posterPath: s.posterPath,
+        episodes: eps,
+        score: isBulk ? eps * 0.01 : days * 1000 + eps,
+      };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 1);
 
   const yearActiveDays = [...dayCountMap.keys()].filter((d) => {
     const y = Number(d.slice(0, 4));
