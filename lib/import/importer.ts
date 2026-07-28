@@ -199,20 +199,25 @@ export async function importMovies(
         },
       });
 
-    // Insert user movie record
+    // Bulk TV Time import: unwatched titles land in Watch Later (for_later),
+    // not Watch Next. Manual adds via the app still use want_to_watch.
+    const status =
+      movie.status === "watched" ? "watched" : "for_later";
+
     await db
       .insert(userMovies)
       .values({
         userId,
         tmdbId,
-        status: movie.status,
+        status,
         watchedAt: movie.watchedAt,
       })
       .onConflictDoUpdate({
         target: [userMovies.userId, userMovies.tmdbId],
         set: {
-          status: movie.status,
+          status,
           watchedAt: movie.watchedAt,
+          updatedAt: new Date(),
         },
       });
   }

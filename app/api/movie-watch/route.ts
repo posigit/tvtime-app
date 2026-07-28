@@ -29,7 +29,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true });
   }
 
-  if (status !== "watched" && status !== "want_to_watch") {
+  if (
+    status !== "watched" &&
+    status !== "want_to_watch" &&
+    status !== "for_later"
+  ) {
     return NextResponse.json({ error: "Invalid status" }, { status: 400 });
   }
 

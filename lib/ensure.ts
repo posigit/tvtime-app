@@ -8,9 +8,10 @@ import {
   getMovieExternalIds,
 } from "./tmdb";
 import { getRottenTomatoesScore } from "./omdb";
+import { getTvTomatometerFromRt } from "./rt-tv";
 import { eq, sql } from "drizzle-orm";
 
-/** Stored in `rt_score` when OMDb was checked and has no Tomatometer (stops retries). */
+/** Stored in `rt_score` when OMDb/RT was checked and has no Tomatometer (stops retries). */
 const RT_NONE = -1;
 
 type ShowRow = {
@@ -122,21 +123,27 @@ function persistMovie(movie: MovieRow) {
 const rtInFlight = new Set<string>();
 
 /**
- * Fetch + cache the RT Tomatometer for a title (via TMDB external_ids → OMDb).
+ * Fetch + cache the RT Tomatometer for a title.
+ *
+ * Movies: TMDB external_ids → OMDb
+ * TV:     OMDb first, then Rotten Tomatoes /tv/{slug} page (ld+json) when OMDb has no RT
  *
  * Persistence rules:
- * - Real score (0–100) when OMDb includes Rotten Tomatoes
- * - `rt_score = -1` when OMDb answered successfully but has no RT entry
- *   (stops retries so we don't burn the free-tier quota)
+ * - Real score (0–100) when found
+ * - `rt_score = -1` when sources answered with no Tomatometer (stops retries)
  * - Leave `rt_score` null on failure / rate limit so the next visit retries
  */
 async function fillRtScore(
   tmdbId: number,
   type: "tv" | "movie",
-  existingImdbId?: string | null
+  opts?: {
+    imdbId?: string | null;
+    title?: string | null;
+    firstAirDate?: string | null;
+  }
 ) {
   try {
-    let imdbId = existingImdbId ?? null;
+    let imdbId = opts?.imdbId ?? null;
     if (!imdbId) {
       const ids =
         type === "tv"
@@ -146,32 +153,60 @@ async function fillRtScore(
     }
 
     const table = type === "tv" ? shows : movies;
+    let score: number | null = null;
+    let checked = false;
 
-    // No IMDb id → cannot query OMDb; mark checked so we stop retrying.
-    if (!imdbId) {
-      await withDbRetry(() =>
-        db
-          .update(table)
-          .set({ imdbId: null, rtScore: RT_NONE })
-          .where(eq(table.tmdbId, tmdbId))
-      );
-      return;
+    if (imdbId) {
+      const omdb = await getRottenTomatoesScore(imdbId);
+      score = omdb.score;
+      checked = omdb.checked;
     }
 
-    const { score, checked } = await getRottenTomatoesScore(imdbId);
+    // TV fallback: RT series page when OMDb has no Tomatometer
+    if (type === "tv" && score == null) {
+      let title = opts?.title ?? null;
+      let firstAirDate = opts?.firstAirDate ?? null;
+      if (!title) {
+        const row = await withDbRetry(() =>
+          db.query.shows.findFirst({ where: eq(shows.tmdbId, tmdbId) })
+        );
+        title = row?.title ?? null;
+        firstAirDate = firstAirDate ?? row?.firstAirDate ?? null;
+      }
+      if (title) {
+        const rt = await getTvTomatometerFromRt(title, firstAirDate);
+        if (rt.score != null) {
+          score = rt.score;
+          checked = true;
+        } else if (rt.checked) {
+          checked = true;
+        }
+        // if RT not checked (network/block), leave checked as OMDb said
+      } else if (!imdbId) {
+        // No title and no imdb — nothing we can do
+        checked = true;
+      }
+    } else if (!imdbId && type === "movie") {
+      checked = true;
+    }
 
     if (!checked) {
-      // Keep imdb for next try; leave rt_score null so ensureRtScore retries.
-      await withDbRetry(() =>
-        db.update(table).set({ imdbId }).where(eq(table.tmdbId, tmdbId))
-      );
+      // Transient failure — keep imdb if any; leave rt_score null for retry
+      if (imdbId) {
+        await withDbRetry(() =>
+          db.update(table).set({ imdbId }).where(eq(table.tmdbId, tmdbId))
+        );
+      }
       return;
     }
 
     await withDbRetry(() =>
       db
         .update(table)
-        .set({ imdbId, rtScore: score ?? RT_NONE })
+        .set({
+          ...(imdbId ? { imdbId } : {}),
+          rtScore: score ?? RT_NONE,
+        })
         .where(eq(table.tmdbId, tmdbId))
     );
   } catch (err) {
@@ -185,9 +220,16 @@ async function fillRtScore(
 /**
  * Kick off a background RT fill when we do not yet have a resolved score.
  * `rt_score = -1` means "checked, no RT" and is treated as resolved.
+ * For TV with -1 from the old OMDb-only pass, callers may pass force via nulling.
  */
 function ensureRtScore(
-  row: { tmdbId: number; rtScore?: number | null; imdbId?: string | null },
+  row: {
+    tmdbId: number;
+    rtScore?: number | null;
+    imdbId?: string | null;
+    title?: string | null;
+    firstAirDate?: string | null;
+  },
   type: "tv" | "movie"
 ) {
   // null = never resolved (or failed last time) → try again
@@ -196,9 +238,11 @@ function ensureRtScore(
   const key = `${type}:${row.tmdbId}`;
   if (rtInFlight.has(key)) return;
   rtInFlight.add(key);
-  void fillRtScore(row.tmdbId, type, row.imdbId).finally(() =>
-    rtInFlight.delete(key)
-  );
+  void fillRtScore(row.tmdbId, type, {
+    imdbId: row.imdbId,
+    title: row.title,
+    firstAirDate: row.firstAirDate,
+  }).finally(() => rtInFlight.delete(key));
 }
 
 /**

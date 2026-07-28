@@ -6,6 +6,10 @@ import { ShowTabs } from "@/components/show-tabs";
 import { SectionLabel } from "@/components/section-label";
 import { RatingBadge } from "@/components/star-rating";
 import { posterUrl } from "@/lib/tmdb";
+import {
+  isUnreleased,
+  splitWatchNextAndLater,
+} from "@/lib/movie-watchlist";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -199,29 +203,22 @@ export default async function MoviesPage({
       status: userMovies.status,
       watchedAt: userMovies.watchedAt,
       rating: userMovies.rating,
+      updatedAt: userMovies.updatedAt,
     })
     .from(userMovies)
     .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
     .where(eq(userMovies.userId, userId));
 
-  // Local YYYY-MM-DD for ISO date-string comparison
-  const now = new Date();
-  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-  const isUnreleased = (m: { releaseDate: string | null }) =>
-    m.releaseDate != null && m.releaseDate > todayStr;
-
   const wantToWatchAll = userMoviesList.filter(
     (m) => m.status === "want_to_watch" || m.status === "for_later"
   );
 
-  // Watch Next = released (or undated) movies you can actually watch now.
-  // Unreleased ones belong to the Upcoming tab.
-  const wantToWatch = wantToWatchAll
-    .filter((m) => !isUnreleased(m))
-    .sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+  // Unreleased → Upcoming tab. Released/undated → Watch Next vs Watch Later.
+  const releasedUnwatched = wantToWatchAll.filter((m) => !isUnreleased(m.releaseDate));
+  const { watchNext, watchLater } = splitWatchNextAndLater(releasedUnwatched);
 
   const upcomingMovies = wantToWatchAll
-    .filter(isUnreleased)
+    .filter((m) => isUnreleased(m.releaseDate))
     .sort((a, b) =>
       (a.releaseDate || "").localeCompare(b.releaseDate || "") ||
       (a.title || "").localeCompare(b.title || "")
@@ -255,7 +252,7 @@ export default async function MoviesPage({
 
       {currentView === "watchlist" && (
         <>
-          {wantToWatch.length > 0 && (
+          {watchNext.length > 0 && (
             <section className="mb-6">
               <div className="relative mb-3 mt-2 flex justify-center">
                 <SectionLabel>Watch Next</SectionLabel>
@@ -268,7 +265,16 @@ export default async function MoviesPage({
                   </svg>
                 </div>
               </div>
-              <MovieGrid items={wantToWatch} />
+              <MovieGrid items={watchNext} />
+            </section>
+          )}
+
+          {watchLater.length > 0 && (
+            <section className="mb-6">
+              <div className="mb-3 mt-2 flex justify-center">
+                <SectionLabel>Watch Later</SectionLabel>
+              </div>
+              <MovieGrid items={watchLater} />
             </section>
           )}
 
