@@ -24,6 +24,10 @@ import { ExplorePills } from "@/components/explore-pills";
 import { ShowFollowButton } from "@/components/show-follow-button";
 import { MovieWatchButton } from "@/components/movie-watch-button";
 import { DiscoverRail } from "@/components/discover-rail";
+import {
+  DiscoverGenreBrowser,
+  type GenreChip,
+} from "@/components/discover-genre-browser";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -98,9 +102,9 @@ export default async function ExplorePage() {
     topTv,
     topMovies,
     nowPlaying,
-    genreTv,
-    genreMovies,
     becauseRails,
+    followedShows,
+    followedMovies,
   ] = await Promise.all([
     getTrendingTv("week"),
     getPopularMovies(),
@@ -109,33 +113,57 @@ export default async function ExplorePage() {
     getTopRatedTv().catch(() => [] as TmdbMediaCard[]),
     getTopRatedMovies().catch(() => [] as TmdbMediaCard[]),
     getNowPlayingMovies().catch(() => [] as TmdbMediaCard[]),
-    discoverTvByGenre(TV_GENRES[0].id).catch(() => [] as TmdbMediaCard[]),
-    discoverMoviesByGenre(MOVIE_GENRES[0].id).catch(
-      () => [] as TmdbMediaCard[]
-    ),
     getBecauseYouWatched(userId, 14).catch(() => []),
+    db
+      .select({ tmdbId: userShows.tmdbId })
+      .from(userShows)
+      .where(eq(userShows.userId, userId)),
+    db
+      .select({ tmdbId: userMovies.tmdbId, status: userMovies.status })
+      .from(userMovies)
+      .where(eq(userMovies.userId, userId)),
   ]);
 
-  const followedShows = await db
-    .select({ tmdbId: userShows.tmdbId })
-    .from(userShows)
-    .where(eq(userShows.userId, userId));
   const followedShowIds = new Set(followedShows.map((s) => s.tmdbId));
-
-  const followedMovies = await db
-    .select({ tmdbId: userMovies.tmdbId, status: userMovies.status })
-    .from(userMovies)
-    .where(eq(userMovies.userId, userId));
   const movieStatusById = new Map(
     followedMovies.map((m) => [m.tmdbId, m.status])
   );
   const ownedMovieIds = new Set(followedMovies.map((m) => m.tmdbId));
 
+  // Prefetch every genre chip (TMDB 1h cache) so taps switch instantly
+  const [tvGenreLists, movieGenreLists] = await Promise.all([
+    Promise.all(
+      TV_GENRES.map(async (g) => {
+        const raw = await discoverTvByGenre(g.id).catch(
+          () => [] as TmdbMediaCard[]
+        );
+        return {
+          key: `tv-${g.id}`,
+          label: `TV · ${g.name}`,
+          kind: "tv" as const,
+          items: filterNewMedia(raw, followedShowIds, 18),
+        } satisfies GenreChip;
+      })
+    ),
+    Promise.all(
+      MOVIE_GENRES.map(async (g) => {
+        const raw = await discoverMoviesByGenre(g.id).catch(
+          () => [] as TmdbMediaCard[]
+        );
+        return {
+          key: `movie-${g.id}`,
+          label: `Film · ${g.name}`,
+          kind: "movie" as const,
+          items: filterNewMedia(raw, ownedMovieIds, 18),
+        } satisfies GenreChip;
+      })
+    ),
+  ]);
+  const genreChips: GenreChip[] = [...tvGenreLists, ...movieGenreLists];
+
   const topTvFresh = filterNewMedia(topTv, followedShowIds, 12);
   const topMoviesFresh = filterNewMedia(topMovies, ownedMovieIds, 12);
   const nowPlayingFresh = filterNewMedia(nowPlaying, ownedMovieIds, 12);
-  const genreTvFresh = filterNewMedia(genreTv, followedShowIds, 12);
-  const genreMoviesFresh = filterNewMedia(genreMovies, ownedMovieIds, 12);
 
   const feed = (
     <>
@@ -194,42 +222,7 @@ export default async function ExplorePage() {
 
   const discover = (
     <>
-      <section className="mb-4 mt-4">
-        <div className="mb-3">
-          <SectionLabel>Browse by mood</SectionLabel>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {TV_GENRES.map((g) => (
-            <span
-              key={`tv-${g.id}`}
-              className="rounded-full bg-card px-3 py-1.5 text-xs font-semibold text-white/80"
-            >
-              TV · {g.name}
-            </span>
-          ))}
-          {MOVIE_GENRES.map((g) => (
-            <span
-              key={`mv-${g.id}`}
-              className="rounded-full bg-card px-3 py-1.5 text-xs font-semibold text-white/70"
-            >
-              Film · {g.name}
-            </span>
-          ))}
-        </div>
-        <p className="mt-2 text-[11px] text-white/40">
-          Showing {TV_GENRES[0].name} TV + {MOVIE_GENRES[0].name} films below.
-          Open a title for more like it.
-        </p>
-      </section>
-
-      <DiscoverRail
-        label={`${TV_GENRES[0].name} shows`}
-        items={genreTvFresh}
-      />
-      <DiscoverRail
-        label={`${MOVIE_GENRES[0].name} movies`}
-        items={genreMoviesFresh}
-      />
+      <DiscoverGenreBrowser genres={genreChips} />
 
       <GridSection label="Airing Today">
         {airingToday.results.slice(0, 9).map((show) => (
