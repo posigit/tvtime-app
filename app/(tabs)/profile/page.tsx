@@ -732,21 +732,26 @@ export default async function ProfilePage() {
       .groupBy(shows.tmdbId, shows.tmdbData),
   ]);
 
-  // Prefer non-bulk shows: bulk = ≥3 eps all stamped within 2 seconds (import dump)
-  const yearTopShowRows = [...yearShowCandidates]
-    .map((s) => {
-      const eps = Number(s.episodes);
-      const days = Number(s.days);
-      const span = Number(s.spanSec) || 0;
-      const isBulk = eps >= 3 && span <= 2;
-      return {
-        title: s.title,
-        posterPath: s.posterPath,
-        episodes: eps,
-        score: isBulk ? eps * 0.01 : days * 1000 + eps,
-      };
-    })
-    .sort((a, b) => b.score - a.score)
+  // Most watched = highest episode count this year.
+  // Only demote pure bulk dumps (many eps, single day, all within ~30s) so
+  // import stamps like "114 Flash in one second" don't win over real binges.
+  const yearShowRanked = [...yearShowCandidates].map((s) => {
+    const eps = Number(s.episodes);
+    const days = Number(s.days);
+    const span = Number(s.spanSec) || 0;
+    const isBulk = eps >= 5 && days <= 1 && span <= 30;
+    return {
+      title: s.title,
+      posterPath: s.posterPath,
+      episodes: eps,
+      isBulk,
+    };
+  });
+  const nonBulk = yearShowRanked.filter((s) => !s.isBulk);
+  const yearTopShowRows = (
+    nonBulk.length > 0 ? nonBulk : yearShowRanked
+  )
+    .sort((a, b) => b.episodes - a.episodes)
     .slice(0, 1);
 
   const yearActiveDays = [...dayCountMap.keys()].filter((d) => {
