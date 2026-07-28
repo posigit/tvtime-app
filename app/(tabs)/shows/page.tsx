@@ -243,12 +243,11 @@ export default async function ShowsPage({
           : show.lastWatchedAt);
       activityByShow.set(show.tmdbId, effective);
 
-      // Newly followed (or re-followed) shows land in Watch Next even with
-      // zero watches — followedAt / updatedAt stamp from the + button.
-      const followedAt = show.followedAt ?? show.updatedAt ?? null;
+      // Only explicit followedAt (set by + / follow API) counts as "just added".
+      // Do NOT fall back to updatedAt — catalog/import bumps would flood Watch Next.
       const isNewlyFollowed =
-        followedAt != null &&
-        followedAt > twoWeeksAgo &&
+        show.followedAt != null &&
+        show.followedAt > twoWeeksAgo &&
         !watchedAtsByShow.has(show.tmdbId);
 
       // "For later" is intentional parking — never Watch Next.
