@@ -4,7 +4,6 @@ import { userMovies } from "@/lib/schema";
 import { eq, and } from "drizzle-orm";
 import {
   backdropUrl,
-  posterUrl,
   getMovieRecommendations,
   getMovieSimilar,
   getWatchProviders,
@@ -19,6 +18,14 @@ import { MovieWatchButton } from "@/components/movie-watch-button";
 import { MovieRating } from "@/components/star-rating";
 import { DiscoverRail } from "@/components/discover-rail";
 import { WatchProviders } from "@/components/watch-providers";
+
+function formatRuntime(minutes: number) {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h <= 0) return `${m}m`;
+  if (m <= 0) return `${h}h`;
+  return `${h}h ${m}m`;
+}
 
 export default async function MovieDetailPage({
   params,
@@ -59,9 +66,24 @@ export default async function MovieDetailPage({
   const moreLikeThis = filterNewMedia(similarRaw, ownedIds, 12);
   const recommended = filterNewMedia(recsRaw, ownedIds, 12);
 
+  // Meta line under title (mirrors show: seasons · status · network)
+  const metaParts: string[] = [];
+  if (movie.releaseDate) metaParts.push(movie.releaseDate.slice(0, 4));
+  if (movie.runtime) metaParts.push(formatRuntime(movie.runtime));
+  if (movie.status) metaParts.push(movie.status);
+
+  // Same rating badge logic as show detail
+  const rating =
+    movie.rtScore != null && movie.rtScore >= 0
+      ? { icon: "rt" as const, text: `${movie.rtScore}%` }
+      : movie.voteAverage
+        ? { icon: "tmdb" as const, text: `${movie.voteAverage.toFixed(1)}/10` }
+        : null;
+
   return (
-    <div className="min-h-screen bg-black pb-20">
-      <div className="relative h-48 w-full overflow-hidden">
+    <div className="min-h-screen bg-black pb-24">
+      {/* ---------- Backdrop header (same as show detail) ---------- */}
+      <div className="relative h-72 w-full overflow-hidden">
         {movie.backdropPath ? (
           <Image
             src={backdropUrl(movie.backdropPath, "w1280") ?? ""}
@@ -75,85 +97,75 @@ export default async function MovieDetailPage({
         ) : (
           <div className="h-full w-full bg-card" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/30" />
+
         <Link
           href="/movies"
+          aria-label="Back to movies"
           className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white"
         >
           <ChevronLeft className="h-5 w-5" />
         </Link>
-      </div>
 
-      <div className="-mt-12 px-4">
-        <div className="flex gap-4">
-          <div className="relative h-36 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-secondary shadow-lg">
-            {movie.posterPath ? (
-              <Image
-                src={posterUrl(movie.posterPath, "w342") ?? ""}
-                alt={movie.title}
-                width={96}
-                height={144}
-                className="object-cover"
-                unoptimized
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
-                No img
-              </div>
+        {/* Title + RT badge overlaid on backdrop */}
+        <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-black text-white drop-shadow">
+              {movie.title}
+            </h1>
+            {metaParts.length > 0 && (
+              <p className="mt-0.5 truncate text-sm text-white/80">
+                {metaParts.join(" · ")}
+              </p>
             )}
           </div>
-
-          <div className="flex-1 pt-12">
-            <h1 className="text-xl font-bold text-white">{movie.title}</h1>
-            <div className="mt-1 flex flex-wrap gap-2 text-xs text-muted-foreground">
-              {movie.releaseDate && (
-                <span>{movie.releaseDate.slice(0, 4)}</span>
+          {rating && (
+            <div className="flex flex-shrink-0 items-center gap-1.5">
+              {rating.icon === "rt" ? (
+                <span className="text-xl leading-none" title="Rotten Tomatoes">
+                  🍅
+                </span>
+              ) : (
+                <span
+                  className="flex h-6 w-6 items-center justify-center rounded bg-primary text-sm font-black text-black"
+                  title="TMDB score"
+                >
+                  T
+                </span>
               )}
-              {movie.runtime && (
-                <>
-                  <span>·</span>
-                  <span>
-                    {Math.floor(movie.runtime / 60)}h {movie.runtime % 60}m
-                  </span>
-                </>
-              )}
-              {movie.rtScore != null && movie.rtScore >= 0 ? (
-                <>
-                  <span>·</span>
-                  <span className="text-primary" title="Rotten Tomatoes">
-                    🍅 {movie.rtScore}%
-                  </span>
-                </>
-              ) : movie.voteAverage ? (
-                <>
-                  <span>·</span>
-                  <span className="text-primary" title="TMDB score">
-                    T {movie.voteAverage.toFixed(1)}/10
-                  </span>
-                </>
-              ) : null}
+              <span className="text-lg font-bold text-primary">
+                {rating.text}
+              </span>
             </div>
-          </div>
+          )}
         </div>
+      </div>
 
-        {movie.overview && (
-          <p className="mt-4 text-sm text-muted-foreground">{movie.overview}</p>
-        )}
-
-        <div className="mt-6">
-          <MovieWatchButton
-            tmdbId={tmdbId}
-            initialStatus={userMovie?.status || null}
-          />
-        </div>
+      {/* ---------- Body ---------- */}
+      <div className="px-4 pt-4">
+        <MovieWatchButton
+          tmdbId={tmdbId}
+          initialStatus={userMovie?.status || null}
+        />
 
         {userMovie && (
-          <div className="mt-6">
+          <div className="mt-4 border-b border-white/10 pb-4">
             <MovieRating
               tmdbId={tmdbId}
               initialRating={userMovie.rating ?? null}
             />
           </div>
+        )}
+
+        {movie.overview && (
+          <section className="mt-4">
+            <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              Overview
+            </h2>
+            <p className="text-sm leading-relaxed text-white/90">
+              {movie.overview}
+            </p>
+          </section>
         )}
 
         <WatchProviders providers={providers} />
