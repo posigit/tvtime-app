@@ -13,9 +13,45 @@ import {
 } from "./tmdb";
 import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
 
+/** How often "Because you watched" seeds advance (ms). 4h → ~6 rotations/day. */
+const ROTATION_MS = 4 * 60 * 60 * 1000;
+/** Pull this many candidates; we only surface RAILS_PER_KIND of each. */
+const SEED_POOL = 6;
+const RAILS_PER_KIND = 2;
+
+type Seed = { tmdbId: number; title: string };
+
+/**
+ * Stable-ish daily rotation: advances every ROTATION_MS, offset by userId so
+ * different accounts don't all show the same seed at the same hour.
+ */
+function rotationOffset(userId: string, poolSize: number): number {
+  if (poolSize <= 0) return 0;
+  let hash = 0;
+  for (let i = 0; i < userId.length; i++) {
+    hash = (hash * 31 + userId.charCodeAt(i)) >>> 0;
+  }
+  const slot = Math.floor(Date.now() / ROTATION_MS);
+  return (slot + hash) % poolSize;
+}
+
+/** Pick `count` items from `pool`, starting at a rotating offset (wraps). */
+function pickRotated<T>(pool: T[], count: number, offset: number): T[] {
+  if (pool.length === 0) return [];
+  if (pool.length <= count) return pool;
+  const out: T[] = [];
+  for (let i = 0; i < count; i++) {
+    out.push(pool[(offset + i) % pool.length]);
+  }
+  return out;
+}
+
 /**
  * "Because you watched…" rails from highest-rated / recent titles,
  * via TMDB recommendations, excluding library.
+ *
+ * Seeds rotate lightly through the day (~every 4h) across a top pool of 6,
+ * so Explore doesn't lock on a single title forever.
  */
 export async function getBecauseYouWatched(
   userId: string,
@@ -54,13 +90,12 @@ export async function getBecauseYouWatched(
     .groupBy(watchedEpisodes.showTmdbId, shows.title)
     .having(sql`count(*) >= 3`)
     .orderBy(desc(sql`avg(${watchedEpisodes.rating})`))
-    .limit(4);
+    .limit(SEED_POOL);
 
-  let movieSeeds = await db
+  let movieSeeds: Seed[] = await db
     .select({
       tmdbId: userMovies.tmdbId,
       title: movies.title,
-      rating: userMovies.rating,
     })
     .from(userMovies)
     .innerJoin(movies, eq(movies.tmdbId, userMovies.tmdbId))
@@ -72,14 +107,13 @@ export async function getBecauseYouWatched(
       )
     )
     .orderBy(desc(userMovies.rating), desc(userMovies.watchedAt))
-    .limit(4);
+    .limit(SEED_POOL);
 
   if (movieSeeds.length === 0) {
     movieSeeds = await db
       .select({
         tmdbId: userMovies.tmdbId,
         title: movies.title,
-        rating: userMovies.rating,
       })
       .from(userMovies)
       .innerJoin(movies, eq(movies.tmdbId, userMovies.tmdbId))
@@ -87,11 +121,11 @@ export async function getBecauseYouWatched(
         and(eq(userMovies.userId, userId), eq(userMovies.status, "watched"))
       )
       .orderBy(desc(userMovies.watchedAt))
-      .limit(3);
+      .limit(SEED_POOL);
   }
 
   // Fallback show seeds: most watched episodes if no ratings
-  let showSeeds = topShows;
+  let showSeeds: Seed[] = topShows;
   if (showSeeds.length === 0) {
     showSeeds = await db
       .select({
@@ -103,13 +137,25 @@ export async function getBecauseYouWatched(
       .where(eq(watchedEpisodes.userId, userId))
       .groupBy(watchedEpisodes.showTmdbId, shows.title)
       .orderBy(desc(sql`count(*)`))
-      .limit(3);
+      .limit(SEED_POOL);
   }
+
+  const showPicks = pickRotated(
+    showSeeds,
+    RAILS_PER_KIND,
+    rotationOffset(userId, showSeeds.length)
+  );
+  const moviePicks = pickRotated(
+    movieSeeds,
+    RAILS_PER_KIND,
+    // +1 so movie rails don't always share the same slot phase as shows
+    rotationOffset(userId + ":m", movieSeeds.length)
+  );
 
   const rails: { seedTitle: string; items: TmdbMediaCard[] }[] = [];
   const seen = new Set<string>();
 
-  for (const seed of showSeeds.slice(0, 2)) {
+  for (const seed of showPicks) {
     try {
       const recs = await getTvRecommendations(seed.tmdbId);
       const items = recs
@@ -127,7 +173,7 @@ export async function getBecauseYouWatched(
     }
   }
 
-  for (const seed of movieSeeds.slice(0, 2)) {
+  for (const seed of moviePicks) {
     try {
       const recs = await getMovieRecommendations(seed.tmdbId);
       const items = recs
