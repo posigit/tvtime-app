@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { posterUrl, stillUrl } from "@/lib/tmdb";
@@ -19,11 +22,15 @@ export type ShowListItemData = {
 
 /** Row from snapshot 1: episode still | title pill + Sxx | Exx + episode name | white check */
 export function ShowListItem({ show }: { show: ShowListItemData }) {
+  const [dismissed, setDismissed] = useState(false);
   const hasNext = show.nextEpisode != null;
   const still = hasNext
     ? stillUrl(show.nextEpisode!.stillPath, "w300")
     : null;
   const poster = posterUrl(show.posterPath, "w154");
+
+  // Instant dismiss after optimistic mark — parent refresh fills next episode later
+  if (dismissed) return null;
 
   return (
     <div className="flex items-center gap-3 rounded-xl bg-[#101011] p-2.5">
@@ -93,6 +100,8 @@ export function ShowListItem({ show }: { show: ShowListItemData }) {
           showTmdbId={show.tmdbId}
           seasonNumber={show.nextEpisode!.seasonNumber}
           episodeNumber={show.nextEpisode!.episodeNumber}
+          onWatched={() => setDismissed(true)}
+          onWatchFailed={() => setDismissed(false)}
         />
       )}
     </div>

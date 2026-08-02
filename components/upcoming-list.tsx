@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { SectionLabel } from "@/components/section-label";
@@ -45,6 +45,10 @@ function todayKey(): string {
 export function UpcomingList({ groups }: { groups: UpcomingGroup[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const today = todayKey();
+  const [dismissed, setDismissed] = useState<Set<string>>(() => new Set());
+
+  const dismissKey = (item: UpcomingListItem) =>
+    `${item.tmdbId}:${item.seasonNumber}:${item.episodeNumber}`;
 
   useEffect(() => {
     if (groups.length === 0) return;
@@ -83,6 +87,8 @@ export function UpcomingList({ groups }: { groups: UpcomingGroup[] }) {
             {group.items.map((item) => {
               const still = stillUrl(item.stillPath, "w300");
               const poster = posterUrl(item.posterPath, "w154");
+              const key = dismissKey(item);
+              if (dismissed.has(key)) return null;
               return (
                 <div
                   key={`${item.tmdbId}-${item.seasonNumber}-${item.episodeNumber}`}
@@ -158,6 +164,16 @@ export function UpcomingList({ groups }: { groups: UpcomingGroup[] }) {
                       showTmdbId={item.tmdbId}
                       seasonNumber={item.seasonNumber}
                       episodeNumber={item.episodeNumber}
+                      onWatched={() =>
+                        setDismissed((prev) => new Set(prev).add(key))
+                      }
+                      onWatchFailed={() =>
+                        setDismissed((prev) => {
+                          const next = new Set(prev);
+                          next.delete(key);
+                          return next;
+                        })
+                      }
                     />
                   ) : (
                     <div

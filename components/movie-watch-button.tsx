@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Check, Plus } from "lucide-react";
+import { useToast } from "@/components/toast";
 
 export type MovieStatus = "want_to_watch" | "watched" | null;
 
@@ -26,6 +27,7 @@ export function MovieWatchButton({
   variant?: "overlay" | "compact" | "full";
 }) {
   const router = useRouter();
+  const { toast } = useToast();
   // Tolerate legacy statuses (e.g. for_later): any non-null value = in library
   const normalize = (s: string | null): MovieStatus =>
     s === "watched" ? "watched" : s ? "want_to_watch" : null;
@@ -36,7 +38,13 @@ export function MovieWatchButton({
 
   const update = (next: MovieStatus) => {
     const prev = status;
+    // Optimistic flip
     setStatus(next);
+    try {
+      navigator.vibrate?.(10);
+    } catch {
+      /* ignore */
+    }
     startTransition(async () => {
       try {
         const res = await fetch("/api/movie-watch", {
@@ -45,9 +53,13 @@ export function MovieWatchButton({
           body: JSON.stringify({ tmdbId, status: next }),
         });
         if (!res.ok) throw new Error("save failed");
+        if (next === "watched") toast("Marked watched");
+        else if (next === "want_to_watch") toast("Added to watchlist");
+        else toast("Removed from library", "info");
         router.refresh();
       } catch {
         setStatus(prev);
+        toast("Couldn't save — try again", "error");
       }
     });
   };

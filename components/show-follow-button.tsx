@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Check, Plus } from "lucide-react";
+import { useToast } from "@/components/toast";
 
 /**
  * Show follow button. Small surfaces (overlay/compact) follow-only and turn
@@ -20,6 +21,7 @@ export function ShowFollowButton({
   variant?: "overlay" | "compact" | "full";
 }) {
   const router = useRouter();
+  const { toast } = useToast();
   const [following, setFollowing] = useState(initialFollowing);
   const [pending, startTransition] = useTransition();
 
@@ -32,6 +34,11 @@ export function ShowFollowButton({
     const next = !following;
     const prev = following;
     setFollowing(next);
+    try {
+      navigator.vibrate?.(10);
+    } catch {
+      /* ignore */
+    }
     startTransition(async () => {
       try {
         const res = await fetch("/api/show-follow", {
@@ -40,9 +47,11 @@ export function ShowFollowButton({
           body: JSON.stringify({ tmdbId, following: next }),
         });
         if (!res.ok) throw new Error("follow failed");
+        toast(next ? "Added to watchlist" : "Removed from watchlist");
         router.refresh();
       } catch {
         setFollowing(prev);
+        toast("Couldn't save — try again", "error");
       }
     });
   };

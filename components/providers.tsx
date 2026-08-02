@@ -2,6 +2,7 @@
 
 import { SessionProvider } from "next-auth/react";
 import { ReactNode, useEffect } from "react";
+import { ToastProvider } from "@/components/toast";
 
 export function Providers({ children }: { children: ReactNode }) {
   useEffect(() => {
@@ -17,7 +18,7 @@ export function Providers({ children }: { children: ReactNode }) {
       refetchWhenOffline={false}
       refetchInterval={0}
     >
-      {children}
+      <ToastProvider>{children}</ToastProvider>
     </SessionProvider>
   );
 }

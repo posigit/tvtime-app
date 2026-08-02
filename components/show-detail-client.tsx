@@ -10,6 +10,7 @@ import { Confetti } from "@/components/confetti";
 import { EpisodeRating, StarRatingDisplay } from "@/components/star-rating";
 import { DiscoverRail } from "@/components/discover-rail";
 import { WatchProviders } from "@/components/watch-providers";
+import { formatEpisodeLabel, useToast } from "@/components/toast";
 import type { TmdbMediaCard, WatchProvidersResult } from "@/lib/tmdb";
 import { Check, ChevronDown, MoreHorizontal } from "lucide-react";
 
@@ -98,6 +99,7 @@ export function ShowDetailClient({
   providers?: WatchProvidersResult | null;
 }) {
   const router = useRouter();
+  const { toast } = useToast();
 
   const [watchedMap, setWatchedMap] = useState<Record<string, boolean>>(() => {
     const map: Record<string, boolean> = {};
@@ -219,13 +221,22 @@ export function ShowDetailClient({
   const applyWatched = async (
     items: { seasonNumber: number; episodeNumber: number; watched: boolean }[]
   ) => {
+    if (items.length === 0) return;
+
     const prev = watchedMap;
     const next = { ...watchedMap };
     for (const item of items) {
       next[watchKey(item.seasonNumber, item.episodeNumber)] = item.watched;
     }
     setWatchedMap(next);
-    if (items.some((i) => i.watched)) celebrateIfComplete(next);
+    if (items.some((i) => i.watched)) {
+      celebrateIfComplete(next);
+      try {
+        navigator.vibrate?.(10);
+      } catch {
+        /* ignore */
+      }
+    }
 
     try {
       await postWatch(
@@ -236,8 +247,25 @@ export function ShowDetailClient({
           watched: i.watched,
         }))
       );
+
+      const marking = items.filter((i) => i.watched);
+      const unmarking = items.filter((i) => !i.watched);
+      if (marking.length === 1 && unmarking.length === 0) {
+        toast(
+          `Watched ${formatEpisodeLabel(marking[0].seasonNumber, marking[0].episodeNumber)}`
+        );
+      } else if (marking.length > 1 && unmarking.length === 0) {
+        toast(`Marked ${marking.length} episodes watched`);
+      } else if (unmarking.length > 0 && marking.length === 0) {
+        toast(
+          unmarking.length === 1
+            ? "Unmarked episode"
+            : `Unmarked ${unmarking.length} episodes`
+        );
+      }
     } catch {
       setWatchedMap(prev);
+      toast("Couldn't save — try again", "error");
     }
   };
 
@@ -360,8 +388,9 @@ export function ShowDetailClient({
         [seasonNumber]: data.count ?? (prev[seasonNumber] ?? 0) + 1,
       }));
       setExpandedSeasons((prev) => new Set(prev).add(seasonNumber));
+      toast(`Season ${seasonNumber} rewatch started`);
     } catch {
-      // leave state as-is
+      toast("Couldn't start rewatch — try again", "error");
     } finally {
       setPending(false);
       setRewatchSeason(null);

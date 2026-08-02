@@ -4,24 +4,44 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
+import { formatEpisodeLabel, useToast } from "@/components/toast";
 
-/** White filled circle check button (snapshot 1/2 style) */
+/** White filled circle check button (snapshot 1/2 style) — optimistic */
 export function MarkWatchedButton({
   showTmdbId,
   seasonNumber,
   episodeNumber,
+  onWatched,
+  onWatchFailed,
 }: {
   showTmdbId: number;
   seasonNumber: number;
   episodeNumber: number;
+  /** Fired on optimistic flip so parent can dismiss the row immediately */
+  onWatched?: () => void;
+  /** Fired if the network save fails so parent can restore the row */
+  onWatchFailed?: () => void;
 }) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+  const [done, setDone] = useState(false);
+  const [pending, setPending] = useState(false);
 
   const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setLoading(true);
+    if (done || pending) return;
+
+    // Optimistic: flip immediately
+    setDone(true);
+    setPending(true);
+    onWatched?.();
+    try {
+      navigator.vibrate?.(10);
+    } catch {
+      /* ignore */
+    }
+
     try {
       const res = await fetch("/api/watch", {
         method: "POST",
@@ -33,27 +53,34 @@ export function MarkWatchedButton({
           watched: true,
         }),
       });
-      if (res.ok) {
-        router.refresh();
-      } else {
-        console.error("Failed to mark episode watched");
-      }
-    } catch (err) {
-      console.error("Error marking episode watched:", err);
+      if (!res.ok) throw new Error("watch failed");
+
+      toast(`Watched ${formatEpisodeLabel(seasonNumber, episodeNumber)}`);
+      // Soft refresh — UI already updated; keep list in sync with server
+      router.refresh();
+    } catch {
+      setDone(false);
+      onWatchFailed?.();
+      toast("Couldn't save — try again", "error");
     } finally {
-      setLoading(false);
+      setPending(false);
     }
   };
 
   return (
     <button
+      type="button"
       onClick={handleClick}
-      disabled={loading}
+      disabled={done || pending}
       className={cn(
-        "flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-white text-black transition-transform active:scale-90",
-        loading && "opacity-60"
+        "flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full transition-all active:scale-90",
+        done
+          ? "bg-primary text-black scale-95"
+          : "bg-white text-black",
+        pending && !done && "opacity-60"
       )}
-      aria-label="Mark as watched"
+      aria-label={done ? "Watched" : "Mark as watched"}
+      aria-pressed={done}
     >
       <Check className="h-5 w-5" strokeWidth={3} />
     </button>
