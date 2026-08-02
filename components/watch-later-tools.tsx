@@ -89,11 +89,36 @@ function pickSurprise(
   return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
-export function WatchLaterTools({ items }: { items: LaterMovie[] }) {
+/**
+ * @param items — Watch Later grid
+ * @param surprisePool — full unwatched pool (Watch Next + Watch Later + …).
+ *   Surprise Me draws from this, not only the later backlog.
+ */
+export function WatchLaterTools({
+  items,
+  surprisePool,
+}: {
+  items: LaterMovie[];
+  surprisePool?: LaterMovie[];
+}) {
   const [sort, setSort] = useState<SortKey>("rt");
   const [pick, setPick] = useState<LaterMovie | null>(null);
   /** Session history of surprise picks — prevents the same title looping */
   const recentRef = useRef<number[]>([]);
+
+  /** Everything we can pick from — never limited to Watch Later alone */
+  const poolAll = useMemo(() => {
+    const raw = surprisePool && surprisePool.length > 0 ? surprisePool : items;
+    // Dedupe by tmdbId
+    const seen = new Set<number>();
+    const out: LaterMovie[] = [];
+    for (const m of raw) {
+      if (seen.has(m.tmdbId)) continue;
+      seen.add(m.tmdbId);
+      out.push(m);
+    }
+    return out;
+  }, [surprisePool, items]);
 
   const sorted = useMemo(() => {
     const list = [...items];
@@ -121,77 +146,40 @@ export function WatchLaterTools({ items }: { items: LaterMovie[] }) {
     return list;
   }, [items, sort]);
 
-  /** Prefer solid RT + reasonable runtime, but never as the only pool if tiny */
-  const shortlist = useMemo(
-    () =>
-      items.filter(
-        (m) =>
-          (m.runtime == null || m.runtime <= 130) &&
-          (m.rtScore == null || m.rtScore < 0 || m.rtScore >= 75)
-      ),
-    [items]
-  );
-
   function surprise() {
-    // Use shortlist only when it's large enough to actually surprise
-    const pool =
-      shortlist.length >= 3 && shortlist.length >= items.length * 0.25
-        ? shortlist
-        : items;
-    if (pool.length === 0) return;
+    if (poolAll.length === 0) return;
 
-    const next = pickSurprise(pool, recentRef.current);
+    const next = pickSurprise(poolAll, recentRef.current);
     if (!next) return;
 
     // Remember last up to poolSize-1 so we cycle through before repeats
-    const maxRemember = Math.max(1, Math.min(pool.length - 1, 12));
+    const maxRemember = Math.max(1, Math.min(poolAll.length - 1, 20));
     recentRef.current = [...recentRef.current, next.tmdbId].slice(-maxRemember);
     setPick(next);
   }
 
-  if (items.length === 0) return null;
+  // Show surprise UI if we have anything unwatched, even with empty Watch Later grid
+  if (items.length === 0 && poolAll.length === 0) return null;
+
+  const showLaterGrid = items.length > 0;
 
   return (
     <section className="mb-6">
-      <div className="mb-3 mt-2 flex justify-center">
-        <SectionLabel>
-          Watch Later
-          <span className="ml-1.5 font-semibold normal-case tracking-normal text-white/50">
-            · {items.length}
-          </span>
-        </SectionLabel>
-      </div>
-
-      <div className="mb-3 flex flex-wrap items-center gap-2">
+      {/* Surprise draws from full unwatched list (Next + Later), not just Later */}
+      <div className="mb-3 mt-2 flex flex-col items-center gap-2">
         <button
           type="button"
           onClick={surprise}
-          className="flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-black uppercase tracking-wide text-black active:scale-95"
+          disabled={poolAll.length === 0}
+          className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-black uppercase tracking-wide text-black active:scale-95 disabled:opacity-40"
         >
           <Shuffle className="h-3.5 w-3.5" />
           {pick ? "Surprise again" : "Surprise me"}
         </button>
-        {(
-          [
-            ["rt", "🍅 RT"],
-            ["runtime", "Shortest"],
-            ["year", "Newest"],
-            ["title", "A–Z"],
-          ] as const
-        ).map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => setSort(key)}
-            className={
-              sort === key
-                ? "rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold text-white"
-                : "rounded-full bg-card px-3 py-1.5 text-xs font-medium text-white/60"
-            }
-          >
-            {label}
-          </button>
-        ))}
+        <p className="text-[10px] text-muted-foreground">
+          From {poolAll.length} unwatched movie
+          {poolAll.length === 1 ? "" : "s"}
+        </p>
       </div>
 
       {pick && (
@@ -245,36 +233,73 @@ export function WatchLaterTools({ items }: { items: LaterMovie[] }) {
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-2">
-        {sorted.map((movie) => (
-          <Link
-            key={movie.tmdbId}
-            href={`/movie/${movie.tmdbId}`}
-            className="overflow-hidden rounded-md bg-card"
-          >
-            <MoviePoster
-              title={movie.title}
-              posterPath={movie.posterPath}
-              rating={movie.rating}
-              highlighted={pick?.tmdbId === movie.tmdbId}
-            />
-            {(movie.rtScore != null && movie.rtScore >= 0) ||
-            movie.runtime != null ? (
-              <p className="px-1 py-1 text-center text-[10px] font-bold text-primary">
-                {movie.rtScore != null && movie.rtScore >= 0
-                  ? `🍅 ${movie.rtScore}%`
-                  : ""}
-                {movie.rtScore != null &&
-                movie.rtScore >= 0 &&
-                movie.runtime != null
-                  ? " · "
-                  : ""}
-                {movie.runtime != null ? formatRuntime(movie.runtime) : ""}
-              </p>
-            ) : null}
-          </Link>
-        ))}
-      </div>
+      {showLaterGrid && (
+        <>
+          <div className="mb-3 mt-4 flex flex-wrap items-center justify-center gap-2">
+            <SectionLabel>
+              Watch Later
+              <span className="ml-1.5 font-semibold normal-case tracking-normal text-white/50">
+                · {items.length}
+              </span>
+            </SectionLabel>
+          </div>
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            {(
+              [
+                ["rt", "🍅 RT"],
+                ["runtime", "Shortest"],
+                ["year", "Newest"],
+                ["title", "A–Z"],
+              ] as const
+            ).map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setSort(key)}
+                className={
+                  sort === key
+                    ? "rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold text-white"
+                    : "rounded-full bg-card px-3 py-1.5 text-xs font-medium text-white/60"
+                }
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {sorted.map((movie) => (
+              <Link
+                key={movie.tmdbId}
+                href={`/movie/${movie.tmdbId}`}
+                className="overflow-hidden rounded-md bg-card"
+              >
+                <MoviePoster
+                  title={movie.title}
+                  posterPath={movie.posterPath}
+                  rating={movie.rating}
+                  highlighted={pick?.tmdbId === movie.tmdbId}
+                />
+                {(movie.rtScore != null && movie.rtScore >= 0) ||
+                movie.runtime != null ? (
+                  <p className="px-1 py-1 text-center text-[10px] font-bold text-primary">
+                    {movie.rtScore != null && movie.rtScore >= 0
+                      ? `🍅 ${movie.rtScore}%`
+                      : ""}
+                    {movie.rtScore != null &&
+                    movie.rtScore >= 0 &&
+                    movie.runtime != null
+                      ? " · "
+                      : ""}
+                    {movie.runtime != null
+                      ? formatRuntime(movie.runtime)
+                      : ""}
+                  </p>
+                ) : null}
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
     </section>
   );
 }

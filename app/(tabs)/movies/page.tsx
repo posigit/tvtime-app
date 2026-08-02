@@ -273,9 +273,19 @@ export default async function MoviesPage({
             </section>
           )}
 
-          {watchLater.length > 0 && (
+          {/* Surprise from ALL unwatched (Next + Later); grid is Watch Later only */}
+          {releasedUnwatched.length > 0 && (
             <WatchLaterTools
               items={watchLater.map((m) => ({
+                tmdbId: m.tmdbId,
+                title: m.title,
+                posterPath: m.posterPath,
+                releaseDate: m.releaseDate,
+                runtime: m.runtime,
+                rtScore: m.rtScore,
+                rating: m.rating,
+              }))}
+              surprisePool={releasedUnwatched.map((m) => ({
                 tmdbId: m.tmdbId,
                 title: m.title,
                 posterPath: m.posterPath,

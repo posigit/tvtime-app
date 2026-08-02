@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { backdropUrl, posterUrl } from "@/lib/tmdb";
@@ -18,13 +19,89 @@ export type ExploreHeroItem = {
   movieStatus?: string | null;
 };
 
+const AUTO_MS = 5000;
+
 /**
- * "Trending today" — horizontal snap strip you swipe through.
- * No left/right chrome; native scroll + peek of the next card.
+ * "Trending today" — snap strip with auto-advance.
+ * No left/right chrome; swipe manually or let it rotate.
  */
 export function ExploreHeroCarousel({ items }: { items: ExploreHeroItem[] }) {
   const slides = items.slice(0, 6);
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const indexRef = useRef(0);
+  const pausedRef = useRef(false);
+  const [active, setActive] = useState(0);
+
+  const scrollToIndex = (i: number, behavior: ScrollBehavior = "smooth") => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const card = el.querySelector<HTMLElement>(`[data-hero-i="${i}"]`);
+    if (!card) return;
+    // Align card to start of scroller (accounts for padding)
+    const left = card.offsetLeft - el.offsetLeft;
+    el.scrollTo({ left, behavior });
+  };
+
+  useEffect(() => {
+    if (slides.length <= 1) return;
+
+    const id = window.setInterval(() => {
+      if (pausedRef.current) return;
+      const next = (indexRef.current + 1) % slides.length;
+      indexRef.current = next;
+      setActive(next);
+      scrollToIndex(next, "smooth");
+    }, AUTO_MS);
+
+    return () => window.clearInterval(id);
+  }, [slides.length]);
+
+  // Keep index in sync when user swipes manually
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el || slides.length <= 1) return;
+
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        const cards = el.querySelectorAll<HTMLElement>("[data-hero-i]");
+        const scrollMid = el.scrollLeft + el.clientWidth * 0.35;
+        let best = 0;
+        let bestDist = Infinity;
+        cards.forEach((card) => {
+          const i = Number(card.dataset.heroI);
+          const dist = Math.abs(card.offsetLeft - el.offsetLeft - el.scrollLeft);
+          // Prefer card whose left edge is near scrollLeft
+          const d = Math.abs(card.offsetLeft - el.offsetLeft - scrollMid + card.clientWidth / 2);
+          if (d < bestDist) {
+            bestDist = d;
+            best = i;
+          }
+          void dist;
+        });
+        indexRef.current = best;
+        setActive(best);
+      });
+    };
+
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [slides.length]);
+
   if (slides.length === 0) return null;
+
+  const pause = () => {
+    pausedRef.current = true;
+  };
+  const resume = () => {
+    // brief delay so a flick doesn't immediately jump
+    window.setTimeout(() => {
+      pausedRef.current = false;
+    }, 4000);
+  };
 
   return (
     <section className="mb-6">
@@ -34,14 +111,19 @@ export function ExploreHeroCarousel({ items }: { items: ExploreHeroItem[] }) {
         </p>
         {slides.length > 1 && (
           <p className="text-[10px] font-medium text-muted-foreground">
-            Swipe
+            {active + 1}/{slides.length}
           </p>
         )}
       </div>
 
       <div
+        ref={scrollerRef}
         className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{ WebkitOverflowScrolling: "touch" }}
+        onPointerDown={pause}
+        onPointerUp={resume}
+        onTouchStart={pause}
+        onTouchEnd={resume}
       >
         {slides.map((item, i) => {
           const href =
@@ -55,6 +137,7 @@ export function ExploreHeroCarousel({ items }: { items: ExploreHeroItem[] }) {
           return (
             <article
               key={`${item.mediaType}-${item.id}`}
+              data-hero-i={i}
               className="relative w-[min(86vw,22rem)] flex-shrink-0 snap-center overflow-hidden rounded-2xl bg-card"
             >
               <Link href={href} className="block">
@@ -135,7 +218,6 @@ export function ExploreHeroCarousel({ items }: { items: ExploreHeroItem[] }) {
             </article>
           );
         })}
-        {/* End spacer so last card can snap centered-ish */}
         <div className="w-2 flex-shrink-0" aria-hidden />
       </div>
     </section>
