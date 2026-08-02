@@ -69,7 +69,7 @@ export function BottomNav() {
               <span
                 className={cn(
                   "mb-0.5 h-0.5 w-5 rounded-full transition-opacity",
-                  active ? "bg-primary opacity-100" : "opacity-0"
+                  active ? "bg-white opacity-100" : "opacity-0"
                 )}
                 aria-hidden
               />

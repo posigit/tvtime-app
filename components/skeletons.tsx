@@ -66,7 +66,7 @@ export function TabsHeaderSkeleton() {
     <div className="relative flex">
       <div className="relative flex-1 pb-3 pt-2">
         <Skeleton className="mx-auto h-4 w-24" />
-        <span className="absolute bottom-0 left-1/2 h-0.5 w-12 -translate-x-1/2 rounded-full bg-primary/50" />
+        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/40" />
       </div>
       <div className="flex-1 pb-3 pt-2">
         <Skeleton className="mx-auto h-4 w-20 opacity-50" />

@@ -32,7 +32,7 @@ export function ShowTabs({ tabs }: { tabs: Tab[] }) {
           >
             {tab.label}
             {active && (
-              <span className="absolute bottom-0 left-1/2 h-0.5 w-12 -translate-x-1/2 rounded-full bg-primary" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-white" />
             )}
           </button>
         );
