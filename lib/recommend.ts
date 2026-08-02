@@ -18,9 +18,13 @@ import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
  * 1h → ~24 rotations/day so Explore keeps changing when you re-open it.
  */
 const ROTATION_MS = 60 * 60 * 1000;
-/** Pull this many candidates; we only surface RAILS_PER_KIND of each. */
+/** Pull this many candidates for rotation. */
 const SEED_POOL = 8;
-const RAILS_PER_KIND = 2;
+/**
+ * Max "Because you watched X" rails on Explore.
+ * Keep this low — a mixed "For you" rail covers the rest.
+ */
+const BECAUSE_RAILS_MAX = 2;
 
 type Seed = { tmdbId: number; title: string };
 
@@ -151,24 +155,24 @@ export async function getBecauseYouWatched(
       .limit(SEED_POOL);
   }
 
-  const showPicks = pickRotated(
+  // Prefer one TV seed + one movie seed (max 2 "Because you watched" rails)
+  const showPick = pickRotated(
     showSeeds,
-    RAILS_PER_KIND,
+    1,
     rotationOffset(userId, showSeeds.length)
-  );
-  const moviePicks = pickRotated(
+  )[0];
+  const moviePick = pickRotated(
     movieSeeds,
-    RAILS_PER_KIND,
-    // +1 so movie rails don't always share the same slot phase as shows
+    1,
     rotationOffset(userId + ":m", movieSeeds.length)
-  );
+  )[0];
 
   const rails: { seedTitle: string; items: TmdbMediaCard[] }[] = [];
   const seen = new Set<string>();
 
-  for (const seed of showPicks) {
+  if (showPick) {
     try {
-      const recs = await getTvRecommendations(seed.tmdbId);
+      const recs = await getTvRecommendations(showPick.tmdbId);
       const items = recs
         .filter((r) => !ownedShowIds.has(r.id))
         .filter((r) => {
@@ -178,15 +182,17 @@ export async function getBecauseYouWatched(
           return true;
         })
         .slice(0, limit);
-      if (items.length > 0) rails.push({ seedTitle: seed.title, items });
+      if (items.length > 0) {
+        rails.push({ seedTitle: showPick.title, items });
+      }
     } catch {
       /* skip */
     }
   }
 
-  for (const seed of moviePicks) {
+  if (moviePick && rails.length < BECAUSE_RAILS_MAX) {
     try {
-      const recs = await getMovieRecommendations(seed.tmdbId);
+      const recs = await getMovieRecommendations(moviePick.tmdbId);
       const items = recs
         .filter((r) => !ownedMovieIds.has(r.id))
         .filter((r) => {
@@ -196,13 +202,154 @@ export async function getBecauseYouWatched(
           return true;
         })
         .slice(0, limit);
-      if (items.length > 0) rails.push({ seedTitle: seed.title, items });
+      if (items.length > 0) {
+        rails.push({ seedTitle: moviePick.title, items });
+      }
     } catch {
       /* skip */
     }
   }
 
-  return rails;
+  // If we only got movies or only shows, fill second slot from the other pool
+  if (rails.length < BECAUSE_RAILS_MAX && showSeeds.length > 1) {
+    const alt = pickRotated(
+      showSeeds.filter((s) => s.tmdbId !== showPick?.tmdbId),
+      1,
+      rotationOffset(userId + ":alt", Math.max(1, showSeeds.length - 1))
+    )[0];
+    if (alt) {
+      try {
+        const recs = await getTvRecommendations(alt.tmdbId);
+        const items = recs
+          .filter((r) => !ownedShowIds.has(r.id))
+          .filter((r) => {
+            const k = `tv:${r.id}`;
+            if (seen.has(k)) return false;
+            seen.add(k);
+            return true;
+          })
+          .slice(0, limit);
+        if (items.length > 0) rails.push({ seedTitle: alt.title, items });
+      } catch {
+        /* skip */
+      }
+    }
+  }
+
+  return rails.slice(0, BECAUSE_RAILS_MAX);
+}
+
+/**
+ * Single mixed "For you" rail — recommendations from several seeds,
+ * interleaved TV + movies, excluding library. Less repetitive than
+ * many "Because you watched" rows.
+ */
+export async function getForYouMix(
+  userId: string,
+  limit = 16
+): Promise<TmdbMediaCard[]> {
+  const ownedShowIds = new Set(
+    (
+      await db
+        .select({ tmdbId: userShows.tmdbId })
+        .from(userShows)
+        .where(eq(userShows.userId, userId))
+    ).map((r) => r.tmdbId)
+  );
+  const ownedMovieIds = new Set(
+    (
+      await db
+        .select({ tmdbId: userMovies.tmdbId })
+        .from(userMovies)
+        .where(eq(userMovies.userId, userId))
+    ).map((r) => r.tmdbId)
+  );
+
+  const showSeeds = await db
+    .select({
+      tmdbId: watchedEpisodes.showTmdbId,
+      title: shows.title,
+    })
+    .from(watchedEpisodes)
+    .innerJoin(shows, eq(shows.tmdbId, watchedEpisodes.showTmdbId))
+    .where(eq(watchedEpisodes.userId, userId))
+    .groupBy(watchedEpisodes.showTmdbId, shows.title)
+    .orderBy(desc(sql`count(*)`))
+    .limit(SEED_POOL);
+
+  const movieSeeds = await db
+    .select({
+      tmdbId: userMovies.tmdbId,
+      title: movies.title,
+    })
+    .from(userMovies)
+    .innerJoin(movies, eq(movies.tmdbId, userMovies.tmdbId))
+    .where(and(eq(userMovies.userId, userId), eq(userMovies.status, "watched")))
+    .orderBy(desc(userMovies.watchedAt))
+    .limit(SEED_POOL);
+
+  const showPicks = pickRotated(
+    showSeeds,
+    3,
+    rotationOffset(userId + ":foryou-tv", showSeeds.length)
+  );
+  const moviePicks = pickRotated(
+    movieSeeds,
+    2,
+    rotationOffset(userId + ":foryou-mv", movieSeeds.length)
+  );
+
+  const buckets: TmdbMediaCard[][] = [];
+  const seen = new Set<string>();
+
+  for (const seed of showPicks) {
+    try {
+      const recs = await getTvRecommendations(seed.tmdbId);
+      const items = recs.filter((r) => {
+        if (ownedShowIds.has(r.id)) return false;
+        const k = `tv:${r.id}`;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+      if (items.length) buckets.push(items);
+    } catch {
+      /* skip */
+    }
+  }
+
+  for (const seed of moviePicks) {
+    try {
+      const recs = await getMovieRecommendations(seed.tmdbId);
+      const items = recs.filter((r) => {
+        if (ownedMovieIds.has(r.id)) return false;
+        const k = `movie:${r.id}`;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+      if (items.length) buckets.push(items);
+    } catch {
+      /* skip */
+    }
+  }
+
+  // Round-robin interleave so one seed doesn't dominate
+  const out: TmdbMediaCard[] = [];
+  let i = 0;
+  while (out.length < limit) {
+    let added = false;
+    for (const bucket of buckets) {
+      if (i < bucket.length) {
+        out.push(bucket[i]);
+        added = true;
+        if (out.length >= limit) break;
+      }
+    }
+    if (!added) break;
+    i++;
+  }
+  return out;
 }
 
 export function filterNewMedia(

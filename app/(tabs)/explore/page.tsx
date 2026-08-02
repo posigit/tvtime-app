@@ -20,6 +20,7 @@ import {
 } from "@/lib/tmdb";
 import {
   getBecauseYouWatched,
+  getForYouMix,
   filterNewMedia,
   pickRotated,
   rotationOffset,
@@ -119,6 +120,7 @@ export default async function ExplorePage() {
     topMovies,
     nowPlaying,
     becauseRails,
+    forYouMix,
     followedShows,
     followedMovies,
   ] = await Promise.all([
@@ -153,6 +155,7 @@ export default async function ExplorePage() {
     getTopRatedMovies().catch(() => [] as TmdbMediaCard[]),
     getNowPlayingMovies().catch(() => [] as TmdbMediaCard[]),
     getBecauseYouWatched(userId, 14).catch(() => []),
+    getForYouMix(userId, 16).catch(() => [] as TmdbMediaCard[]),
     db
       .select({ tmdbId: userShows.tmdbId })
       .from(userShows)
@@ -301,7 +304,8 @@ export default async function ExplorePage() {
     <>
       <ExploreHeroCarousel items={heroItems} />
 
-      {becauseRails.map((rail) => (
+      {/* At most 2 personal seed rails — rest of recs live in "For you" */}
+      {becauseRails.slice(0, 2).map((rail) => (
         <DiscoverRail
           key={rail.seedTitle}
           label={`Because you watched ${rail.seedTitle}`}
@@ -310,6 +314,15 @@ export default async function ExplorePage() {
           movieStatusById={movieStatusById}
         />
       ))}
+
+      {forYouMix.length > 0 && (
+        <DiscoverRail
+          label="For you"
+          items={forYouMix}
+          followedShowIds={followedShowIds}
+          movieStatusById={movieStatusById}
+        />
+      )}
 
       <GridSection label="Trending This Week">
         {trendingGrid.map((show) => (

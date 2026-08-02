@@ -29,6 +29,7 @@ import { ProfileMenu } from "@/components/profile-menu";
 import { ProfileHeatmap } from "@/components/profile-heatmap";
 import { ProfileTaste } from "@/components/profile-taste";
 import { ProfileYearRecap } from "@/components/profile-year-recap";
+import { StarRatingDisplay } from "@/components/star-rating";
 import {
   aggregateGenres,
   currentStreak as calcCurrentStreak,
@@ -217,6 +218,8 @@ type RailItem = {
   posterPath: string | null;
   sub: string;
   subAccent?: boolean;
+  /** Stored 1–10 rating — render as full star row instead of "★ 4.5" text */
+  rating?: number | null;
 };
 
 /** Poster rail with a title + caption under each tile (Recently Watched / Top Rated). */
@@ -232,14 +235,20 @@ function CaptionedRail({ items }: { items: RailItem[] }) {
             <p className="mt-1.5 truncate text-xs font-semibold text-white">
               {item.title}
             </p>
-            <p
-              className={cn(
-                "truncate text-[10px] font-medium",
-                item.subAccent ? "text-primary" : "text-muted-foreground"
-              )}
-            >
-              {item.sub}
-            </p>
+            {item.rating != null && item.rating > 0 ? (
+              <div className="mt-0.5 flex items-center gap-0.5">
+                <StarRatingDisplay value={item.rating} size={11} />
+              </div>
+            ) : (
+              <p
+                className={cn(
+                  "truncate text-[10px] font-medium",
+                  item.subAccent ? "text-primary" : "text-muted-foreground"
+                )}
+              >
+                {item.sub}
+              </p>
+            )}
           </div>
         </Link>
       ))}
@@ -446,6 +455,7 @@ export default async function ProfilePage() {
     backdropPath: string | null;
     sub: string;
     subAccent: boolean;
+    rating?: number | null;
     watchedAt: Date | null;
   };
   const recentCandidates: RecentRaw[] = [
@@ -457,6 +467,7 @@ export default async function ProfilePage() {
       backdropPath: e.backdropPath,
       sub: `S${String(e.seasonNumber).padStart(2, "0")} E${String(e.episodeNumber).padStart(2, "0")}`,
       subAccent: false,
+      rating: null as number | null,
       watchedAt: e.watchedAt,
     })),
     ...recentMovies.map((m) => ({
@@ -465,8 +476,9 @@ export default async function ProfilePage() {
       title: m.title,
       posterPath: m.posterPath,
       backdropPath: m.backdropPath,
-      sub: m.rating != null ? `★ ${(m.rating / 2).toFixed(1)}` : "Movie",
+      sub: m.rating != null ? "" : "Movie",
       subAccent: m.rating != null,
+      rating: m.rating,
       watchedAt: m.watchedAt,
     })),
   ].sort(
@@ -529,7 +541,8 @@ export default async function ProfilePage() {
       title: m.title,
       posterPath: m.posterPath,
       score: m.rating ?? 0,
-      sub: `★ ${((m.rating ?? 0) / 2).toFixed(1)}`,
+      sub: "",
+      rating: m.rating ?? null,
     })),
     ...topShows.map((s) => ({
       key: `ts-${s.tmdbId}`,
@@ -537,7 +550,9 @@ export default async function ProfilePage() {
       title: s.title,
       posterPath: s.posterPath,
       score: s.avgScore,
-      sub: `★ ${(s.avgScore / 2).toFixed(1)} · ${s.ratedCount} ep${s.ratedCount === 1 ? "" : "s"}`,
+      // Round avg to nearest half-star step (1–10 int scale) for glyph display
+      sub: "",
+      rating: Math.round(s.avgScore),
     })),
   ]
     .sort((a, b) => b.score - a.score)
