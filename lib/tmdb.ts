@@ -147,8 +147,54 @@ export async function getTrendingTv(timeWindow: "day" | "week" = "week") {
       name: string;
       poster_path?: string;
       backdrop_path?: string;
+      overview?: string;
+      vote_average?: number;
     }>;
   }>(`/trending/tv/${timeWindow}`);
+}
+
+export async function getTrendingMovies(timeWindow: "day" | "week" = "week") {
+  return tmdbFetch<{
+    results: Array<{
+      id: number;
+      title: string;
+      poster_path?: string;
+      backdrop_path?: string;
+      overview?: string;
+      vote_average?: number;
+    }>;
+  }>(`/trending/movie/${timeWindow}`);
+}
+
+/** Flat card list from trending TV (for rails / feed). */
+export async function getTrendingTvCards(
+  timeWindow: "day" | "week" = "week"
+): Promise<TmdbMediaCard[]> {
+  const data = await getTrendingTv(timeWindow);
+  return mapList(
+    (data.results ?? []).map((r) => ({
+      id: r.id,
+      name: r.name,
+      poster_path: r.poster_path,
+      vote_average: r.vote_average,
+    })),
+    "tv"
+  );
+}
+
+export async function getTrendingMovieCards(
+  timeWindow: "day" | "week" = "week"
+): Promise<TmdbMediaCard[]> {
+  const data = await getTrendingMovies(timeWindow);
+  return mapList(
+    (data.results ?? []).map((r) => ({
+      id: r.id,
+      title: r.title,
+      poster_path: r.poster_path,
+      vote_average: r.vote_average,
+    })),
+    "movie"
+  );
 }
 
 export async function getPopularMovies() {

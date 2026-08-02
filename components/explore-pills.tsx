@@ -8,14 +8,12 @@ type Pill = {
   label: string;
 };
 
+/** Only ship tabs that have real content — no empty Groups/Activity shells */
 const PILLS: Pill[] = [
   { value: "feed", label: "FEED" },
   { value: "discover", label: "DISCOVER" },
-  { value: "groups", label: "GROUPS" },
-  { value: "activity", label: "ACTIVITY" },
 ];
 
-/** Snapshot 5 pill row: FEED active (yellow), others dark, horizontally scrollable */
 export function ExplorePills({
   feed,
   discover,
@@ -31,9 +29,10 @@ export function ExplorePills({
         {PILLS.map((pill) => (
           <button
             key={pill.value}
+            type="button"
             onClick={() => setActive(pill.value)}
             className={cn(
-              "flex-shrink-0 rounded-full px-5 py-2.5 text-sm font-black tracking-wide transition-colors",
+              "flex-shrink-0 rounded-full px-5 py-2.5 text-sm font-black tracking-wide transition-colors active:scale-95",
               active === pill.value
                 ? "bg-primary text-black"
                 : "bg-[#2c2c2e] text-white"
@@ -44,19 +43,9 @@ export function ExplorePills({
         ))}
       </div>
 
-      <div className="pt-2">
+      <div className="pt-3">
         {active === "feed" && feed}
         {active === "discover" && discover}
-        {active === "groups" && (
-          <p className="pt-20 text-center text-sm text-muted-foreground">
-            No groups yet
-          </p>
-        )}
-        {active === "activity" && (
-          <p className="pt-20 text-center text-sm text-muted-foreground">
-            No activity yet
-          </p>
-        )}
       </div>
     </div>
   );
