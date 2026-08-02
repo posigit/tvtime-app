@@ -936,7 +936,6 @@ export default async function ProfilePage() {
     rawName.length > 0
       ? rawName.charAt(0).toUpperCase() + rawName.slice(1)
       : "User";
-  const initial = name.charAt(0).toUpperCase() || "U";
 
   return (
     <div className="min-h-dvh bg-black pb-nav-page">
@@ -968,11 +967,16 @@ export default async function ProfilePage() {
 
         {/* Sits on top of the banner edge — outside the overflow-hidden image box */}
         <div className="relative z-10 -mt-12 flex items-end gap-3 px-4">
-          <div
-            className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/40 text-4xl font-bold text-white shadow-lg ring-4 ring-black"
-            aria-hidden
-          >
-            {initial}
+          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-primary to-primary/40 shadow-lg ring-4 ring-black">
+            {/* Static avatar in /public/avatars/profile.jpg */}
+            {/* eslint-disable-next-line @next/next/no-img-element -- local static avatar; avoid next/image fill quirks on circle crop */}
+            <img
+              src="/avatars/profile.jpg"
+              alt={name}
+              className="h-full w-full object-cover"
+              width={96}
+              height={96}
+            />
           </div>
           <div className="min-w-0 flex-1 pb-1">
             <h1 className="truncate text-2xl font-bold leading-tight text-white drop-shadow-sm">

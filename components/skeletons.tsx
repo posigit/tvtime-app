@@ -227,7 +227,7 @@ export function ProfilePageSkeleton() {
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20" />
         </div>
         <div className="relative z-10 -mt-12 flex items-end gap-3 px-4">
-          <Skeleton className="h-24 w-24 flex-shrink-0 rounded-full ring-4 ring-black" />
+          <Skeleton className="h-24 w-24 flex-shrink-0 rounded-full ring-4 ring-black overflow-hidden" />
           <div className="min-w-0 flex-1 space-y-2 pb-1">
             <Skeleton className="h-7 w-36" />
             <Skeleton className="h-3 w-48" />
