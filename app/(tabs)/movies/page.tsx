@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { ShowTabs } from "@/components/show-tabs";
 import { StickyChrome } from "@/components/sticky-chrome";
 import { SectionLabel } from "@/components/section-label";
+import { LayoutToggle } from "@/components/layout-toggle";
 import { RatingBadge } from "@/components/star-rating";
 import { posterUrl } from "@/lib/tmdb";
 import {
@@ -15,6 +16,7 @@ import { getUnseenGreatMoviesPool } from "@/lib/surprise-movies";
 import { WatchLaterTools } from "@/components/watch-later-tools";
 import Link from "next/link";
 import Image from "next/image";
+import { ChevronRight, Clock } from "lucide-react";
 
 function PopcornIllustration() {
   return (
@@ -114,16 +116,25 @@ function MoviePoster({
   );
 }
 
-function MovieGrid({
-  items,
-}: {
-  items: {
-    tmdbId: number;
-    title: string;
-    posterPath: string | null;
-    rating?: number | null;
-  }[];
-}) {
+type MovieRow = {
+  tmdbId: number;
+  title: string;
+  posterPath: string | null;
+  rating?: number | null;
+  releaseDate?: string | null;
+  runtime?: number | null;
+  rtScore?: number | null;
+};
+
+function formatRuntime(minutes: number): string {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h <= 0) return `${m}m`;
+  if (m <= 0) return `${h}h`;
+  return `${h}h ${m}m`;
+}
+
+function MovieGrid({ items }: { items: MovieRow[] }) {
   return (
     <div className="grid grid-cols-3 gap-2">
       {items.map((movie) => (
@@ -139,6 +150,65 @@ function MovieGrid({
           />
         </Link>
       ))}
+    </div>
+  );
+}
+
+/** List row for Watch Next — poster + title meta (matches Shows list vibe). */
+function MovieList({ items }: { items: MovieRow[] }) {
+  return (
+    <div className="space-y-2">
+      {items.map((movie) => {
+        const poster = posterUrl(movie.posterPath, "w185");
+        const year = movie.releaseDate?.slice(0, 4);
+        return (
+          <Link
+            key={movie.tmdbId}
+            href={`/movie/${movie.tmdbId}`}
+            className="flex items-center gap-3 rounded-xl bg-[#101011] p-2.5 active:scale-[0.99]"
+          >
+            <div className="relative h-[88px] w-[60px] flex-shrink-0 overflow-hidden rounded-lg bg-[#2c2c2e]">
+              {poster ? (
+                <Image
+                  src={poster}
+                  alt={movie.title}
+                  fill
+                  sizes="60px"
+                  className="object-cover"
+                  unoptimized
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center p-1 text-center text-[9px] text-muted-foreground">
+                  {movie.title}
+                </div>
+              )}
+            </div>
+            <div className="min-w-0 flex-1 py-0.5">
+              <div className="mb-1.5 inline-flex max-w-full items-center gap-0.5 rounded-full border border-white/90 px-2.5 py-[3px]">
+                <span className="truncate text-[11px] font-bold uppercase tracking-wide text-white">
+                  {movie.title}
+                </span>
+                <ChevronRight
+                  className="h-3 w-3 flex-shrink-0 text-white"
+                  strokeWidth={2.5}
+                />
+              </div>
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13px] font-semibold text-white/70">
+                {year && <span>{year}</span>}
+                {movie.runtime != null && movie.runtime > 0 && (
+                  <span className="inline-flex items-center gap-0.5">
+                    <Clock className="h-3 w-3" />
+                    {formatRuntime(movie.runtime)}
+                  </span>
+                )}
+                {movie.rtScore != null && movie.rtScore >= 0 && (
+                  <span className="text-primary">🍅 {movie.rtScore}%</span>
+                )}
+              </div>
+            </div>
+          </Link>
+        );
+      })}
     </div>
   );
 }
@@ -190,10 +260,12 @@ function UpcomingMovieGrid({
 export default async function MoviesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ view?: string }>;
+  searchParams: Promise<{ view?: string; layout?: string }>;
 }) {
-  const { view } = await searchParams;
+  const { view, layout } = await searchParams;
   const currentView = view === "upcoming" ? "upcoming" : "watchlist";
+  // Match Shows: list is default; grid when ?layout=grid
+  const gridLayout = layout === "grid";
 
   const userId = await requireAuth();
 
@@ -267,16 +339,15 @@ export default async function MoviesPage({
             <section className="mb-6">
               <div className="relative mb-3 mt-2 flex justify-center">
                 <SectionLabel>Watch Next</SectionLabel>
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 p-1 text-primary">
-                  <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
-                    <rect x="3" y="3" width="8" height="8" rx="1.5" />
-                    <rect x="13" y="3" width="8" height="8" rx="1.5" />
-                    <rect x="3" y="13" width="8" height="8" rx="1.5" />
-                    <rect x="13" y="13" width="8" height="8" rx="1.5" />
-                  </svg>
+                <div className="absolute right-0 top-1/2 -translate-y-1/2">
+                  <LayoutToggle />
                 </div>
               </div>
-              <MovieGrid items={watchNext} />
+              {gridLayout ? (
+                <MovieGrid items={watchNext} />
+              ) : (
+                <MovieList items={watchNext} />
+              )}
             </section>
           )}
 
