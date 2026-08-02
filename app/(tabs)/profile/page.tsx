@@ -968,14 +968,18 @@ export default async function ProfilePage() {
         {/* Sits on top of the banner edge — outside the overflow-hidden image box */}
         <div className="relative z-10 -mt-12 flex items-end gap-3 px-4">
           <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-primary to-primary/40 shadow-lg ring-4 ring-black">
-            {/* Static avatar in /public/avatars/profile.jpg */}
-            {/* eslint-disable-next-line @next/next/no-img-element -- local static avatar; avoid next/image fill quirks on circle crop */}
+            {/* Cached aggressively via Cache-Control + service worker (see next.config / sw.js) */}
+            {/* eslint-disable-next-line @next/next/no-img-element -- local avatar; circle crop + SW cache-first */}
             <img
               src="/avatars/profile.jpg"
               alt={name}
               className="h-full w-full object-cover"
               width={96}
               height={96}
+              decoding="async"
+              fetchPriority="high"
+              // Hint browser to reuse disk cache across navigations
+              loading="eager"
             />
           </div>
           <div className="min-w-0 flex-1 pb-1">

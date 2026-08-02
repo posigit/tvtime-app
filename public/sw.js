@@ -8,7 +8,7 @@
  *
  * Bump VERSION when changing strategies so activate() purges old caches.
  */
-const VERSION = "3";
+const VERSION = "4";
 const SHELL_CACHE = `tvtime-shell-v${VERSION}`;
 const STATIC_CACHE = `tvtime-static-v${VERSION}`;
 const IMAGE_CACHE = `tvtime-images-v${VERSION}`;
@@ -21,6 +21,7 @@ const PRECACHE_URLS = [
   "/manifest.json",
   "/icons/icon-192x192.png",
   "/icons/icon-512x512.png",
+  "/avatars/profile.jpg",
 ];
 
 const IMAGE_CACHE_MAX = 250;
@@ -80,9 +81,10 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // --- Icons / manifest / offline page: cache-first ---
+  // --- Icons / avatar / manifest / offline page: cache-first ---
   if (
     url.pathname.startsWith("/icons/") ||
+    url.pathname.startsWith("/avatars/") ||
     url.pathname === "/manifest.json" ||
     url.pathname === "/offline.html" ||
     url.pathname === "/favicon.ico"
