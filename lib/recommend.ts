@@ -13,30 +13,41 @@ import {
 } from "./tmdb";
 import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
 
-/** How often "Because you watched" seeds advance (ms). 4h → ~6 rotations/day. */
-const ROTATION_MS = 4 * 60 * 60 * 1000;
+/**
+ * How often personal "Because you watched" seeds advance.
+ * 1h → ~24 rotations/day so Explore keeps changing when you re-open it.
+ */
+const ROTATION_MS = 60 * 60 * 1000;
 /** Pull this many candidates; we only surface RAILS_PER_KIND of each. */
-const SEED_POOL = 6;
+const SEED_POOL = 8;
 const RAILS_PER_KIND = 2;
 
 type Seed = { tmdbId: number; title: string };
 
 /**
- * Stable-ish daily rotation: advances every ROTATION_MS, offset by userId so
+ * Stable-ish rotation: advances every ROTATION_MS, offset by userId so
  * different accounts don't all show the same seed at the same hour.
  */
-function rotationOffset(userId: string, poolSize: number): number {
+export function rotationOffset(
+  userId: string,
+  poolSize: number,
+  periodMs: number = ROTATION_MS
+): number {
   if (poolSize <= 0) return 0;
   let hash = 0;
   for (let i = 0; i < userId.length; i++) {
     hash = (hash * 31 + userId.charCodeAt(i)) >>> 0;
   }
-  const slot = Math.floor(Date.now() / ROTATION_MS);
+  const slot = Math.floor(Date.now() / periodMs);
   return (slot + hash) % poolSize;
 }
 
 /** Pick `count` items from `pool`, starting at a rotating offset (wraps). */
-function pickRotated<T>(pool: T[], count: number, offset: number): T[] {
+export function pickRotated<T>(
+  pool: T[],
+  count: number,
+  offset: number
+): T[] {
   if (pool.length === 0) return [];
   if (pool.length <= count) return pool;
   const out: T[] = [];

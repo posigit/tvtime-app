@@ -11,14 +11,16 @@ function getApiKey() {
 
 async function tmdbFetch<T>(
   path: string,
-  params: Record<string, string> = {}
+  params: Record<string, string> = {},
+  opts?: { revalidate?: number }
 ): Promise<T> {
   const url = new URL(`${TMDB_BASE_URL}${path}`);
   url.searchParams.append("api_key", getApiKey());
   Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, v));
 
   const res = await fetch(url.toString(), {
-    next: { revalidate: 3600 },
+    // Default 1h; hot paths (trending) can pass a shorter window
+    next: { revalidate: opts?.revalidate ?? 3600 },
   });
   if (!res.ok) {
     throw new Error(`TMDB API error: ${res.status} ${res.statusText}`);
@@ -140,6 +142,9 @@ export async function getMovieExternalIds(tmdbId: number) {
   return tmdbFetch<{ imdb_id?: string | null }>(`/movie/${tmdbId}/external_ids`);
 }
 
+/** Trending revalidates every 15m so Explore feels fresher. */
+const TRENDING_REVALIDATE = 900;
+
 export async function getTrendingTv(timeWindow: "day" | "week" = "week") {
   return tmdbFetch<{
     results: Array<{
@@ -150,7 +155,7 @@ export async function getTrendingTv(timeWindow: "day" | "week" = "week") {
       overview?: string;
       vote_average?: number;
     }>;
-  }>(`/trending/tv/${timeWindow}`);
+  }>(`/trending/tv/${timeWindow}`, {}, { revalidate: TRENDING_REVALIDATE });
 }
 
 export async function getTrendingMovies(timeWindow: "day" | "week" = "week") {
@@ -163,38 +168,7 @@ export async function getTrendingMovies(timeWindow: "day" | "week" = "week") {
       overview?: string;
       vote_average?: number;
     }>;
-  }>(`/trending/movie/${timeWindow}`);
-}
-
-/** Flat card list from trending TV (for rails / feed). */
-export async function getTrendingTvCards(
-  timeWindow: "day" | "week" = "week"
-): Promise<TmdbMediaCard[]> {
-  const data = await getTrendingTv(timeWindow);
-  return mapList(
-    (data.results ?? []).map((r) => ({
-      id: r.id,
-      name: r.name,
-      poster_path: r.poster_path,
-      vote_average: r.vote_average,
-    })),
-    "tv"
-  );
-}
-
-export async function getTrendingMovieCards(
-  timeWindow: "day" | "week" = "week"
-): Promise<TmdbMediaCard[]> {
-  const data = await getTrendingMovies(timeWindow);
-  return mapList(
-    (data.results ?? []).map((r) => ({
-      id: r.id,
-      title: r.title,
-      poster_path: r.poster_path,
-      vote_average: r.vote_average,
-    })),
-    "movie"
-  );
+  }>(`/trending/movie/${timeWindow}`, {}, { revalidate: TRENDING_REVALIDATE });
 }
 
 export async function getPopularMovies() {
