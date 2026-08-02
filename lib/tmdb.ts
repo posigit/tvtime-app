@@ -272,6 +272,64 @@ export async function getTopRatedMovies() {
   return mapList(data.results ?? [], "movie");
 }
 
+export type TmdbMovieCard = TmdbMediaCard & {
+  release_date?: string | null;
+  overview?: string | null;
+};
+
+function mapMovieCards(
+  results: Array<
+    TmdbListItem & { release_date?: string; overview?: string }
+  >
+): TmdbMovieCard[] {
+  return (results ?? []).map((r) => ({
+    id: r.id,
+    title: r.title || r.name || "Untitled",
+    poster_path: r.poster_path,
+    mediaType: "movie" as const,
+    vote_average: r.vote_average,
+    release_date: r.release_date ?? null,
+    overview: r.overview ?? null,
+  }));
+}
+
+/** Paginated top-rated movies (TMDB ~20 per page). */
+export async function getTopRatedMoviesPage(page = 1): Promise<TmdbMovieCard[]> {
+  const data = await tmdbFetch<{
+    results: Array<
+      TmdbListItem & { release_date?: string; overview?: string }
+    >;
+  }>("/movie/top_rated", { page: String(page) });
+  return mapMovieCards(data.results ?? []);
+}
+
+/**
+ * Highly rated "classics" — strong scores + real vote volume.
+ * Optional max year biases toward older films when set.
+ */
+export async function discoverGreatMovies(
+  page = 1,
+  opts?: { maxYear?: number; minVoteAverage?: number }
+): Promise<TmdbMovieCard[]> {
+  const maxYear = opts?.maxYear;
+  const minVote = opts?.minVoteAverage ?? 7.5;
+  const data = await tmdbFetch<{
+    results: Array<
+      TmdbListItem & { release_date?: string; overview?: string }
+    >;
+  }>("/discover/movie", {
+    sort_by: "vote_average.desc",
+    "vote_count.gte": "800",
+    "vote_average.gte": String(minVote),
+    ...(maxYear
+      ? { "primary_release_date.lte": `${maxYear}-12-31` }
+      : {}),
+    page: String(page),
+    include_adult: "false",
+  });
+  return mapMovieCards(data.results ?? []);
+}
+
 export async function getNowPlayingMovies() {
   const data = await tmdbFetch<{ results: TmdbListItem[] }>("/movie/now_playing");
   return mapList(data.results ?? [], "movie");

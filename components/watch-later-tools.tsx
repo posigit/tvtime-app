@@ -6,7 +6,7 @@ import Image from "next/image";
 import { posterUrl } from "@/lib/tmdb";
 import { RatingBadge } from "@/components/star-rating";
 import { SectionLabel } from "@/components/section-label";
-import { Shuffle, Clock, X } from "lucide-react";
+import { Shuffle, Clock, X, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type LaterMovie = {
@@ -17,6 +17,9 @@ export type LaterMovie = {
   runtime: number | null;
   rtScore: number | null;
   rating?: number | null;
+  /** TMDB score 0–10 for surprise classics */
+  voteAverage?: number | null;
+  badge?: string;
 };
 
 type SortKey = "title" | "rt" | "runtime" | "year";
@@ -68,7 +71,7 @@ function MoviePoster({
 }
 
 /**
- * Pick a random movie, avoiding recent surprises until the pool is exhausted.
+ * Weighted random: higher TMDB scores more likely, still avoids recent picks.
  */
 function pickSurprise(
   pool: LaterMovie[],
@@ -77,22 +80,30 @@ function pickSurprise(
   if (pool.length === 0) return null;
   const avoid = new Set(recentIds);
   let candidates = pool.filter((m) => !avoid.has(m.tmdbId));
-  // If we've seen everything recently, only avoid the very last pick
   if (candidates.length === 0) {
     const last = recentIds[recentIds.length - 1];
     candidates =
-      pool.length > 1
-        ? pool.filter((m) => m.tmdbId !== last)
-        : pool;
+      pool.length > 1 ? pool.filter((m) => m.tmdbId !== last) : pool;
   }
   if (candidates.length === 0) return pool[0] ?? null;
-  return candidates[Math.floor(Math.random() * candidates.length)];
+
+  // Weight by vote average (fallback equal weight)
+  const weights = candidates.map((m) => {
+    const v = m.voteAverage ?? 7;
+    return Math.max(0.5, (v - 6) ** 2);
+  });
+  const total = weights.reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < candidates.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return candidates[i];
+  }
+  return candidates[candidates.length - 1];
 }
 
 /**
  * @param items — Watch Later grid
- * @param surprisePool — full unwatched pool (Watch Next + Watch Later + …).
- *   Surprise Me draws from this, not only the later backlog.
+ * @param surprisePool — great/classic films user hasn't seen (from TMDB)
  */
 export function WatchLaterTools({
   items,
@@ -103,13 +114,10 @@ export function WatchLaterTools({
 }) {
   const [sort, setSort] = useState<SortKey>("rt");
   const [pick, setPick] = useState<LaterMovie | null>(null);
-  /** Session history of surprise picks — prevents the same title looping */
   const recentRef = useRef<number[]>([]);
 
-  /** Everything we can pick from — never limited to Watch Later alone */
   const poolAll = useMemo(() => {
     const raw = surprisePool && surprisePool.length > 0 ? surprisePool : items;
-    // Dedupe by tmdbId
     const seen = new Set<number>();
     const out: LaterMovie[] = [];
     for (const m of raw) {
@@ -148,24 +156,19 @@ export function WatchLaterTools({
 
   function surprise() {
     if (poolAll.length === 0) return;
-
     const next = pickSurprise(poolAll, recentRef.current);
     if (!next) return;
-
-    // Remember last up to poolSize-1 so we cycle through before repeats
-    const maxRemember = Math.max(1, Math.min(poolAll.length - 1, 20));
+    const maxRemember = Math.max(1, Math.min(poolAll.length - 1, 30));
     recentRef.current = [...recentRef.current, next.tmdbId].slice(-maxRemember);
     setPick(next);
   }
 
-  // Show surprise UI if we have anything unwatched, even with empty Watch Later grid
   if (items.length === 0 && poolAll.length === 0) return null;
 
   const showLaterGrid = items.length > 0;
 
   return (
     <section className="mb-6">
-      {/* Surprise draws from full unwatched list (Next + Later), not just Later */}
       <div className="mb-3 mt-2 flex flex-col items-center gap-2">
         <button
           type="button"
@@ -176,9 +179,9 @@ export function WatchLaterTools({
           <Shuffle className="h-3.5 w-3.5" />
           {pick ? "Surprise again" : "Surprise me"}
         </button>
-        <p className="text-[10px] text-muted-foreground">
-          From {poolAll.length} unwatched movie
-          {poolAll.length === 1 ? "" : "s"}
+        <p className="max-w-xs text-center text-[10px] leading-snug text-muted-foreground">
+          Top-rated &amp; classics you haven&apos;t watched · {poolAll.length}{" "}
+          films
         </p>
       </div>
 
@@ -201,12 +204,20 @@ export function WatchLaterTools({
             </div>
             <div className="min-w-0 flex-1 pr-6">
               <p className="text-[10px] font-bold uppercase tracking-wide text-primary">
-                Tonight&apos;s pick
+                {pick.badge
+                  ? `${pick.badge} · tonight`
+                  : "Tonight\u2019s pick"}
               </p>
               <p className="truncate text-base font-bold text-white">
                 {pick.title}
               </p>
               <div className="mt-1 flex flex-wrap gap-2 text-xs text-white/60">
+                {pick.voteAverage != null && pick.voteAverage > 0 && (
+                  <span className="inline-flex items-center gap-0.5 text-primary">
+                    <Star className="h-3 w-3" fill="currentColor" />
+                    {pick.voteAverage.toFixed(1)}
+                  </span>
+                )}
                 {pick.rtScore != null && pick.rtScore >= 0 && (
                   <span className="text-primary">🍅 {pick.rtScore}%</span>
                 )}

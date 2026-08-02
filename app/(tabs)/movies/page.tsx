@@ -11,6 +11,7 @@ import {
   isUnreleased,
   splitWatchNextAndLater,
 } from "@/lib/movie-watchlist";
+import { getUnseenGreatMoviesPool } from "@/lib/surprise-movies";
 import { WatchLaterTools } from "@/components/watch-later-tools";
 import Link from "next/link";
 import Image from "next/image";
@@ -213,6 +214,12 @@ export default async function MoviesPage({
     .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
     .where(eq(userMovies.userId, userId));
 
+  // Exclude anything already in the library (watched or listed) from Surprise
+  const libraryIds = new Set(userMoviesList.map((m) => m.tmdbId));
+  const surprisePool = await getUnseenGreatMoviesPool(libraryIds).catch(
+    () => []
+  );
+
   const wantToWatchAll = userMoviesList.filter(
     (m) => m.status === "want_to_watch" || m.status === "for_later"
   );
@@ -273,8 +280,8 @@ export default async function MoviesPage({
             </section>
           )}
 
-          {/* Surprise from ALL unwatched (Next + Later); grid is Watch Later only */}
-          {releasedUnwatched.length > 0 && (
+          {/* Surprise = TMDB top-rated/classics not in library; grid = Watch Later only */}
+          {(watchLater.length > 0 || surprisePool.length > 0) && (
             <WatchLaterTools
               items={watchLater.map((m) => ({
                 tmdbId: m.tmdbId,
@@ -285,15 +292,7 @@ export default async function MoviesPage({
                 rtScore: m.rtScore,
                 rating: m.rating,
               }))}
-              surprisePool={releasedUnwatched.map((m) => ({
-                tmdbId: m.tmdbId,
-                title: m.title,
-                posterPath: m.posterPath,
-                releaseDate: m.releaseDate,
-                runtime: m.runtime,
-                rtScore: m.rtScore,
-                rating: m.rating,
-              }))}
+              surprisePool={surprisePool}
             />
           )}
 
