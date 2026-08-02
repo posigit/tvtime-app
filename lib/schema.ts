@@ -26,6 +26,8 @@ export const shows = pgTable("shows", {
   episodeRuntime: integer("episode_runtime"),
   voteAverage: real("vote_average"),
   rtScore: integer("rt_score"),
+  /** Last successful RT/OMDb check — used to re-fetch Tomatometer every ~2 weeks. */
+  rtCheckedAt: timestamp("rt_checked_at"),
   imdbId: text("imdb_id"),
   tmdbData: jsonb("tmdb_data"),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -43,6 +45,8 @@ export const movies = pgTable("movies", {
   overview: text("overview"),
   voteAverage: real("vote_average"),
   rtScore: integer("rt_score"),
+  /** Last successful RT/OMDb check — used to re-fetch Tomatometer every ~2 weeks. */
+  rtCheckedAt: timestamp("rt_checked_at"),
   imdbId: text("imdb_id"),
   tmdbData: jsonb("tmdb_data"),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

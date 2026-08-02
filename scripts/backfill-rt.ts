@@ -51,7 +51,7 @@ async function resolveOne(
   if (!imdbId) {
     await pool.query(
       `UPDATE ${type === "tv" ? "shows" : "movies"}
-       SET imdb_id = NULL, rt_score = $1 WHERE tmdb_id = $2`,
+       SET imdb_id = NULL, rt_score = $1, rt_checked_at = NOW() WHERE tmdb_id = $2`,
       [RT_NONE, row.tmdb_id]
     );
     return "none";
@@ -70,7 +70,7 @@ async function resolveOne(
   const rtScore = score ?? RT_NONE;
   await pool.query(
     `UPDATE ${type === "tv" ? "shows" : "movies"}
-     SET imdb_id = $1, rt_score = $2 WHERE tmdb_id = $3`,
+     SET imdb_id = $1, rt_score = $2, rt_checked_at = NOW() WHERE tmdb_id = $3`,
     [imdbId, rtScore, row.tmdb_id]
   );
   return score != null ? "score" : "none";

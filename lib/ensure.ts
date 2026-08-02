@@ -11,8 +11,10 @@ import { getRottenTomatoesScore } from "./omdb";
 import { getTvTomatometerFromRt } from "./rt-tv";
 import { eq, sql } from "drizzle-orm";
 
-/** Stored in `rt_score` when OMDb/RT was checked and has no Tomatometer (stops retries). */
+/** Stored in `rt_score` when OMDb/RT was checked and has no Tomatometer. */
 const RT_NONE = -1;
+/** Re-check Tomatometer this often even when a score already exists. */
+const RT_STALE_MS = 14 * 24 * 60 * 60 * 1000;
 
 type ShowRow = {
   tmdbId: number;
@@ -130,8 +132,9 @@ const rtInFlight = new Set<string>();
  *
  * Persistence rules:
  * - Real score (0–100) when found
- * - `rt_score = -1` when sources answered with no Tomatometer (stops retries)
- * - Leave `rt_score` null on failure / rate limit so the next visit retries
+ * - `rt_score = -1` when sources answered with no Tomatometer
+ * - Leave `rt_score` unchanged on failure / rate limit (retry next visit)
+ * - Always stamp `rt_checked_at` on a successful check so we re-poll every 2 weeks
  */
 async function fillRtScore(
   tmdbId: number,
@@ -191,7 +194,7 @@ async function fillRtScore(
     }
 
     if (!checked) {
-      // Transient failure — keep imdb if any; leave rt_score null for retry
+      // Transient failure — keep imdb if any; do not bump rt_checked_at
       if (imdbId) {
         await withDbRetry(() =>
           db.update(table).set({ imdbId }).where(eq(table.tmdbId, tmdbId))
@@ -200,12 +203,15 @@ async function fillRtScore(
       return;
     }
 
+    const now = new Date();
     await withDbRetry(() =>
       db
         .update(table)
         .set({
           ...(imdbId ? { imdbId } : {}),
           rtScore: score ?? RT_NONE,
+          rtCheckedAt: now,
+          updatedAt: now,
         })
         .where(eq(table.tmdbId, tmdbId))
     );
@@ -217,24 +223,36 @@ async function fillRtScore(
   }
 }
 
+function isRtStale(rtCheckedAt: Date | string | null | undefined): boolean {
+  if (rtCheckedAt == null) return true; // never stamped → refresh
+  const t =
+    rtCheckedAt instanceof Date
+      ? rtCheckedAt.getTime()
+      : new Date(rtCheckedAt).getTime();
+  if (!Number.isFinite(t)) return true;
+  return Date.now() - t >= RT_STALE_MS;
+}
+
 /**
- * Kick off a background RT fill when we do not yet have a resolved score.
- * `rt_score = -1` means "checked, no RT" and is treated as resolved.
- * For TV with -1 from the old OMDb-only pass, callers may pass force via nulling.
+ * Kick off a background RT fill when:
+ * - we have never resolved a score (`rt_score` null), or
+ * - the last successful check is ≥ 2 weeks old (refresh Tomatometer)
  */
 function ensureRtScore(
   row: {
     tmdbId: number;
     rtScore?: number | null;
+    rtCheckedAt?: Date | string | null;
     imdbId?: string | null;
     title?: string | null;
     firstAirDate?: string | null;
   },
   type: "tv" | "movie"
 ) {
-  // null = never resolved (or failed last time) → try again
-  // number (incl. -1) = done
-  if (row.rtScore != null) return;
+  const needsFirst = row.rtScore == null;
+  const needsRefresh = !needsFirst && isRtStale(row.rtCheckedAt);
+  if (!needsFirst && !needsRefresh) return;
+
   const key = `${type}:${row.tmdbId}`;
   if (rtInFlight.has(key)) return;
   rtInFlight.add(key);
