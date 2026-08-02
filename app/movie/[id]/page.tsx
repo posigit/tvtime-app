@@ -1,9 +1,8 @@
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { userMovies } from "@/lib/schema";
+import { userMovies, userShows } from "@/lib/schema";
 import { eq, and } from "drizzle-orm";
 import {
-  backdropUrl,
   getMovieRecommendations,
   getMovieSimilar,
   getWatchProviders,
@@ -11,21 +10,7 @@ import {
 import { ensureMovie } from "@/lib/ensure";
 import { filterNewMedia } from "@/lib/recommend";
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { ChevronLeft } from "lucide-react";
-import { MovieWatchButton } from "@/components/movie-watch-button";
-import { MovieRating } from "@/components/star-rating";
-import { DiscoverRail } from "@/components/discover-rail";
-import { WatchProviders } from "@/components/watch-providers";
-
-function formatRuntime(minutes: number) {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  if (h <= 0) return `${m}m`;
-  if (m <= 0) return `${h}h`;
-  return `${h}h ${m}m`;
-}
+import { MovieDetailClient } from "@/components/movie-detail-client";
 
 export default async function MovieDetailPage({
   params,
@@ -41,17 +26,25 @@ export default async function MovieDetailPage({
   const movie = await ensureMovie(tmdbId);
   if (!movie) notFound();
 
-  const [userMovie, ownedMovies] = await Promise.all([
+  const [userMovie, ownedMovies, ownedShows] = await Promise.all([
     db.query.userMovies.findFirst({
       where: and(eq(userMovies.userId, userId), eq(userMovies.tmdbId, tmdbId)),
     }),
     db
-      .select({ tmdbId: userMovies.tmdbId })
+      .select({ tmdbId: userMovies.tmdbId, status: userMovies.status })
       .from(userMovies)
       .where(eq(userMovies.userId, userId)),
+    db
+      .select({ tmdbId: userShows.tmdbId })
+      .from(userShows)
+      .where(eq(userShows.userId, userId)),
   ]);
 
   const ownedIds = new Set(ownedMovies.map((m) => m.tmdbId));
+  const followedShowIds = new Set(ownedShows.map((s) => s.tmdbId));
+  const movieStatusById = new Map(
+    ownedMovies.map((m) => [m.tmdbId, m.status] as const)
+  );
 
   const [similarRaw, recsRaw, providers] = await Promise.all([
     getMovieSimilar(tmdbId).catch(() => []),
@@ -66,118 +59,27 @@ export default async function MovieDetailPage({
   const moreLikeThis = filterNewMedia(similarRaw, ownedIds, 12);
   const recommended = filterNewMedia(recsRaw, ownedIds, 12);
 
-  // Meta line under title (mirrors show: seasons · status · network)
-  const metaParts: string[] = [];
-  if (movie.releaseDate) metaParts.push(movie.releaseDate.slice(0, 4));
-  if (movie.runtime) metaParts.push(formatRuntime(movie.runtime));
-  if (movie.status) metaParts.push(movie.status);
-
-  // Same rating badge logic as show detail
-  const rating =
-    movie.rtScore != null && movie.rtScore >= 0
-      ? { icon: "rt" as const, text: `${movie.rtScore}%` }
-      : movie.voteAverage
-        ? { icon: "tmdb" as const, text: `${movie.voteAverage.toFixed(1)}/10` }
-        : null;
-
   return (
-    <div className="min-h-dvh bg-black pb-safe-page">
-      {/* ---------- Backdrop header (same as show detail) ---------- */}
-      <div className="relative h-detail-hero w-full overflow-hidden">
-        {movie.backdropPath ? (
-          <Image
-            src={backdropUrl(movie.backdropPath, "w1280") ?? ""}
-            alt={movie.title}
-            fill
-            sizes="100vw"
-            className="object-cover"
-            unoptimized
-            priority
-          />
-        ) : (
-          <div className="h-full w-full bg-card" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/30" />
-
-        <Link
-          href="/movies"
-          aria-label="Back to movies"
-          className="absolute left-4 top-safe-float flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </Link>
-
-        {/* Title + RT badge overlaid on backdrop */}
-        <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="text-2xl font-black text-white drop-shadow">
-              {movie.title}
-            </h1>
-            {metaParts.length > 0 && (
-              <p className="mt-0.5 truncate text-sm text-white/80">
-                {metaParts.join(" · ")}
-              </p>
-            )}
-          </div>
-          {rating && (
-            <div className="flex flex-shrink-0 items-center gap-1.5">
-              {rating.icon === "rt" ? (
-                <span className="text-xl leading-none" title="Rotten Tomatoes">
-                  🍅
-                </span>
-              ) : (
-                <span
-                  className="flex h-6 w-6 items-center justify-center rounded bg-primary text-sm font-black text-black"
-                  title="TMDB score"
-                >
-                  T
-                </span>
-              )}
-              <span className="text-lg font-bold text-primary">
-                {rating.text}
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ---------- Body ---------- */}
-      <div className="px-4 pt-4">
-        <MovieWatchButton
-          tmdbId={tmdbId}
-          initialStatus={userMovie?.status || null}
-        />
-
-        {userMovie && (
-          <div className="mt-4 border-b border-white/10 pb-4">
-            <MovieRating
-              tmdbId={tmdbId}
-              initialRating={userMovie.rating ?? null}
-            />
-          </div>
-        )}
-
-        {movie.overview && (
-          <section className="mt-4">
-            <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-              Overview
-            </h2>
-            <p className="text-sm leading-relaxed text-white/90">
-              {movie.overview}
-            </p>
-          </section>
-        )}
-
-        <WatchProviders providers={providers} />
-
-        <div className="mt-6">
-          <DiscoverRail
-            label={`More like ${movie.title}`}
-            items={moreLikeThis}
-          />
-          <DiscoverRail label="Recommended for you" items={recommended} />
-        </div>
-      </div>
-    </div>
+    <MovieDetailClient
+      movie={{
+        tmdbId,
+        title: movie.title,
+        posterPath: movie.posterPath,
+        backdropPath: movie.backdropPath,
+        overview: movie.overview,
+        releaseDate: movie.releaseDate,
+        runtime: movie.runtime,
+        status: movie.status,
+        voteAverage: movie.voteAverage,
+        rtScore: movie.rtScore ?? null,
+      }}
+      initialStatus={userMovie?.status || null}
+      initialRating={userMovie?.rating ?? null}
+      moreLikeThis={moreLikeThis}
+      recommended={recommended}
+      providers={providers}
+      followedShowIds={followedShowIds}
+      movieStatusById={movieStatusById}
+    />
   );
 }
