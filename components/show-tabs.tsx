@@ -14,7 +14,7 @@ export function ShowTabs({ tabs }: { tabs: Tab[] }) {
   const current = searchParams.get("view") || tabs[0].value;
 
   return (
-    <div className="relative flex border-b border-white/10">
+    <div className="relative flex">
       {tabs.map((tab) => {
         const active = current === tab.value;
         return (
@@ -26,13 +26,13 @@ export function ShowTabs({ tabs }: { tabs: Tab[] }) {
               router.push(`?${params.toString()}`);
             }}
             className={cn(
-              "relative flex-1 pb-3 pt-2 text-center text-sm font-bold tracking-wide transition-colors",
+              "relative flex-1 pb-3 pt-2 text-center text-sm font-bold tracking-wide transition-colors active:scale-[0.98]",
               active ? "text-white" : "text-muted-foreground hover:text-white"
             )}
           >
             {tab.label}
             {active && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-white" />
+              <span className="absolute bottom-0 left-1/2 h-0.5 w-12 -translate-x-1/2 rounded-full bg-primary" />
             )}
           </button>
         );

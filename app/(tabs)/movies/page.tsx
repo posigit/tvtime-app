@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { movies, userMovies } from "@/lib/schema";
 import { eq } from "drizzle-orm";
 import { ShowTabs } from "@/components/show-tabs";
+import { StickyChrome } from "@/components/sticky-chrome";
 import { SectionLabel } from "@/components/section-label";
 import { RatingBadge } from "@/components/star-rating";
 import { posterUrl } from "@/lib/tmdb";
@@ -244,16 +245,14 @@ export default async function MoviesPage({
 
   return (
     <div className="min-h-dvh bg-black px-4 pb-nav-page">
-      <div className="sticky top-0 z-10 bg-black pb-1 pt-safe">
-        <div className="pt-2">
-          <ShowTabs
-            tabs={[
-              { value: "watchlist", label: "WATCH LIST" },
-              { value: "upcoming", label: "UPCOMING" },
-            ]}
-          />
-        </div>
-      </div>
+      <StickyChrome contentClassName="pt-2">
+        <ShowTabs
+          tabs={[
+            { value: "watchlist", label: "WATCH LIST" },
+            { value: "upcoming", label: "UPCOMING" },
+          ]}
+        />
+      </StickyChrome>
 
       {currentView === "watchlist" && (
         <>

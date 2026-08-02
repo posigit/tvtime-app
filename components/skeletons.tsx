@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
+import { StickyChrome } from "@/components/sticky-chrome";
 
 /** Base pulse block — matches card surfaces on the AMOLED shell */
 export function Skeleton({
@@ -62,10 +63,10 @@ export function PosterGridSkeleton({
 /** WATCH LIST / UPCOMING tab bar */
 export function TabsHeaderSkeleton() {
   return (
-    <div className="relative flex border-b border-white/10">
+    <div className="relative flex">
       <div className="relative flex-1 pb-3 pt-2">
         <Skeleton className="mx-auto h-4 w-24" />
-        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/40" />
+        <span className="absolute bottom-0 left-1/2 h-0.5 w-12 -translate-x-1/2 rounded-full bg-primary/50" />
       </div>
       <div className="flex-1 pb-3 pt-2">
         <Skeleton className="mx-auto h-4 w-20 opacity-50" />
@@ -127,11 +128,9 @@ export function ShowsPageSkeleton() {
       role="status"
       aria-label="Loading shows"
     >
-      <div className="sticky top-0 z-10 bg-black pb-1 pt-safe">
-        <div className="pt-2">
-          <TabsHeaderSkeleton />
-        </div>
-      </div>
+      <StickyChrome contentClassName="pt-2">
+        <TabsHeaderSkeleton />
+      </StickyChrome>
       <section className="mb-6">
         <SectionLabelSkeleton />
         <div className="space-y-2">
@@ -160,11 +159,9 @@ export function MoviesPageSkeleton() {
       role="status"
       aria-label="Loading movies"
     >
-      <div className="sticky top-0 z-10 bg-black pb-1 pt-safe">
-        <div className="pt-2">
-          <TabsHeaderSkeleton />
-        </div>
-      </div>
+      <StickyChrome contentClassName="pt-2">
+        <TabsHeaderSkeleton />
+      </StickyChrome>
       <section className="mb-6">
         <SectionLabelSkeleton />
         <PosterGridSkeleton count={6} />
@@ -181,18 +178,18 @@ export function MoviesPageSkeleton() {
 export function ExplorePageSkeleton() {
   return (
     <div
-      className="min-h-dvh bg-black px-4 pb-nav-page pt-safe"
+      className="min-h-dvh bg-black pb-nav-page"
       role="status"
       aria-label="Loading explore"
     >
-      <div className="pt-4">
+      <StickyChrome contentClassName="px-4 pt-3 pb-1">
         <SearchBarSkeleton />
-        {/* Feed / Discover pills */}
-        <div className="mb-5 flex gap-2 overflow-hidden">
+      </StickyChrome>
+      <div className="px-4 pt-1">
+        <div className="mb-5 flex gap-2 overflow-hidden pt-3">
           <Skeleton className="h-10 w-20 flex-shrink-0 rounded-full bg-white/15" />
           <Skeleton className="h-10 w-24 flex-shrink-0 rounded-full" />
         </div>
-      </div>
       <section className="mb-6">
         <div className="mb-3">
           <Skeleton className="h-7 w-40 rounded-full bg-[#3a3a3c]" />
@@ -211,6 +208,7 @@ export function ExplorePageSkeleton() {
         </div>
         <PosterGridSkeleton count={6} />
       </section>
+      </div>
       <span className="sr-only">Loading explore…</span>
     </div>
   );

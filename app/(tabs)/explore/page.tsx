@@ -19,6 +19,7 @@ import {
 } from "@/lib/tmdb";
 import { getBecauseYouWatched, filterNewMedia } from "@/lib/recommend";
 import { SearchBar } from "@/components/search-bar";
+import { StickyChrome } from "@/components/sticky-chrome";
 import { SectionLabel } from "@/components/section-label";
 import { ExplorePills } from "@/components/explore-pills";
 import { ShowFollowButton } from "@/components/show-follow-button";
@@ -265,9 +266,11 @@ export default async function ExplorePage() {
   );
 
   return (
-    <div className="min-h-dvh bg-black px-4 pb-nav-page pt-safe">
-      <div className="pt-4">
+    <div className="min-h-dvh bg-black pb-nav-page">
+      <StickyChrome contentClassName="px-4 pt-3 pb-1">
         <SearchBar />
+      </StickyChrome>
+      <div className="px-4 pt-1">
         <ExplorePills feed={feed} discover={discover} />
       </div>
     </div>

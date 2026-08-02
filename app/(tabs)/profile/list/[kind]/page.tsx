@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
+import { StickyChrome } from "@/components/sticky-chrome";
 
 const KINDS = {
   shows: { title: "Shows", favorite: false, movies: false },
@@ -70,18 +71,21 @@ export default async function ProfileListPage({
   const hrefPrefix = config.movies ? "/movie" : "/show";
 
   return (
-    <div className="min-h-dvh bg-black px-4 pb-nav-page pt-safe">
-      <div className="mb-5 flex items-center gap-3 pt-4">
-        <Link
-          href="/profile"
-          aria-label="Back to profile"
-          className="flex h-9 w-9 items-center justify-center rounded-full text-white"
-        >
-          <ChevronLeft className="h-6 w-6" />
-        </Link>
-        <h1 className="text-xl font-bold text-white">{config.title}</h1>
-      </div>
+    <div className="min-h-dvh bg-black pb-nav-page">
+      <StickyChrome contentClassName="px-4 pt-3 pb-2">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/profile"
+            aria-label="Back to profile"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-white active:scale-95"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Link>
+          <h1 className="text-xl font-bold text-white">{config.title}</h1>
+        </div>
+      </StickyChrome>
 
+      <div className="px-4 pt-4">
       {items.length === 0 ? (
         <div className="flex flex-col items-center pt-24 text-center">
           <p className="mb-4 text-muted-foreground">
@@ -130,6 +134,7 @@ export default async function ProfileListPage({
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }
