@@ -13,7 +13,15 @@ export type GenreChip = {
   items: TmdbMediaCard[];
 };
 
-export function DiscoverGenreBrowser({ genres }: { genres: GenreChip[] }) {
+export function DiscoverGenreBrowser({
+  genres,
+  followedShowIds,
+  movieStatusById,
+}: {
+  genres: GenreChip[];
+  followedShowIds?: Set<number>;
+  movieStatusById?: Map<number, string | null | undefined>;
+}) {
   const defaultKey = genres[0]?.key ?? "";
   const [active, setActive] = useState(defaultKey);
 
@@ -25,7 +33,7 @@ export function DiscoverGenreBrowser({ genres }: { genres: GenreChip[] }) {
   if (genres.length === 0) return null;
 
   return (
-    <section className="mb-4 mt-4">
+    <section className="mb-6">
       <div className="mb-3">
         <SectionLabel>Browse by genre</SectionLabel>
       </div>
@@ -36,7 +44,7 @@ export function DiscoverGenreBrowser({ genres }: { genres: GenreChip[] }) {
             type="button"
             onClick={() => setActive(g.key)}
             className={cn(
-              "flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
+              "flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors active:scale-95",
               active === g.key
                 ? "bg-primary text-black"
                 : "bg-card text-white/80 hover:bg-white/10"
@@ -56,6 +64,8 @@ export function DiscoverGenreBrowser({ genres }: { genres: GenreChip[] }) {
                 : `${selected.label.replace(/^Film · /, "")} movies`
             }
             items={selected.items}
+            followedShowIds={followedShowIds}
+            movieStatusById={movieStatusById}
           />
           {selected.items.length === 0 && (
             <p className="text-sm text-muted-foreground">

@@ -10,6 +10,8 @@ import {
   getTopRatedTv,
   getTopRatedMovies,
   getNowPlayingMovies,
+  getUpcomingMovies,
+  getPopularTv,
   getTrendingMovies,
   discoverTvByGenre,
   discoverMoviesByGenre,
@@ -113,12 +115,15 @@ export default async function ExplorePage() {
     trendingDay,
     trendingWeek,
     trendingMoviesDay,
+    trendingMoviesWeek,
     popularMovies,
+    popularTv,
     airingToday,
     onTheAir,
     topTv,
     topMovies,
     nowPlaying,
+    upcomingMovies,
     becauseRails,
     forYouMix,
     followedShows,
@@ -148,12 +153,22 @@ export default async function ExplorePage() {
       overview?: string;
       vote_average?: number;
     }> })),
+    getTrendingMovies("week").catch(() => ({ results: [] as Array<{
+      id: number;
+      title: string;
+      poster_path?: string;
+      backdrop_path?: string;
+      overview?: string;
+      vote_average?: number;
+    }> })),
     getPopularMovies(),
+    getPopularTv().catch(() => [] as TmdbMediaCard[]),
     getAiringToday(),
     getOnTheAir(),
     getTopRatedTv().catch(() => [] as TmdbMediaCard[]),
     getTopRatedMovies().catch(() => [] as TmdbMediaCard[]),
     getNowPlayingMovies().catch(() => [] as TmdbMediaCard[]),
+    getUpcomingMovies().catch(() => [] as TmdbMediaCard[]),
     getBecauseYouWatched(userId, 14).catch(() => []),
     getForYouMix(userId, 16).catch(() => [] as TmdbMediaCard[]),
     db
@@ -384,47 +399,129 @@ export default async function ExplorePage() {
     </>
   );
 
+  // Discover: browse-first — not the same as Feed
+  const discTrendingMovies = filterNewMedia(
+    (trendingMoviesWeek.results ?? []).map((m) => ({
+      id: m.id,
+      title: m.title,
+      poster_path: m.poster_path,
+      mediaType: "movie" as const,
+      vote_average: m.vote_average,
+    })),
+    ownedMovieIds,
+    14
+  );
+  const discPopularTv = filterNewMedia(popularTv, followedShowIds, 14);
+  const discUpcoming = filterNewMedia(upcomingMovies, ownedMovieIds, 14);
+  const discAiring = filterNewMedia(
+    (airingToday.results ?? []).map((s) => ({
+      id: s.id,
+      title: s.name,
+      poster_path: s.poster_path,
+      mediaType: "tv" as const,
+    })),
+    followedShowIds,
+    12
+  );
+  const discOnAir = filterNewMedia(
+    (onTheAir.results ?? []).map((s) => ({
+      id: s.id,
+      title: s.name,
+      poster_path: s.poster_path,
+      mediaType: "tv" as const,
+    })),
+    followedShowIds,
+    12
+  );
+  const discNowPlaying = filterNewMedia(nowPlaying, ownedMovieIds, 12);
+  const discTopMovies = filterNewMedia(topMovies, ownedMovieIds, 12);
+
   const discover = (
     <>
-      <DiscoverGenreBrowser genres={genreChips} />
+      <p className="mb-4 text-center text-xs text-muted-foreground">
+        Find something new — not already in your library
+      </p>
 
-      <GridSection label="Airing Today">
-        {airingToday.results.slice(0, 9).map((show) => (
-          <PosterTile
-            key={show.id}
-            title={show.name}
-            posterPath={show.poster_path}
-            href={`/show/${show.id}`}
-            owned={followedShowIds.has(show.id)}
-            action={
-              <ShowFollowButton
-                tmdbId={show.id}
-                initialFollowing={followedShowIds.has(show.id)}
-                variant="overlay"
-              />
-            }
-          />
-        ))}
-      </GridSection>
+      <DiscoverRail
+        label="Hot movies this week"
+        items={discTrendingMovies}
+        followedShowIds={followedShowIds}
+        movieStatusById={movieStatusById}
+      />
 
-      <GridSection label="On The Air">
-        {onTheAir.results.slice(0, 9).map((show) => (
-          <PosterTile
-            key={show.id}
-            title={show.name}
-            posterPath={show.poster_path}
-            href={`/show/${show.id}`}
-            owned={followedShowIds.has(show.id)}
-            action={
-              <ShowFollowButton
-                tmdbId={show.id}
-                initialFollowing={followedShowIds.has(show.id)}
-                variant="overlay"
-              />
-            }
-          />
-        ))}
-      </GridSection>
+      <DiscoverRail
+        label="Popular series"
+        items={discPopularTv}
+        followedShowIds={followedShowIds}
+        movieStatusById={movieStatusById}
+      />
+
+      <DiscoverRail
+        label="Coming to theaters"
+        items={discUpcoming}
+        followedShowIds={followedShowIds}
+        movieStatusById={movieStatusById}
+      />
+
+      <DiscoverGenreBrowser
+        genres={genreChips}
+        followedShowIds={followedShowIds}
+        movieStatusById={movieStatusById}
+      />
+
+      {discAiring.length > 0 && (
+        <GridSection label="Airing Today">
+          {discAiring.map((show) => (
+            <PosterTile
+              key={show.id}
+              title={show.title}
+              posterPath={show.poster_path}
+              href={`/show/${show.id}`}
+              action={
+                <ShowFollowButton
+                  tmdbId={show.id}
+                  initialFollowing={false}
+                  variant="overlay"
+                />
+              }
+            />
+          ))}
+        </GridSection>
+      )}
+
+      <DiscoverRail
+        label="In theaters now"
+        items={discNowPlaying}
+        followedShowIds={followedShowIds}
+        movieStatusById={movieStatusById}
+      />
+
+      {discOnAir.length > 0 && (
+        <GridSection label="On The Air">
+          {discOnAir.map((show) => (
+            <PosterTile
+              key={show.id}
+              title={show.title}
+              posterPath={show.poster_path}
+              href={`/show/${show.id}`}
+              action={
+                <ShowFollowButton
+                  tmdbId={show.id}
+                  initialFollowing={false}
+                  variant="overlay"
+                />
+              }
+            />
+          ))}
+        </GridSection>
+      )}
+
+      <DiscoverRail
+        label="Critically loved films"
+        items={discTopMovies}
+        followedShowIds={followedShowIds}
+        movieStatusById={movieStatusById}
+      />
     </>
   );
 

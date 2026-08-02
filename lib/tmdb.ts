@@ -277,9 +277,44 @@ export async function getNowPlayingMovies() {
   return mapList(data.results ?? [], "movie");
 }
 
+/** Movies opening soon (theatrical). */
+export async function getUpcomingMovies() {
+  const data = await tmdbFetch<{ results: TmdbListItem[] }>("/movie/upcoming");
+  return mapList(data.results ?? [], "movie");
+}
+
 export async function getPopularTv() {
   const data = await tmdbFetch<{ results: TmdbListItem[] }>("/tv/popular");
   return mapList(data.results ?? [], "tv");
+}
+
+/** Higher-quality discover: min votes so junk is filtered out. */
+export async function discoverTvPopular(
+  opts: { withGenres?: number; page?: number } = {}
+) {
+  const data = await tmdbFetch<{ results: TmdbListItem[] }>("/discover/tv", {
+    sort_by: "popularity.desc",
+    "vote_count.gte": "50",
+    ...(opts.withGenres != null
+      ? { with_genres: String(opts.withGenres) }
+      : {}),
+    page: String(opts.page ?? 1),
+  });
+  return mapList(data.results ?? [], "tv");
+}
+
+export async function discoverMoviePopular(
+  opts: { withGenres?: number; page?: number } = {}
+) {
+  const data = await tmdbFetch<{ results: TmdbListItem[] }>("/discover/movie", {
+    sort_by: "popularity.desc",
+    "vote_count.gte": "80",
+    ...(opts.withGenres != null
+      ? { with_genres: String(opts.withGenres) }
+      : {}),
+    page: String(opts.page ?? 1),
+  });
+  return mapList(data.results ?? [], "movie");
 }
 
 export async function discoverTvByGenre(genreId: number, page = 1) {
