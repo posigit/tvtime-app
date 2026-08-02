@@ -6,9 +6,27 @@ import { ToastProvider } from "@/components/toast";
 
 export function Providers({ children }: { children: ReactNode }) {
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
-    }
+    // Avoid SW hijacking HMR / dev navigations
+    if (process.env.NODE_ENV !== "production") return;
+    if (!("serviceWorker" in navigator)) return;
+
+    navigator.serviceWorker
+      .register("/sw.js", {
+        // Always revalidate sw.js (server also sends no-cache headers)
+        updateViaCache: "none",
+      })
+      .then((reg) => {
+        // Check for updates when the app becomes visible again
+        const onVisible = () => {
+          if (document.visibilityState === "visible") {
+            reg.update().catch(() => {});
+          }
+        };
+        document.addEventListener("visibilitychange", onVisible);
+        // One-shot cleanup if the effect re-runs (Strict Mode)
+        return () => document.removeEventListener("visibilitychange", onVisible);
+      })
+      .catch(() => {});
   }, []);
 
   return (
