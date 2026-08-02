@@ -18,7 +18,6 @@ function isTabActive(pathname: string, href: string) {
 
 function scrollPageToTop() {
   window.scrollTo({ top: 0, behavior: "smooth" });
-  // Also reset nested scrollers if any exist
   document
     .querySelectorAll<HTMLElement>("[data-scroll-root]")
     .forEach((el) => {
@@ -49,37 +48,24 @@ export function BottomNav() {
                 // Re-tap active tab → scroll to top (native app pattern)
                 if (active) {
                   e.preventDefault();
-                  // If we're on a nested route (e.g. /profile/list/...), go home tab root first
                   if (pathname !== tab.href) {
                     router.push(tab.href);
-                    // Scroll after navigation paints
                     requestAnimationFrame(() => scrollPageToTop());
                   } else {
                     scrollPageToTop();
                   }
-                  return;
                 }
               }}
               className={cn(
-                "relative flex min-h-11 min-w-[4.25rem] flex-col items-center justify-center gap-0.5 px-3 py-1.5 text-[11px] font-medium transition-colors active:scale-95",
+                "flex min-h-11 min-w-[4.25rem] flex-col items-center justify-center gap-0.5 px-3 py-1.5 text-xs transition-colors active:scale-95",
                 active ? "text-white" : "text-muted-foreground"
               )}
             >
-              {/* Active indicator pill above icon */}
-              <span
-                className={cn(
-                  "mb-0.5 h-0.5 w-5 rounded-full transition-opacity",
-                  active ? "bg-white opacity-100" : "opacity-0"
-                )}
-                aria-hidden
-              />
               <Icon
                 className="h-6 w-6"
-                strokeWidth={active ? 2.5 : 1.75}
-                fill={active ? "currentColor" : "none"}
-                fillOpacity={active ? 0.18 : 0}
+                strokeWidth={active ? 2.5 : 2}
               />
-              <span className={cn(active && "font-semibold")}>{tab.label}</span>
+              <span>{tab.label}</span>
             </Link>
           );
         })}
