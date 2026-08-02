@@ -306,22 +306,12 @@ export function MovieDetailSkeleton() {
       role="status"
       aria-label="Loading movie"
     >
-      <div className="relative h-[min(52vw,16rem)] w-full overflow-hidden bg-[#1c1c1e] sm:h-64">
-        <div className="absolute inset-0 animate-pulse bg-[#2c2c2e]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/25" />
-      </div>
-      <div className="relative z-10 -mt-16 px-4">
-        <div className="flex items-end gap-3.5">
-          <Skeleton className="h-40 w-[6.75rem] flex-shrink-0 rounded-xl" />
-          <div className="min-w-0 flex-1 space-y-2 pb-1">
-            <Skeleton className="h-7 w-48" />
-            <Skeleton className="h-4 w-28" />
-            <Skeleton className="h-6 w-16 rounded-full" />
-          </div>
+      <DetailHeroSkeleton />
+      <div className="px-4 pt-4">
+        <div className="mb-6 flex gap-2">
+          <Skeleton className="h-12 flex-1 rounded-xl" />
+          <Skeleton className="h-12 flex-1 rounded-xl" />
         </div>
-      </div>
-      <div className="mt-5 px-4">
-        <Skeleton className="mb-5 h-36 w-full rounded-2xl" />
         <div className="mb-6 space-y-2">
           <Skeleton className="h-3.5 w-full" />
           <Skeleton className="h-3.5 w-full" />

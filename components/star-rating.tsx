@@ -132,19 +132,13 @@ function formatStars(value: number): string {
   return (value / 2).toFixed(1);
 }
 
-/**
- * Connected movie rating control.
- * Works even if the movie isn't watched yet — first rate adds it to the library
- * as want_to_watch (API upserts).
- */
+/** Connected movie rating — only rendered after Mark Watched. */
 export function MovieRating({
   tmdbId,
   initialRating,
-  compact = false,
 }: {
   tmdbId: number;
   initialRating: number | null;
-  compact?: boolean;
 }) {
   const [rating, setRating] = useState(initialRating);
   const [pending, startTransition] = useTransition();
@@ -152,11 +146,6 @@ export function MovieRating({
   const save = (next: number | null) => {
     const prev = rating;
     setRating(next);
-    try {
-      navigator.vibrate?.(8);
-    } catch {
-      /* ignore */
-    }
     startTransition(async () => {
       try {
         const res = await fetch("/api/rate", {
@@ -173,21 +162,11 @@ export function MovieRating({
 
   return (
     <div>
-      {!compact && (
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Your rating
-          <span className="ml-1.5 font-normal normal-case tracking-normal text-white/40">
-            · even if you haven&apos;t watched
-          </span>
-        </p>
-      )}
+      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Your rating
+      </p>
       <div className="flex items-center gap-3">
-        <StarRatingInput
-          value={rating}
-          onChange={save}
-          disabled={pending}
-          size={compact ? 22 : 28}
-        />
+        <StarRatingInput value={rating} onChange={save} disabled={pending} />
         {rating != null && (
           <span className="text-sm font-bold text-primary">
             {formatStars(rating)}

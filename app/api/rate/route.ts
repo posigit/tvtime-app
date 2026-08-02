@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 /**
  * Set or clear a rating.
  * Ratings are integers 1-10 (displayed as 0.5-5 stars); null clears.
- * Movies: upserts library row (want_to_watch) if missing — can rate unwatched.
+ * Movies: must already be marked watched.
  * Episodes: must already be marked watched.
  */
 export async function POST(request: Request) {
@@ -38,30 +38,32 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid tmdbId" }, { status: 400 });
     }
 
-    // Allow rating before "watched" — upsert into library as want_to_watch
-    // if missing; never force status to watched just because they rated.
-    const { ensureMovie } = await import("@/lib/ensure");
-    await ensureMovie(tmdbId);
+    // Only allow rating after Mark Watched
+    const row = await db.query.userMovies.findFirst({
+      where: and(
+        eq(userMovies.userId, session.user.id),
+        eq(userMovies.tmdbId, tmdbId)
+      ),
+    });
 
-    const now = new Date();
+    if (!row || row.status !== "watched") {
+      return NextResponse.json(
+        { error: "Mark the movie as watched before rating" },
+        { status: 400 }
+      );
+    }
+
     await db
-      .insert(userMovies)
-      .values({
-        userId: session.user.id,
-        tmdbId,
-        status: "want_to_watch",
-        rating: value,
-        updatedAt: now,
-      })
-      .onConflictDoUpdate({
-        target: [userMovies.userId, userMovies.tmdbId],
-        set: {
-          rating: value,
-          updatedAt: now,
-        },
-      });
+      .update(userMovies)
+      .set({ rating: value, updatedAt: new Date() })
+      .where(
+        and(
+          eq(userMovies.userId, session.user.id),
+          eq(userMovies.tmdbId, tmdbId)
+        )
+      );
 
-    return NextResponse.json({ success: true, added: true });
+    return NextResponse.json({ success: true });
   }
 
   if (kind === "episode") {
