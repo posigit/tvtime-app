@@ -10,23 +10,31 @@ export function Providers({ children }: { children: ReactNode }) {
     if (process.env.NODE_ENV !== "production") return;
     if (!("serviceWorker" in navigator)) return;
 
+    let cancelled = false;
+    let reg: ServiceWorkerRegistration | null = null;
+
+    const onVisible = () => {
+      if (document.visibilityState === "visible" && reg) {
+        reg.update().catch(() => {});
+      }
+    };
+
     navigator.serviceWorker
       .register("/sw.js", {
         // Always revalidate sw.js (server also sends no-cache headers)
         updateViaCache: "none",
       })
-      .then((reg) => {
-        // Check for updates when the app becomes visible again
-        const onVisible = () => {
-          if (document.visibilityState === "visible") {
-            reg.update().catch(() => {});
-          }
-        };
+      .then((registration) => {
+        if (cancelled) return;
+        reg = registration;
         document.addEventListener("visibilitychange", onVisible);
-        // One-shot cleanup if the effect re-runs (Strict Mode)
-        return () => document.removeEventListener("visibilitychange", onVisible);
       })
       .catch(() => {});
+
+    return () => {
+      cancelled = true;
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, []);
 
   return (
