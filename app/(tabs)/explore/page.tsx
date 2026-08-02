@@ -265,9 +265,11 @@ export default async function ExplorePage() {
   );
 
   return (
-    <div className="min-h-screen bg-black px-4 pb-24 pt-4">
-      <SearchBar />
-      <ExplorePills feed={feed} discover={discover} />
+    <div className="min-h-dvh bg-black px-4 pb-nav-page pt-safe">
+      <div className="pt-4">
+        <SearchBar />
+        <ExplorePills feed={feed} discover={discover} />
+      </div>
     </div>
   );
 }

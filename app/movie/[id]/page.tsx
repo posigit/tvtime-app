@@ -81,9 +81,9 @@ export default async function MovieDetailPage({
         : null;
 
   return (
-    <div className="min-h-screen bg-black pb-24">
+    <div className="min-h-dvh bg-black pb-safe-page">
       {/* ---------- Backdrop header (same as show detail) ---------- */}
-      <div className="relative h-72 w-full overflow-hidden">
+      <div className="relative h-detail-hero w-full overflow-hidden">
         {movie.backdropPath ? (
           <Image
             src={backdropUrl(movie.backdropPath, "w1280") ?? ""}
@@ -102,7 +102,7 @@ export default async function MovieDetailPage({
         <Link
           href="/movies"
           aria-label="Back to movies"
-          className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white"
+          className="absolute left-4 top-safe-float flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white"
         >
           <ChevronLeft className="h-5 w-5" />
         </Link>

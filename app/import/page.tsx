@@ -102,7 +102,7 @@ export default function ImportPage() {
   const needsReviewCount = showMappings.filter((m) => m.needsReview).length + movieMappings.filter((m) => m.needsReview).length;
 
   return (
-    <div className="min-h-screen bg-black p-4 pb-24 text-white">
+    <div className="min-h-dvh bg-black p-4 pb-safe-page pt-safe text-white">
       <h1 className="mb-4 text-2xl font-bold">Import TV Time Data</h1>
 
       {!stats && (

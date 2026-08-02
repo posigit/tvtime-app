@@ -16,17 +16,21 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black">
-      <div className="mx-auto flex max-w-md items-center justify-around pb-safe pt-2">
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black pb-safe"
+      aria-label="Main"
+    >
+      <div className="mx-auto flex max-w-md items-center justify-around pt-1">
         {tabs.map((tab) => {
           const Icon = tab.icon;
-          const active = pathname === tab.href || pathname.startsWith(`${tab.href}/`);
+          const active =
+            pathname === tab.href || pathname.startsWith(`${tab.href}/`);
           return (
             <Link
               key={tab.href}
               href={tab.href}
               className={cn(
-                "flex flex-col items-center gap-1 px-4 py-2 text-xs transition-colors",
+                "flex min-h-11 flex-col items-center justify-center gap-0.5 px-4 py-1.5 text-xs transition-colors",
                 active ? "text-white" : "text-muted-foreground"
               )}
             >

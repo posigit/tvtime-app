@@ -70,8 +70,8 @@ export default async function ProfileListPage({
   const hrefPrefix = config.movies ? "/movie" : "/show";
 
   return (
-    <div className="min-h-screen bg-black px-4 pb-24 pt-4">
-      <div className="mb-5 flex items-center gap-3">
+    <div className="min-h-dvh bg-black px-4 pb-nav-page pt-safe">
+      <div className="mb-5 flex items-center gap-3 pt-4">
         <Link
           href="/profile"
           aria-label="Back to profile"

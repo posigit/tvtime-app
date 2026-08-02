@@ -13,7 +13,7 @@ export default async function TabsLayout({
   }
 
   return (
-    <div className="flex min-h-screen flex-col pb-20">
+    <div className="flex min-h-dvh flex-col pb-nav">
       <main className="flex-1">{children}</main>
       <BottomNav />
     </div>

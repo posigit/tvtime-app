@@ -381,14 +381,16 @@ export default async function ShowsPage({
     });
 
   return (
-    <div className="min-h-screen bg-black px-4 pb-24 pt-2">
-      <div className="sticky top-0 z-10 bg-black pb-1 pt-2">
-        <ShowTabs
-          tabs={[
-            { value: "watchlist", label: "WATCH LIST" },
-            { value: "upcoming", label: "UPCOMING" },
-          ]}
-        />
+    <div className="min-h-dvh bg-black px-4 pb-nav-page">
+      <div className="sticky top-0 z-10 bg-black pb-1 pt-safe">
+        <div className="pt-2">
+          <ShowTabs
+            tabs={[
+              { value: "watchlist", label: "WATCH LIST" },
+              { value: "upcoming", label: "UPCOMING" },
+            ]}
+          />
+        </div>
       </div>
 
       {currentView === "watchlist" && (

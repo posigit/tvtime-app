@@ -124,10 +124,80 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply font-sans;
+    /* App-like shell: no rubber-band chain to browser chrome */
+    overscroll-behavior: none;
+    /* Fill the visual viewport including under system bars when viewport-fit=cover */
+    height: 100%;
+  }
+  body {
+    @apply bg-background text-foreground;
+    min-height: 100%;
+    min-height: 100dvh;
+    /* Keep pull-to-bounce from dragging the whole document on iOS */
+    overscroll-behavior-y: none;
+  }
+}
+
+/* ── Safe areas (Phase 2: native shell) ───────────────────────────────────
+   Requires viewport-fit=cover. env() falls back to 0px in browsers without insets. */
+@layer utilities {
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pl-safe {
+    padding-left: env(safe-area-inset-left, 0px);
+  }
+  .pr-safe {
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+  .px-safe {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
+  /** Sticky headers stick flush under the status bar; black bg fills the notch area */
+  .top-safe {
+    top: env(safe-area-inset-top, 0px);
+  }
+
+  /** Floating back / menu buttons on edge-to-edge heroes */
+  .top-safe-float {
+    top: calc(0.75rem + env(safe-area-inset-top, 0px));
+  }
+
+  /**
+   * Space for fixed bottom tab bar (~5rem content) + home indicator.
+   * Use on the tabs layout shell.
+   */
+  .pb-nav {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  /**
+   * Page-level bottom padding under tab content (was pb-24).
+   * Keeps last list rows clear of the nav + home bar.
+   */
+  .pb-nav-page {
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  /** Detail pages without bottom nav — still clear home indicator */
+  .pb-safe-page {
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  /** Full-bleed detail hero taller under the status bar so title block stays readable */
+  .h-detail-hero {
+    height: calc(18rem + env(safe-area-inset-top, 0px));
+  }
+
+  /** Profile banner under status bar (base h-44 = 11rem) */
+  .h-profile-hero {
+    height: calc(11rem + env(safe-area-inset-top, 0px));
   }
 }

@@ -38,7 +38,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6">
+    <div className="flex min-h-dvh flex-col items-center justify-center px-6 pt-safe pb-safe">
       <div className="w-full max-w-sm space-y-6">
         <h1 className="text-center text-3xl font-bold">TV Time</h1>
         <form onSubmit={handleSubmit} method="post" action="#" className="space-y-4">

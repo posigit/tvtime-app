@@ -924,14 +924,14 @@ export default async function ProfilePage() {
   const initial = name.charAt(0).toUpperCase() || "U";
 
   return (
-    <div className="min-h-screen bg-black pb-24">
+    <div className="min-h-dvh bg-black pb-nav-page">
       {/*
         Hero + identity in one relative stack so the avatar can overlap the
         banner without being clipped by overflow-hidden on the image box.
         (On iPhone that clipping was cutting the avatar in half and eating the name.)
       */}
       <div className="relative mb-6">
-        <div className="relative h-44 w-full overflow-hidden">
+        <div className="relative h-profile-hero w-full overflow-hidden">
           {bannerBackdrop ? (
             <Image
               src={backdropUrl(bannerBackdrop, "w1280") ?? ""}
@@ -946,7 +946,7 @@ export default async function ProfilePage() {
             <div className="h-full w-full bg-gradient-to-br from-primary/40 via-[#1c1c1e] to-black" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20" />
-          <div className="absolute right-3 top-3 z-20">
+          <div className="absolute right-3 top-safe-float z-20">
             <ProfileMenu />
           </div>
         </div>

@@ -25,6 +25,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  // Edge-to-edge under notch / home indicator (standalone PWA)
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -37,7 +39,7 @@ export default function RootLayout({
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </head>
-      <body className="min-h-full bg-black text-white">
+      <body className="min-h-full min-h-dvh bg-black text-white">
         <Providers>{children}</Providers>
       </body>
     </html>

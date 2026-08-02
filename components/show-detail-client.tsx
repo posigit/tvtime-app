@@ -413,11 +413,11 @@ export function ShowDetailClient({
         : null;
 
   return (
-    <div className="min-h-screen bg-black pb-24">
+    <div className="min-h-dvh bg-black pb-safe-page">
       <Confetti fire={confetti} />
 
       {/* ---------- Backdrop header (e4) ---------- */}
-      <div className="relative h-72 w-full overflow-hidden">
+      <div className="relative h-detail-hero w-full overflow-hidden">
         {show.backdropPath ? (
           <Image
             src={backdropUrl(show.backdropPath, "w1280") ?? ""}
@@ -433,15 +433,15 @@ export function ShowDetailClient({
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/30" />
 
-        {/* Top controls */}
+        {/* Top controls — sit below notch / status bar */}
         <button
           onClick={() => router.back()}
           aria-label="Back"
-          className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white"
+          className="absolute left-4 top-safe-float flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white"
         >
           <ChevronDown className="h-5 w-5" />
         </button>
-        <div className="absolute right-4 top-4">
+        <div className="absolute right-4 top-safe-float">
           <button
             onClick={() => setMenuOpen((v) => !v)}
             aria-label="More"
@@ -508,7 +508,7 @@ export function ShowDetailClient({
       )}
 
       {/* ---------- Tabs (ABOUT / EPISODES) ---------- */}
-      <div className="sticky top-0 z-20 flex border-b border-white/10 bg-black">
+      <div className="sticky top-0 z-20 flex border-b border-white/10 bg-black pt-safe">
         {(
           [
             { value: "about", label: "ABOUT" },

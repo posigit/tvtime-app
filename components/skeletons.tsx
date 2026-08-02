@@ -105,11 +105,11 @@ export function PosterRailSkeleton({ count = 4 }: { count?: number }) {
 /** Show/movie detail backdrop + title block */
 export function DetailHeroSkeleton() {
   return (
-    <div className="relative h-72 w-full overflow-hidden bg-[#1c1c1e]">
+    <div className="relative h-detail-hero w-full overflow-hidden bg-[#1c1c1e]">
       <div className="absolute inset-0 animate-pulse bg-[#2c2c2e]" />
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/30" />
-      <div className="absolute left-4 top-4 h-9 w-9 rounded-full bg-black/50" />
-      <div className="absolute right-4 top-4 h-9 w-9 rounded-full bg-black/50" />
+      <div className="absolute left-4 top-safe-float h-9 w-9 rounded-full bg-black/50" />
+      <div className="absolute right-4 top-safe-float h-9 w-9 rounded-full bg-black/50" />
       <div className="absolute bottom-3 left-4 right-4 space-y-2">
         <Skeleton className="h-7 w-48 max-w-[75%] bg-white/15" />
         <Skeleton className="h-4 w-40 bg-white/10" />
@@ -123,12 +123,14 @@ export function DetailHeroSkeleton() {
 export function ShowsPageSkeleton() {
   return (
     <div
-      className="min-h-screen bg-black px-4 pb-24 pt-2"
+      className="min-h-dvh bg-black px-4 pb-nav-page"
       role="status"
       aria-label="Loading shows"
     >
-      <div className="sticky top-0 z-10 bg-black pb-1 pt-2">
-        <TabsHeaderSkeleton />
+      <div className="sticky top-0 z-10 bg-black pb-1 pt-safe">
+        <div className="pt-2">
+          <TabsHeaderSkeleton />
+        </div>
       </div>
       <section className="mb-6">
         <SectionLabelSkeleton />
@@ -154,12 +156,14 @@ export function ShowsPageSkeleton() {
 export function MoviesPageSkeleton() {
   return (
     <div
-      className="min-h-screen bg-black px-4 pb-24 pt-2"
+      className="min-h-dvh bg-black px-4 pb-nav-page"
       role="status"
       aria-label="Loading movies"
     >
-      <div className="sticky top-0 z-10 bg-black pb-1 pt-2">
-        <TabsHeaderSkeleton />
+      <div className="sticky top-0 z-10 bg-black pb-1 pt-safe">
+        <div className="pt-2">
+          <TabsHeaderSkeleton />
+        </div>
       </div>
       <section className="mb-6">
         <SectionLabelSkeleton />
@@ -177,15 +181,17 @@ export function MoviesPageSkeleton() {
 export function ExplorePageSkeleton() {
   return (
     <div
-      className="min-h-screen bg-black px-4 pb-24 pt-4"
+      className="min-h-dvh bg-black px-4 pb-nav-page pt-safe"
       role="status"
       aria-label="Loading explore"
     >
-      <SearchBarSkeleton />
-      {/* Feed / Discover pills */}
-      <div className="mb-5 flex gap-2 overflow-hidden">
-        <Skeleton className="h-10 w-20 flex-shrink-0 rounded-full bg-white/15" />
-        <Skeleton className="h-10 w-24 flex-shrink-0 rounded-full" />
+      <div className="pt-4">
+        <SearchBarSkeleton />
+        {/* Feed / Discover pills */}
+        <div className="mb-5 flex gap-2 overflow-hidden">
+          <Skeleton className="h-10 w-20 flex-shrink-0 rounded-full bg-white/15" />
+          <Skeleton className="h-10 w-24 flex-shrink-0 rounded-full" />
+        </div>
       </div>
       <section className="mb-6">
         <div className="mb-3">
@@ -213,12 +219,12 @@ export function ExplorePageSkeleton() {
 export function ProfilePageSkeleton() {
   return (
     <div
-      className="min-h-screen bg-black pb-24"
+      className="min-h-dvh bg-black pb-nav-page"
       role="status"
       aria-label="Loading profile"
     >
       <div className="relative mb-6">
-        <div className="relative h-44 w-full overflow-hidden bg-[#1c1c1e]">
+        <div className="relative h-profile-hero w-full overflow-hidden bg-[#1c1c1e]">
           <div className="absolute inset-0 animate-pulse bg-[#2c2c2e]" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20" />
         </div>
@@ -264,7 +270,7 @@ export function ProfilePageSkeleton() {
 export function ShowDetailSkeleton() {
   return (
     <div
-      className="min-h-screen bg-black pb-24"
+      className="min-h-dvh bg-black pb-safe-page"
       role="status"
       aria-label="Loading show"
     >
@@ -298,7 +304,7 @@ export function ShowDetailSkeleton() {
 export function MovieDetailSkeleton() {
   return (
     <div
-      className="min-h-screen bg-black pb-24"
+      className="min-h-dvh bg-black pb-safe-page"
       role="status"
       aria-label="Loading movie"
     >
