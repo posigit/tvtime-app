@@ -91,6 +91,9 @@ export function VixPlayer({
         ref={iframeRef}
         src={src}
         title={title}
+        // vixsrc.to WAF blocks referers from *.vercel.app — strip it so the
+        // player loads on Vercel-hosted prod (localhost is allowed).
+        referrerPolicy="no-referrer"
         allow="autoplay; fullscreen; encrypted-media; picture-in-picture; clipboard-write"
         allowFullScreen
         onLoad={() => {
