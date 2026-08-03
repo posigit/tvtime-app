@@ -4,9 +4,11 @@ import { userMovies } from "@/lib/schema";
 import { eq, and } from "drizzle-orm";
 import {
   backdropUrl,
+  getMovieCredits,
   getMovieRecommendations,
   getMovieSimilar,
   getWatchProviders,
+  movieDirectors,
 } from "@/lib/tmdb";
 import { ensureMovie } from "@/lib/ensure";
 import { filterNewMedia } from "@/lib/recommend";
@@ -53,7 +55,7 @@ export default async function MovieDetailPage({
 
   const ownedIds = new Set(ownedMovies.map((m) => m.tmdbId));
 
-  const [similarRaw, recsRaw, providers] = await Promise.all([
+  const [similarRaw, recsRaw, providers, credits] = await Promise.all([
     getMovieSimilar(tmdbId).catch(() => []),
     getMovieRecommendations(tmdbId).catch(() => []),
     getWatchProviders(tmdbId, "movie").catch(() => ({
@@ -61,10 +63,13 @@ export default async function MovieDetailPage({
       rent: [],
       buy: [],
     })),
+    getMovieCredits(tmdbId).catch(() => null),
   ]);
 
   const moreLikeThis = filterNewMedia(similarRaw, ownedIds, 12);
   const recommended = filterNewMedia(recsRaw, ownedIds, 12);
+  const directors = movieDirectors(credits?.crew);
+  const directorLabel = directors.length > 0 ? directors.join(", ") : null;
 
   const metaParts: string[] = [];
   if (movie.releaseDate) metaParts.push(movie.releaseDate.slice(0, 4));
@@ -156,6 +161,19 @@ export default async function MovieDetailPage({
               tmdbId={tmdbId}
               initialRating={userMovie?.rating ?? null}
             />
+          </div>
+        )}
+
+        {directorLabel && (
+          <div className="mt-4 rounded-xl bg-card px-4 py-3">
+            <div className="flex justify-between gap-3 text-sm">
+              <span className="shrink-0 text-muted-foreground">
+                {directors.length > 1 ? "Directors" : "Director"}
+              </span>
+              <span className="text-right font-medium text-white">
+                {directorLabel}
+              </span>
+            </div>
           </div>
         )}
 

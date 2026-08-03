@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { requireAuth } from "@/lib/auth";
 import { db, withDbRetry, mapPool } from "@/lib/db";
 import {
@@ -13,47 +14,27 @@ import { SectionLabel } from "@/components/section-label";
 import { ShowListItem, ShowListItemData } from "@/components/show-list-item";
 import { ShowCard } from "@/components/show-card";
 import { LayoutToggle } from "@/components/layout-toggle";
+import { LAYOUT_COOKIE, resolveLayoutPref } from "@/lib/layout-pref";
 import {
   computeNextEpisode,
   computeUpcomingEpisodes,
   effectiveLastWatchedAt,
+  isEpisodeAired,
   makeWatchedKey,
   EpisodeInfo,
   WatchedKey,
 } from "@/lib/show-progress";
+import {
+  daysUntilYmd,
+  formatAppCalendarDate,
+  toYmd,
+} from "@/lib/app-time";
 import { ensureEpisodes } from "@/lib/ensure";
 import { UpcomingList, UpcomingGroup } from "@/components/upcoming-list";
 import Link from "next/link";
 
-/** Calendar header like original TV Time: "3 JUL 2026" */
-function calendarDateLabel(airDate: string): string {
-  const date = new Date(airDate + "T12:00:00");
-  const day = date.getDate();
-  const month = date
-    .toLocaleDateString("en-GB", { month: "short" })
-    .toUpperCase();
-  const year = date.getFullYear();
-  return `${day} ${month} ${year}`;
-}
-
 function dateKey(airDate: string): string {
-  return airDate.slice(0, 10);
-}
-
-function isAiredDate(airDate: string): boolean {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const d = new Date(airDate + "T12:00:00");
-  d.setHours(0, 0, 0, 0);
-  return d <= today;
-}
-
-function daysUntilDate(airDate: string): number {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const d = new Date(airDate + "T12:00:00");
-  d.setHours(0, 0, 0, 0);
-  return Math.round((d.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+  return toYmd(airDate) ?? airDate.slice(0, 10);
 }
 
 export default async function ShowsPage({
@@ -63,8 +44,12 @@ export default async function ShowsPage({
 }) {
   const { view, layout } = await searchParams;
   const currentView = view === "upcoming" ? "upcoming" : "watchlist";
-  // Snapshot 1 default = list; grid only when explicitly requested
-  const gridLayout = layout === "grid";
+  const cookieStore = await cookies();
+  const layoutPref = resolveLayoutPref(
+    layout,
+    cookieStore.get(LAYOUT_COOKIE)?.value
+  );
+  const gridLayout = layoutPref === "grid";
 
   const userId = await requireAuth();
 
@@ -315,8 +300,9 @@ export default async function ShowsPage({
       let latestKey: string | null = null;
       let latestTime = -Infinity;
       for (const ep of upcoming) {
-        if (!ep.airDate || !isAiredDate(ep.airDate)) continue;
-        const t = new Date(ep.airDate).getTime();
+        if (!ep.airDate || !isEpisodeAired(ep.airDate)) continue;
+        const ymd = toYmd(ep.airDate) ?? "";
+        const t = ymd ? Date.parse(ymd + "T12:00:00Z") : -Infinity;
         if (
           t > latestTime ||
           (t === latestTime &&
@@ -344,15 +330,16 @@ export default async function ShowsPage({
           airDate: ep.airDate,
           isPremiere: ep.episodeNumber === 1,
           isLatest: latestKey === key,
-          aired: isAiredDate(ep.airDate),
+          aired: isEpisodeAired(ep.airDate),
         });
       }
     }
 
-    upcomingItems.sort(
-      (a, b) =>
-        new Date(a.airDate).getTime() - new Date(b.airDate).getTime()
-    );
+    upcomingItems.sort((a, b) => {
+      const ya = toYmd(a.airDate) ?? "";
+      const yb = toYmd(b.airDate) ?? "";
+      return ya < yb ? -1 : ya > yb ? 1 : 0;
+    });
     // Cap size but keep enough past+future for scroll-to-today
     upcomingItems = upcomingItems.slice(0, 120);
   }
@@ -368,15 +355,15 @@ export default async function ShowsPage({
     group.push(item);
   }
   const upcomingGroups: UpcomingGroup[] = Array.from(upcomingGroupMap.keys())
-    .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+    .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
     .map((key) => {
       const items = upcomingGroupMap.get(key)!;
       return {
         dateKey: key,
-        label: calendarDateLabel(items[0].airDate),
+        label: formatAppCalendarDate(items[0].airDate),
         items: items.map((item) => ({
           ...item,
-          daysUntil: daysUntilDate(item.airDate),
+          daysUntil: daysUntilYmd(item.airDate) ?? 0,
         })),
       };
     });
@@ -399,7 +386,7 @@ export default async function ShowsPage({
               <div className="relative mb-3 mt-2 flex justify-center">
                 <SectionLabel>Watch Next</SectionLabel>
                 <div className="absolute right-0 top-1/2 -translate-y-1/2">
-                  <LayoutToggle />
+                  <LayoutToggle initialLayout={layoutPref} />
                 </div>
               </div>
               {gridLayout ? (
@@ -428,7 +415,7 @@ export default async function ShowsPage({
                 <SectionLabel>Haven&apos;t watched for a while</SectionLabel>
                 {watchNext.length === 0 && (
                   <div className="absolute right-0 top-1/2 -translate-y-1/2">
-                    <LayoutToggle />
+                    <LayoutToggle initialLayout={layoutPref} />
                   </div>
                 )}
               </div>

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { backdropUrl, stillUrl } from "@/lib/tmdb";
 import { cn } from "@/lib/utils";
 import { isEpisodeAired } from "@/lib/show-progress";
+import { daysUntilYmd, formatAppDateShort } from "@/lib/app-time";
 import { Confetti } from "@/components/confetti";
 import { EpisodeRating, StarRatingDisplay } from "@/components/star-rating";
 import { DiscoverRail } from "@/components/discover-rail";
@@ -52,14 +53,7 @@ function compareEp(a: DetailEpisode, b: DetailEpisode) {
 }
 
 function formatDate(airDate?: string) {
-  if (!airDate) return "";
-  return new Date(
-    airDate.includes("T") ? airDate : airDate + "T12:00:00"
-  ).toLocaleDateString("en-US", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
+  return formatAppDateShort(airDate);
 }
 
 function seasonLabel(seasonNumber: number) {
@@ -67,14 +61,7 @@ function seasonLabel(seasonNumber: number) {
 }
 
 function daysUntil(airDate?: string): number | null {
-  if (!airDate) return null;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const d = new Date(
-    airDate.includes("T") ? airDate : airDate + "T12:00:00"
-  );
-  d.setHours(0, 0, 0, 0);
-  return Math.round((d.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+  return daysUntilYmd(airDate);
 }
 
 export function ShowDetailClient({

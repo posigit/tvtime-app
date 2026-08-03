@@ -1,3 +1,9 @@
+import {
+  appTodayYmd,
+  toYmd,
+  ymdAddDays,
+} from "./app-time";
+
 export type EpisodeInfo = {
   showTmdbId: number;
   seasonNumber: number;
@@ -16,25 +22,18 @@ export function makeWatchedKey(
   return `${seasonNumber}:${episodeNumber}`;
 }
 
-function startOfToday(): Date {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return today;
-}
-
-/** True if the episode has aired (or has no air date — treat as available). */
-export function isEpisodeAired(airDate: string | null | undefined): boolean {
+/**
+ * True if the episode has aired (or has no air date — treat as available).
+ * Uses APP_TIMEZONE civil calendar, not server host midnight (UTC).
+ */
+export function isEpisodeAired(
+  airDate: string | null | undefined,
+  now: Date = new Date()
+): boolean {
   if (!airDate) return true;
-  const d = new Date(airDate.includes("T") ? airDate : airDate + "T12:00:00");
-  d.setHours(0, 0, 0, 0);
-  return d <= startOfToday();
-}
-
-function isAired(airDate: string | null | undefined, today: Date): boolean {
-  if (!airDate) return true;
-  const d = new Date(airDate.includes("T") ? airDate : airDate + "T12:00:00");
-  d.setHours(0, 0, 0, 0);
-  return d <= today;
+  const ymd = toYmd(airDate);
+  if (!ymd) return true;
+  return ymd <= appTodayYmd(now);
 }
 
 /** Chronological compare: negative if a before b, 0 equal, positive if a after b. */
@@ -91,11 +90,9 @@ export function effectiveLastWatchedAt(
 export function computeNextEpisode(
   episodes: EpisodeInfo[],
   lastWatched: { seasonNumber: number | null; episodeNumber: number | null },
-  watchedKeys: Set<WatchedKey>
+  watchedKeys: Set<WatchedKey>,
+  now: Date = new Date()
 ): { nextEpisode: EpisodeInfo | null; remaining: number } {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
   const sorted = [...episodes].sort((a, b) => {
     if (a.seasonNumber !== b.seasonNumber)
       return a.seasonNumber - b.seasonNumber;
@@ -108,7 +105,7 @@ export function computeNextEpisode(
   for (const ep of sorted) {
     if (watchedKeys.has(makeWatchedKey(ep.seasonNumber, ep.episodeNumber)))
       continue;
-    if (!isAired(ep.airDate, today)) continue;
+    if (!isEpisodeAired(ep.airDate, now)) continue;
 
     remaining++;
 
@@ -129,7 +126,7 @@ export function computeNextEpisode(
     nextEpisode = sorted.find(
       (ep) =>
         !watchedKeys.has(makeWatchedKey(ep.seasonNumber, ep.episodeNumber)) &&
-        isAired(ep.airDate, today)
+        isEpisodeAired(ep.airDate, now)
     )!;
   }
 
@@ -140,24 +137,24 @@ export function computeUpcomingEpisodes(
   episodes: EpisodeInfo[],
   watchedKeys: Set<WatchedKey>,
   /** Days of already-aired unwatched to keep above "today" for scroll-back */
-  lookbackDays = 30
+  lookbackDays = 30,
+  now: Date = new Date()
 ): EpisodeInfo[] {
-  const today = startOfToday();
-  const lookback = new Date(today);
-  lookback.setDate(lookback.getDate() - lookbackDays);
+  const today = appTodayYmd(now);
+  const lookback = ymdAddDays(today, -lookbackDays);
 
   return episodes
     .filter((ep) => {
       if (watchedKeys.has(makeWatchedKey(ep.seasonNumber, ep.episodeNumber)))
         return false;
-      if (!ep.airDate) return false;
-      const d = new Date(ep.airDate.includes("T") ? ep.airDate : ep.airDate + "T12:00:00");
-      d.setHours(0, 0, 0, 0);
+      const ymd = toYmd(ep.airDate);
+      if (!ymd) return false;
       // Recently aired (scroll up) + today + future (scroll down)
-      return d >= lookback;
+      return ymd >= lookback;
     })
-    .sort(
-      (a, b) =>
-        new Date(a.airDate!).getTime() - new Date(b.airDate!).getTime()
-    );
+    .sort((a, b) => {
+      const ya = toYmd(a.airDate) ?? "";
+      const yb = toYmd(b.airDate) ?? "";
+      return ya < yb ? -1 : ya > yb ? 1 : 0;
+    });
 }

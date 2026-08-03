@@ -9,6 +9,8 @@
  *  - Everything else unwatched (bulk import backlog, added > 30 days ago, etc.)
  */
 
+import { appTodayYmd, toYmd, daysUntilYmd } from "./app-time";
+
 export type MovieListRow = {
   tmdbId: number;
   title: string;
@@ -34,16 +36,13 @@ function asDate(v: Date | string | null | undefined): Date | null {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
-function todayYmd(now = new Date()): string {
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-}
-
-/** True if release date is in the future. */
+/** True if release date is in the future (app timezone calendar). */
 export function isUnreleased(
   releaseDate: string | null | undefined,
-  todayStr = todayYmd()
+  todayStr = appTodayYmd()
 ): boolean {
-  return releaseDate != null && releaseDate > todayStr;
+  const ymd = toYmd(releaseDate);
+  return ymd != null && ymd > todayStr;
 }
 
 /**
@@ -78,12 +77,14 @@ export function findBulkAddedMovieIds(rows: MovieListRow[]): Set<number> {
 function isRecentlyReleased(
   releaseDate: string | null,
   todayStr: string,
-  now: Date
+  _now: Date
 ): boolean {
-  if (!releaseDate || releaseDate > todayStr) return false;
-  const released = new Date(releaseDate + "T12:00:00");
-  if (Number.isNaN(released.getTime())) return false;
-  const ageDays = (now.getTime() - released.getTime()) / DAY_MS;
+  const ymd = toYmd(releaseDate);
+  if (!ymd || ymd > todayStr) return false;
+  const daysSince = daysUntilYmd(ymd, _now);
+  if (daysSince == null) return false;
+  // daysUntil is negative when release is in the past
+  const ageDays = -daysSince;
   return ageDays >= 0 && ageDays <= RECENT_RELEASE_DAYS;
 }
 
@@ -105,7 +106,7 @@ export function splitWatchNextAndLater<T extends MovieListRow>(
   now = new Date()
 ): { watchNext: T[]; watchLater: T[] } {
   const bulkIds = findBulkAddedMovieIds(wantToWatchReleased);
-  const todayStr = todayYmd(now);
+  const todayStr = appTodayYmd(now);
 
   const watchNext: T[] = [];
   const watchLater: T[] = [];
@@ -120,10 +121,17 @@ export function splitWatchNextAndLater<T extends MovieListRow>(
 
   const recencyScore = (m: T): number => {
     const added = asDate(m.updatedAt)?.getTime() ?? 0;
-    const released = m.releaseDate
-      ? new Date(m.releaseDate + "T12:00:00").getTime()
+    const ymd = toYmd(m.releaseDate);
+    // Civil date as ms for sort only (UTC noon of that day)
+    const released = ymd
+      ? Date.UTC(
+          Number(ymd.slice(0, 4)),
+          Number(ymd.slice(5, 7)) - 1,
+          Number(ymd.slice(8, 10)),
+          12
+        )
       : 0;
-    return Math.max(added, Number.isFinite(released) ? released : 0);
+    return Math.max(added, released);
   };
 
   watchNext.sort((a, b) => {

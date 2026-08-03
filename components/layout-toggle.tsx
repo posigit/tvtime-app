@@ -2,16 +2,29 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
+import {
+  type LayoutPref,
+  parseLayoutPref,
+  setLayoutCookie,
+} from "@/lib/layout-pref";
 
 /** 2x2 grid icon toggle — yellow in grid mode (snapshot 3), white in list mode (snapshot 1) */
-export function LayoutToggle() {
+export function LayoutToggle({
+  initialLayout,
+}: {
+  /** Server-resolved preference when URL has no ?layout= */
+  initialLayout?: LayoutPref;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const isGrid = searchParams.get("layout") === "grid";
+  const fromUrl = parseLayoutPref(searchParams.get("layout"));
+  const isGrid = (fromUrl ?? initialLayout ?? "list") === "grid";
 
   const toggle = () => {
+    const next: LayoutPref = isGrid ? "list" : "grid";
+    setLayoutCookie(next);
     const params = new URLSearchParams(searchParams.toString());
-    params.set("layout", isGrid ? "list" : "grid");
+    params.set("layout", next);
     router.push(`?${params.toString()}`);
   };
 

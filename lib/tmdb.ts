@@ -134,6 +134,35 @@ export async function getMovieDetails(tmdbId: number) {
   }>(`/movie/${tmdbId}`);
 }
 
+export type TmdbCrewMember = {
+  job?: string;
+  department?: string;
+  name?: string;
+  id?: number;
+};
+
+export async function getMovieCredits(tmdbId: number) {
+  return tmdbFetch<{
+    id: number;
+    cast: Array<{ id: number; name: string; character?: string; order?: number }>;
+    crew: TmdbCrewMember[];
+  }>(`/movie/${tmdbId}/credits`, {}, { revalidate: 86400 });
+}
+
+/** Director names from TMDB movie credits crew. */
+export function movieDirectors(crew: TmdbCrewMember[] | null | undefined): string[] {
+  if (!crew?.length) return [];
+  const names: string[] = [];
+  const seen = new Set<string>();
+  for (const c of crew) {
+    if (c.job !== "Director" || !c.name) continue;
+    if (seen.has(c.name)) continue;
+    seen.add(c.name);
+    names.push(c.name);
+  }
+  return names;
+}
+
 export async function getTvExternalIds(tmdbId: number) {
   return tmdbFetch<{ imdb_id?: string | null }>(`/tv/${tmdbId}/external_ids`);
 }
