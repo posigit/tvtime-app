@@ -64,41 +64,6 @@ export function PopcornIcon({ className }: { className?: string }) {
   );
 }
 
-/**
- * Metacritic's signature look: the score itself in a rounded square,
- * colored by band (green ≥ 61, yellow ≥ 40, red below).
- * `bare` renders just the colored square (tiny chip sizes).
- */
-export function MetacriticIcon({
-  className,
-  score,
-  bare = false,
-}: {
-  className?: string;
-  score: number;
-  bare?: boolean;
-}) {
-  const bg = score >= 61 ? "#66cc33" : score >= 40 ? "#ffcc33" : "#ff0000";
-  return (
-    <svg viewBox="0 0 32 32" className={className} aria-hidden fill="none">
-      <rect x="2" y="2" width="28" height="28" rx="7" fill={bg} />
-      {!bare && (
-        <text
-          x="16"
-          y="22"
-          textAnchor="middle"
-          fontSize={score >= 100 ? 13 : 15}
-          fontWeight="800"
-          fill="#fff"
-          fontFamily="system-ui, sans-serif"
-        >
-          {score}
-        </text>
-      )}
-    </svg>
-  );
-}
-
 /** TMDB user score: a star in TMDB brand blue. */
 export function TmdbIcon({ className }: { className?: string }) {
   return (

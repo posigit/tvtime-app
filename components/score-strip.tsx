@@ -3,7 +3,6 @@ import {
   FreshIcon,
   RottenIcon,
   PopcornIcon,
-  MetacriticIcon,
   TmdbIcon,
 } from "@/components/rt-icons";
 
@@ -14,20 +13,17 @@ import {
 export function ScoreStrip({
   rtScore,
   rtAudienceScore,
-  mcScore,
   voteAverage,
   className,
 }: {
   rtScore?: number | null;
   rtAudienceScore?: number | null;
-  mcScore?: number | null;
   voteAverage?: number | null;
   className?: string;
 }) {
   const cells: {
     key: string;
     icon: React.ReactNode;
-    /** Shown big under the icon; omit when the icon carries the number (Metacritic) */
     value?: string;
     label: string;
   }[] = [];
@@ -51,14 +47,6 @@ export function ScoreStrip({
       icon: <PopcornIcon className="h-7 w-7" />,
       value: `${rtAudienceScore}%`,
       label: "Popcornmeter",
-    });
-  }
-  if (mcScore != null && mcScore >= 0) {
-    cells.push({
-      key: "mc",
-      icon: <MetacriticIcon className="h-7 w-7" score={mcScore} bare />,
-      value: `${mcScore}`,
-      label: "Metacritic",
     });
   }
   if (voteAverage != null && voteAverage > 0) {

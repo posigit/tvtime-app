@@ -211,7 +211,6 @@ export default async function MovieDetailPage({
           className="mt-4"
           rtScore={reviews.rtScore}
           rtAudienceScore={reviews.rtAudienceScore}
-          mcScore={reviews.mcScore}
           voteAverage={movie.voteAverage}
         />
 

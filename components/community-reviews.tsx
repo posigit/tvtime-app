@@ -12,7 +12,6 @@ import {
   FreshIcon,
   RottenIcon,
   PopcornIcon,
-  MetacriticIcon,
 } from "@/components/rt-icons";
 import {
   ChevronRight,
@@ -282,7 +281,7 @@ export function CommunityReviews({
   payload: ReviewsPayload;
   mediaTitle?: string;
 }) {
-  const { reviews, rtScore, rtAudienceScore, mcScore, rtState, counts } =
+  const { reviews, rtScore, rtAudienceScore, rtState, counts } =
     payload;
   const [sheetOpen, setSheetOpen] = useState(false);
   const [filter, setFilter] = useState<Filter>("all");
@@ -345,7 +344,7 @@ export function CommunityReviews({
     .filter(Boolean)
     .join(" · ");
 
-  const hasAnyScore = rtScore != null || rtAudienceScore != null || mcScore != null;
+  const hasAnyScore = rtScore != null || rtAudienceScore != null;
 
   return (
     <>
@@ -394,15 +393,7 @@ export function CommunityReviews({
                   label="Audience"
                 />
               )}
-              {mcScore != null && (
-                <ScoreChip
-                  size="sm"
-                  icon={<MetacriticIcon className="h-3.5 w-3.5" score={mcScore} bare />}
-                  value={`${mcScore}`}
-                  label="Metacritic"
-                />
-              )}
-              {!rtAudienceScore && !mcScore && (
+              {!rtAudienceScore && (
                 <p className="truncate text-xs text-muted-foreground">
                   {subline || "Critics, fans & Reddit"}
                 </p>
@@ -495,19 +486,6 @@ export function CommunityReviews({
                       icon={<PopcornIcon className="h-6 w-6" />}
                       value={`${rtAudienceScore}%`}
                       label="Popcornmeter"
-                    />
-                  )}
-                  {mcScore != null && (
-                    <ScoreChip
-                      icon={
-                        <MetacriticIcon
-                          className="h-6 w-6"
-                          score={mcScore}
-                          bare
-                        />
-                      }
-                      value={`${mcScore}`}
-                      label="Metacritic"
                     />
                   )}
                 </div>
