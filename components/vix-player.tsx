@@ -19,6 +19,48 @@ type NativeAudioTrackList = {
   removeEventListener?: (type: string, listener: () => void) => void;
 };
 
+function parseVttTime(t: string): number {
+  const parts = t.split(":").map(Number);
+  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  if (parts.length === 2) return parts[0] * 60 + parts[1];
+  return 0;
+}
+
+/** Inject an external VTT as a native text track (shows in the CC menu). */
+function injectVttTrack(
+  video: HTMLVideoElement,
+  vtt: string,
+  label: string,
+  show: boolean
+) {
+  const track = video.addTextTrack("subtitles", label, "en");
+  track.mode = show ? "showing" : "disabled";
+  const lines = vtt.split(/\r?\n/);
+  let i = 0;
+  while (i < lines.length) {
+    const m = lines[i].match(
+      /(\d{2}:\d{2}:\d{2}\.\d{3}|\d{2}:\d{2}\.\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}\.\d{3}|\d{2}:\d{2}\.\d{3})/
+    );
+    if (m) {
+      const start = parseVttTime(m[1]);
+      const end = parseVttTime(m[2]);
+      i++;
+      const text: string[] = [];
+      while (i < lines.length && lines[i].trim() !== "") {
+        text.push(lines[i]);
+        i++;
+      }
+      try {
+        track.addCue(new VTTCue(start, end, text.join("\n")));
+      } catch {
+        /* skip malformed cue */
+      }
+    } else {
+      i++;
+    }
+  }
+}
+
 /**
  * Full-screen VixSrc player overlay.
  *
@@ -53,6 +95,7 @@ export function VixPlayer({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
+  const imdbIdRef = useRef<string | null>(null);
   const onEventRef = useRef(onEvent);
   const onCloseRef = useRef(onClose);
   const endedRef = useRef(false);
@@ -103,8 +146,9 @@ export function VixPlayer({
 
     fetch(`/api/vixsrc/stream?${params.toString()}`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error("route"))))
-      .then((data: { playlistUrl?: string }) => {
+      .then((data: { playlistUrl?: string; imdbId?: string | null }) => {
         if (cancelled) return;
+        imdbIdRef.current = data?.imdbId ?? null;
         if (data?.playlistUrl) setPlaylistUrl(data.playlistUrl);
         else setStreamFailed(true);
       })
@@ -130,27 +174,44 @@ export function VixPlayer({
       hls.loadSource(playlistUrl);
       hls.attachMedia(video);
 
-      // Apply persisted settings once the manifest (and its tracks) are parsed.
+      // hls.js populates audio/subtitle tracks AFTER MANIFEST_PARSED (lazy).
+      // So: try on every track-population event, but only until the user
+      // makes a live choice (userTouched) so we never stomp their selection.
+      let userTouched = false;
+      let applying = false;
+
       const applySettings = () => {
         if (!hls) return;
         const s = loadVixSettings();
 
         const at = hls.audioTracks.find((t) => matchLang(t.lang, s.audio));
-        if (at) hls.audioTrack = at.id;
+        if (at && hls.audioTrack !== at.id) {
+          applying = true;
+          hls.audioTrack = at.id;
+          applying = false;
+        }
 
         hls.subtitleDisplay = s.subs !== "off";
         if (s.subs === "off") {
-          hls.subtitleTrack = -1;
+          if (hls.subtitleTrack !== -1) {
+            applying = true;
+            hls.subtitleTrack = -1;
+            applying = false;
+          }
         } else {
           const st = hls.subtitleTracks.find((t) =>
             matchLang(t.lang, s.subs)
           );
-          if (st) hls.subtitleTrack = st.id;
+          if (st && hls.subtitleTrack !== st.id) {
+            applying = true;
+            hls.subtitleTrack = st.id;
+            applying = false;
+          }
         }
 
         if (typeof s.quality === "number") {
           const li = hls.levels.findIndex((lv) => lv.height === s.quality);
-          if (li >= 0) hls.currentLevel = li;
+          if (li >= 0 && hls.currentLevel !== li) hls.currentLevel = li;
         }
 
         video.playbackRate = s.speed;
@@ -158,26 +219,63 @@ export function VixPlayer({
         video.muted = s.muted;
       };
 
+      // First attempt at manifest parse (usually empty — harmless), then
+      // re-apply whenever the track lists actually populate.
       hls.on(Hls.Events.MANIFEST_PARSED, applySettings);
-      // Tracks can land after MANIFEST_PARSED; only apply again if the user
-      // hasn't already picked something (keeps live choices from being stomped).
-      const applyIfUnset = () => {
-        if (!hls) return;
-        if (hls.subtitleTrack < 0) applySettings();
-      };
-      hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, applyIfUnset);
-      hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, applyIfUnset);
+      hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, () => {
+        if (!userTouched) applySettings();
+      });
 
-      // Persist user changes.
+      // OpenSubtitles fallback: only when the stream has NO English CC.
+      let osLoaded = false;
+      const maybeLoadOpenSubtitles = async () => {
+        if (osLoaded || !hls || !imdbIdRef.current) return;
+        const hasEng = hls.subtitleTracks.some((t) => matchLang(t.lang, "en"));
+        if (hasEng) return; // vixsrc already has English CC — prefer it
+        osLoaded = true;
+        try {
+          const q = new URLSearchParams({
+            imdbId: imdbIdRef.current,
+            lang: "en",
+          });
+          if (season != null) q.set("season", String(season));
+          if (episode != null) q.set("episode", String(episode));
+          const res = await fetch(`/api/vixsrc/subs?${q.toString()}`);
+          if (!res.ok) return;
+          const data = (await res.json()) as { vtt?: string; label?: string };
+          if (!data.vtt) return;
+          const show = loadVixSettings().subs !== "off";
+          injectVttTrack(
+            video,
+            data.vtt,
+            data.label ?? "OpenSubtitles (English)",
+            show
+          );
+        } catch {
+          /* non-fatal */
+        }
+      };
+
+      hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, () => {
+        if (!userTouched) applySettings();
+        void maybeLoadOpenSubtitles();
+      });
+
+      // Persist user changes (and ignore switches caused by our own apply).
       hls.on(Hls.Events.AUDIO_TRACK_SWITCHED, (_evt, data) => {
+        if (applying) return;
+        userTouched = true;
         const t = hls?.audioTracks.find((x) => x.id === data.id);
         saveVixSettings({ audio: t?.lang || "en" });
       });
       hls.on(Hls.Events.SUBTITLE_TRACK_SWITCH, (_evt, data) => {
+        if (applying) return;
+        userTouched = true;
         const t = hls?.subtitleTracks.find((x) => x.id === data.id);
         saveVixSettings({ subs: t ? t.lang : "off" });
       });
       hls.on(Hls.Events.LEVEL_SWITCHED, (_evt, data) => {
+        if (applying) return;
         const lv = hls?.levels[data.level];
         saveVixSettings({ quality: lv?.height ?? "auto" });
       });
@@ -277,7 +375,7 @@ export function VixPlayer({
       hlsRef.current = null;
       for (const fn of cleanup) fn();
     };
-  }, [mode, playlistUrl]);
+  }, [mode, playlistUrl, season, episode]);
 
   // ---------- native video -> event bridge ----------
   useEffect(() => {

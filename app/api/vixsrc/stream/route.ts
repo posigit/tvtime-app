@@ -80,9 +80,33 @@ export async function GET(req: NextRequest) {
     const playlist = new URL(urlMatch[1]);
     for (const [k, v] of params) playlist.searchParams.set(k, v);
 
+    // Resolve IMDb id (for OpenSubtitles lookups) via TMDB external_ids.
+    let imdbId: string | null = null;
+    if (process.env.TMDB_API_KEY) {
+      const extPath =
+        type === "tv"
+          ? `/tv/${id}/external_ids`
+          : `/movie/${id}/external_ids`;
+      try {
+        const extRes = await fetch(
+          `https://api.themoviedb.org/3${extPath}?api_key=${process.env.TMDB_API_KEY}`,
+          { cache: "no-store" }
+        );
+        if (extRes.ok) {
+          const ext = (await extRes.json()) as { imdb_id?: string | null };
+          if (ext.imdb_id) imdbId = ext.imdb_id;
+        }
+      } catch {
+        /* imdbId is optional — skip on failure */
+      }
+    }
+
     return NextResponse.json({
       playlistUrl: playlist.toString(),
       thumbnailsUrl: thumbMatch?.[1] ?? null,
+      imdbId,
+      season: type === "tv" ? season : null,
+      episode: type === "tv" ? episode : null,
     });
   } catch (err) {
     return NextResponse.json(
