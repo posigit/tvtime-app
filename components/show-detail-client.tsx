@@ -11,8 +11,10 @@ import { Confetti } from "@/components/confetti";
 import { EpisodeRating, StarRatingDisplay } from "@/components/star-rating";
 import { DiscoverRail } from "@/components/discover-rail";
 import { WatchProviders } from "@/components/watch-providers";
+import { CommunityReviews } from "@/components/community-reviews";
 import { formatEpisodeLabel, useToast } from "@/components/toast";
 import type { TmdbMediaCard, WatchProvidersResult } from "@/lib/tmdb";
+import type { CommunityReview } from "@/lib/reviews";
 import { Check, ChevronDown, MoreHorizontal } from "lucide-react";
 
 export type DetailEpisode = {
@@ -74,6 +76,7 @@ export function ShowDetailClient({
   moreLikeThis = [],
   recommended = [],
   providers = null,
+  reviews = [],
 }: {
   show: DetailShow;
   episodes: DetailEpisode[];
@@ -84,6 +87,7 @@ export function ShowDetailClient({
   moreLikeThis?: TmdbMediaCard[];
   recommended?: TmdbMediaCard[];
   providers?: WatchProvidersResult | null;
+  reviews?: CommunityReview[];
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -612,6 +616,8 @@ export function ShowDetailClient({
           </button>
 
           {providers && <WatchProviders providers={providers} />}
+
+          <CommunityReviews reviews={reviews} title="Community reviews" />
 
           <div className="mt-6">
             <DiscoverRail

@@ -10,6 +10,7 @@ import {
   getWatchProviders,
   movieDirectors,
 } from "@/lib/tmdb";
+import { getCommunityReviews } from "@/lib/reviews";
 import { ensureMovie } from "@/lib/ensure";
 import { filterNewMedia } from "@/lib/recommend";
 import { notFound } from "next/navigation";
@@ -20,6 +21,7 @@ import { MovieWatchButton } from "@/components/movie-watch-button";
 import { MovieRating } from "@/components/star-rating";
 import { DiscoverRail } from "@/components/discover-rail";
 import { WatchProviders } from "@/components/watch-providers";
+import { CommunityReviews } from "@/components/community-reviews";
 
 function formatRuntime(minutes: number) {
   const h = Math.floor(minutes / 60);
@@ -55,7 +57,7 @@ export default async function MovieDetailPage({
 
   const ownedIds = new Set(ownedMovies.map((m) => m.tmdbId));
 
-  const [similarRaw, recsRaw, providers, credits] = await Promise.all([
+  const [similarRaw, recsRaw, providers, credits, reviews] = await Promise.all([
     getMovieSimilar(tmdbId).catch(() => []),
     getMovieRecommendations(tmdbId).catch(() => []),
     getWatchProviders(tmdbId, "movie").catch(() => ({
@@ -64,6 +66,12 @@ export default async function MovieDetailPage({
       buy: [],
     })),
     getMovieCredits(tmdbId).catch(() => null),
+    getCommunityReviews({
+      kind: "movie",
+      tmdbId,
+      title: movie.title,
+      year: movie.releaseDate,
+    }).catch(() => []),
   ]);
 
   const moreLikeThis = filterNewMedia(similarRaw, ownedIds, 12);
@@ -189,6 +197,8 @@ export default async function MovieDetailPage({
         )}
 
         <WatchProviders providers={providers} />
+
+        <CommunityReviews reviews={reviews} title="Community reviews" />
 
         <div className="mt-6">
           <DiscoverRail

@@ -13,6 +13,7 @@ import {
   getTvSimilar,
   getWatchProviders,
 } from "@/lib/tmdb";
+import { getCommunityReviews } from "@/lib/reviews";
 import { notFound } from "next/navigation";
 
 export default async function ShowDetailPage({
@@ -68,7 +69,7 @@ export default async function ShowDetailPage({
 
   const ownedIds = new Set(ownedShows.map((s) => s.tmdbId));
 
-  const [similarRaw, recsRaw, providers] = await Promise.all([
+  const [similarRaw, recsRaw, providers, reviews] = await Promise.all([
     getTvSimilar(tmdbId).catch(() => []),
     getTvRecommendations(tmdbId).catch(() => []),
     getWatchProviders(tmdbId, "tv").catch(() => ({
@@ -76,6 +77,12 @@ export default async function ShowDetailPage({
       rent: [],
       buy: [],
     })),
+    getCommunityReviews({
+      kind: "tv",
+      tmdbId,
+      title: show.title,
+      year: show.firstAirDate,
+    }).catch(() => []),
   ]);
 
   const moreLikeThis = filterNewMedia(similarRaw, ownedIds, 12);
@@ -148,6 +155,7 @@ export default async function ShowDetailPage({
       moreLikeThis={moreLikeThis}
       recommended={recommended}
       providers={providers}
+      reviews={reviews}
     />
   );
 }

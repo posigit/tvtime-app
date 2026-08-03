@@ -171,6 +171,41 @@ export async function getMovieExternalIds(tmdbId: number) {
   return tmdbFetch<{ imdb_id?: string | null }>(`/movie/${tmdbId}/external_ids`);
 }
 
+export type TmdbReview = {
+  id: string;
+  author: string;
+  content: string;
+  url?: string;
+  created_at?: string;
+  updated_at?: string;
+  author_details?: {
+    name?: string;
+    username?: string;
+    avatar_path?: string | null;
+    rating?: number | null;
+  };
+};
+
+export async function getMovieReviews(tmdbId: number, page = 1) {
+  return tmdbFetch<{
+    id: number;
+    page: number;
+    results: TmdbReview[];
+    total_pages: number;
+    total_results: number;
+  }>(`/movie/${tmdbId}/reviews`, { page: String(page) }, { revalidate: 3600 });
+}
+
+export async function getTvReviews(tmdbId: number, page = 1) {
+  return tmdbFetch<{
+    id: number;
+    page: number;
+    results: TmdbReview[];
+    total_pages: number;
+    total_results: number;
+  }>(`/tv/${tmdbId}/reviews`, { page: String(page) }, { revalidate: 3600 });
+}
+
 /** Trending revalidates every 15m so Explore feels fresher. */
 const TRENDING_REVALIDATE = 900;
 
