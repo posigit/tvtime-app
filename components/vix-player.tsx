@@ -4,6 +4,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import { ExternalLink, LoaderCircle, X } from "lucide-react";
 import { VIX_PLAYER_ORIGIN, parseVixPlayerEvent } from "@/lib/vixsrc";
+import {
+  loadVixSettings,
+  saveVixSettings,
+  matchLang,
+} from "@/lib/vix-settings";
+
+/** Safari-only audio-track API — not present in TS's DOM lib. */
+type NativeAudioTrack = { language: string; enabled: boolean };
+type NativeAudioTrackList = {
+  length: number;
+  [index: number]: NativeAudioTrack;
+  addEventListener?: (type: string, listener: () => void) => void;
+  removeEventListener?: (type: string, listener: () => void) => void;
+};
 
 /**
  * Full-screen VixSrc player overlay.
@@ -108,12 +122,66 @@ export function VixPlayer({
     if (mode !== "native" || !playlistUrl || !videoRef.current) return;
     const video = videoRef.current;
     let hls: Hls | null = null;
+    const cleanup: Array<() => void> = [];
 
     if (Hls.isSupported()) {
       hls = new Hls();
       hlsRef.current = hls;
       hls.loadSource(playlistUrl);
       hls.attachMedia(video);
+
+      // Apply persisted settings once the manifest (and its tracks) are parsed.
+      const applySettings = () => {
+        if (!hls) return;
+        const s = loadVixSettings();
+
+        const at = hls.audioTracks.find((t) => matchLang(t.lang, s.audio));
+        if (at) hls.audioTrack = at.id;
+
+        hls.subtitleDisplay = s.subs !== "off";
+        if (s.subs === "off") {
+          hls.subtitleTrack = -1;
+        } else {
+          const st = hls.subtitleTracks.find((t) =>
+            matchLang(t.lang, s.subs)
+          );
+          if (st) hls.subtitleTrack = st.id;
+        }
+
+        if (typeof s.quality === "number") {
+          const li = hls.levels.findIndex((lv) => lv.height === s.quality);
+          if (li >= 0) hls.currentLevel = li;
+        }
+
+        video.playbackRate = s.speed;
+        video.volume = s.volume;
+        video.muted = s.muted;
+      };
+
+      hls.on(Hls.Events.MANIFEST_PARSED, applySettings);
+      // Tracks can land after MANIFEST_PARSED; only apply again if the user
+      // hasn't already picked something (keeps live choices from being stomped).
+      const applyIfUnset = () => {
+        if (!hls) return;
+        if (hls.subtitleTrack < 0) applySettings();
+      };
+      hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, applyIfUnset);
+      hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, applyIfUnset);
+
+      // Persist user changes.
+      hls.on(Hls.Events.AUDIO_TRACK_SWITCHED, (_evt, data) => {
+        const t = hls?.audioTracks.find((x) => x.id === data.id);
+        saveVixSettings({ audio: t?.lang || "en" });
+      });
+      hls.on(Hls.Events.SUBTITLE_TRACK_SWITCH, (_evt, data) => {
+        const t = hls?.subtitleTracks.find((x) => x.id === data.id);
+        saveVixSettings({ subs: t ? t.lang : "off" });
+      });
+      hls.on(Hls.Events.LEVEL_SWITCHED, (_evt, data) => {
+        const lv = hls?.levels[data.level];
+        saveVixSettings({ quality: lv?.height ?? "auto" });
+      });
+
       hls.on(Hls.Events.ERROR, (_evt, data) => {
         if (!data.fatal) return;
         if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
@@ -125,14 +193,89 @@ export function VixPlayer({
         }
       });
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = playlistUrl; // Safari / native HLS
+      // Safari / native HLS: persist + restore via the native track lists.
+      video.src = playlistUrl;
+
+      const s = loadVixSettings();
+      const applyNative = () => {
+        const at = (video as unknown as { audioTracks?: NativeAudioTrackList })
+          .audioTracks;
+        if (at && at.length) {
+          let any = false;
+          for (let i = 0; i < at.length; i++) {
+            const want = matchLang(at[i].language, s.audio);
+            at[i].enabled = want;
+            if (want) any = true;
+          }
+          if (!any) at[0].enabled = true;
+        }
+        const tt = video.textTracks as unknown as TextTrackList | undefined;
+        if (tt && tt.length) {
+          for (let i = 0; i < tt.length; i++) {
+            const t = tt[i];
+            if (t.kind === "subtitles" || t.kind === "captions") {
+              t.mode = matchLang(t.language, s.subs) ? "showing" : "hidden";
+            }
+          }
+        }
+        video.playbackRate = s.speed;
+        video.volume = s.volume;
+        video.muted = s.muted;
+      };
+      video.addEventListener("loadedmetadata", applyNative, { once: true });
+      cleanup.push(() =>
+        video.removeEventListener("loadedmetadata", applyNative)
+      );
+
+      const at = (video as unknown as { audioTracks?: NativeAudioTrackList })
+        .audioTracks;
+      const tt = video.textTracks as unknown as TextTrackList | undefined;
+      const onNativeChange = () => {
+        let audio = "en";
+        let subs: string | "off" = "off";
+        if (at) {
+          for (let i = 0; i < at.length; i++) {
+            if (at[i].enabled) audio = at[i].language;
+          }
+        }
+        if (tt) {
+          for (let i = 0; i < tt.length; i++) {
+            const t = tt[i];
+            if (
+              (t.kind === "subtitles" || t.kind === "captions") &&
+              t.mode === "showing"
+            ) {
+              subs = t.language;
+            }
+          }
+        }
+        saveVixSettings({ audio, subs });
+      };
+      at?.addEventListener?.("change", onNativeChange);
+      tt?.addEventListener?.("change", onNativeChange);
+      cleanup.push(() => {
+        at?.removeEventListener?.("change", onNativeChange);
+        tt?.removeEventListener?.("change", onNativeChange);
+      });
     } else {
       setStreamFailed(true);
     }
 
+    // Speed + volume persist on both paths.
+    const onRate = () => saveVixSettings({ speed: video.playbackRate });
+    const onVol = () =>
+      saveVixSettings({ volume: video.volume, muted: video.muted });
+    video.addEventListener("ratechange", onRate);
+    video.addEventListener("volumechange", onVol);
+    cleanup.push(() => {
+      video.removeEventListener("ratechange", onRate);
+      video.removeEventListener("volumechange", onVol);
+    });
+
     return () => {
       hls?.destroy();
       hlsRef.current = null;
+      for (const fn of cleanup) fn();
     };
   }, [mode, playlistUrl]);
 
@@ -237,7 +380,7 @@ export function VixPlayer({
           <div className="min-w-0">
             <p className="truncate text-sm font-bold text-white">{title}</p>
             <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/50">
-              VixSrc · Italian audio
+              VixSrc
             </p>
           </div>
           <div className="pointer-events-auto flex shrink-0 items-center gap-2">

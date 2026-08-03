@@ -13,7 +13,7 @@ const VIX_PRIMARY_COLOR = "F5C518";
 const VIX_SECONDARY_COLOR = "2C2C2E";
 
 /** Default audio-language preference for embeds (user-provided `lang=it`). */
-export const VIX_LANG = "it";
+export const VIX_LANG = "en";
 
 const VIX_PLAYER_EVENTS = [
   "play",
