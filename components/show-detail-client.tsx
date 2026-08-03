@@ -13,11 +13,13 @@ import { DiscoverRail } from "@/components/discover-rail";
 import { WatchProviders } from "@/components/watch-providers";
 import { CommunityReviews } from "@/components/community-reviews";
 import { TrailerButton } from "@/components/trailer-button";
+import { VixPlayer } from "@/components/vix-player";
+import { vixTvUrl } from "@/lib/vixsrc";
 import { TmdbIcon } from "@/components/rt-icons";
 import { formatEpisodeLabel, useToast } from "@/components/toast";
 import type { TmdbMediaCard, WatchProvidersResult } from "@/lib/tmdb";
 import type { ReviewsPayload } from "@/lib/reviews";
-import { Check, ChevronDown, MoreHorizontal } from "lucide-react";
+import { Check, ChevronDown, MoreHorizontal, Play } from "lucide-react";
 
 export type DetailEpisode = {
   seasonNumber: number;
@@ -113,6 +115,8 @@ export function ShowDetailClient({
   const [markPreviousTarget, setMarkPreviousTarget] =
     useState<DetailEpisode | null>(null);
   const [pending, setPending] = useState(false);
+  /** Episode currently open in the VixSrc player overlay. */
+  const [playerEp, setPlayerEp] = useState<DetailEpisode | null>(null);
 
   const isWatched = (ep: DetailEpisode) =>
     watchedMap[watchKey(ep.seasonNumber, ep.episodeNumber)] ?? false;
@@ -215,8 +219,8 @@ export function ShowDetailClient({
 
   const applyWatched = async (
     items: { seasonNumber: number; episodeNumber: number; watched: boolean }[]
-  ) => {
-    if (items.length === 0) return;
+  ): Promise<boolean> => {
+    if (items.length === 0) return false;
 
     const prev = watchedMap;
     const next = { ...watchedMap };
@@ -261,7 +265,10 @@ export function ShowDetailClient({
     } catch {
       setWatchedMap(prev);
       toast("Couldn't save — try again", "error");
+      return false;
     }
+
+    return true;
   };
 
   const previousUnwatchedAired = (episode: DetailEpisode) =>
@@ -353,6 +360,41 @@ export function ShowDetailClient({
           }))
       );
     }
+  };
+
+  const openPlayer = (ep: DetailEpisode) => setPlayerEp(ep);
+
+  /**
+   * Streaming events from VixSrc. On "ended": mark the episode watched,
+   * then auto-advance to the next unwatched aired episode (seamless binge).
+   */
+  const handlePlayerEvent = async (event: string) => {
+    if (event !== "ended" || !playerEp) return;
+    const endedEpisode = playerEp;
+    if (isWatched(endedEpisode)) {
+      setPlayerEp(null);
+      return;
+    }
+
+    const saved = await applyWatched([
+      {
+        seasonNumber: endedEpisode.seasonNumber,
+        episodeNumber: endedEpisode.episodeNumber,
+        watched: true,
+      },
+    ]);
+    if (!saved) return;
+
+    const next = [...episodes]
+      .sort(compareEp)
+      .find(
+        (ep) =>
+          compareEp(ep, endedEpisode) > 0 &&
+          !isWatched(ep) &&
+          isEpisodeAired(ep.airDate)
+      );
+    if (next) setPlayerEp(next);
+    else setPlayerEp(null);
   };
 
   const confirmRewatch = async () => {
@@ -666,10 +708,7 @@ export function ShowDetailClient({
               </div>
             </div>
           ) : nextEpisode ? (
-            <button
-              onClick={() => handleEpisodeToggle(nextEpisode, true)}
-              className="relative mb-6 flex h-28 w-full items-end overflow-hidden rounded-xl text-left"
-            >
+            <div className="relative mb-6 flex h-28 w-full items-end overflow-hidden rounded-xl">
               {nextEpisode.stillPath ? (
                 <Image
                   src={stillUrl(nextEpisode.stillPath, "w300") ?? ""}
@@ -683,8 +722,13 @@ export function ShowDetailClient({
                 <div className="absolute inset-0 bg-secondary" />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-              <div className="relative flex w-full items-end justify-between p-3">
-                <div className="min-w-0">
+              <div className="relative flex w-full items-end justify-between gap-3 p-3">
+                <button
+                  type="button"
+                  onClick={() => handleEpisodeToggle(nextEpisode, true)}
+                  className="min-w-0 flex-1 text-left"
+                  aria-label={`Mark ${nextEpisode.title} watched`}
+                >
                   <p className="text-sm font-bold text-white">
                     S{String(nextEpisode.seasonNumber).padStart(2, "0")} | E
                     {String(nextEpisode.episodeNumber).padStart(2, "0")}
@@ -692,12 +736,27 @@ export function ShowDetailClient({
                   <p className="truncate text-xs text-white/80">
                     {nextEpisode.title}
                   </p>
+                </button>
+                <div className="flex shrink-0 items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => openPlayer(nextEpisode)}
+                    aria-label={`Play ${nextEpisode.title}`}
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-black transition active:scale-95"
+                  >
+                    <Play className="h-4 w-4 fill-current" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleEpisodeToggle(nextEpisode, true)}
+                    aria-label={`Mark ${nextEpisode.title} watched`}
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-black transition active:scale-95"
+                  >
+                    <Check className="h-5 w-5" strokeWidth={3} />
+                  </button>
                 </div>
-                <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-white text-black">
-                  <Check className="h-5 w-5" strokeWidth={3} />
-                </span>
               </div>
-            </button>
+            </div>
           ) : nextUnaired ? (
             <div className="relative mb-6 flex h-28 w-full items-end overflow-hidden rounded-xl">
               {nextUnaired.stillPath ? (
@@ -875,6 +934,23 @@ export function ShowDetailClient({
                               )}
                             </div>
                             <button
+                              onClick={() => openPlayer(ep)}
+                              disabled={!aired}
+                              aria-label={
+                                aired
+                                  ? `Play ${ep.title}`
+                                  : "Not aired yet"
+                              }
+                              className={cn(
+                                "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors",
+                                aired
+                                  ? "bg-primary text-black active:scale-95"
+                                  : "cursor-not-allowed bg-white/[0.04] text-white/20"
+                              )}
+                            >
+                              <Play className="h-3.5 w-3.5 fill-current" />
+                            </button>
+                            <button
                               onClick={() => handleEpisodeToggle(ep, !watched)}
                               disabled={!aired && !watched}
                               aria-label={
@@ -967,6 +1043,21 @@ export function ShowDetailClient({
             </div>
           </div>
         </div>
+      )}
+
+      {/* ---------- VixSrc streaming player ---------- */}
+      {playerEp && (
+        <VixPlayer
+          key={`${show.tmdbId}-${playerEp.seasonNumber}-${playerEp.episodeNumber}`}
+          src={vixTvUrl(
+            show.tmdbId,
+            playerEp.seasonNumber,
+            playerEp.episodeNumber
+          )}
+          title={`${show.title} — S${playerEp.seasonNumber}E${playerEp.episodeNumber} ${playerEp.title}`}
+          onEvent={handlePlayerEvent}
+          onClose={() => setPlayerEp(null)}
+        />
       )}
     </div>
   );

@@ -1,0 +1,50 @@
+/**
+ * VixSrc streaming embeds.
+ *
+ * Docs: https://vixsrc.to (Next generation Streaming API).
+ * Movie embed:  https://vixsrc.to/movie/{tmdb_id|imdb_id}
+ * Episode embed: https://vixsrc.to/tv/{tmdb_id|imdb_id}/{seasonNumber}/{episodeNumber}
+ * Optional query params: lang=it (preferred audio), autoplay, startAt,
+ * primaryColor, secondaryColor.
+ */
+export const VIX_BASE = "https://vixsrc.to";
+export const VIX_PLAYER_ORIGIN = "https://vixsrc.to";
+const VIX_PRIMARY_COLOR = "F5C518";
+const VIX_SECONDARY_COLOR = "2C2C2E";
+
+/** Default audio-language preference for embeds (user-provided `lang=it`). */
+export const VIX_LANG = "it";
+
+const VIX_PLAYER_EVENTS = [
+  "play",
+  "pause",
+  "seeked",
+  "ended",
+  "timeupdate",
+] as const;
+
+export type VixPlayerEvent = (typeof VIX_PLAYER_EVENTS)[number];
+
+export function vixMovieUrl(tmdbId: number) {
+  return `${VIX_BASE}/movie/${tmdbId}?primaryColor=${VIX_PRIMARY_COLOR}&secondaryColor=${VIX_SECONDARY_COLOR}&autoplay=true&lang=${VIX_LANG}`;
+}
+
+export function vixTvUrl(
+  tmdbId: number,
+  seasonNumber: number,
+  episodeNumber: number
+) {
+  return `${VIX_BASE}/tv/${tmdbId}/${seasonNumber}/${episodeNumber}?primaryColor=${VIX_PRIMARY_COLOR}&secondaryColor=${VIX_SECONDARY_COLOR}&autoplay=true&lang=${VIX_LANG}`;
+}
+
+export function parseVixPlayerEvent(data: unknown): VixPlayerEvent | null {
+  if (!data || typeof data !== "object") return null;
+  const obj = data as { type?: string; data?: { event?: string } };
+  if (obj.type !== "PLAYER_EVENT") return null;
+
+  const event = obj.data?.event;
+  return typeof event === "string" &&
+    (VIX_PLAYER_EVENTS as readonly string[]).includes(event)
+    ? (event as VixPlayerEvent)
+    : null;
+}

@@ -27,6 +27,7 @@ import { WatchProviders } from "@/components/watch-providers";
 import { CommunityReviews } from "@/components/community-reviews";
 import { ScoreStrip } from "@/components/score-strip";
 import { TrailerButton } from "@/components/trailer-button";
+import { MovieVixButton } from "@/components/movie-vix-button";
 import { TmdbIcon } from "@/components/rt-icons";
 
 function formatRuntime(minutes: number) {
@@ -201,10 +202,14 @@ export default async function MovieDetailPage({
 
       {/* ---------- Body ---------- */}
       <div className="px-4 pt-4">
-        <MovieWatchButton
-          tmdbId={tmdbId}
-          initialStatus={userMovie?.status || null}
-        />
+        <MovieVixButton tmdbId={tmdbId} title={movie.title} isWatched={isWatched} />
+
+        <div className="mt-3">
+          <MovieWatchButton
+            tmdbId={tmdbId}
+            initialStatus={userMovie?.status || null}
+          />
+        </div>
 
         {/* Critic + audience scores */}
         <ScoreStrip
