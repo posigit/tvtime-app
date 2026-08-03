@@ -1,16 +1,22 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CommunityReview, ReviewSource } from "@/lib/reviews";
 import { cn } from "@/lib/utils";
-import { ExternalLink, MessageCircle, ChevronDown } from "lucide-react";
+import {
+  ChevronRight,
+  ExternalLink,
+  MessageSquare,
+  X,
+  Star,
+} from "lucide-react";
 
 type Filter = "all" | ReviewSource;
 
 function monogram(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return "?";
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  if (parts.length === 1) return parts[0].slice(0, 1).toUpperCase();
   return (parts[0][0] + parts[1][0]).toUpperCase();
 }
 
@@ -20,7 +26,6 @@ function formatWhen(iso: string | null) {
   if (Number.isNaN(d.getTime())) return null;
   return d.toLocaleDateString("en-US", {
     month: "short",
-    day: "numeric",
     year: "numeric",
   });
 }
@@ -31,173 +36,134 @@ function formatScore(n: number) {
 }
 
 function starsFromTen(rating: number) {
-  // TMDB author ratings are out of 10
-  const half = Math.round(rating) / 2;
-  return half.toFixed(1);
+  return (Math.round(rating) / 2).toFixed(1);
 }
 
-function ReviewCard({
-  review,
-  index,
-}: {
-  review: CommunityReview;
-  index: number;
-}) {
-  const [expanded, setExpanded] = useState(false);
-  const long = review.content.length > 280;
-  const when = formatWhen(review.createdAt);
+function ReviewRow({ review }: { review: CommunityReview }) {
+  const [open, setOpen] = useState(false);
   const isReddit = review.source === "reddit";
+  const long = review.content.length > 220;
+  const when = formatWhen(review.createdAt);
 
   return (
-    <article
-      className={cn(
-        "group relative overflow-hidden rounded-2xl border border-white/[0.06]",
-        "bg-gradient-to-br from-white/[0.04] to-transparent",
-        "transition-colors duration-300 hover:border-white/[0.12]"
-      )}
-      style={{ animationDelay: `${index * 45}ms` }}
-    >
-      {/* Source accent rail */}
-      <div
-        className={cn(
-          "absolute inset-y-0 left-0 w-[3px]",
-          isReddit
-            ? "bg-gradient-to-b from-[#ff4500] via-[#ff8717] to-[#ff4500]/60"
-            : "bg-gradient-to-b from-primary via-primary/70 to-primary/30"
-        )}
-      />
-
-      <div className="pl-4 pr-4 pt-4 pb-3.5">
-        {/* Header */}
-        <div className="flex items-start gap-3">
+    <article className="border-b border-white/[0.06] last:border-0">
+      <div className="px-4 py-4">
+        <div className="flex items-center gap-3">
           <div
             className={cn(
-              "flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-bold tracking-wide",
+              "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-bold",
               isReddit
-                ? "bg-[#ff4500]/15 text-[#ff8717] ring-1 ring-[#ff4500]/30"
-                : "bg-primary/15 text-primary ring-1 ring-primary/30"
+                ? "bg-[#ff4500]/12 text-[#ff6a33]"
+                : "bg-primary/12 text-primary"
             )}
-            aria-hidden
           >
             {review.avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={review.avatarUrl}
                 alt=""
-                className="h-10 w-10 rounded-full object-cover"
+                className="h-9 w-9 rounded-full object-cover"
               />
-            ) : isReddit ? (
-              <span className="text-base leading-none">◆</span>
             ) : (
               monogram(review.author)
             )}
           </div>
 
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <span className="truncate text-sm font-semibold text-white">
+            <div className="flex items-center gap-2">
+              <p className="truncate text-sm font-semibold text-white">
                 {review.author}
-              </span>
-              <span
-                className={cn(
-                  "rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider",
-                  isReddit
-                    ? "bg-[#ff4500]/15 text-[#ff8717]"
-                    : "bg-primary/15 text-primary"
-                )}
-              >
-                {isReddit ? "Reddit" : "TMDB"}
-              </span>
+              </p>
               {review.rating != null && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">
-                  <span aria-hidden>★</span>
+                <span className="inline-flex shrink-0 items-center gap-0.5 text-xs font-bold text-primary">
+                  <Star className="h-3 w-3 fill-primary" />
                   {starsFromTen(review.rating)}
                 </span>
               )}
             </div>
-            <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[11px] text-muted-foreground">
-              {review.subreddit && (
-                <span className="font-medium text-white/50">{review.subreddit}</span>
+            <p className="truncate text-[11px] text-muted-foreground">
+              {isReddit ? (
+                <>
+                  <span className="text-[#ff6a33]/90">
+                    {review.subreddit ?? "Reddit"}
+                  </span>
+                  {review.score != null && (
+                    <span className="text-white/30">
+                      {" "}
+                      · {formatScore(review.score)} up
+                    </span>
+                  )}
+                  {review.commentCount != null && (
+                    <span className="text-white/30">
+                      {" "}
+                      · {formatScore(review.commentCount)} comments
+                    </span>
+                  )}
+                </>
+              ) : (
+                <>
+                  <span className="text-primary/80">TMDB</span>
+                  {when && <span className="text-white/30"> · {when}</span>}
+                </>
               )}
-              {when && <span>{when}</span>}
-              {isReddit && review.score != null && (
-                <span className="tabular-nums">{formatScore(review.score)} pts</span>
-              )}
-              {isReddit && review.commentCount != null && (
-                <span className="inline-flex items-center gap-0.5 tabular-nums">
-                  <MessageCircle className="h-3 w-3 opacity-70" />
-                  {formatScore(review.commentCount)}
-                </span>
-              )}
-            </div>
+            </p>
           </div>
-        </div>
-
-        {/* Reddit thread title */}
-        {review.title && (
-          <h4 className="mt-3 text-[15px] font-semibold leading-snug tracking-tight text-white/95">
-            {review.title}
-          </h4>
-        )}
-
-        {/* Body */}
-        <p
-          className={cn(
-            "mt-2 text-[13px] leading-relaxed text-white/70 whitespace-pre-wrap",
-            !expanded && long && "line-clamp-4"
-          )}
-        >
-          {review.content}
-        </p>
-
-        {/* Actions */}
-        <div className="mt-3 flex items-center justify-between gap-2">
-          {long ? (
-            <button
-              type="button"
-              onClick={() => setExpanded((v) => !v)}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-primary transition-opacity hover:opacity-80"
-            >
-              {expanded ? "Show less" : "Read more"}
-              <ChevronDown
-                className={cn(
-                  "h-3.5 w-3.5 transition-transform",
-                  expanded && "rotate-180"
-                )}
-              />
-            </button>
-          ) : (
-            <span />
-          )}
 
           {review.url && (
             <a
               href={review.url}
               target="_blank"
               rel="noopener noreferrer"
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide",
-                "bg-white/[0.06] text-white/80 ring-1 ring-white/[0.08]",
-                "transition-all hover:bg-white/[0.1] hover:text-white"
-              )}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/[0.05] text-white/50 transition-colors hover:bg-white/10 hover:text-white"
+              aria-label="Open original"
+              onClick={(e) => e.stopPropagation()}
             >
-              {isReddit ? "Thread" : "Full review"}
-              <ExternalLink className="h-3 w-3 opacity-70" />
+              <ExternalLink className="h-3.5 w-3.5" />
             </a>
           )}
         </div>
+
+        {review.title && (
+          <h3 className="mt-3 text-[15px] font-semibold leading-snug text-white">
+            {review.title}
+          </h3>
+        )}
+
+        <p
+          className={cn(
+            "mt-2 text-[13px] leading-[1.55] text-white/65 whitespace-pre-wrap",
+            !open && long && "line-clamp-3"
+          )}
+        >
+          {review.content}
+        </p>
+
+        {long && (
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            className="mt-2 text-xs font-semibold text-primary"
+          >
+            {open ? "Less" : "More"}
+          </button>
+        )}
       </div>
     </article>
   );
 }
 
+/**
+ * Collapsed by default — one compact row on the detail page.
+ * Tap opens a full-height sheet so "More like / Recommended" stay reachable.
+ */
 export function CommunityReviews({
   reviews,
-  title = "Community",
+  mediaTitle,
 }: {
   reviews: CommunityReview[];
-  title?: string;
+  mediaTitle?: string;
 }) {
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [filter, setFilter] = useState<Filter>("all");
 
   const counts = useMemo(() => {
@@ -205,9 +171,21 @@ export function CommunityReviews({
     let reddit = 0;
     for (const r of reviews) {
       if (r.source === "tmdb") tmdb++;
-      else reddit++;
+      else if (r.id !== "reddit-browse") reddit++;
+      else reddit++; // count browse card too for tab presence
     }
-    return { tmdb, reddit, all: reviews.length };
+    // Don't inflate "all" with only a browse placeholder if no real reddit
+    const realReddit = reviews.filter(
+      (r) => r.source === "reddit" && r.id !== "reddit-browse"
+    ).length;
+    const browseOnly =
+      realReddit === 0 && reviews.some((r) => r.id === "reddit-browse");
+    return {
+      tmdb,
+      reddit: realReddit > 0 ? realReddit : browseOnly ? 1 : 0,
+      all: reviews.length,
+      realReddit,
+    };
   }, [reviews]);
 
   const visible = useMemo(() => {
@@ -215,101 +193,172 @@ export function CommunityReviews({
     return reviews.filter((r) => r.source === filter);
   }, [reviews, filter]);
 
-  if (reviews.length === 0) {
-    return (
-      <section className="mt-8">
-        <header className="mb-3 flex items-end justify-between">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80">
-              Voices
-            </p>
-            <h2 className="text-lg font-black tracking-tight text-white">
-              {title}
-            </h2>
-          </div>
-        </header>
-        <div className="relative overflow-hidden rounded-2xl border border-dashed border-white/10 bg-gradient-to-b from-white/[0.03] to-transparent px-5 py-10 text-center">
-          <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-primary/10 blur-2xl" />
-          <p className="relative text-sm text-muted-foreground">
-            No community reviews yet for this title.
-          </p>
-          <p className="relative mt-1 text-xs text-white/30">
-            TMDB write-ups and Reddit threads show up when people talk about it.
-          </p>
-        </div>
-      </section>
-    );
-  }
+  // Lock body scroll while sheet open
+  useEffect(() => {
+    if (!sheetOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [sheetOpen]);
 
-  const tabs: { id: Filter; label: string; count: number }[] = (
+  // Escape closes sheet
+  useEffect(() => {
+    if (!sheetOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSheetOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [sheetOpen]);
+
+  const summary =
+    counts.tmdb > 0 && counts.realReddit > 0
+      ? `${counts.tmdb} TMDB · ${counts.realReddit} Reddit`
+      : counts.tmdb > 0
+        ? `${counts.tmdb} review${counts.tmdb === 1 ? "" : "s"}`
+        : counts.realReddit > 0
+          ? `${counts.realReddit} thread${counts.realReddit === 1 ? "" : "s"}`
+          : "TMDB & Reddit";
+
+  const tabs = (
     [
-      { id: "all" as const, label: "All", count: counts.all },
-      { id: "tmdb" as const, label: "TMDB", count: counts.tmdb },
-      { id: "reddit" as const, label: "Reddit", count: counts.reddit },
-    ] satisfies { id: Filter; label: string; count: number }[]
-  ).filter((t) => t.id === "all" || t.count > 0);
+      { id: "all" as const, label: "All", n: counts.all },
+      { id: "tmdb" as const, label: "TMDB", n: counts.tmdb },
+      { id: "reddit" as const, label: "Reddit", n: counts.reddit },
+    ] satisfies { id: Filter; label: string; n: number }[]
+  ).filter((t) => t.id === "all" || t.n > 0);
 
   return (
-    <section className="mt-8">
-      <header className="mb-4 flex items-end justify-between gap-3">
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80">
-            Voices
-          </p>
-          <h2 className="text-lg font-black tracking-tight text-white">
-            {title}
-            <span className="ml-2 text-sm font-semibold text-muted-foreground">
-              {counts.all}
-            </span>
-          </h2>
+    <>
+      {/* ── Compact trigger (always collapsed on page) ── */}
+      <button
+        type="button"
+        onClick={() => setSheetOpen(true)}
+        className={cn(
+          "mt-4 flex w-full items-center gap-3 rounded-xl bg-card px-4 py-3.5 text-left",
+          "ring-1 ring-white/[0.06] transition active:scale-[0.99]",
+          "hover:ring-white/10"
+        )}
+      >
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/12">
+          <MessageSquare className="h-5 w-5 text-primary" />
         </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-bold text-white">Reviews</p>
+          <p className="truncate text-xs text-muted-foreground">{summary}</p>
+        </div>
+        <ChevronRight className="h-5 w-5 shrink-0 text-white/30" />
+      </button>
 
-        <div
-          className="flex rounded-full bg-secondary/80 p-0.5 ring-1 ring-white/[0.06]"
-          role="tablist"
-          aria-label="Filter reviews by source"
-        >
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              role="tab"
-              aria-selected={filter === tab.id}
-              onClick={() => setFilter(tab.id)}
-              className={cn(
-                "rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide transition-all",
-                filter === tab.id
-                  ? tab.id === "reddit"
-                    ? "bg-[#ff4500] text-white shadow-sm"
-                    : "bg-primary text-black shadow-sm"
-                  : "text-muted-foreground hover:text-white"
+      {/* ── Full-screen sheet ── */}
+      {sheetOpen && (
+        <div className="fixed inset-0 z-[80] flex flex-col">
+          {/* Scrim */}
+          <button
+            type="button"
+            aria-label="Close reviews"
+            className="absolute inset-0 bg-black/70 backdrop-blur-[2px]"
+            onClick={() => setSheetOpen(false)}
+          />
+
+          {/* Panel */}
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Community reviews"
+            className={cn(
+              "relative mt-auto flex max-h-[92dvh] w-full flex-col",
+              "rounded-t-[1.25rem] bg-[#0c0c0e] shadow-[0_-12px_40px_rgba(0,0,0,0.55)]",
+              "ring-1 ring-white/[0.08]",
+              "animate-in slide-in-from-bottom duration-300"
+            )}
+          >
+            {/* Grab handle */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="h-1 w-10 rounded-full bg-white/15" />
+            </div>
+
+            {/* Sticky chrome */}
+            <div className="shrink-0 border-b border-white/[0.06] px-4 pb-3 pt-1">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
+                    Community
+                  </p>
+                  <h2 className="truncate text-xl font-black tracking-tight text-white">
+                    Reviews
+                  </h2>
+                  {mediaTitle && (
+                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                      {mediaTitle}
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSheetOpen(false)}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-white/70 transition hover:bg-white/10 hover:text-white"
+                  aria-label="Close"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              {tabs.length > 1 && (
+                <div className="mt-3 flex gap-1.5">
+                  {tabs.map((tab) => {
+                    const active = filter === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setFilter(tab.id)}
+                        className={cn(
+                          "rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors",
+                          active
+                            ? tab.id === "reddit"
+                              ? "bg-[#ff4500] text-white"
+                              : "bg-primary text-black"
+                            : "bg-white/[0.05] text-white/55 hover:text-white"
+                        )}
+                      >
+                        {tab.label}
+                        <span
+                          className={cn(
+                            "ml-1.5 tabular-nums",
+                            active ? "opacity-80" : "opacity-50"
+                          )}
+                        >
+                          {tab.n}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               )}
-            >
-              {tab.label}
-              <span
-                className={cn(
-                  "ml-1 tabular-nums opacity-70",
-                  filter === tab.id && "opacity-90"
-                )}
-              >
-                {tab.count}
-              </span>
-            </button>
-          ))}
+            </div>
+
+            {/* Scroll body */}
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-safe-page">
+              {visible.length === 0 ? (
+                <div className="px-6 py-16 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    Nothing in this filter.
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  {visible.map((r) => (
+                    <ReviewRow key={r.id} review={r} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </header>
-
-      <div className="space-y-3">
-        {visible.map((review, i) => (
-          <ReviewCard key={review.id} review={review} index={i} />
-        ))}
-      </div>
-
-      {visible.length === 0 && (
-        <p className="py-6 text-center text-sm text-muted-foreground">
-          Nothing in this filter.
-        </p>
       )}
-    </section>
+    </>
   );
 }

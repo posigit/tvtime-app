@@ -617,7 +617,7 @@ export function ShowDetailClient({
 
           {providers && <WatchProviders providers={providers} />}
 
-          <CommunityReviews reviews={reviews} title="Community reviews" />
+          <CommunityReviews reviews={reviews} mediaTitle={show.title} />
 
           <div className="mt-6">
             <DiscoverRail

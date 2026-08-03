@@ -1,10 +1,14 @@
 /**
- * Community reviews from TMDB + Reddit discussion threads.
- * Server-only fetchers; shape is serializable for client UI.
+ * Community reviews from TMDB + Reddit.
+ * Server-only fetchers; serializable for client UI.
  */
 
 import { getMovieReviews, getTvReviews, type TmdbReview } from "./tmdb";
-import { redditSearchUrl, searchRedditDiscussions } from "./reddit";
+import {
+  redditSearchUrl,
+  searchRedditDiscussions,
+  type RedditSubmission,
+} from "./reddit";
 
 export type ReviewSource = "tmdb" | "reddit";
 
@@ -12,16 +16,12 @@ export type CommunityReview = {
   id: string;
   source: ReviewSource;
   author: string;
-  /** TMDB author rating 1–10 when present */
   rating: number | null;
-  /** Reddit post title (or empty for TMDB) */
   title: string | null;
   content: string;
   url: string | null;
   createdAt: string | null;
-  /** e.g. r/movies */
   subreddit: string | null;
-  /** Reddit upvotes */
   score: number | null;
   commentCount: number | null;
   avatarUrl: string | null;
@@ -36,7 +36,7 @@ function tmdbAvatar(path: string | null | undefined): string | null {
   return `${TMDB_IMG}${path}`;
 }
 
-function cleanText(raw: string, max = 1200): string {
+function cleanText(raw: string, max = 1400): string {
   const t = raw
     .replace(/\r\n/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
@@ -47,7 +47,7 @@ function cleanText(raw: string, max = 1200): string {
 
 function mapTmdb(r: TmdbReview): CommunityReview | null {
   const content = cleanText(r.content || "");
-  if (!content) return null;
+  if (content.length < 20) return null;
   const author =
     r.author_details?.name?.trim() ||
     r.author_details?.username?.trim() ||
@@ -74,53 +74,23 @@ function mapTmdb(r: TmdbReview): CommunityReview | null {
   };
 }
 
-type RedditChild = {
-  data?: {
-    id?: string;
-    name?: string;
-    author?: string;
-    title?: string;
-    selftext?: string;
-    url?: string;
-    permalink?: string;
-    created_utc?: number;
-    subreddit?: string;
-    score?: number;
-    num_comments?: number;
-    stickied?: boolean;
-    over_18?: boolean;
-  };
-};
-
-function mapReddit(child: RedditChild): CommunityReview | null {
-  const d = child.data;
-  if (!d?.id || d.stickied || d.over_18) return null;
-
-  const title = (d.title || "").trim();
-  const body = cleanText(d.selftext || "", 900);
-  if (!title) return null;
-  if (!body && (d.num_comments ?? 0) < 15 && (d.score ?? 0) < 50) return null;
-
-  const content = body || "Open the thread for the full discussion.";
-  const permalink = d.permalink
-    ? `https://www.reddit.com${d.permalink}`
-    : d.url || null;
-
+function mapReddit(d: RedditSubmission): CommunityReview {
+  const body = cleanText(d.selftext, 900);
   return {
-    id: `reddit-${d.name || d.id}`,
+    id: `reddit-${d.id}`,
     source: "reddit",
-    author: d.author && d.author !== "[deleted]" ? d.author : "redditor",
+    author: d.author,
     rating: null,
-    title,
-    content,
-    url: permalink,
+    title: d.title,
+    content: body || "Open the thread for the full discussion.",
+    url: d.permalink || null,
     createdAt:
-      typeof d.created_utc === "number"
+      d.created_utc != null
         ? new Date(d.created_utc * 1000).toISOString()
         : null,
     subreddit: d.subreddit ? `r/${d.subreddit}` : null,
-    score: typeof d.score === "number" ? d.score : null,
-    commentCount: typeof d.num_comments === "number" ? d.num_comments : null,
+    score: d.score,
+    commentCount: d.num_comments,
     avatarUrl: null,
   };
 }
@@ -137,7 +107,7 @@ async function fetchTmdbReviews(
     return (data.results ?? [])
       .map(mapTmdb)
       .filter((r): r is CommunityReview => r != null)
-      .slice(0, 12);
+      .slice(0, 15);
   } catch (err) {
     console.error(
       "TMDB reviews failed:",
@@ -152,40 +122,14 @@ async function fetchRedditReviews(
   title: string,
   year?: string | null
 ): Promise<CommunityReview[]> {
-  const cleanTitle = title.trim();
-  if (!cleanTitle) return [];
-
-  const subreddits =
-    kind === "movie"
-      ? "movies+TrueFilm+MovieSuggestions+flicks"
-      : "television+TrueFilm+televisionsuggestions+series";
-
-  const q = [
-    `"${cleanTitle}"`,
-    year ? year.slice(0, 4) : null,
-    "(review OR discussion OR thoughts OR spoiler)",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
   try {
-    const data = await searchRedditDiscussions({
-      query: q,
-      subreddits,
-      limit: 15,
+    const posts = await searchRedditDiscussions({
+      title,
+      kind,
+      year,
+      limit: 10,
     });
-    const children = data?.children ?? [];
-    const mapped = children
-      .map(mapReddit)
-      .filter((r): r is CommunityReview => r != null);
-
-    mapped.sort((a, b) => {
-      const sa = (a.score ?? 0) + (a.commentCount ?? 0) * 2;
-      const sb = (b.score ?? 0) + (b.commentCount ?? 0) * 2;
-      return sb - sa;
-    });
-
-    return mapped.slice(0, 8);
+    return posts.map(mapReddit);
   } catch (err) {
     console.error(
       "Reddit reviews failed:",
@@ -195,7 +139,6 @@ async function fetchRedditReviews(
   }
 }
 
-/** Synthetic card so Reddit is still one click away when API is blocked. */
 function redditBrowseCard(
   title: string,
   kind: "movie" | "tv"
@@ -205,9 +148,9 @@ function redditBrowseCard(
     source: "reddit",
     author: "Reddit",
     rating: null,
-    title: `Discuss ${title} on Reddit`,
+    title: `Search Reddit for “${title}”`,
     content:
-      "Jump into community threads on r/movies, r/television, and TrueFilm. Live posts appear here when Reddit search is available for this app.",
+      "No embedded threads found. Open Reddit for live discussion on this title.",
     url: redditSearchUrl(title, kind),
     createdAt: null,
     subreddit: kind === "movie" ? "r/movies" : "r/television",
@@ -231,11 +174,6 @@ export async function getCommunityReviews(opts: {
   const redditList =
     reddit.length > 0 ? reddit : [redditBrowseCard(opts.title, opts.kind)];
 
-  const out: CommunityReview[] = [];
-  const max = Math.max(tmdb.length, redditList.length);
-  for (let i = 0; i < max; i++) {
-    if (tmdb[i]) out.push(tmdb[i]);
-    if (redditList[i]) out.push(redditList[i]);
-  }
-  return out;
+  // TMDB first (actual reviews), then Reddit discussions
+  return [...tmdb, ...redditList];
 }

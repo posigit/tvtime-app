@@ -198,7 +198,7 @@ export default async function MovieDetailPage({
 
         <WatchProviders providers={providers} />
 
-        <CommunityReviews reviews={reviews} title="Community reviews" />
+        <CommunityReviews reviews={reviews} mediaTitle={movie.title} />
 
         <div className="mt-6">
           <DiscoverRail
