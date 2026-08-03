@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { CommunityReview, ReviewSource } from "@/lib/reviews";
+import type {
+  CommunityReview,
+  ReviewSentiment,
+  ReviewSource,
+  ReviewsPayload,
+} from "@/lib/reviews";
 import { cn } from "@/lib/utils";
 import {
   ChevronRight,
@@ -11,23 +16,91 @@ import {
   Star,
 } from "lucide-react";
 
-type Filter = "all" | ReviewSource;
+type Filter = "all" | "fresh" | "rotten" | ReviewSource;
 
-function monogram(name: string) {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return "?";
-  if (parts.length === 1) return parts[0].slice(0, 1).toUpperCase();
-  return (parts[0][0] + parts[1][0]).toUpperCase();
+/* ── Fresh / Rotten icons (clean, iconic) ───────────────────────── */
+
+function FreshIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 32 32"
+      className={className}
+      aria-hidden
+      fill="none"
+    >
+      <circle cx="16" cy="18" r="11" fill="#fa320a" />
+      <ellipse cx="12" cy="15" rx="2.2" ry="3" fill="#ff6b4a" opacity="0.55" />
+      <path
+        d="M16 8c0-3 2.5-5 5-5-1 2.5-1 4.5 0 6"
+        stroke="#3d8b37"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M16 8c1.5-1 3-1.2 4.5-.5"
+        stroke="#2f6b2a"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function RottenIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" className={className} aria-hidden fill="none">
+      <path
+        d="M8 12c-2 3-2 8 1 12 3 4 9 5 13 2 4-3 5-9 2-13-2-3-6-5-10-4-3 .5-5 1.5-6 3z"
+        fill="#6ac04a"
+      />
+      <path
+        d="M10 14c2 1 3 3 3 5M18 12c1 2 1 4 0 6M14 20c2 .5 4 0 5-1"
+        stroke="#3d7a2a"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        opacity="0.7"
+      />
+      <circle cx="12" cy="16" r="1.2" fill="#2d5a20" />
+      <path
+        d="M20 9c2-2 4-2 5-1"
+        stroke="#3d8b37"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function VerdictIcon({
+  sentiment,
+  size = "md",
+}: {
+  sentiment: ReviewSentiment;
+  size?: "sm" | "md" | "lg";
+}) {
+  const cls =
+    size === "lg" ? "h-8 w-8" : size === "sm" ? "h-5 w-5" : "h-6 w-6";
+  if (sentiment === "fresh") return <FreshIcon className={cls} />;
+  if (sentiment === "rotten") return <RottenIcon className={cls} />;
+  return (
+    <div
+      className={cn(
+        "flex items-center justify-center rounded-full bg-[#ff4500]/15 text-[#ff6a33]",
+        size === "lg" ? "h-8 w-8 text-sm" : "h-6 w-6 text-[10px]"
+      )}
+    >
+      r/
+    </div>
+  );
 }
 
 function formatWhen(iso: string | null) {
   if (!iso) return null;
+  // RT sometimes sends "03/20/2024" or "Jul 24"
+  if (!iso.includes("T") && !/^\d{4}-/.test(iso)) return iso;
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return null;
-  return d.toLocaleDateString("en-US", {
-    month: "short",
-    year: "numeric",
-  });
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
 }
 
 function formatScore(n: number) {
@@ -39,161 +112,177 @@ function starsFromTen(rating: number) {
   return (Math.round(rating) / 2).toFixed(1);
 }
 
+function sourceLabel(s: ReviewSource) {
+  if (s === "rt") return "RT";
+  if (s === "tmdb") return "TMDB";
+  return "Reddit";
+}
+
+/* ── Single review row ──────────────────────────────────────────── */
+
 function ReviewRow({ review }: { review: CommunityReview }) {
   const [open, setOpen] = useState(false);
-  const isReddit = review.source === "reddit";
-  const long = review.content.length > 220;
+  const long = review.content.length > 200;
   const when = formatWhen(review.createdAt);
 
-  return (
-    <article className="border-b border-white/[0.06] last:border-0">
-      <div className="px-4 py-4">
-        <div className="flex items-center gap-3">
-          <div
-            className={cn(
-              "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-bold",
-              isReddit
-                ? "bg-[#ff4500]/12 text-[#ff6a33]"
-                : "bg-primary/12 text-primary"
-            )}
-          >
-            {review.avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={review.avatarUrl}
-                alt=""
-                className="h-9 w-9 rounded-full object-cover"
-              />
-            ) : (
-              monogram(review.author)
-            )}
-          </div>
-
+  if (review.featured) {
+    return (
+      <article className="mx-4 my-3 overflow-hidden rounded-2xl bg-gradient-to-br from-[#2a120c] to-[#1a1a1c] ring-1 ring-[#fa320a]/35">
+        <div className="flex items-start gap-3 p-4">
+          <VerdictIcon sentiment={review.sentiment} size="lg" />
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <p className="truncate text-sm font-semibold text-white">
-                {review.author}
-              </p>
-              {review.rating != null && (
-                <span className="inline-flex shrink-0 items-center gap-0.5 text-xs font-bold text-primary">
-                  <Star className="h-3 w-3 fill-primary" />
-                  {starsFromTen(review.rating)}
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#fa320a]">
+              Critics Consensus
+            </p>
+            <p className="mt-1.5 text-[15px] font-medium leading-snug text-white/95">
+              “{review.content}”
+            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-white/45">
+              {review.score != null && (
+                <span className="font-bold text-[#fa320a]">
+                  {review.score}% Tomatometer
                 </span>
               )}
+              {review.url && (
+                <a
+                  href={review.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 font-semibold text-white/60 hover:text-white"
+                >
+                  Rotten Tomatoes
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              )}
             </div>
-            <p className="truncate text-[11px] text-muted-foreground">
-              {isReddit ? (
-                <>
-                  <span className="text-[#ff6a33]/90">
-                    {review.subreddit ?? "Reddit"}
+          </div>
+        </div>
+      </article>
+    );
+  }
+
+  return (
+    <article className="border-b border-white/[0.05] last:border-0">
+      <div className="flex gap-3 px-4 py-4">
+        <div className="mt-0.5 shrink-0">
+          <VerdictIcon sentiment={review.sentiment} />
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                <span className="truncate text-sm font-semibold text-white">
+                  {review.author}
+                </span>
+                {review.rating != null && (
+                  <span className="inline-flex items-center gap-0.5 text-xs font-bold text-primary">
+                    <Star className="h-3 w-3 fill-primary" />
+                    {starsFromTen(review.rating)}
                   </span>
-                  {review.score != null && (
-                    <span className="text-white/30">
-                      {" "}
-                      · {formatScore(review.score)} up
-                    </span>
+                )}
+              </div>
+              <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
+                <span
+                  className={cn(
+                    "font-semibold",
+                    review.source === "rt" && "text-[#fa320a]/90",
+                    review.source === "tmdb" && "text-primary/80",
+                    review.source === "reddit" && "text-[#ff6a33]/90"
                   )}
-                  {review.commentCount != null && (
+                >
+                  {sourceLabel(review.source)}
+                </span>
+                {review.meta && (
+                  <span className="text-white/35"> · {review.meta}</span>
+                )}
+                {when && <span className="text-white/30"> · {when}</span>}
+                {review.source === "reddit" && review.score != null && (
+                  <span className="text-white/30">
+                    {" "}
+                    · {formatScore(review.score)} up
+                  </span>
+                )}
+                {review.source === "reddit" &&
+                  review.commentCount != null && (
                     <span className="text-white/30">
                       {" "}
                       · {formatScore(review.commentCount)} comments
                     </span>
                   )}
-                </>
-              ) : (
-                <>
-                  <span className="text-primary/80">TMDB</span>
-                  {when && <span className="text-white/30"> · {when}</span>}
-                </>
-              )}
-            </p>
+              </p>
+            </div>
+
+            {review.url && (
+              <a
+                href={review.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/[0.04] text-white/40 transition hover:bg-white/10 hover:text-white"
+                aria-label="Open original"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            )}
           </div>
 
-          {review.url && (
-            <a
-              href={review.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/[0.05] text-white/50 transition-colors hover:bg-white/10 hover:text-white"
-              aria-label="Open original"
-              onClick={(e) => e.stopPropagation()}
+          {review.title && (
+            <h3 className="mt-2 text-[14px] font-semibold leading-snug text-white/95">
+              {review.title}
+            </h3>
+          )}
+
+          <p
+            className={cn(
+              "mt-1.5 text-[13px] leading-[1.55] text-white/65 whitespace-pre-wrap",
+              !open && long && "line-clamp-3"
+            )}
+          >
+            {review.content}
+          </p>
+
+          {long && (
+            <button
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              className="mt-1.5 text-xs font-bold text-primary"
             >
-              <ExternalLink className="h-3.5 w-3.5" />
-            </a>
+              {open ? "Show less" : "Read more"}
+            </button>
           )}
         </div>
-
-        {review.title && (
-          <h3 className="mt-3 text-[15px] font-semibold leading-snug text-white">
-            {review.title}
-          </h3>
-        )}
-
-        <p
-          className={cn(
-            "mt-2 text-[13px] leading-[1.55] text-white/65 whitespace-pre-wrap",
-            !open && long && "line-clamp-3"
-          )}
-        >
-          {review.content}
-        </p>
-
-        {long && (
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            className="mt-2 text-xs font-semibold text-primary"
-          >
-            {open ? "Less" : "More"}
-          </button>
-        )}
       </div>
     </article>
   );
 }
 
-/**
- * Collapsed by default — one compact row on the detail page.
- * Tap opens a full-height sheet so "More like / Recommended" stay reachable.
- */
+/* ── Main export ────────────────────────────────────────────────── */
+
 export function CommunityReviews({
-  reviews,
+  payload,
   mediaTitle,
 }: {
-  reviews: CommunityReview[];
+  payload: ReviewsPayload;
   mediaTitle?: string;
 }) {
+  const { reviews, rtScore, rtState, counts } = payload;
   const [sheetOpen, setSheetOpen] = useState(false);
   const [filter, setFilter] = useState<Filter>("all");
 
-  const counts = useMemo(() => {
-    let tmdb = 0;
-    let reddit = 0;
-    for (const r of reviews) {
-      if (r.source === "tmdb") tmdb++;
-      else if (r.id !== "reddit-browse") reddit++;
-      else reddit++; // count browse card too for tab presence
-    }
-    // Don't inflate "all" with only a browse placeholder if no real reddit
-    const realReddit = reviews.filter(
-      (r) => r.source === "reddit" && r.id !== "reddit-browse"
-    ).length;
-    const browseOnly =
-      realReddit === 0 && reviews.some((r) => r.id === "reddit-browse");
-    return {
-      tmdb,
-      reddit: realReddit > 0 ? realReddit : browseOnly ? 1 : 0,
-      all: reviews.length,
-      realReddit,
-    };
-  }, [reviews]);
+  const realReddit = useMemo(
+    () => reviews.filter((r) => r.source === "reddit" && r.id !== "reddit-browse"),
+    [reviews]
+  );
 
   const visible = useMemo(() => {
     if (filter === "all") return reviews;
+    if (filter === "fresh")
+      return reviews.filter((r) => r.sentiment === "fresh");
+    if (filter === "rotten")
+      return reviews.filter((r) => r.sentiment === "rotten");
     return reviews.filter((r) => r.source === filter);
   }, [reviews, filter]);
 
-  // Lock body scroll while sheet open
   useEffect(() => {
     if (!sheetOpen) return;
     const prev = document.body.style.overflow;
@@ -203,7 +292,6 @@ export function CommunityReviews({
     };
   }, [sheetOpen]);
 
-  // Escape closes sheet
   useEffect(() => {
     if (!sheetOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -213,88 +301,140 @@ export function CommunityReviews({
     return () => window.removeEventListener("keydown", onKey);
   }, [sheetOpen]);
 
-  const summary =
-    counts.tmdb > 0 && counts.realReddit > 0
-      ? `${counts.tmdb} TMDB · ${counts.realReddit} Reddit`
-      : counts.tmdb > 0
-        ? `${counts.tmdb} review${counts.tmdb === 1 ? "" : "s"}`
-        : counts.realReddit > 0
-          ? `${counts.realReddit} thread${counts.realReddit === 1 ? "" : "s"}`
-          : "TMDB & Reddit";
+  const rtFresh =
+    rtScore != null ? rtScore >= 60 : rtState?.includes("fresh") ?? null;
 
   const tabs = (
     [
       { id: "all" as const, label: "All", n: counts.all },
-      { id: "tmdb" as const, label: "TMDB", n: counts.tmdb },
-      { id: "reddit" as const, label: "Reddit", n: counts.reddit },
-    ] satisfies { id: Filter; label: string; n: number }[]
-  ).filter((t) => t.id === "all" || t.n > 0);
+      { id: "fresh" as const, label: "Fresh", n: counts.fresh },
+      { id: "rotten" as const, label: "Rotten", n: counts.rotten },
+      { id: "rt" as const, label: "RT", n: counts.rt },
+      { id: "tmdb" as const, label: "Fans", n: counts.tmdb },
+      {
+        id: "reddit" as const,
+        label: "Reddit",
+        n: Math.max(counts.reddit, realReddit.length),
+      },
+    ] satisfies { id: Filter; label: string; n?: number }[]
+  ).filter((t) => t.id === "all" || (t.n != null && t.n > 0));
+
+  const subline = [
+    rtScore != null ? `${rtScore}% RT` : null,
+    counts.rt > 0 ? `${counts.rt} critic${counts.rt === 1 ? "" : "s"}` : null,
+    counts.tmdb > 0 ? `${counts.tmdb} fan` : null,
+    realReddit.length > 0
+      ? `${realReddit.length} Reddit`
+      : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <>
-      {/* ── Compact trigger (always collapsed on page) ── */}
+      {/* ── Compact trigger ── */}
       <button
         type="button"
         onClick={() => setSheetOpen(true)}
         className={cn(
-          "mt-4 flex w-full items-center gap-3 rounded-xl bg-card px-4 py-3.5 text-left",
-          "ring-1 ring-white/[0.06] transition active:scale-[0.99]",
-          "hover:ring-white/10"
+          "group mt-4 flex w-full items-center gap-3.5 rounded-2xl px-3.5 py-3 text-left",
+          "bg-card ring-1 ring-white/[0.07]",
+          "transition duration-200 hover:ring-white/15 active:scale-[0.99]"
         )}
       >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/12">
-          <MessageSquare className="h-5 w-5 text-primary" />
+        {/* RT score badge */}
+        <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
+          {rtScore != null ? (
+            <>
+              {rtFresh ? (
+                <FreshIcon className="h-11 w-11" />
+              ) : (
+                <RottenIcon className="h-11 w-11" />
+              )}
+              <span className="absolute inset-0 flex items-center justify-center pt-1 text-[11px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                {rtScore}
+              </span>
+            </>
+          ) : (
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/12">
+              <MessageSquare className="h-5 w-5 text-primary" />
+            </div>
+          )}
         </div>
+
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-white">Reviews</p>
-          <p className="truncate text-xs text-muted-foreground">{summary}</p>
+          <p className="text-[15px] font-bold tracking-tight text-white">
+            Reviews
+          </p>
+          <p className="truncate text-xs text-muted-foreground">
+            {subline || "Critics, fans & Reddit"}
+          </p>
         </div>
-        <ChevronRight className="h-5 w-5 shrink-0 text-white/30" />
+
+        <div className="flex shrink-0 items-center gap-1.5">
+          {counts.fresh > 0 && (
+            <span className="hidden items-center gap-0.5 rounded-full bg-[#fa320a]/12 px-2 py-0.5 text-[10px] font-bold text-[#fa320a] xs:inline-flex sm:inline-flex">
+              <FreshIcon className="h-3.5 w-3.5" />
+              {counts.fresh}
+            </span>
+          )}
+          <ChevronRight className="h-5 w-5 text-white/25 transition group-hover:text-white/50" />
+        </div>
       </button>
 
-      {/* ── Full-screen sheet ── */}
+      {/* ── Sheet ── */}
       {sheetOpen && (
         <div className="fixed inset-0 z-[80] flex flex-col">
-          {/* Scrim */}
           <button
             type="button"
             aria-label="Close reviews"
-            className="absolute inset-0 bg-black/70 backdrop-blur-[2px]"
+            className="absolute inset-0 bg-black/75 backdrop-blur-[3px]"
             onClick={() => setSheetOpen(false)}
           />
 
-          {/* Panel */}
           <div
             role="dialog"
             aria-modal="true"
-            aria-label="Community reviews"
+            aria-label="Reviews"
             className={cn(
-              "relative mt-auto flex max-h-[92dvh] w-full flex-col",
-              "rounded-t-[1.25rem] bg-[#0c0c0e] shadow-[0_-12px_40px_rgba(0,0,0,0.55)]",
+              "relative mt-auto flex max-h-[93dvh] w-full flex-col",
+              "rounded-t-[1.35rem] bg-[#0a0a0c]",
+              "shadow-[0_-20px_60px_rgba(0,0,0,0.65)]",
               "ring-1 ring-white/[0.08]",
               "animate-in slide-in-from-bottom duration-300"
             )}
           >
-            {/* Grab handle */}
-            <div className="flex justify-center pt-3 pb-1">
+            <div className="flex justify-center pt-2.5 pb-1">
               <div className="h-1 w-10 rounded-full bg-white/15" />
             </div>
 
-            {/* Sticky chrome */}
             <div className="shrink-0 border-b border-white/[0.06] px-4 pb-3 pt-1">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
-                    Community
-                  </p>
-                  <h2 className="truncate text-xl font-black tracking-tight text-white">
-                    Reviews
-                  </h2>
-                  {mediaTitle && (
-                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                      {mediaTitle}
-                    </p>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {rtScore != null && (
+                      <div className="relative flex h-9 w-9 items-center justify-center">
+                        {rtFresh ? (
+                          <FreshIcon className="h-9 w-9" />
+                        ) : (
+                          <RottenIcon className="h-9 w-9" />
+                        )}
+                        <span className="absolute text-[10px] font-black text-white drop-shadow">
+                          {rtScore}
+                        </span>
+                      </div>
+                    )}
+                    <div>
+                      <h2 className="text-xl font-black tracking-tight text-white">
+                        Reviews
+                      </h2>
+                      {mediaTitle && (
+                        <p className="truncate text-xs text-muted-foreground">
+                          {mediaTitle}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
                 <button
                   type="button"
@@ -306,54 +446,54 @@ export function CommunityReviews({
                 </button>
               </div>
 
-              {tabs.length > 1 && (
-                <div className="mt-3 flex gap-1.5">
-                  {tabs.map((tab) => {
-                    const active = filter === tab.id;
-                    return (
-                      <button
-                        key={tab.id}
-                        type="button"
-                        onClick={() => setFilter(tab.id)}
-                        className={cn(
-                          "rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors",
-                          active
-                            ? tab.id === "reddit"
+              <div className="mt-3 flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+                {tabs.map((tab) => {
+                  const active = filter === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setFilter(tab.id)}
+                      className={cn(
+                        "shrink-0 rounded-full px-3 py-1.5 text-xs font-bold transition-colors",
+                        active
+                          ? tab.id === "rotten"
+                            ? "bg-[#6ac04a] text-black"
+                            : tab.id === "reddit"
                               ? "bg-[#ff4500] text-white"
-                              : "bg-primary text-black"
-                            : "bg-white/[0.05] text-white/55 hover:text-white"
-                        )}
-                      >
-                        {tab.label}
-                        <span
-                          className={cn(
-                            "ml-1.5 tabular-nums",
-                            active ? "opacity-80" : "opacity-50"
-                          )}
-                        >
+                              : tab.id === "fresh" || tab.id === "rt"
+                                ? "bg-[#fa320a] text-white"
+                                : "bg-primary text-black"
+                          : "bg-white/[0.05] text-white/55 hover:text-white"
+                      )}
+                    >
+                      {tab.id === "fresh" && (
+                        <FreshIcon className="mr-1 inline h-3.5 w-3.5 align-[-2px]" />
+                      )}
+                      {tab.id === "rotten" && (
+                        <RottenIcon className="mr-1 inline h-3.5 w-3.5 align-[-2px]" />
+                      )}
+                      {tab.label}
+                      {tab.n != null && (
+                        <span className="ml-1 tabular-nums opacity-75">
                           {tab.n}
                         </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Scroll body */}
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-safe-page">
               {visible.length === 0 ? (
                 <div className="px-6 py-16 text-center">
                   <p className="text-sm text-muted-foreground">
-                    Nothing in this filter.
+                    Nothing in this filter yet.
                   </p>
                 </div>
               ) : (
-                <div>
-                  {visible.map((r) => (
-                    <ReviewRow key={r.id} review={r} />
-                  ))}
-                </div>
+                visible.map((r) => <ReviewRow key={r.id} review={r} />)
               )}
             </div>
           </div>

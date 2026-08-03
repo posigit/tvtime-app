@@ -71,7 +71,14 @@ export default async function MovieDetailPage({
       tmdbId,
       title: movie.title,
       year: movie.releaseDate,
-    }).catch(() => []),
+      knownRtScore: movie.rtScore,
+    }).catch(() => ({
+      reviews: [],
+      rtScore: movie.rtScore != null && movie.rtScore >= 0 ? movie.rtScore : null,
+      rtState: null,
+      rtUrl: null,
+      counts: { all: 0, rt: 0, tmdb: 0, reddit: 0, fresh: 0, rotten: 0 },
+    })),
   ]);
 
   const moreLikeThis = filterNewMedia(similarRaw, ownedIds, 12);
@@ -198,7 +205,7 @@ export default async function MovieDetailPage({
 
         <WatchProviders providers={providers} />
 
-        <CommunityReviews reviews={reviews} mediaTitle={movie.title} />
+        <CommunityReviews payload={reviews} mediaTitle={movie.title} />
 
         <div className="mt-6">
           <DiscoverRail

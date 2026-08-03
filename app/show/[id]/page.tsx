@@ -82,7 +82,14 @@ export default async function ShowDetailPage({
       tmdbId,
       title: show.title,
       year: show.firstAirDate,
-    }).catch(() => []),
+      knownRtScore: show.rtScore,
+    }).catch(() => ({
+      reviews: [],
+      rtScore: show.rtScore != null && show.rtScore >= 0 ? show.rtScore : null,
+      rtState: null,
+      rtUrl: null,
+      counts: { all: 0, rt: 0, tmdb: 0, reddit: 0, fresh: 0, rotten: 0 },
+    })),
   ]);
 
   const moreLikeThis = filterNewMedia(similarRaw, ownedIds, 12);
