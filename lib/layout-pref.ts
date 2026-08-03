@@ -1,9 +1,19 @@
-/** Shared Shows/Movies list vs grid preference. */
+/**
+ * Separate list/grid prefs for Shows vs Movies.
+ * Cookies: tvtime_layout_shows | tvtime_layout_movies
+ */
 
-export const LAYOUT_COOKIE = "tvtime_layout";
+export type LayoutScope = "shows" | "movies";
+export type LayoutPref = "grid" | "list";
+
 export const LAYOUT_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 
-export type LayoutPref = "grid" | "list";
+/** @deprecated shared cookie — migrated once into scope-specific cookies */
+const LEGACY_LAYOUT_COOKIE = "tvtime_layout";
+
+export function layoutCookieName(scope: LayoutScope): string {
+  return `tvtime_layout_${scope}`;
+}
 
 export function parseLayoutPref(
   value: string | null | undefined
@@ -13,21 +23,25 @@ export function parseLayoutPref(
 }
 
 /**
- * URL query wins (bookmarks), then cookie, then list default.
+ * URL query wins (bookmarks), then scope cookie, then legacy shared cookie, then list.
  */
 export function resolveLayoutPref(
   searchParam: string | null | undefined,
-  cookieValue: string | null | undefined
+  scopeCookie: string | null | undefined,
+  legacyCookie?: string | null | undefined
 ): LayoutPref {
   return (
     parseLayoutPref(searchParam) ??
-    parseLayoutPref(cookieValue) ??
+    parseLayoutPref(scopeCookie) ??
+    parseLayoutPref(legacyCookie) ??
     "list"
   );
 }
 
-/** Client-side cookie write (path=/, long-lived). */
-export function setLayoutCookie(layout: LayoutPref) {
+/** Client-side cookie write for one scope (path=/, long-lived). */
+export function setLayoutCookie(scope: LayoutScope, layout: LayoutPref) {
   if (typeof document === "undefined") return;
-  document.cookie = `${LAYOUT_COOKIE}=${layout}; path=/; max-age=${LAYOUT_MAX_AGE}; SameSite=Lax`;
+  document.cookie = `${layoutCookieName(scope)}=${layout}; path=/; max-age=${LAYOUT_MAX_AGE}; SameSite=Lax`;
 }
+
+export { LEGACY_LAYOUT_COOKIE };

@@ -15,7 +15,11 @@ import {
 } from "@/lib/movie-watchlist";
 import { getUnseenGreatMoviesPool } from "@/lib/surprise-movies";
 import { WatchLaterTools } from "@/components/watch-later-tools";
-import { LAYOUT_COOKIE, resolveLayoutPref } from "@/lib/layout-pref";
+import {
+  LEGACY_LAYOUT_COOKIE,
+  layoutCookieName,
+  resolveLayoutPref,
+} from "@/lib/layout-pref";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight, Clock } from "lucide-react";
@@ -269,7 +273,8 @@ export default async function MoviesPage({
   const cookieStore = await cookies();
   const layoutPref = resolveLayoutPref(
     layout,
-    cookieStore.get(LAYOUT_COOKIE)?.value
+    cookieStore.get(layoutCookieName("movies"))?.value,
+    cookieStore.get(LEGACY_LAYOUT_COOKIE)?.value
   );
   const gridLayout = layoutPref === "grid";
 
@@ -346,7 +351,7 @@ export default async function MoviesPage({
               <div className="relative mb-3 mt-2 flex justify-center">
                 <SectionLabel>Watch Next</SectionLabel>
                 <div className="absolute right-0 top-1/2 -translate-y-1/2">
-                  <LayoutToggle initialLayout={layoutPref} />
+                  <LayoutToggle scope="movies" initialLayout={layoutPref} />
                 </div>
               </div>
               {gridLayout ? (

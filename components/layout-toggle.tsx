@@ -4,14 +4,18 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   type LayoutPref,
+  type LayoutScope,
   parseLayoutPref,
   setLayoutCookie,
 } from "@/lib/layout-pref";
 
-/** 2x2 grid icon toggle — yellow in grid mode (snapshot 3), white in list mode (snapshot 1) */
+/** 2x2 grid icon toggle — yellow in grid mode, white in list mode */
 export function LayoutToggle({
+  scope,
   initialLayout,
 }: {
+  /** Independent pref for Shows vs Movies */
+  scope: LayoutScope;
   /** Server-resolved preference when URL has no ?layout= */
   initialLayout?: LayoutPref;
 }) {
@@ -22,7 +26,7 @@ export function LayoutToggle({
 
   const toggle = () => {
     const next: LayoutPref = isGrid ? "list" : "grid";
-    setLayoutCookie(next);
+    setLayoutCookie(scope, next);
     const params = new URLSearchParams(searchParams.toString());
     params.set("layout", next);
     router.push(`?${params.toString()}`);

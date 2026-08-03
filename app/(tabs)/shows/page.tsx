@@ -14,7 +14,11 @@ import { SectionLabel } from "@/components/section-label";
 import { ShowListItem, ShowListItemData } from "@/components/show-list-item";
 import { ShowCard } from "@/components/show-card";
 import { LayoutToggle } from "@/components/layout-toggle";
-import { LAYOUT_COOKIE, resolveLayoutPref } from "@/lib/layout-pref";
+import {
+  LEGACY_LAYOUT_COOKIE,
+  layoutCookieName,
+  resolveLayoutPref,
+} from "@/lib/layout-pref";
 import {
   computeNextEpisode,
   computeUpcomingEpisodes,
@@ -47,7 +51,8 @@ export default async function ShowsPage({
   const cookieStore = await cookies();
   const layoutPref = resolveLayoutPref(
     layout,
-    cookieStore.get(LAYOUT_COOKIE)?.value
+    cookieStore.get(layoutCookieName("shows"))?.value,
+    cookieStore.get(LEGACY_LAYOUT_COOKIE)?.value
   );
   const gridLayout = layoutPref === "grid";
 
@@ -386,7 +391,7 @@ export default async function ShowsPage({
               <div className="relative mb-3 mt-2 flex justify-center">
                 <SectionLabel>Watch Next</SectionLabel>
                 <div className="absolute right-0 top-1/2 -translate-y-1/2">
-                  <LayoutToggle initialLayout={layoutPref} />
+                  <LayoutToggle scope="shows" initialLayout={layoutPref} />
                 </div>
               </div>
               {gridLayout ? (
@@ -415,7 +420,7 @@ export default async function ShowsPage({
                 <SectionLabel>Haven&apos;t watched for a while</SectionLabel>
                 {watchNext.length === 0 && (
                   <div className="absolute right-0 top-1/2 -translate-y-1/2">
-                    <LayoutToggle initialLayout={layoutPref} />
+                    <LayoutToggle scope="shows" initialLayout={layoutPref} />
                   </div>
                 )}
               </div>
