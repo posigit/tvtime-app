@@ -1,0 +1,92 @@
+/* Fresh / Rotten icons (clean, iconic) — shared by reviews + score strip */
+
+export function FreshIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 32 32"
+      className={className}
+      aria-hidden
+      fill="none"
+    >
+      <circle cx="16" cy="18" r="11" fill="#fa320a" />
+      <ellipse cx="12" cy="15" rx="2.2" ry="3" fill="#ff6b4a" opacity="0.55" />
+      <path
+        d="M16 8c0-3 2.5-5 5-5-1 2.5-1 4.5 0 6"
+        stroke="#3d8b37"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M16 8c1.5-1 3-1.2 4.5-.5"
+        stroke="#2f6b2a"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+export function RottenIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" className={className} aria-hidden fill="none">
+      <path
+        d="M8 12c-2 3-2 8 1 12 3 4 9 5 13 2 4-3 5-9 2-13-2-3-6-5-10-4-3 .5-5 1.5-6 3z"
+        fill="#6ac04a"
+      />
+      <path
+        d="M10 14c2 1 3 3 3 5M18 12c1 2 1 4 0 6M14 20c2 .5 4 0 5-1"
+        stroke="#3d7a2a"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        opacity="0.7"
+      />
+      <circle cx="12" cy="16" r="1.2" fill="#2d5a20" />
+      <path
+        d="M20 9c2-2 4-2 5-1"
+        stroke="#3d8b37"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+/** Popcorn bucket for the RT audience score (Popcornmeter). */
+export function PopcornIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" className={className} aria-hidden fill="none">
+      <circle cx="10" cy="10" r="3.4" fill="#f6e7c8" />
+      <circle cx="16" cy="8" r="3.8" fill="#fdf3dd" />
+      <circle cx="22" cy="10" r="3.4" fill="#f6e7c8" />
+      <path d="M9 14 L12 27 H20 L23 14 Z" fill="#e0202e" />
+      <path d="M13 14 L14.5 27 H17.5 L16 14 Z" fill="#fff" opacity="0.85" />
+    </svg>
+  );
+}
+
+/** Metacritic-style rounded square, colored by score band. */
+export function MetacriticIcon({
+  className,
+  score,
+}: {
+  className?: string;
+  score: number;
+}) {
+  const bg = score >= 61 ? "#6c3" : score >= 40 ? "#fc3" : "#f00";
+  return (
+    <svg viewBox="0 0 32 32" className={className} aria-hidden fill="none">
+      <rect x="4" y="4" width="24" height="24" rx="6" fill={bg} />
+      <text
+        x="16"
+        y="21.5"
+        textAnchor="middle"
+        fontSize="13"
+        fontWeight="800"
+        fill="#000"
+        fontFamily="system-ui, sans-serif"
+      >
+        M
+      </text>
+    </svg>
+  );
+}

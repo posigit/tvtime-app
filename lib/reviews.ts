@@ -9,6 +9,9 @@ import {
   type RedditSubmission,
 } from "./reddit";
 import { getRtReviewBundle } from "./rt-reviews";
+import { db } from "./db";
+import { shows, movies } from "./schema";
+import { eq } from "drizzle-orm";
 
 export type ReviewSource = "rt" | "tmdb" | "reddit";
 export type ReviewSentiment = "fresh" | "rotten" | null;
@@ -36,6 +39,10 @@ export type CommunityReview = {
 export type ReviewsPayload = {
   reviews: CommunityReview[];
   rtScore: number | null;
+  /** Popcornmeter (RT audience score) 0–100 */
+  rtAudienceScore: number | null;
+  /** Metacritic Metascore 0–100 */
+  mcScore: number | null;
   rtState: string | null;
   rtUrl: string | null;
   counts: { all: number; rt: number; tmdb: number; reddit: number; fresh: number; rotten: number };
@@ -189,6 +196,46 @@ function redditBrowseCard(
   };
 }
 
+/**
+ * The RT scrape often finds scores the DB doesn't have yet (lazy background
+ * fill hasn't run, or OMDb lacked an entry). Heal the row in the background
+ * so hero badges / grids light up on the next render.
+ */
+function persistScrapedScores(
+  kind: "movie" | "tv",
+  tmdbId: number,
+  found: { rtScore?: number | null; rtAudienceScore?: number | null },
+  known: { rtScore?: number | null; rtAudienceScore?: number | null }
+) {
+  const set: Record<string, unknown> = {};
+  if (
+    found.rtScore != null &&
+    (known.rtScore == null || known.rtScore < 0)
+  ) {
+    set.rtScore = found.rtScore;
+  }
+  if (
+    found.rtAudienceScore != null &&
+    (known.rtAudienceScore == null || known.rtAudienceScore < 0)
+  ) {
+    set.rtAudienceScore = found.rtAudienceScore;
+  }
+  if (Object.keys(set).length === 0) return;
+
+  const table = kind === "tv" ? shows : movies;
+  set.rtCheckedAt = new Date();
+  void db
+    .update(table)
+    .set(set)
+    .where(eq(table.tmdbId, tmdbId))
+    .catch((err) =>
+      console.error(
+        `RT score write-back failed for ${kind} ${tmdbId}:`,
+        err instanceof Error ? err.message : err
+      )
+    );
+}
+
 export async function getCommunityReviews(opts: {
   kind: "movie" | "tv";
   tmdbId: number;
@@ -196,6 +243,8 @@ export async function getCommunityReviews(opts: {
   year?: string | null;
   /** Prefer DB score when scrape misses */
   knownRtScore?: number | null;
+  knownRtAudienceScore?: number | null;
+  knownMcScore?: number | null;
 }): Promise<ReviewsPayload> {
   const [tmdb, reddit, rt] = await Promise.all([
     fetchTmdbReviews(opts.kind, opts.tmdbId),
@@ -206,12 +255,20 @@ export async function getCommunityReviews(opts: {
       year: opts.year,
     }).catch(() => ({
       score: null,
+      audienceScore: null,
       state: null,
       consensus: null,
       pageUrl: null,
       reviews: [],
     })),
   ]);
+
+  persistScrapedScores(
+    opts.kind,
+    opts.tmdbId,
+    { rtScore: rt.score, rtAudienceScore: rt.audienceScore },
+    { rtScore: opts.knownRtScore, rtAudienceScore: opts.knownRtAudienceScore }
+  );
 
   const rtReviews: CommunityReview[] = [];
 
@@ -281,6 +338,15 @@ export async function getCommunityReviews(opts: {
       (opts.knownRtScore != null && opts.knownRtScore >= 0
         ? opts.knownRtScore
         : null),
+    rtAudienceScore:
+      rt.audienceScore ??
+      (opts.knownRtAudienceScore != null && opts.knownRtAudienceScore >= 0
+        ? opts.knownRtAudienceScore
+        : null),
+    mcScore:
+      opts.knownMcScore != null && opts.knownMcScore >= 0
+        ? opts.knownMcScore
+        : null,
     rtState: rt.state,
     rtUrl: rt.pageUrl,
     counts,

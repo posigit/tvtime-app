@@ -4,6 +4,7 @@
  */
 
 import { titleToRtSlug } from "./rt-tv";
+import { parseRtPageScores } from "./rt-page";
 
 const RT_UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
@@ -21,6 +22,8 @@ export type RtCriticReview = {
 
 export type RtReviewBundle = {
   score: number | null;
+  /** Popcornmeter (audience score) 0–100 */
+  audienceScore: number | null;
   /** certified-fresh | fresh | rotten | null */
   state: string | null;
   consensus: string | null;
@@ -83,58 +86,6 @@ async function fetchHtml(url: string): Promise<string | null> {
   } catch {
     return null;
   }
-}
-
-function parseScore(html: string): {
-  score: number | null;
-  state: string | null;
-} {
-  // Prefer ld+json aggregateRating
-  const ld = html.match(
-    /<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/i
-  );
-  if (ld) {
-    try {
-      const data = JSON.parse(ld[1]) as {
-        aggregateRating?: { ratingValue?: string | number; name?: string };
-      };
-      const raw = data.aggregateRating?.ratingValue;
-      if (raw != null && raw !== "") {
-        const score =
-          typeof raw === "number"
-            ? raw
-            : Number(String(raw).match(/\d+/)?.[0]);
-        if (Number.isFinite(score) && score >= 0 && score <= 100) {
-          const rounded = Math.round(score);
-          const state =
-            rounded >= 75
-              ? "certified-fresh"
-              : rounded >= 60
-                ? "fresh"
-                : "rotten";
-          return { score: rounded, state };
-        }
-      }
-    } catch {
-      /* fall through */
-    }
-  }
-
-  const m = html.match(
-    /score-icon-critics[^>]*sentiment="([^"]+)"[\s\S]{0,200}?class="critics-score"[^>]*>(\d+)%/i
-  );
-  if (m) {
-    const score = Number(m[2]);
-    const sent = m[1].toLowerCase();
-    const state =
-      score >= 75
-        ? "certified-fresh"
-        : sent.includes("neg") || score < 60
-          ? "rotten"
-          : "fresh";
-    return { score, state };
-  }
-  return { score: null, state: null };
 }
 
 function parseConsensus(html: string): string | null {
@@ -206,6 +157,7 @@ export async function getRtReviewBundle(opts: {
 }): Promise<RtReviewBundle> {
   const empty: RtReviewBundle = {
     score: null,
+    audienceScore: null,
     state: null,
     consensus: null,
     pageUrl: null,
@@ -224,15 +176,16 @@ export async function getRtReviewBundle(opts: {
     const html = await fetchHtml(pageUrl);
     if (!html) continue;
 
-    const { score, state } = parseScore(html);
+    const { tomatometer, audienceScore, state } = parseRtPageScores(html);
     const consensus = parseConsensus(html);
     const reviews = parseCriticCards(html);
 
     // Accept page if we got anything useful
-    if (score != null || consensus || reviews.length > 0) {
+    if (tomatometer != null || audienceScore != null || consensus || reviews.length > 0) {
       return {
-        score,
-        state: state ?? (score != null && score >= 60 ? "fresh" : score != null ? "rotten" : null),
+        score: tomatometer,
+        audienceScore,
+        state,
         consensus,
         pageUrl,
         reviews: reviews.slice(0, 20),

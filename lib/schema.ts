@@ -26,6 +26,10 @@ export const shows = pgTable("shows", {
   episodeRuntime: integer("episode_runtime"),
   voteAverage: real("vote_average"),
   rtScore: integer("rt_score"),
+  /** RT Popcornmeter (audience score 0–100); -1 = checked, none. */
+  rtAudienceScore: integer("rt_audience_score"),
+  /** Metacritic Metascore (0–100) via OMDb; -1 = checked, none. */
+  mcScore: integer("mc_score"),
   /** Last successful RT/OMDb check — used to re-fetch Tomatometer every ~2 weeks. */
   rtCheckedAt: timestamp("rt_checked_at"),
   imdbId: text("imdb_id"),
@@ -45,6 +49,10 @@ export const movies = pgTable("movies", {
   overview: text("overview"),
   voteAverage: real("vote_average"),
   rtScore: integer("rt_score"),
+  /** RT Popcornmeter (audience score 0–100); -1 = checked, none. */
+  rtAudienceScore: integer("rt_audience_score"),
+  /** Metacritic Metascore (0–100) via OMDb; -1 = checked, none. */
+  mcScore: integer("mc_score"),
   /** Last successful RT/OMDb check — used to re-fetch Tomatometer every ~2 weeks. */
   rtCheckedAt: timestamp("rt_checked_at"),
   imdbId: text("imdb_id"),
@@ -221,3 +229,35 @@ export const userLists = pgTable("user_lists", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+/**
+ * Surprise Me pool — rebuilt weekly by /api/cron/weekly (Thursday night).
+ * Pages read this table instead of hammering TMDB discover on every load.
+ */
+export const surprisePool = pgTable("surprise_pool", {
+  tmdbId: integer("tmdb_id").primaryKey(),
+  title: text("title").notNull(),
+  posterPath: text("poster_path"),
+  releaseDate: text("release_date"),
+  runtime: integer("runtime"),
+  voteAverage: real("vote_average"),
+  /** "Top rated" | "Critically acclaimed" | "Classic" | "Hidden gem" | decade… */
+  badge: text("badge"),
+  /** ISO week the pool was built for, e.g. "2026-W31". */
+  week: text("week").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/** Web-push subscriptions for new-episode alerts. */
+export const pushSubscriptions = pgTable(
+  "push_subscriptions",
+  {
+    endpoint: text("endpoint").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    p256dh: text("p256dh").notNull(),
+    auth: text("auth").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  }
+);

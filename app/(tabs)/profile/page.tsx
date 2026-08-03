@@ -26,6 +26,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight, Flame, Heart, Plus } from "lucide-react";
 import { ProfileMenu } from "@/components/profile-menu";
+import { NotificationToggle } from "@/components/notification-toggle";
 import { ProfileHeatmap } from "@/components/profile-heatmap";
 import { ProfileTaste } from "@/components/profile-taste";
 import { ProfileYearRecap } from "@/components/profile-year-recap";
@@ -1042,6 +1043,12 @@ export default async function ProfilePage() {
               </StatCell>
             </div>
           </div>
+        </section>
+
+        {/* ---------- New-episode push alerts ---------- */}
+        <section className="mb-8">
+          <SectionHeader title="Notifications" />
+          <NotificationToggle />
         </section>
 
         {/* ---------- Year in review ---------- */}

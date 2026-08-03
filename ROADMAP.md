@@ -22,8 +22,8 @@ Architecture done. Pages being wired.
 
 | Feature | Why |
 |---------|-----|
-| **Calendar page** | "What's airing today/this week" — filtered to your followed shows. TMDB `/tv/airing_today` cross-referenced with `user_shows`. TV Time's most-used feature. |
-| **GDPR import** | Upload `followed_tv_show.csv` + `show_seen_episode_latest.csv`. Show name → TMDB search → populate `shows` + `user_shows` + `watched_episodes`. |
+| **Calendar page** ✅ | `/calendar` — followed shows' episodes by air date (7-day lookback + all future), premiere/latest badges, mark-watched inline. |
+| ~~**GDPR import**~~ | Done. |
 | **Stats dashboard** | Total episodes watched, total hours (sum episode runtime), current streaks, top shows by time spent. All computable from `watched_episodes` + `shows.episodeRuntime`. |
 | **Season progress bars** | On show cards: "S3 E8 · 62%". TV Time's signature visual. Query: count watched episodes in latest season / total episodes in that season. |
 
@@ -45,7 +45,7 @@ Architecture done. Pages being wired.
 | Feature | Why |
 |---------|-----|
 | **Trakt sync** | Two-way sync: mark watched on Trakt → appears here, mark here → appears on Trakt. Big for ecosystem compatibility. |
-| **Push notifications** | "New episode of Silo airs tomorrow". Cron job: query `tv/airing_today`, match `user_shows`, send web push via service worker. |
+| ~~**Push notifications**~~ ✅ | Done: daily digest push for episodes airing today (`/api/cron/episode-alerts`, profile toggle). |
 | **Rewatch tracking** | Mark a show as "rewatching" → fresh progress counter. Your schema has the data model for it (just needs `rewatch_count` column or separate sessions). |
 | **Custom lists** | "Best of 2026", "Cosy rewatches", "Shows to binge". Schema has `user_lists` table ready. Needs CRUD API + UI. |
 | **Episode reactions** | TV Time's heart/Wow/OK reactions. Schema has `episode_reactions` table. Needs emoji picker UI. |

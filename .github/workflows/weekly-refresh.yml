@@ -1,0 +1,39 @@
+# Thursday-night refresh (Fri 00:00 UTC = Thursday evening US):
+#   - RT sweep: resolve missing Rotten Tomatoes / Popcornmeter / Metacritic
+#     scores for shows & movies that still have none, re-check recent releases
+#   - Surprise Me pool rebuild (fresh week-seeded TMDB slices)
+#
+# Requires repo secrets:
+#   APP_URL      e.g. https://your-app.up.railway.app  (no trailing slash)
+#   CRON_SECRET  must match CRON_SECRET env on the app
+
+name: Weekly refresh
+
+on:
+  schedule:
+    - cron: "0 0 * * 5" # Friday 00:00 UTC
+  workflow_dispatch: # manual run from Actions tab
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call /api/cron/weekly
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$APP_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "Set repository secrets APP_URL and CRON_SECRET."
+            exit 1
+          fi
+          URL="${APP_URL%/}/api/cron/weekly?secret=${CRON_SECRET}"
+          echo "GET ${APP_URL%/}/api/cron/weekly"
+          code=$(curl -sS -o /tmp/weekly.json -w "%{http_code}" --max-time 600 "$URL" || true)
+          cat /tmp/weekly.json || true
+          echo ""
+          if [ "$code" != "200" ]; then
+            echo "Weekly refresh failed with HTTP $code"
+            exit 1
+          fi
+          echo "OK"

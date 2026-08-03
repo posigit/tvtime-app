@@ -4,11 +4,8 @@ import {
   getTvDetails,
   getMovieDetails,
   getTvSeason,
-  getTvExternalIds,
-  getMovieExternalIds,
 } from "./tmdb";
-import { getRottenTomatoesScore } from "./omdb";
-import { getTvTomatometerFromRt } from "./rt-tv";
+import { resolveRtScores } from "./rt-resolve";
 import { eq, sql } from "drizzle-orm";
 
 /** Stored in `rt_score` when OMDb/RT was checked and has no Tomatometer. */
@@ -31,6 +28,8 @@ type ShowRow = {
   episodeRuntime: number | null;
   voteAverage: number | null;
   rtScore?: number | null;
+  rtAudienceScore?: number | null;
+  mcScore?: number | null;
   imdbId?: string | null;
   tmdbData: unknown;
 };
@@ -46,6 +45,8 @@ type MovieRow = {
   overview: string | null;
   voteAverage: number | null;
   rtScore?: number | null;
+  rtAudienceScore?: number | null;
+  mcScore?: number | null;
   imdbId?: string | null;
   tmdbData: unknown;
 };
@@ -125,15 +126,16 @@ function persistMovie(movie: MovieRow) {
 const rtInFlight = new Set<string>();
 
 /**
- * Fetch + cache the RT Tomatometer for a title.
+ * Fetch + cache the RT Tomatometer (+ Popcornmeter + Metacritic) for a title.
  *
- * Movies: TMDB external_ids → OMDb
- * TV:     OMDb first, then Rotten Tomatoes /tv/{slug} page (ld+json) when OMDb has no RT
+ * Sources (shared resolver in rt-resolve.ts):
+ *   1) OMDb (Tomatometer + Metacritic)
+ *   2) RT title page fallback (/m/ or /tv/) — Tomatometer + Popcornmeter
  *
  * Persistence rules:
  * - Real score (0–100) when found
- * - `rt_score = -1` when sources answered with no Tomatometer
- * - Leave `rt_score` unchanged on failure / rate limit (retry next visit)
+ * - `-1` when sources answered with no score
+ * - Leave unchanged on failure / rate limit (retry next visit)
  * - Always stamp `rt_checked_at` on a successful check so we re-poll every 2 weeks
  */
 async function fillRtScore(
@@ -143,61 +145,48 @@ async function fillRtScore(
     imdbId?: string | null;
     title?: string | null;
     firstAirDate?: string | null;
+    releaseDate?: string | null;
   }
 ) {
   try {
-    let imdbId = opts?.imdbId ?? null;
-    if (!imdbId) {
-      const ids =
-        type === "tv"
-          ? await getTvExternalIds(tmdbId)
-          : await getMovieExternalIds(tmdbId);
-      imdbId = ids.imdb_id ?? null;
-    }
+    let title = opts?.title ?? null;
+    let date =
+      type === "tv"
+        ? (opts?.firstAirDate ?? null)
+        : (opts?.releaseDate ?? null);
 
     const table = type === "tv" ? shows : movies;
-    let score: number | null = null;
-    let checked = false;
 
-    if (imdbId) {
-      const omdb = await getRottenTomatoesScore(imdbId);
-      score = omdb.score;
-      checked = omdb.checked;
-    }
-
-    // TV fallback: RT series page when OMDb has no Tomatometer
-    if (type === "tv" && score == null) {
-      let title = opts?.title ?? null;
-      let firstAirDate = opts?.firstAirDate ?? null;
-      if (!title) {
+    // The RT fallback needs a title; fetch from DB when the caller didn't have one
+    if (!title) {
+      if (type === "tv") {
         const row = await withDbRetry(() =>
           db.query.shows.findFirst({ where: eq(shows.tmdbId, tmdbId) })
         );
         title = row?.title ?? null;
-        firstAirDate = firstAirDate ?? row?.firstAirDate ?? null;
+        if (!date) date = row?.firstAirDate ?? null;
+      } else {
+        const row = await withDbRetry(() =>
+          db.query.movies.findFirst({ where: eq(movies.tmdbId, tmdbId) })
+        );
+        title = row?.title ?? null;
+        if (!date) date = row?.releaseDate ?? null;
       }
-      if (title) {
-        const rt = await getTvTomatometerFromRt(title, firstAirDate);
-        if (rt.score != null) {
-          score = rt.score;
-          checked = true;
-        } else if (rt.checked) {
-          checked = true;
-        }
-        // if RT not checked (network/block), leave checked as OMDb said
-      } else if (!imdbId) {
-        // No title and no imdb — nothing we can do
-        checked = true;
-      }
-    } else if (!imdbId && type === "movie") {
-      checked = true;
     }
 
-    if (!checked) {
+    const r = await resolveRtScores({
+      type,
+      tmdbId,
+      imdbId: opts?.imdbId,
+      title,
+      date,
+    });
+
+    if (!r.checked) {
       // Transient failure — keep imdb if any; do not bump rt_checked_at
-      if (imdbId) {
+      if (r.imdbId) {
         await withDbRetry(() =>
-          db.update(table).set({ imdbId }).where(eq(table.tmdbId, tmdbId))
+          db.update(table).set({ imdbId: r.imdbId }).where(eq(table.tmdbId, tmdbId))
         );
       }
       return;
@@ -208,8 +197,10 @@ async function fillRtScore(
       db
         .update(table)
         .set({
-          ...(imdbId ? { imdbId } : {}),
-          rtScore: score ?? RT_NONE,
+          ...(r.imdbId ? { imdbId: r.imdbId } : {}),
+          rtScore: r.score ?? RT_NONE,
+          rtAudienceScore: r.audienceScore ?? RT_NONE,
+          mcScore: r.mcScore ?? RT_NONE,
           rtCheckedAt: now,
           updatedAt: now,
         })
@@ -246,6 +237,7 @@ function ensureRtScore(
     imdbId?: string | null;
     title?: string | null;
     firstAirDate?: string | null;
+    releaseDate?: string | null;
   },
   type: "tv" | "movie"
 ) {
@@ -260,6 +252,7 @@ function ensureRtScore(
     imdbId: row.imdbId,
     title: row.title,
     firstAirDate: row.firstAirDate,
+    releaseDate: row.releaseDate,
   }).finally(() => rtInFlight.delete(key));
 }
 

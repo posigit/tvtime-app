@@ -144,7 +144,13 @@ export type TmdbCrewMember = {
 export async function getMovieCredits(tmdbId: number) {
   return tmdbFetch<{
     id: number;
-    cast: Array<{ id: number; name: string; character?: string; order?: number }>;
+    cast: Array<{
+      id: number;
+      name: string;
+      character?: string;
+      order?: number;
+      profile_path?: string | null;
+    }>;
     crew: TmdbCrewMember[];
   }>(`/movie/${tmdbId}/credits`, {}, { revalidate: 86400 });
 }
@@ -169,6 +175,45 @@ export async function getTvExternalIds(tmdbId: number) {
 
 export async function getMovieExternalIds(tmdbId: number) {
   return tmdbFetch<{ imdb_id?: string | null }>(`/movie/${tmdbId}/external_ids`);
+}
+
+export type TmdbVideo = {
+  id: string;
+  key: string;
+  site?: string;
+  type?: string;
+  official?: boolean;
+  name?: string;
+  published_at?: string;
+};
+
+export async function getMovieVideos(tmdbId: number) {
+  const data = await tmdbFetch<{ results: TmdbVideo[] }>(
+    `/movie/${tmdbId}/videos`,
+    {},
+    { revalidate: 86400 }
+  );
+  return data.results ?? [];
+}
+
+export async function getTvVideos(tmdbId: number) {
+  const data = await tmdbFetch<{ results: TmdbVideo[] }>(
+    `/tv/${tmdbId}/videos`,
+    {},
+    { revalidate: 86400 }
+  );
+  return data.results ?? [];
+}
+
+/** Best YouTube trailer key: official Trailer first, then any Trailer, then Teaser. */
+export function pickTrailerKey(videos: TmdbVideo[]): string | null {
+  const yt = videos.filter((v) => v.site === "YouTube" && v.key);
+  if (yt.length === 0) return null;
+  const rank = (v: TmdbVideo) =>
+    (v.type === "Trailer" ? 2 : v.type === "Teaser" ? 1 : 0) * 10 +
+    (v.official ? 1 : 0);
+  yt.sort((a, b) => rank(b) - rank(a));
+  return yt[0].key;
 }
 
 export type TmdbReview = {
@@ -373,7 +418,15 @@ export async function getTopRatedMoviesPage(page = 1): Promise<TmdbMovieCard[]> 
  */
 export async function discoverGreatMovies(
   page = 1,
-  opts?: { maxYear?: number; minVoteAverage?: number }
+  opts?: {
+    maxYear?: number;
+    minYear?: number;
+    minVoteAverage?: number;
+    minVoteCount?: number;
+    maxVoteCount?: number;
+    /** ISO 639-1 code(s), e.g. "ja" or "fr|ko" — for world-cinema slices */
+    originalLanguage?: string;
+  }
 ): Promise<TmdbMovieCard[]> {
   const maxYear = opts?.maxYear;
   const minVote = opts?.minVoteAverage ?? 7.5;
@@ -383,10 +436,19 @@ export async function discoverGreatMovies(
     >;
   }>("/discover/movie", {
     sort_by: "vote_average.desc",
-    "vote_count.gte": "800",
+    "vote_count.gte": String(opts?.minVoteCount ?? 800),
     "vote_average.gte": String(minVote),
+    ...(opts?.maxVoteCount
+      ? { "vote_count.lte": String(opts.maxVoteCount) }
+      : {}),
     ...(maxYear
       ? { "primary_release_date.lte": `${maxYear}-12-31` }
+      : {}),
+    ...(opts?.minYear
+      ? { "primary_release_date.gte": `${opts.minYear}-01-01` }
+      : {}),
+    ...(opts?.originalLanguage
+      ? { with_original_language: opts.originalLanguage }
       : {}),
     page: String(page),
     include_adult: "false",

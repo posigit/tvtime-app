@@ -1,7 +1,9 @@
 const OMDB_BASE_URL = "https://www.omdbapi.com";
 
 function getApiKey(): string | null {
-  return process.env.OMDB_API_KEY || null;
+  const key = process.env.OMDB_API_KEY?.trim();
+  // Tolerate quotes copied from .env files ("abc123" → abc123)
+  return key ? key.replace(/^["']|["']$/g, "") : null;
 }
 
 type OmdbRating = { Source: string; Value: string };
@@ -22,6 +24,52 @@ export type RtLookupResult = {
   checked: boolean;
 };
 
+/** OMDb critic scores: Tomatometer + Metacritic in one call. */
+export type OmdbScores = {
+  rtScore: number | null;
+  mcScore: number | null;
+  checked: boolean;
+};
+
+function parsePercent(value: string | undefined): number | null {
+  if (!value) return null;
+  const match = value.match(/(\d+)/);
+  if (!match) return null;
+  const n = Number(match[1]);
+  return Number.isFinite(n) && n >= 0 && n <= 100 ? n : null;
+}
+
+/**
+ * Fetch the Rotten Tomatoes Tomatometer AND Metacritic Metascore via OMDb.
+ * Scores are null when absent from a valid response.
+ */
+export async function getOmdbScores(imdbId: string): Promise<OmdbScores> {
+  const key = getApiKey();
+  if (!key || !imdbId) return { rtScore: null, mcScore: null, checked: false };
+
+  try {
+    const url = `${OMDB_BASE_URL}/?apikey=${encodeURIComponent(key)}&i=${encodeURIComponent(imdbId)}`;
+    // DB is our cache — do not let Next cache rate-limit / error bodies for a day
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) return { rtScore: null, mcScore: null, checked: false };
+
+    const data = (await res.json()) as OmdbResponse;
+    if (data.Response !== "True") {
+      return { rtScore: null, mcScore: null, checked: false };
+    }
+
+    const rt = data.Ratings?.find((r) => r.Source === "Rotten Tomatoes");
+    const mc = data.Ratings?.find((r) => r.Source === "Metacritic");
+    return {
+      rtScore: parsePercent(rt?.Value),
+      mcScore: parsePercent(mc?.Value),
+      checked: true,
+    };
+  } catch {
+    return { rtScore: null, mcScore: null, checked: false };
+  }
+}
+
 /**
  * Fetch the Rotten Tomatoes Tomatometer for a title via OMDb.
  * Returns e.g. 96 for "96%", or null score when RT is absent from a valid response.
@@ -29,29 +77,8 @@ export type RtLookupResult = {
 export async function getRottenTomatoesScore(
   imdbId: string
 ): Promise<RtLookupResult> {
-  const key = getApiKey();
-  if (!key || !imdbId) return { score: null, checked: false };
-
-  try {
-    const url = `${OMDB_BASE_URL}/?apikey=${encodeURIComponent(key)}&i=${encodeURIComponent(imdbId)}`;
-    // DB is our cache — do not let Next cache rate-limit / error bodies for a day
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) return { score: null, checked: false };
-
-    const data = (await res.json()) as OmdbResponse;
-    if (data.Response !== "True") return { score: null, checked: false };
-
-    const rt = data.Ratings?.find((r) => r.Source === "Rotten Tomatoes");
-    if (!rt) return { score: null, checked: true };
-
-    const match = rt.Value.match(/(\d+)/);
-    return {
-      score: match ? Number(match[1]) : null,
-      checked: true,
-    };
-  } catch {
-    return { score: null, checked: false };
-  }
+  const { rtScore, checked } = await getOmdbScores(imdbId);
+  return { score: rtScore, checked };
 }
 
 /** True when `rt_score` is a real Tomatometer (0–100). `-1` means "checked, no RT". */

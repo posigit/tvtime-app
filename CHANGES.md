@@ -4,6 +4,45 @@ This document summarizes all changes made during the three-chunk overhaul of the
 
 ---
 
+## Weekly RT refresh, richer scores, Surprise pool 2.0, trailers, calendar, push alerts (2026-08-03)
+
+### Rotten Tomatoes scores: root-cause fixes + Thursday-night sweep
+- **Root causes of missing scores:** RT scores only filled lazily when a detail page was opened; movies had no RT fallback (OMDb only, which lags on new releases); scrape-found scores were never persisted; unvisited library rows never healed.
+- **New shared resolver** (`lib/rt-resolve.ts`): OMDb (Tomatometer + Metacritic) → RT title-page fallback. Movies now have the same `/m/{slug}` fallback TV had (`lib/rt-movie.ts`); both parse RT's embedded `mediaScorecard` JSON (`lib/rt-page.ts`) for **Tomatometer + Popcornmeter (audience score)**.
+- **`lib/reviews.ts` writes scrape-found scores back to the DB** (background), so hero badges and grids heal on first view.
+- **New columns** on `shows`/`movies`: `rt_audience_score`, `mc_score` (same `-1` = "checked, none" convention as `rt_score`).
+- **Weekly cron**: `GET /api/cron/weekly` (secret-gated via `CRON_SECRET`) sweeps rows with no RT score, rows missing Popcornmeter, and recent releases (meters move ~90 days post-release); oldest-checked first, ~150 rows/run. GitHub Actions `weekly-refresh.yml` fires **Fri 00:00 UTC (Thursday night US)** + manual dispatch. `scripts/weekly-refresh.ts` runs the same job locally.
+- First full run: movies with RT 520 → **615/646**, zero pending; Good Will Hunting 97, Sleepers 76, The Invite 97, Avatar Aang 91 all resolved.
+
+### Surprise Me 2.0
+- New `surprise_pool` table, **rebuilt weekly by the same Thursday cron**. Slices: TMDB top rated (canon), critically acclaimed, classics, **decade slices (60s–2010s), hidden gems, world cinema** — discover pages rotate by ISO week so the pool never runs dry (~280 films vs 73 before).
+- Movies tab now reads the cached table — no more 9 live TMDB calls per page load.
+
+### More scores everywhere
+- New `ScoreStrip` on the movie page: **Tomatometer, Popcornmeter, Metacritic, TMDB** cells (renders only what exists).
+- Reviews card + sheet header show the same score trio; new shared `components/rt-icons.tsx` (fresh/rotten/popcorn/Metacritic).
+
+### Movie detail redesign
+- Kept the backdrop hero + big RT badge. Added: **centered trailer play button**, score strip, **genre chips**, **top-billed cast rail** (TMDB credits), kept director/providers/rails.
+
+### Reviews UI redesign
+- Trigger card leads with the RT badge and shows Audience/Metacritic chips; sheet header is a proper score board; review rows get per-source avatar discs, publication chips, Reddit upvote/comment counts, sentiment icons inline.
+
+### Trailers
+- `getMovieVideos`/`getTvVideos` + `pickTrailerKey` (official YouTube trailers first); `TrailerButton` modal (youtube-nocookie embed) on movie **and** show detail heroes.
+
+### Calendar page
+- New `/calendar`: every followed show's episodes grouped by air date (7-day lookback + all future), premiere/latest badges, mark-watched inline, auto-scrolls to today. Reuses `UpcomingList`; new shared loader `lib/calendar-data.ts`. Linked from the Shows header (calendar icon).
+
+### New-episode push alerts
+- Web push: `push_subscriptions` table, `POST/DELETE /api/push/subscribe`, profile **Notifications** toggle, `push`/`notificationclick` handlers in `sw.js` (v5), VAPID via `NEXT_PUBLIC_VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY`.
+- Daily `GET /api/cron/episode-alerts` (13:00 UTC via `episode-alerts.yml`): one digest push per user for episodes airing today; dead subscriptions auto-pruned.
+
+### Env / ops
+- New env: `CRON_SECRET` (guards `/api/cron/*`), VAPID keys. All documented in `.env.example`. GitHub workflows need repo secrets `APP_URL` + `CRON_SECRET`.
+
+---
+
 ## Chunk 1: Critical fixes, render-first loading, and image optimization
 
 **Commits:**

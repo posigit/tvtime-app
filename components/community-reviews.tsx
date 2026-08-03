@@ -9,67 +9,22 @@ import type {
 } from "@/lib/reviews";
 import { cn } from "@/lib/utils";
 import {
+  FreshIcon,
+  RottenIcon,
+  PopcornIcon,
+  MetacriticIcon,
+} from "@/components/rt-icons";
+import {
   ChevronRight,
   ExternalLink,
   MessageSquare,
   X,
   Star,
+  ThumbsUp,
+  MessagesSquare,
 } from "lucide-react";
 
 type Filter = "all" | "fresh" | "rotten" | ReviewSource;
-
-/* ── Fresh / Rotten icons (clean, iconic) ───────────────────────── */
-
-function FreshIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 32 32"
-      className={className}
-      aria-hidden
-      fill="none"
-    >
-      <circle cx="16" cy="18" r="11" fill="#fa320a" />
-      <ellipse cx="12" cy="15" rx="2.2" ry="3" fill="#ff6b4a" opacity="0.55" />
-      <path
-        d="M16 8c0-3 2.5-5 5-5-1 2.5-1 4.5 0 6"
-        stroke="#3d8b37"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M16 8c1.5-1 3-1.2 4.5-.5"
-        stroke="#2f6b2a"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function RottenIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 32 32" className={className} aria-hidden fill="none">
-      <path
-        d="M8 12c-2 3-2 8 1 12 3 4 9 5 13 2 4-3 5-9 2-13-2-3-6-5-10-4-3 .5-5 1.5-6 3z"
-        fill="#6ac04a"
-      />
-      <path
-        d="M10 14c2 1 3 3 3 5M18 12c1 2 1 4 0 6M14 20c2 .5 4 0 5-1"
-        stroke="#3d7a2a"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-        opacity="0.7"
-      />
-      <circle cx="12" cy="16" r="1.2" fill="#2d5a20" />
-      <path
-        d="M20 9c2-2 4-2 5-1"
-        stroke="#3d8b37"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
 
 function VerdictIcon({
   sentiment,
@@ -118,6 +73,33 @@ function sourceLabel(s: ReviewSource) {
   return "Reddit";
 }
 
+/** Pastel avatar disc with the author's initial, tinted per source. */
+function AuthorAvatar({
+  author,
+  source,
+}: {
+  author: string;
+  source: ReviewSource;
+}) {
+  const initial = (author.trim().charAt(0) || "?").toUpperCase();
+  const tint =
+    source === "rt"
+      ? "bg-[#fa320a]/15 text-[#fa320a]"
+      : source === "tmdb"
+        ? "bg-primary/15 text-primary"
+        : "bg-[#ff4500]/15 text-[#ff6a33]";
+  return (
+    <div
+      className={cn(
+        "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-black",
+        tint
+      )}
+    >
+      {initial}
+    </div>
+  );
+}
+
 /* ── Single review row ──────────────────────────────────────────── */
 
 function ReviewRow({ review }: { review: CommunityReview }) {
@@ -164,9 +146,7 @@ function ReviewRow({ review }: { review: CommunityReview }) {
   return (
     <article className="border-b border-white/[0.05] last:border-0">
       <div className="flex gap-3 px-4 py-4">
-        <div className="mt-0.5 shrink-0">
-          <VerdictIcon sentiment={review.sentiment} />
-        </div>
+        <AuthorAvatar author={review.author} source={review.source} />
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
@@ -176,13 +156,16 @@ function ReviewRow({ review }: { review: CommunityReview }) {
                   {review.author}
                 </span>
                 {review.rating != null && (
-                  <span className="inline-flex items-center gap-0.5 text-xs font-bold text-primary">
-                    <Star className="h-3 w-3 fill-primary" />
+                  <span className="inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
+                    <Star className="h-2.5 w-2.5 fill-primary" />
                     {starsFromTen(review.rating)}
                   </span>
                 )}
+                {review.sentiment && (
+                  <VerdictIcon sentiment={review.sentiment} size="sm" />
+                )}
               </div>
-              <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
+              <p className="mt-1 flex flex-wrap items-center gap-x-1.5 text-[11px]">
                 <span
                   className={cn(
                     "font-semibold",
@@ -194,22 +177,11 @@ function ReviewRow({ review }: { review: CommunityReview }) {
                   {sourceLabel(review.source)}
                 </span>
                 {review.meta && (
-                  <span className="text-white/35"> · {review.meta}</span>
-                )}
-                {when && <span className="text-white/30"> · {when}</span>}
-                {review.source === "reddit" && review.score != null && (
-                  <span className="text-white/30">
-                    {" "}
-                    · {formatScore(review.score)} up
+                  <span className="max-w-[12rem] truncate rounded-full bg-white/[0.05] px-1.5 py-px text-[10px] text-white/45">
+                    {review.meta}
                   </span>
                 )}
-                {review.source === "reddit" &&
-                  review.commentCount != null && (
-                    <span className="text-white/30">
-                      {" "}
-                      · {formatScore(review.commentCount)} comments
-                    </span>
-                  )}
+                {when && <span className="text-white/30">{when}</span>}
               </p>
             </div>
 
@@ -241,18 +213,63 @@ function ReviewRow({ review }: { review: CommunityReview }) {
             {review.content}
           </p>
 
-          {long && (
-            <button
-              type="button"
-              onClick={() => setOpen((v) => !v)}
-              className="mt-1.5 text-xs font-bold text-primary"
-            >
-              {open ? "Show less" : "Read more"}
-            </button>
-          )}
+          <div className="mt-1.5 flex items-center gap-3">
+            {long && (
+              <button
+                type="button"
+                onClick={() => setOpen((v) => !v)}
+                className="text-xs font-bold text-primary"
+              >
+                {open ? "Show less" : "Read more"}
+              </button>
+            )}
+            {review.source === "reddit" && review.score != null && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-white/35">
+                <ThumbsUp className="h-3 w-3" />
+                {formatScore(review.score)}
+              </span>
+            )}
+            {review.source === "reddit" && review.commentCount != null && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-white/35">
+                <MessagesSquare className="h-3 w-3" />
+                {formatScore(review.commentCount)}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </article>
+  );
+}
+
+/* ── Score chip (trigger + sheet header) ────────────────────────── */
+
+function ScoreChip({
+  icon,
+  value,
+  label,
+  size = "md",
+}: {
+  icon: React.ReactNode;
+  value: string;
+  label: string;
+  size?: "sm" | "md";
+}) {
+  return (
+    <div className="flex items-center gap-1.5">
+      {icon}
+      <span
+        className={cn(
+          "font-black leading-none text-white",
+          size === "sm" ? "text-sm" : "text-base"
+        )}
+      >
+        {value}
+      </span>
+      <span className="text-[9px] font-bold uppercase tracking-wide text-white/35">
+        {label}
+      </span>
+    </div>
   );
 }
 
@@ -265,7 +282,8 @@ export function CommunityReviews({
   payload: ReviewsPayload;
   mediaTitle?: string;
 }) {
-  const { reviews, rtScore, rtState, counts } = payload;
+  const { reviews, rtScore, rtAudienceScore, mcScore, rtState, counts } =
+    payload;
   const [sheetOpen, setSheetOpen] = useState(false);
   const [filter, setFilter] = useState<Filter>("all");
 
@@ -320,15 +338,14 @@ export function CommunityReviews({
   ).filter((t) => t.id === "all" || (t.n != null && t.n > 0));
 
   const subline = [
-    rtScore != null ? `${rtScore}% RT` : null,
     counts.rt > 0 ? `${counts.rt} critic${counts.rt === 1 ? "" : "s"}` : null,
     counts.tmdb > 0 ? `${counts.tmdb} fan` : null,
-    realReddit.length > 0
-      ? `${realReddit.length} Reddit`
-      : null,
+    realReddit.length > 0 ? `${realReddit.length} Reddit` : null,
   ]
     .filter(Boolean)
     .join(" · ");
+
+  const hasAnyScore = rtScore != null || rtAudienceScore != null || mcScore != null;
 
   return (
     <>
@@ -342,7 +359,7 @@ export function CommunityReviews({
           "transition duration-200 hover:ring-white/15 active:scale-[0.99]"
         )}
       >
-        {/* RT score badge */}
+        {/* Lead score badge */}
         <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
           {rtScore != null ? (
             <>
@@ -366,9 +383,36 @@ export function CommunityReviews({
           <p className="text-[15px] font-bold tracking-tight text-white">
             Reviews
           </p>
-          <p className="truncate text-xs text-muted-foreground">
-            {subline || "Critics, fans & Reddit"}
-          </p>
+          {/* Score trio when available */}
+          {hasAnyScore ? (
+            <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5">
+              {rtAudienceScore != null && (
+                <ScoreChip
+                  size="sm"
+                  icon={<PopcornIcon className="h-3.5 w-3.5" />}
+                  value={`${rtAudienceScore}%`}
+                  label="Audience"
+                />
+              )}
+              {mcScore != null && (
+                <ScoreChip
+                  size="sm"
+                  icon={<MetacriticIcon className="h-3.5 w-3.5" score={mcScore} />}
+                  value={`${mcScore}`}
+                  label="Metacritic"
+                />
+              )}
+              {!rtAudienceScore && !mcScore && (
+                <p className="truncate text-xs text-muted-foreground">
+                  {subline || "Critics, fans & Reddit"}
+                </p>
+              )}
+            </div>
+          ) : (
+            <p className="truncate text-xs text-muted-foreground">
+              {subline || "Critics, fans & Reddit"}
+            </p>
+          )}
         </div>
 
         <div className="flex shrink-0 items-center gap-1.5">
@@ -411,30 +455,14 @@ export function CommunityReviews({
             <div className="shrink-0 border-b border-white/[0.06] px-4 pb-3 pt-1">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    {rtScore != null && (
-                      <div className="relative flex h-9 w-9 items-center justify-center">
-                        {rtFresh ? (
-                          <FreshIcon className="h-9 w-9" />
-                        ) : (
-                          <RottenIcon className="h-9 w-9" />
-                        )}
-                        <span className="absolute text-[10px] font-black text-white drop-shadow">
-                          {rtScore}
-                        </span>
-                      </div>
-                    )}
-                    <div>
-                      <h2 className="text-xl font-black tracking-tight text-white">
-                        Reviews
-                      </h2>
-                      {mediaTitle && (
-                        <p className="truncate text-xs text-muted-foreground">
-                          {mediaTitle}
-                        </p>
-                      )}
-                    </div>
-                  </div>
+                  <h2 className="text-xl font-black tracking-tight text-white">
+                    Reviews
+                  </h2>
+                  {mediaTitle && (
+                    <p className="truncate text-xs text-muted-foreground">
+                      {mediaTitle}
+                    </p>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -445,6 +473,39 @@ export function CommunityReviews({
                   <X className="h-4 w-4" />
                 </button>
               </div>
+
+              {/* Score board */}
+              {hasAnyScore && (
+                <div className="mt-3 flex items-center gap-5 rounded-xl bg-white/[0.03] px-3.5 py-2.5 ring-1 ring-white/[0.05]">
+                  {rtScore != null && (
+                    <ScoreChip
+                      icon={
+                        rtFresh ? (
+                          <FreshIcon className="h-6 w-6" />
+                        ) : (
+                          <RottenIcon className="h-6 w-6" />
+                        )
+                      }
+                      value={`${rtScore}%`}
+                      label="Tomatometer"
+                    />
+                  )}
+                  {rtAudienceScore != null && (
+                    <ScoreChip
+                      icon={<PopcornIcon className="h-6 w-6" />}
+                      value={`${rtAudienceScore}%`}
+                      label="Popcornmeter"
+                    />
+                  )}
+                  {mcScore != null && (
+                    <ScoreChip
+                      icon={<MetacriticIcon className="h-6 w-6" score={mcScore} />}
+                      value={`${mcScore}`}
+                      label="Metacritic"
+                    />
+                  )}
+                </div>
+              )}
 
               <div className="mt-3 flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
                 {tabs.map((tab) => {

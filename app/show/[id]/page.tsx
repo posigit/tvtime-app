@@ -11,7 +11,9 @@ import { filterNewMedia } from "@/lib/recommend";
 import {
   getTvRecommendations,
   getTvSimilar,
+  getTvVideos,
   getWatchProviders,
+  pickTrailerKey,
 } from "@/lib/tmdb";
 import { getCommunityReviews } from "@/lib/reviews";
 import { notFound } from "next/navigation";
@@ -69,7 +71,7 @@ export default async function ShowDetailPage({
 
   const ownedIds = new Set(ownedShows.map((s) => s.tmdbId));
 
-  const [similarRaw, recsRaw, providers, reviews] = await Promise.all([
+  const [similarRaw, recsRaw, providers, reviews, videos] = await Promise.all([
     getTvSimilar(tmdbId).catch(() => []),
     getTvRecommendations(tmdbId).catch(() => []),
     getWatchProviders(tmdbId, "tv").catch(() => ({
@@ -83,13 +85,21 @@ export default async function ShowDetailPage({
       title: show.title,
       year: show.firstAirDate,
       knownRtScore: show.rtScore,
+      knownRtAudienceScore: show.rtAudienceScore,
+      knownMcScore: show.mcScore,
     }).catch(() => ({
       reviews: [],
       rtScore: show.rtScore != null && show.rtScore >= 0 ? show.rtScore : null,
+      rtAudienceScore:
+        show.rtAudienceScore != null && show.rtAudienceScore >= 0
+          ? show.rtAudienceScore
+          : null,
+      mcScore: show.mcScore != null && show.mcScore >= 0 ? show.mcScore : null,
       rtState: null,
       rtUrl: null,
       counts: { all: 0, rt: 0, tmdb: 0, reddit: 0, fresh: 0, rotten: 0 },
     })),
+    getTvVideos(tmdbId).catch(() => []),
   ]);
 
   const moreLikeThis = filterNewMedia(similarRaw, ownedIds, 12);
@@ -163,6 +173,7 @@ export default async function ShowDetailPage({
       recommended={recommended}
       providers={providers}
       reviews={reviews}
+      trailerKey={pickTrailerKey(videos)}
     />
   );
 }

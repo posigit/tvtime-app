@@ -36,6 +36,7 @@ import {
 import { ensureEpisodes } from "@/lib/ensure";
 import { UpcomingList, UpcomingGroup } from "@/components/upcoming-list";
 import Link from "next/link";
+import { CalendarDays } from "lucide-react";
 
 function dateKey(airDate: string): string {
   return toYmd(airDate) ?? airDate.slice(0, 10);
@@ -376,12 +377,21 @@ export default async function ShowsPage({
   return (
     <div className="min-h-dvh bg-black px-4 pb-nav-page">
       <StickyChrome contentClassName="pt-2">
-        <ShowTabs
-          tabs={[
-            { value: "watchlist", label: "WATCH LIST" },
-            { value: "upcoming", label: "UPCOMING" },
-          ]}
-        />
+        <div className="relative">
+          <ShowTabs
+            tabs={[
+              { value: "watchlist", label: "WATCH LIST" },
+              { value: "upcoming", label: "UPCOMING" },
+            ]}
+          />
+          <Link
+            href="/calendar"
+            aria-label="Calendar"
+            className="absolute right-0 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-white/60 transition hover:text-white"
+          >
+            <CalendarDays className="h-5 w-5" />
+          </Link>
+        </div>
       </StickyChrome>
 
       {currentView === "watchlist" && (

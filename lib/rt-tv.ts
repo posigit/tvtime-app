@@ -1,13 +1,15 @@
 /**
- * Rotten Tomatoes series Tomatometer via public TV pages (ld+json).
+ * Rotten Tomatoes series Tomatometer via public TV pages.
  * Used as a TV fallback when OMDb has no RT score.
+ * Score parsing lives in rt-page.ts (shared with movies).
  */
 
-const RT_UA =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
+import { fetchRtPageHtml, parseRtPageScores } from "./rt-page";
 
 export type RtTvLookupResult = {
   score: number | null;
+  /** Popcornmeter 0–100 when the page exposes it */
+  audienceScore: number | null;
   checked: boolean;
   slug?: string;
 };
@@ -40,7 +42,7 @@ export function titleToRtSlug(title: string): string {
     .replace(/_+/g, "_");
 }
 
-function titlesMatch(a: string, b: string): boolean {
+export function titlesMatch(a: string, b: string): boolean {
   const na = normalizeTitleKey(a);
   const nb = normalizeTitleKey(b);
   if (!na || !nb) return false;
@@ -104,69 +106,15 @@ function candidateSlugs(title: string, year?: string | null): string[] {
   return ordered;
 }
 
-function parseTomatometer(html: string): {
-  score: number | null;
-  name: string | null;
-  type: string | null;
-} {
-  const ldMatch = html.match(
-    /<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/i
-  );
-  if (!ldMatch) return { score: null, name: null, type: null };
-
-  try {
-    const data = JSON.parse(ldMatch[1]) as {
-      "@type"?: string;
-      name?: string;
-      aggregateRating?: { ratingValue?: string | number; name?: string };
-    };
-    const type = data["@type"] ?? null;
-    const name = data.name ?? null;
-    const raw = data.aggregateRating?.ratingValue;
-    if (raw == null || raw === "") {
-      return { score: null, name, type };
-    }
-    const score = typeof raw === "number" ? raw : Number(String(raw).match(/\d+/)?.[0]);
-    if (!Number.isFinite(score) || score < 0 || score > 100) {
-      return { score: null, name, type };
-    }
-    return { score: Math.round(score), name, type };
-  } catch {
-    return { score: null, name: null, type: null };
-  }
-}
-
-async function fetchRtPage(slug: string): Promise<string | null> {
-  try {
-    const res = await fetch(`https://www.rottentomatoes.com/tv/${slug}`, {
-      headers: {
-        "User-Agent": RT_UA,
-        Accept: "text/html,application/xhtml+xml",
-        "Accept-Language": "en-US,en;q=0.9",
-      },
-      cache: "no-store",
-      redirect: "follow",
-    });
-    if (!res.ok) return null;
-    const html = await res.text();
-    if (html.includes("404 - Not Found") || html.includes("Sorry, please try again later")) {
-      return null;
-    }
-    return html;
-  } catch {
-    return null;
-  }
-}
-
 /**
- * Look up series Tomatometer by title (and optional first-air year).
- * Tries slug variants against /tv/{slug} and reads schema.org ld+json.
+ * Look up series Tomatometer + Popcornmeter by title (and optional first-air year).
+ * Tries slug variants against /tv/{slug} and reads the embedded scorecard JSON.
  */
 export async function getTvTomatometerFromRt(
   title: string,
   firstAirDate?: string | null
 ): Promise<RtTvLookupResult> {
-  if (!title?.trim()) return { score: null, checked: false };
+  if (!title?.trim()) return { score: null, audienceScore: null, checked: false };
 
   const year = firstAirDate?.slice(0, 4) ?? null;
   const slugs = candidateSlugs(title, year);
@@ -174,11 +122,11 @@ export async function getTvTomatometerFromRt(
   let matchedNoScore = false;
 
   for (const slug of slugs) {
-    const html = await fetchRtPage(slug);
+    const html = await fetchRtPageHtml("tv", slug);
     if (!html) continue;
     anyPage = true;
 
-    const { score, name, type } = parseTomatometer(html);
+    const { tomatometer, audienceScore, name, type } = parseRtPageScores(html);
     // Prefer TVSeries; accept if name matches even when type missing
     const typeOk =
       !type ||
@@ -192,8 +140,8 @@ export async function getTvTomatometerFromRt(
     const nameOk = !name || titlesMatch(title, name);
     if (!nameOk) continue;
 
-    if (score != null) {
-      return { score, checked: true, slug };
+    if (tomatometer != null || audienceScore != null) {
+      return { score: tomatometer, audienceScore, checked: true, slug };
     }
     // Page matched but no meter — keep trying year/alt slugs first
     matchedNoScore = true;
@@ -201,8 +149,8 @@ export async function getTvTomatometerFromRt(
 
   // All slug attempts done: matched a page with no score, or saw pages only
   if (matchedNoScore || anyPage) {
-    return { score: null, checked: true };
+    return { score: null, audienceScore: null, checked: true };
   }
   // Nothing fetched (network/block) → retry later
-  return { score: null, checked: false };
+  return { score: null, audienceScore: null, checked: false };
 }

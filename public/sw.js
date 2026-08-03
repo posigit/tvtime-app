@@ -8,7 +8,7 @@
  *
  * Bump VERSION when changing strategies so activate() purges old caches.
  */
-const VERSION = "4";
+const VERSION = "5";
 const SHELL_CACHE = `tvtime-shell-v${VERSION}`;
 const STATIC_CACHE = `tvtime-static-v${VERSION}`;
 const IMAGE_CACHE = `tvtime-images-v${VERSION}`;
@@ -177,3 +177,42 @@ function trimCache(cacheName, maxItems) {
     await Promise.all(keys.slice(0, extra).map((key) => cache.delete(key)));
   });
 }
+
+/* ---------- New-episode push alerts ---------- */
+
+self.addEventListener("push", (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = {};
+  }
+  const title = data.title || "TV Time";
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: data.body || "",
+      icon: "/icons/icon-192x192.png",
+      badge: "/icons/icon-192x192.png",
+      tag: data.tag || "episode-alert",
+      data: { url: data.url || "/calendar" },
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || "/calendar";
+  event.waitUntil(
+    clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((list) => {
+        for (const client of list) {
+          if ("focus" in client) {
+            client.navigate(url);
+            return client.focus();
+          }
+        }
+        return clients.openWindow(url);
+      })
+  );
+});

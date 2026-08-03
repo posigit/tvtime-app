@@ -12,6 +12,7 @@ import { EpisodeRating, StarRatingDisplay } from "@/components/star-rating";
 import { DiscoverRail } from "@/components/discover-rail";
 import { WatchProviders } from "@/components/watch-providers";
 import { CommunityReviews } from "@/components/community-reviews";
+import { TrailerButton } from "@/components/trailer-button";
 import { formatEpisodeLabel, useToast } from "@/components/toast";
 import type { TmdbMediaCard, WatchProvidersResult } from "@/lib/tmdb";
 import type { ReviewsPayload } from "@/lib/reviews";
@@ -77,6 +78,7 @@ export function ShowDetailClient({
   recommended = [],
   providers = null,
   reviews,
+  trailerKey = null,
 }: {
   show: DetailShow;
   episodes: DetailEpisode[];
@@ -88,6 +90,7 @@ export function ShowDetailClient({
   recommended?: TmdbMediaCard[];
   providers?: WatchProvidersResult | null;
   reviews?: ReviewsPayload;
+  trailerKey?: string | null;
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -452,6 +455,15 @@ export function ShowDetailClient({
           <div className="h-full w-full bg-card" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/30" />
+
+        {/* Centered play button opens the trailer */}
+        {trailerKey && (
+          <TrailerButton
+            trailerKey={trailerKey}
+            title={show.title}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/55 px-5 py-3 text-sm ring-1 ring-white/25"
+          />
+        )}
 
         {/* Top controls — sit below notch / status bar */}
         <button

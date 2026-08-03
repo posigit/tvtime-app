@@ -1,0 +1,38 @@
+# Daily new-episode push alerts (13:00 UTC ≈ morning US).
+# Sends one digest notification per user for episodes airing today
+# (app timezone) on shows they follow.
+#
+# Requires repo secrets:
+#   APP_URL      e.g. https://your-app.up.railway.app  (no trailing slash)
+#   CRON_SECRET  must match CRON_SECRET env on the app
+
+name: Episode alerts
+
+on:
+  schedule:
+    - cron: "0 13 * * *" # daily 13:00 UTC
+  workflow_dispatch: # manual run from Actions tab
+
+jobs:
+  alerts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call /api/cron/episode-alerts
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$APP_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "Set repository secrets APP_URL and CRON_SECRET."
+            exit 1
+          fi
+          URL="${APP_URL%/}/api/cron/episode-alerts?secret=${CRON_SECRET}"
+          echo "GET ${APP_URL%/}/api/cron/episode-alerts"
+          code=$(curl -sS -o /tmp/alerts.json -w "%{http_code}" --max-time 120 "$URL" || true)
+          cat /tmp/alerts.json || true
+          echo ""
+          if [ "$code" != "200" ]; then
+            echo "Episode alerts failed with HTTP $code"
+            exit 1
+          fi
+          echo "OK"
