@@ -56,7 +56,8 @@ export function ScoreStrip({
   if (mcScore != null && mcScore >= 0) {
     cells.push({
       key: "mc",
-      icon: <MetacriticIcon className="h-7 w-7" score={mcScore} />,
+      icon: <MetacriticIcon className="h-7 w-7" score={mcScore} bare />,
+      value: `${mcScore}`,
       label: "Metacritic",
     });
   }

@@ -476,7 +476,7 @@ export function CommunityReviews({
 
               {/* Score board */}
               {hasAnyScore && (
-                <div className="mt-3 flex items-center gap-5 rounded-xl bg-white/[0.03] px-3.5 py-2.5 ring-1 ring-white/[0.05]">
+                <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-xl bg-white/[0.03] px-3.5 py-2.5 ring-1 ring-white/[0.05]">
                   {rtScore != null && (
                     <ScoreChip
                       icon={
@@ -499,7 +499,13 @@ export function CommunityReviews({
                   )}
                   {mcScore != null && (
                     <ScoreChip
-                      icon={<MetacriticIcon className="h-6 w-6" score={mcScore} />}
+                      icon={
+                        <MetacriticIcon
+                          className="h-6 w-6"
+                          score={mcScore}
+                          bare
+                        />
+                      }
                       value={`${mcScore}`}
                       label="Metacritic"
                     />
