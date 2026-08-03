@@ -74,35 +74,34 @@ export function ProfileHeatmap({
         </div>
       </div>
 
-      <div className="-mx-1 overflow-x-auto px-1 pb-1">
-        <div className="inline-flex gap-0.5">
-          {weeks.map((week, wi) => (
-            <div key={wi} className="flex flex-col gap-0.5">
-              {week.map((cell, di) => {
-                if (!cell.key) {
-                  return (
-                    <div
-                      key={`pad-${wi}-${di}`}
-                      className="h-2.5 w-2.5 rounded-[2px] bg-transparent"
-                    />
-                  );
-                }
-                const level = heatLevel(cell.count, max);
+      {/* Fluid grid: week columns share the card width equally — no h-scroll */}
+      <div className="flex gap-[3px]">
+        {weeks.map((week, wi) => (
+          <div key={wi} className="flex min-w-0 flex-1 flex-col gap-[3px]">
+            {week.map((cell, di) => {
+              if (!cell.key) {
                 return (
                   <div
-                    key={cell.key}
-                    title={`${cell.key}: ${cell.count} watch${cell.count === 1 ? "" : "es"}`}
-                    className={cn(
-                      "h-2.5 w-2.5 rounded-[2px]",
-                      LEVEL_CLASS[level],
-                      cell.key === dayKey(new Date()) && "ring-1 ring-white/40"
-                    )}
+                    key={`pad-${wi}-${di}`}
+                    className="aspect-square w-full rounded-[2px] bg-transparent"
                   />
                 );
-              })}
-            </div>
-          ))}
-        </div>
+              }
+              const level = heatLevel(cell.count, max);
+              return (
+                <div
+                  key={cell.key}
+                  title={`${cell.key}: ${cell.count} watch${cell.count === 1 ? "" : "es"}`}
+                  className={cn(
+                    "aspect-square w-full rounded-[2px]",
+                    LEVEL_CLASS[level],
+                    cell.key === dayKey(new Date()) && "ring-1 ring-white/40"
+                  )}
+                />
+              );
+            })}
+          </div>
+        ))}
       </div>
 
       <div className="mt-3 flex items-center justify-end gap-1 text-[10px] text-muted-foreground">

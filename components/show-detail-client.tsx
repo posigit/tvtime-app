@@ -13,6 +13,7 @@ import { DiscoverRail } from "@/components/discover-rail";
 import { WatchProviders } from "@/components/watch-providers";
 import { CommunityReviews } from "@/components/community-reviews";
 import { TrailerButton } from "@/components/trailer-button";
+import { TmdbIcon } from "@/components/rt-icons";
 import { formatEpisodeLabel, useToast } from "@/components/toast";
 import type { TmdbMediaCard, WatchProvidersResult } from "@/lib/tmdb";
 import type { ReviewsPayload } from "@/lib/reviews";
@@ -510,12 +511,7 @@ export function ShowDetailClient({
                   🍅
                 </span>
               ) : (
-                <span
-                  className="flex h-6 w-6 items-center justify-center rounded bg-primary text-sm font-black text-black"
-                  title="TMDB score"
-                >
-                  T
-                </span>
+                <TmdbIcon className="h-6 w-6" />
               )}
               <span className="text-lg font-bold text-primary">
                 {rating.text}

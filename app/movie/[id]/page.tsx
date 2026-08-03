@@ -27,6 +27,7 @@ import { WatchProviders } from "@/components/watch-providers";
 import { CommunityReviews } from "@/components/community-reviews";
 import { ScoreStrip } from "@/components/score-strip";
 import { TrailerButton } from "@/components/trailer-button";
+import { TmdbIcon } from "@/components/rt-icons";
 
 function formatRuntime(minutes: number) {
   const h = Math.floor(minutes / 60);
@@ -188,12 +189,7 @@ export default async function MovieDetailPage({
                   🍅
                 </span>
               ) : (
-                <span
-                  className="flex h-6 w-6 items-center justify-center rounded bg-primary text-sm font-black text-black"
-                  title="TMDB score"
-                >
-                  T
-                </span>
+                <TmdbIcon className="h-6 w-6" />
               )}
               <span className="text-lg font-bold text-primary">
                 {rating.text}

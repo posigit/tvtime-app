@@ -4,6 +4,7 @@ import {
   RottenIcon,
   PopcornIcon,
   MetacriticIcon,
+  TmdbIcon,
 } from "@/components/rt-icons";
 
 /**
@@ -26,7 +27,8 @@ export function ScoreStrip({
   const cells: {
     key: string;
     icon: React.ReactNode;
-    value: string;
+    /** Shown big under the icon; omit when the icon carries the number (Metacritic) */
+    value?: string;
     label: string;
   }[] = [];
 
@@ -55,18 +57,13 @@ export function ScoreStrip({
     cells.push({
       key: "mc",
       icon: <MetacriticIcon className="h-7 w-7" score={mcScore} />,
-      value: `${mcScore}`,
       label: "Metacritic",
     });
   }
   if (voteAverage != null && voteAverage > 0) {
     cells.push({
       key: "tmdb",
-      icon: (
-        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-sm font-black text-black">
-          T
-        </span>
-      ),
+      icon: <TmdbIcon className="h-7 w-7" />,
       value: voteAverage.toFixed(1),
       label: "TMDB",
     });
@@ -90,9 +87,11 @@ export function ScoreStrip({
           className="flex flex-col items-center gap-1.5 bg-[#101011] px-2 py-3.5"
         >
           {c.icon}
-          <p className="text-lg font-black leading-none text-white">
-            {c.value}
-          </p>
+          {c.value != null && (
+            <p className="text-lg font-black leading-none text-white">
+              {c.value}
+            </p>
+          )}
           <p className="text-[9px] font-bold uppercase tracking-wider text-white/40">
             {c.label}
           </p>

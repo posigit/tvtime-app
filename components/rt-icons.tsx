@@ -64,29 +64,49 @@ export function PopcornIcon({ className }: { className?: string }) {
   );
 }
 
-/** Metacritic-style rounded square, colored by score band. */
+/**
+ * Metacritic's signature look: the score itself in a rounded square,
+ * colored by band (green ≥ 61, yellow ≥ 40, red below).
+ * `bare` renders just the colored square (tiny chip sizes).
+ */
 export function MetacriticIcon({
   className,
   score,
+  bare = false,
 }: {
   className?: string;
   score: number;
+  bare?: boolean;
 }) {
-  const bg = score >= 61 ? "#6c3" : score >= 40 ? "#fc3" : "#f00";
+  const bg = score >= 61 ? "#66cc33" : score >= 40 ? "#ffcc33" : "#ff0000";
   return (
     <svg viewBox="0 0 32 32" className={className} aria-hidden fill="none">
-      <rect x="4" y="4" width="24" height="24" rx="6" fill={bg} />
-      <text
-        x="16"
-        y="21.5"
-        textAnchor="middle"
-        fontSize="13"
-        fontWeight="800"
-        fill="#000"
-        fontFamily="system-ui, sans-serif"
-      >
-        M
-      </text>
+      <rect x="2" y="2" width="28" height="28" rx="7" fill={bg} />
+      {!bare && (
+        <text
+          x="16"
+          y="22"
+          textAnchor="middle"
+          fontSize={score >= 100 ? 13 : 15}
+          fontWeight="800"
+          fill="#fff"
+          fontFamily="system-ui, sans-serif"
+        >
+          {score}
+        </text>
+      )}
+    </svg>
+  );
+}
+
+/** TMDB user score: a star in TMDB brand blue. */
+export function TmdbIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" className={className} aria-hidden fill="none">
+      <path
+        d="M16 3.5l3.9 7.9 8.7 1.3-6.3 6.1 1.5 8.7L16 23.4l-7.8 4.1 1.5-8.7-6.3-6.1 8.7-1.3z"
+        fill="#01b4e4"
+      />
     </svg>
   );
 }

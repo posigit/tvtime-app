@@ -397,7 +397,7 @@ export function CommunityReviews({
               {mcScore != null && (
                 <ScoreChip
                   size="sm"
-                  icon={<MetacriticIcon className="h-3.5 w-3.5" score={mcScore} />}
+                  icon={<MetacriticIcon className="h-3.5 w-3.5" score={mcScore} bare />}
                   value={`${mcScore}`}
                   label="Metacritic"
                 />

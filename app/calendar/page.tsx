@@ -1,91 +1,100 @@
 import { requireAuth } from "@/lib/auth";
 import { loadFollowedEpisodeData } from "@/lib/calendar-data";
+import { isEpisodeAired } from "@/lib/show-progress";
+import { appTodayYmd, daysUntilYmd, toYmd, ymdAddDays } from "@/lib/app-time";
 import {
-  computeUpcomingEpisodes,
-  isEpisodeAired,
-} from "@/lib/show-progress";
-import { daysUntilYmd, formatAppCalendarDate, toYmd } from "@/lib/app-time";
-import { UpcomingList, type UpcomingGroup } from "@/components/upcoming-list";
+  CalendarMonth,
+  type CalendarDay,
+  type CalendarEpisode,
+} from "@/components/calendar-month";
 import Link from "next/link";
 import { ChevronLeft, CalendarDays } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
+function monthKey(ymd: string): string {
+  return ymd.slice(0, 7); // YYYY-MM
+}
+
+function shiftMonth(key: string, delta: number): string {
+  const [y, m] = key.split("-").map(Number);
+  const d = new Date(Date.UTC(y, m - 1 + delta, 1));
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
+function monthLabel(key: string): string {
+  const [y, m] = key.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, 1, 12))
+    .toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" })
+    .toUpperCase();
+}
+
 /**
- * Calendar — every followed show's aired-this-week + upcoming episodes,
- * grouped by air date. TV Time's signature agenda view.
+ * Month-grid calendar — everything that aired/airs on each day for shows you
+ * follow (watched included). Upcoming is the to-do list; this is the agenda.
  */
-export default async function CalendarPage() {
+export default async function CalendarPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ month?: string }>;
+}) {
+  const { month } = await searchParams;
   const userId = await requireAuth();
+
+  const today = appTodayYmd();
+  const currentKey = monthKey(today);
+  const key = month && /^\d{4}-\d{2}$/.test(month) ? month : currentKey;
+
+  const [y, m] = key.split("-").map(Number);
+  const monthStart = `${key}-01`;
+  const lastDay = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  const monthEnd = `${key}-${String(lastDay).padStart(2, "0")}`;
 
   const { following, episodesByShow, watchedByShow } =
     await loadFollowedEpisodeData(userId);
 
-  type Item = UpcomingGroup["items"][number];
-  const items: Item[] = [];
-
+  // Episodes landing inside this month (watched history included)
+  const byDay = new Map<string, CalendarEpisode[]>();
   for (const show of following) {
-    const showEpisodes = episodesByShow.get(show.tmdbId) ?? [];
     const showWatched = watchedByShow.get(show.tmdbId) ?? new Set();
-
-    // 7-day scroll-back + all future episodes
-    const upcoming = computeUpcomingEpisodes(showEpisodes, showWatched, 7);
-
-    // LATEST = most recent already-aired unwatched ep for this show
-    let latestKey: string | null = null;
-    let latestTime = -Infinity;
-    for (const ep of upcoming) {
-      if (!ep.airDate || !isEpisodeAired(ep.airDate)) continue;
-      const ymd = toYmd(ep.airDate) ?? "";
-      const t = ymd ? Date.parse(ymd + "T12:00:00Z") : -Infinity;
-      const key = `${ep.seasonNumber}:${ep.episodeNumber}`;
-      if (t > latestTime) {
-        latestTime = t;
-        latestKey = key;
-      }
-    }
-
-    for (const ep of upcoming) {
-      if (!ep.airDate) continue;
-      const key = `${ep.seasonNumber}:${ep.episodeNumber}`;
-      items.push({
+    for (const ep of episodesByShow.get(show.tmdbId) ?? []) {
+      const ymd = toYmd(ep.airDate);
+      if (!ymd || ymd < monthStart || ymd > monthEnd) continue;
+      const item: CalendarEpisode = {
         tmdbId: show.tmdbId,
-        title: show.title,
+        showTitle: show.title,
         posterPath: show.posterPath,
+        stillPath: ep.stillPath ?? null,
         seasonNumber: ep.seasonNumber,
         episodeNumber: ep.episodeNumber,
         episodeTitle: ep.title,
-        stillPath: ep.stillPath ?? null,
-        airDate: ep.airDate,
+        airDate: ymd,
+        aired: isEpisodeAired(ymd),
+        watched: showWatched.has(`${ep.seasonNumber}:${ep.episodeNumber}`),
         isPremiere: ep.episodeNumber === 1,
-        isLatest: latestKey === key,
-        aired: isEpisodeAired(ep.airDate),
-        daysUntil: daysUntilYmd(ep.airDate) ?? 0,
-      });
+        daysUntil: daysUntilYmd(ymd) ?? 0,
+      };
+      const arr = byDay.get(ymd);
+      if (arr) arr.push(item);
+      else byDay.set(ymd, [item]);
     }
   }
 
-  items.sort((a, b) => {
-    const ya = toYmd(a.airDate) ?? "";
-    const yb = toYmd(b.airDate) ?? "";
-    return ya < yb ? -1 : ya > yb ? 1 : 0;
-  });
-
-  const groupMap = new Map<string, Item[]>();
-  for (const item of items.slice(0, 200)) {
-    const key = toYmd(item.airDate) ?? item.airDate.slice(0, 10);
-    const arr = groupMap.get(key);
-    if (arr) arr.push(item);
-    else groupMap.set(key, [item]);
+  // 6-row grid starting on the Sunday of the week containing the 1st
+  const firstDow = new Date(Date.UTC(y, m - 1, 1, 12)).getUTCDay(); // 0 = Sun
+  const gridStart = ymdAddDays(monthStart, -firstDow);
+  const days: CalendarDay[] = [];
+  for (let i = 0; i < 42; i++) {
+    const date = ymdAddDays(gridStart, i);
+    days.push({
+      date,
+      day: Number(date.slice(8, 10)),
+      inMonth: date >= monthStart && date <= monthEnd,
+      episodes: (byDay.get(date) ?? []).sort((a, b) =>
+        a.showTitle.localeCompare(b.showTitle)
+      ),
+    });
   }
-
-  const groups: UpcomingGroup[] = Array.from(groupMap.keys())
-    .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
-    .map((key) => ({
-      dateKey: key,
-      label: formatAppCalendarDate(groupMap.get(key)![0].airDate),
-      items: groupMap.get(key)!,
-    }));
 
   return (
     <div className="min-h-dvh bg-black px-4 pb-nav-page">
@@ -106,25 +115,15 @@ export default async function CalendarPage() {
         </div>
       </div>
 
-      {groups.length > 0 ? (
-        <div className="mt-4">
-          <UpcomingList groups={groups} />
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center pt-24 text-center">
-          <CalendarDays className="mb-4 h-10 w-10 text-white/20" />
-          <p className="mb-1 text-lg font-bold text-white">Nothing scheduled</p>
-          <p className="mb-8 max-w-xs text-sm text-muted-foreground">
-            New episodes of shows you follow will show up here by air date.
-          </p>
-          <Link
-            href="/explore"
-            className="rounded-full bg-primary px-8 py-3.5 text-sm font-black uppercase tracking-wide text-black"
-          >
-            Browse all shows
-          </Link>
-        </div>
-      )}
+      <div className="mt-4">
+        <CalendarMonth
+          monthLabel={monthLabel(key)}
+          days={days}
+          today={today}
+          prevHref={`/calendar?month=${shiftMonth(key, -1)}`}
+          nextHref={`/calendar?month=${shiftMonth(key, 1)}`}
+        />
+      </div>
     </div>
   );
 }
