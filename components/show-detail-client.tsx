@@ -1054,6 +1054,10 @@ export function ShowDetailClient({
             playerEp.seasonNumber,
             playerEp.episodeNumber
           )}
+          type="tv"
+          tmdbId={show.tmdbId}
+          season={playerEp.seasonNumber}
+          episode={playerEp.episodeNumber}
           title={`${show.title} — S${playerEp.seasonNumber}E${playerEp.episodeNumber} ${playerEp.title}`}
           onEvent={handlePlayerEvent}
           onClose={() => setPlayerEp(null)}

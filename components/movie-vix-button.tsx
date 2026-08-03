@@ -63,6 +63,8 @@ export function MovieVixButton({
   return (
     <VixPlayer
       src={vixMovieUrl(tmdbId)}
+      type="movie"
+      tmdbId={tmdbId}
       title={title}
       onEvent={handleEvent}
       onClose={() => setOpen(false)}
