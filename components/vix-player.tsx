@@ -54,13 +54,29 @@ function addStartAt(src: string, position: number | null) {
 // and reopen the player before the previous keepalive request has completed.
 let playbackRequestQueue: Promise<void> = Promise.resolve();
 
+// Log a rejected iframe event once per page load (not per message — spam).
+let loggedRejectedSource = false;
+let loggedRejectedOrigin = false;
+
 function queuePlaybackRequest(params: string, init: RequestInit) {
   const request = playbackRequestQueue
     .catch(() => {})
     .then(() => fetch(`/api/playback?${params}`, init))
     .then(
-      () => undefined,
-      () => undefined
+      (res) => {
+        if (!res.ok) {
+          console.warn("[playback] save rejected", params, res.status);
+        }
+        return undefined;
+      },
+      (err) => {
+        console.warn(
+          "[playback] save request failed",
+          params,
+          err instanceof Error ? err.message : err
+        );
+        return undefined;
+      }
     );
   playbackRequestQueue = request;
 }
@@ -359,10 +375,52 @@ export function VixPlayer({
   // bookmark while the lookup is pending.
   useEffect(() => {
     const params = playbackParams();
-    if (!params || mode === "iframe") {
-      // Iframe playback has no cross-origin seek API; it is save-only.
+    if (!params) return;
+    if (mode === "iframe") {
+      // No cross-origin seek API for the embed — resume via its startAt
+      // param instead, and keep saves enabled throughout.
       saveEnabledRef.current = true;
       holdForResumeRef.current = false;
+      if (initialResumePosition == null) {
+        let cancelled = false;
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 8_000);
+        waitForPlaybackRequests()
+          .then(() =>
+            cancelled
+              ? null
+              : fetch(`/api/playback?${params}`, { signal: controller.signal })
+          )
+          .then((r) => (r?.ok ? r.json() : null))
+          .then(
+            (
+              data: { positionSeconds?: number; durationSeconds?: number } | null
+            ) => {
+              if (cancelled) return;
+              const pos =
+                typeof data?.positionSeconds === "number" &&
+                Number.isFinite(data.positionSeconds)
+                  ? Math.max(0, data.positionSeconds)
+                  : 0;
+              const dur =
+                typeof data?.durationSeconds === "number" &&
+                Number.isFinite(data.durationSeconds)
+                  ? Math.max(0, data.durationSeconds)
+                  : 0;
+              if (pos > 5 && (dur === 0 || pos < dur * 0.92)) {
+                resumePosRef.current = pos;
+                setResumePosition(pos);
+              }
+            }
+          )
+          .catch(() => {})
+          .finally(() => window.clearTimeout(timeout));
+        return () => {
+          cancelled = true;
+          controller.abort();
+          window.clearTimeout(timeout);
+        };
+      }
       return;
     }
     if (mode !== "native") return;
@@ -415,7 +473,7 @@ export function VixPlayer({
               ? Math.max(0, data.durationSeconds)
               : 0;
           // Resume only if meaningfully mid-way; near-complete counts as done.
-          if (pos > 30 && (dur === 0 || pos < dur * 0.92)) {
+          if (pos > 5 && (dur === 0 || pos < dur * 0.92)) {
             resumePosRef.current = pos;
             setResumeKey(params);
             holdForResumeRef.current = true;
@@ -506,14 +564,30 @@ export function VixPlayer({
     if (episode != null) params.set("episode", String(episode));
 
     fetch(`/api/vixsrc/stream?${params.toString()}`)
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("route"))))
+      .then((res) => {
+        if (!res.ok) {
+          return res
+            .text()
+            .then(
+              (text) =>
+                Promise.reject(
+                  new Error(`stream route ${res.status}: ${text.slice(0, 200)}`)
+                )
+            );
+        }
+        return res.json();
+      })
       .then((data: { playlistUrl?: string; imdbId?: string | null }) => {
         if (cancelled) return;
         imdbIdRef.current = data?.imdbId ?? null;
         if (data?.playlistUrl) setPlaylistUrl(data.playlistUrl);
         else setStreamFailed(true);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.warn(
+          "[player] stream resolution failed — falling back to iframe:",
+          err instanceof Error ? err.message : err
+        );
         if (!cancelled) setStreamFailed(true);
       });
 
@@ -829,8 +903,31 @@ export function VixPlayer({
   // ---------- iframe fallback: postMessage bridge ----------
   useEffect(() => {
     const handler = (e: MessageEvent) => {
-      if (e.source !== iframeRef.current?.contentWindow) return;
-      if (e.origin !== VIX_PLAYER_ORIGIN) return;
+      const isPlayerEvent =
+        typeof e.data === "object" &&
+        e.data !== null &&
+        (e.data as { type?: unknown }).type === "PLAYER_EVENT";
+      if (e.source !== iframeRef.current?.contentWindow) {
+        if (isPlayerEvent && !loggedRejectedSource) {
+          loggedRejectedSource = true;
+          console.warn(
+            "[player] PLAYER_EVENT from unexpected source ignored (no resume saves from this iframe)"
+          );
+        }
+        return;
+      }
+      if (e.origin !== VIX_PLAYER_ORIGIN) {
+        if (isPlayerEvent && !loggedRejectedOrigin) {
+          loggedRejectedOrigin = true;
+          console.warn(
+            "[player] PLAYER_EVENT from origin",
+            e.origin,
+            "ignored (expected",
+            VIX_PLAYER_ORIGIN + ")"
+          );
+        }
+        return;
+      }
       const d = parseVixPlayerEventData(e.data);
       if (!d) return;
       emit(d.event);
@@ -904,10 +1001,7 @@ export function VixPlayer({
     !autoResume &&
     resumePosition != null &&
     resumeKey === playbackKey;
-  const iframeSrc = addStartAt(
-    src,
-    autoResume ? resumePosition ?? initialResumePosition : null
-  );
+  const iframeSrc = addStartAt(src, resumePosition ?? initialResumePosition);
 
   return (
     <div

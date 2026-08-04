@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
-import { MoreHorizontal } from "lucide-react";
+import { History, MoreHorizontal } from "lucide-react";
 
-/** Profile "⋯" menu: Import data + Sign out */
+/** Profile "⋯" menu: Watch history, Import data + Sign out */
 export function ProfileMenu() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -33,6 +33,14 @@ export function ProfileMenu() {
       </button>
       {open && (
         <div className="absolute right-0 top-12 z-30 w-44 overflow-hidden rounded-xl border border-white/10 bg-card shadow-xl">
+          <Link
+            href="/profile/history"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 px-4 py-3 text-left text-sm font-medium text-white hover:bg-secondary"
+          >
+            <History className="h-4 w-4" />
+            Watch history
+          </Link>
           <Link
             href="/import"
             onClick={() => setOpen(false)}

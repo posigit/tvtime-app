@@ -32,7 +32,8 @@ import { ProfileTaste } from "@/components/profile-taste";
 import { ProfileYearRecap } from "@/components/profile-year-recap";
 import { StarRatingDisplay } from "@/components/star-rating";
 import { ContinueWatchingRail } from "@/components/continue-watching";
-import { getContinueWatching } from "@/lib/playback";
+import { getContinueWatching, getWatchHistory } from "@/lib/playback";
+import { formatEpisodeCode } from "@/lib/playback-format";
 import {
   aggregateGenres,
   currentStreak as calcCurrentStreak,
@@ -297,6 +298,29 @@ export default async function ProfilePage() {
     .where(eq(userMovies.userId, userId));
 
   const continueWatching = await getContinueWatching(userId, 10).catch(() => []);
+  const recentStreams = await getWatchHistory(userId, 30).catch(() => []);
+
+  // One tile per show/movie (latest stream wins) so the rail shows distinct posters.
+  const streamedCandidates: RailItem[] = [];
+  const seenStreamed = new Set<string>();
+  for (const h of recentStreams) {
+    const key = `${h.mediaType}:${h.tmdbId}`;
+    if (seenStreamed.has(key)) continue;
+    seenStreamed.add(key);
+    streamedCandidates.push({
+      key,
+      href: h.mediaType === "tv" ? `/show/${h.tmdbId}` : `/movie/${h.tmdbId}`,
+      title: h.title,
+      posterPath: h.posterPath,
+      sub:
+        h.mediaType === "tv"
+          ? formatEpisodeCode(h.seasonNumber, h.episodeNumber)
+          : "Movie",
+      subAccent: false,
+      rating: null,
+    });
+    if (streamedCandidates.length >= 12) break;
+  }
 
   const monthStart = new Date();
   monthStart.setDate(1);
@@ -1081,13 +1105,14 @@ export default async function ProfilePage() {
         {continueWatching.length > 0 && (
           <section className="mb-8">
             <ContinueWatchingRail items={continueWatching} className="mb-2" />
-            <Link
-              href="/profile/history"
-              className="ml-1 inline-flex items-center gap-0.5 text-xs font-bold text-muted-foreground transition hover:text-white"
-            >
-              Watch history
-              <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
+          </section>
+        )}
+
+        {/* ---------- Recently streamed ---------- */}
+        {streamedCandidates.length > 0 && (
+          <section className="mb-8">
+            <SectionHeader title="Recently streamed" href="/profile/history" />
+            <CaptionedRail items={streamedCandidates} />
           </section>
         )}
 
