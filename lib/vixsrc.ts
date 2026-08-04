@@ -25,6 +25,19 @@ const VIX_PLAYER_EVENTS = [
 
 export type VixPlayerEvent = (typeof VIX_PLAYER_EVENTS)[number];
 
+/** True for https://vixsrc.to and any https://*.vixsrc.to player frame. */
+export function isVixPlayerOrigin(origin: string): boolean {
+  try {
+    const url = new URL(origin);
+    return (
+      url.protocol === "https:" &&
+      (url.hostname === "vixsrc.to" || url.hostname.endsWith(".vixsrc.to"))
+    );
+  } catch {
+    return false;
+  }
+}
+
 export function vixMovieUrl(tmdbId: number) {
   return `${VIX_BASE}/movie/${tmdbId}?primaryColor=${VIX_PRIMARY_COLOR}&secondaryColor=${VIX_SECONDARY_COLOR}&autoplay=true&lang=${VIX_LANG}`;
 }
@@ -38,15 +51,7 @@ export function vixTvUrl(
 }
 
 export function parseVixPlayerEvent(data: unknown): VixPlayerEvent | null {
-  if (!data || typeof data !== "object") return null;
-  const obj = data as { type?: string; data?: { event?: string } };
-  if (obj.type !== "PLAYER_EVENT") return null;
-
-  const event = obj.data?.event;
-  return typeof event === "string" &&
-    (VIX_PLAYER_EVENTS as readonly string[]).includes(event)
-    ? (event as VixPlayerEvent)
-    : null;
+  return parseVixPlayerEventData(data)?.event ?? null;
 }
 
 export type VixPlayerEventData = {
@@ -55,6 +60,14 @@ export type VixPlayerEventData = {
   duration?: number;
 };
 
+function readNonNegativeNumber(value: unknown): number | undefined {
+  return typeof value === "number" &&
+    Number.isFinite(value) &&
+    value >= 0
+    ? value
+    : undefined;
+}
+
 /** Like parseVixPlayerEvent but also surfaces currentTime/duration (resume saves). */
 export function parseVixPlayerEventData(
   data: unknown
@@ -62,11 +75,29 @@ export function parseVixPlayerEventData(
   if (!data || typeof data !== "object") return null;
   const obj = data as {
     type?: string;
-    data?: { event?: string; currentTime?: number; duration?: number };
+    data?: {
+      event?: string;
+      currentTime?: number;
+      duration?: number;
+      // Some embed builds nest time under `data` differently.
+      time?: number;
+    };
+    event?: string;
+    currentTime?: number;
+    duration?: number;
   };
   if (obj.type !== "PLAYER_EVENT") return null;
 
-  const event = obj.data?.event;
+  const payload: {
+    event?: string;
+    currentTime?: number;
+    duration?: number;
+    time?: number;
+  } =
+    obj.data && typeof obj.data === "object"
+      ? obj.data
+      : obj;
+  const event = payload.event ?? obj.event;
   if (
     typeof event !== "string" ||
     !(VIX_PLAYER_EVENTS as readonly string[]).includes(event)
@@ -76,16 +107,11 @@ export function parseVixPlayerEventData(
   return {
     event: event as VixPlayerEvent,
     currentTime:
-      typeof obj.data?.currentTime === "number" &&
-      Number.isFinite(obj.data.currentTime) &&
-      obj.data.currentTime >= 0
-        ? obj.data.currentTime
-        : undefined,
+      readNonNegativeNumber(payload.currentTime) ??
+      readNonNegativeNumber(payload.time) ??
+      readNonNegativeNumber(obj.currentTime),
     duration:
-      typeof obj.data?.duration === "number" &&
-      Number.isFinite(obj.data.duration) &&
-      obj.data.duration >= 0
-        ? obj.data.duration
-        : undefined,
+      readNonNegativeNumber(payload.duration) ??
+      readNonNegativeNumber(obj.duration),
   };
 }

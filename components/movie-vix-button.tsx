@@ -85,7 +85,11 @@ export function MovieVixButton({
       initialPosition={playback?.positionSeconds}
       autoResume={Boolean(playback)}
       onEvent={handleEvent}
-      onClose={() => setOpen(false)}
+      onClose={() => {
+        setOpen(false);
+        // Re-fetch playback server state so the CTA reflects saved progress.
+        router.refresh();
+      }}
     />
   );
 }

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import { ExternalLink, LoaderCircle, X } from "lucide-react";
 import {
-  VIX_PLAYER_ORIGIN,
+  isVixPlayerOrigin,
   parseVixPlayerEventData,
 } from "@/lib/vixsrc";
 import { ResumeOverlay } from "@/components/resume-overlay";
@@ -24,6 +24,8 @@ type NativeAudioTrackList = {
 };
 
 const MAX_PLAYBACK_SECONDS = 2_147_483_647;
+const RESUME_MIN_SECONDS = 5;
+const RESUME_END_RATIO = 0.92;
 
 function makePlaybackKey(
   type: "movie" | "tv" | undefined,
@@ -43,25 +45,33 @@ function addStartAt(src: string, position: number | null) {
   if (position == null || !Number.isFinite(position) || position <= 0) return src;
   try {
     const url = new URL(src);
-    url.searchParams.set("startAt", String(position));
+    url.searchParams.set("startAt", String(Math.floor(position)));
     return url.toString();
   } catch {
     return src;
   }
 }
 
+function isResumablePosition(pos: number, dur: number) {
+  return pos > RESUME_MIN_SECONDS && (dur <= 0 || pos < dur * RESUME_END_RATIO);
+}
+
 // Keep playback mutations ordered across player remounts. A user can close
 // and reopen the player before the previous keepalive request has completed.
 let playbackRequestQueue: Promise<void> = Promise.resolve();
 
-// Log a rejected iframe event once per page load (not per message — spam).
-let loggedRejectedSource = false;
+// Log a rejected iframe origin once per page load (not per message — spam).
 let loggedRejectedOrigin = false;
 
 function queuePlaybackRequest(params: string, init: RequestInit) {
   const request = playbackRequestQueue
     .catch(() => {})
-    .then(() => fetch(`/api/playback?${params}`, init))
+    .then(() =>
+      fetch(`/api/playback?${params}`, {
+        ...init,
+        credentials: "same-origin",
+      })
+    )
     .then(
       (res) => {
         if (!res.ok) {
@@ -837,7 +847,7 @@ export function VixPlayer({
       endedRef.current ||
       bookmarkClearedRef.current
     ) {
-      return;
+      return Promise.resolve();
     }
 
     if (mode === "native") {
@@ -845,19 +855,26 @@ export function VixPlayer({
       if (v && Number.isFinite(v.currentTime) && v.currentTime > 0) {
         savePosition(v.currentTime, v.duration, true);
       }
-      return;
+      return waitForPlaybackRequests();
     }
 
-    if (
-      mode === "iframe" &&
-      remotePositionRef.current > 0
-    ) {
+    if (mode === "iframe" && remotePositionRef.current > 0) {
+      // Same gate as the message handler: closing during a startAt restart
+      // must not overwrite the saved position with a tiny pre-seek report.
+      if (
+        resumePosRef.current > 0 &&
+        remotePositionRef.current < resumePosRef.current - 1
+      ) {
+        return Promise.resolve();
+      }
       savePosition(
         remotePositionRef.current,
         remoteDurationRef.current,
         true
       );
+      return waitForPlaybackRequests();
     }
+    return Promise.resolve();
   }, [mode, savePosition]);
 
   // ---------- native video -> event bridge ----------
@@ -907,23 +924,15 @@ export function VixPlayer({
         typeof e.data === "object" &&
         e.data !== null &&
         (e.data as { type?: unknown }).type === "PLAYER_EVENT";
-      if (e.source !== iframeRef.current?.contentWindow) {
-        if (isPlayerEvent && !loggedRejectedSource) {
-          loggedRejectedSource = true;
-          console.warn(
-            "[player] PLAYER_EVENT from unexpected source ignored (no resume saves from this iframe)"
-          );
-        }
-        return;
-      }
-      if (e.origin !== VIX_PLAYER_ORIGIN) {
+      // Nested player frames post from inner windows, so trust any VixSrc
+      // player origin instead of requiring the exact embed frame/source.
+      if (!isVixPlayerOrigin(e.origin)) {
         if (isPlayerEvent && !loggedRejectedOrigin) {
           loggedRejectedOrigin = true;
           console.warn(
             "[player] PLAYER_EVENT from origin",
             e.origin,
-            "ignored (expected",
-            VIX_PLAYER_ORIGIN + ")"
+            "ignored (expected vixsrc.to)"
           );
         }
         return;
@@ -945,6 +954,17 @@ export function VixPlayer({
       }
 
       if (remotePositionRef.current <= 0) return;
+
+      // Resume gate: a startAt restart can report tiny positions before the
+      // embed seeks to the bookmark — never let those overwrite a real one.
+      if (resumePosRef.current > 0) {
+        if (remotePositionRef.current >= resumePosRef.current - 1) {
+          resumePosRef.current = 0;
+        } else if (d.event === "timeupdate" || d.event === "pause") {
+          return;
+        }
+      }
+
       if (d.event === "pause" || d.event === "seeked") {
         savePosition(
           remotePositionRef.current,
@@ -952,6 +972,16 @@ export function VixPlayer({
           true
         );
       } else if (d.event === "timeupdate") {
+        // Persist only positions worth resuming — a sub-5s report (e.g. after
+        // a failed resume lookup) must not wipe the existing bookmark.
+        if (
+          !isResumablePosition(
+            remotePositionRef.current,
+            remoteDurationRef.current
+          )
+        ) {
+          return;
+        }
         savePosition(remotePositionRef.current, remoteDurationRef.current);
       }
     };
@@ -962,8 +992,10 @@ export function VixPlayer({
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        flushPosition();
-        onCloseRef.current();
+        // Let the final save land before the parent refreshes playback state.
+        void flushPosition().then(() => {
+          onCloseRef.current();
+        });
       }
     };
     window.addEventListener("keydown", onKeyDown);
@@ -1067,8 +1099,10 @@ export function VixPlayer({
             <button
               type="button"
               onClick={() => {
-                flushPosition();
-                onClose();
+                // Let the final save land before the parent refreshes playback.
+                void flushPosition().then(() => {
+                  onClose();
+                });
               }}
               aria-label="Close player"
               className="flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"

@@ -1096,6 +1096,8 @@ export function ShowDetailClient({
           onClose={() => {
             playerSessionRef.current += 1;
             setPlayerEp(null);
+            // Re-fetch playback server state so resume labels reflect saves.
+            router.refresh();
           }}
         />
       )}
