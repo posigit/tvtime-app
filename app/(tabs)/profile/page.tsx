@@ -27,6 +27,7 @@ import Image from "next/image";
 import { ChevronRight, Flame, Heart, Plus } from "lucide-react";
 import { ProfileMenu } from "@/components/profile-menu";
 import { NotificationToggle } from "@/components/notification-toggle";
+import { UserAvatar } from "@/components/user-avatar";
 import { ProfileHeatmap } from "@/components/profile-heatmap";
 import { ProfileTaste } from "@/components/profile-taste";
 import { ProfileYearRecap } from "@/components/profile-year-recap";
@@ -950,6 +951,11 @@ export default async function ProfilePage() {
       ? rawName.charAt(0).toUpperCase() + rawName.slice(1)
       : "User";
 
+  // Only the admin keeps the branded photo; everyone else gets an initials disc.
+  const adminUsername = process.env.ADMIN_USERNAME || "posi";
+  const isAdmin =
+    name.toLowerCase() === adminUsername.toLowerCase();
+
   return (
     <div className="min-h-dvh bg-black pb-nav-page">
       {/*
@@ -980,19 +986,11 @@ export default async function ProfilePage() {
 
         {/* Sits on top of the banner edge — outside the overflow-hidden image box */}
         <div className="relative z-10 -mt-12 flex items-end gap-3 px-4">
-          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-primary to-primary/40 shadow-lg ring-4 ring-black">
-            {/* Cached aggressively via Cache-Control + service worker (see next.config / sw.js) */}
-            {/* eslint-disable-next-line @next/next/no-img-element -- local avatar; circle crop + SW cache-first */}
-            <img
-              src="/avatars/profile.jpg"
-              alt={name}
+          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full shadow-lg ring-4 ring-black">
+            <UserAvatar
+              name={name}
+              photo={isAdmin ? "/avatars/profile.jpg" : null}
               className="h-full w-full object-cover"
-              width={96}
-              height={96}
-              decoding="async"
-              fetchPriority="high"
-              // Hint browser to reuse disk cache across navigations
-              loading="eager"
             />
           </div>
           <div className="min-w-0 flex-1 pb-1">
