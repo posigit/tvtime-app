@@ -1020,6 +1020,12 @@ export default async function ProfilePage() {
           recentItems={recentStreams}
         />
 
+        {/* ---------- New-episode push alerts ---------- */}
+        <section className="mb-8">
+          <SectionHeader title="Notifications" />
+          <NotificationToggle />
+        </section>
+
         {/* ---------- Stats (one consolidated card) ---------- */}
         <section className="mb-8">
           <SectionHeader title="Stats" />
@@ -1060,12 +1066,6 @@ export default async function ProfilePage() {
               </StatCell>
             </div>
           </div>
-        </section>
-
-        {/* ---------- New-episode push alerts ---------- */}
-        <section className="mb-8">
-          <SectionHeader title="Notifications" />
-          <NotificationToggle />
         </section>
 
         {/* ---------- Year in review ---------- */}

@@ -5,6 +5,19 @@ import { Bell, BellOff, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type State = "loading" | "unsupported" | "denied" | "on" | "off";
+type UnsupportedReason = "config" | "browser" | "ios-install";
+
+function isIosDevice() {
+  return /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+}
+
+function isStandaloneMode() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    (navigator as Navigator & { standalone?: boolean }).standalone === true
+  );
+}
 
 function urlBase64ToUint8Array(base64: string): Uint8Array {
   const padding = "=".repeat((4 - (base64.length % 4)) % 4);
@@ -21,19 +34,33 @@ function urlBase64ToUint8Array(base64: string): Uint8Array {
  */
 export function NotificationToggle() {
   const [state, setState] = useState<State>("loading");
+  const [unsupportedReason, setUnsupportedReason] =
+    useState<UnsupportedReason>("browser");
   const [busy, setBusy] = useState(false);
   const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      if (!vapidKey) {
+        if (!cancelled) {
+          setUnsupportedReason("config");
+          setState("unsupported");
+        }
+        return;
+      }
       if (
-        !vapidKey ||
+        (isIosDevice() && !isStandaloneMode()) ||
         !("serviceWorker" in navigator) ||
         !("PushManager" in window) ||
         !("Notification" in window)
       ) {
-        if (!cancelled) setState("unsupported");
+        if (!cancelled) {
+          setUnsupportedReason(
+            isIosDevice() && !isStandaloneMode() ? "ios-install" : "browser"
+          );
+          setState("unsupported");
+        }
         return;
       }
       if (Notification.permission === "denied") {
@@ -106,7 +133,25 @@ export function NotificationToggle() {
     }
   }
 
-  if (state === "unsupported") return null;
+  if (state === "unsupported") {
+    const message =
+      unsupportedReason === "ios-install"
+        ? "Add TV Time to your Home Screen to enable alerts"
+        : unsupportedReason === "config"
+          ? "Alerts are not configured on this deployment"
+          : "Push alerts are not supported in this browser";
+    return (
+      <div className="flex items-center gap-3 rounded-xl bg-card px-4 py-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-white/50">
+          <BellOff className="h-4 w-4" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-white">Episode alerts</p>
+          <p className="text-xs text-muted-foreground">{message}</p>
+        </div>
+      </div>
+    );
+  }
 
   const on = state === "on";
 
