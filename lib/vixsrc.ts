@@ -82,22 +82,36 @@ export function parseVixPlayerEventData(
       // Some embed builds nest time under `data` differently.
       time?: number;
     };
-    event?: string;
+    event?: string | {
+      event?: string;
+      currentTime?: number;
+      duration?: number;
+      time?: number;
+    };
     currentTime?: number;
     duration?: number;
   };
   if (obj.type !== "PLAYER_EVENT") return null;
 
+  // The vixsite /tv/... page (our iframe fallback) re-wraps the embed's
+  // PLAYER_EVENT payload as `event` (not `data`), e.g.
+  // { type:"PLAYER_EVENT", event:{ event, currentTime, duration } }.
   const payload: {
-    event?: string;
+    event?: unknown;
     currentTime?: number;
     duration?: number;
     time?: number;
   } =
     obj.data && typeof obj.data === "object"
       ? obj.data
-      : obj;
-  const event = payload.event ?? obj.event;
+      : obj.event && typeof obj.event === "object"
+        ? obj.event
+        : obj;
+  const event = typeof payload.event === "string"
+    ? payload.event
+    : typeof obj.event === "string"
+      ? obj.event
+      : null;
   if (
     typeof event !== "string" ||
     !(VIX_PLAYER_EVENTS as readonly string[]).includes(event)
