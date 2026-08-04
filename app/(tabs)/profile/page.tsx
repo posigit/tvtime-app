@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { auth, requireAuth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { db, withDbRetry } from "@/lib/db";
 import {
   shows,
   movies,
@@ -42,6 +42,11 @@ import {
   type TasteSnapshot,
   type YearRecap,
 } from "@/lib/profile-insights";
+
+// Playback and watch-history shelves are user-specific and must be read fresh
+// after the player closes or another device updates the account.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 // ---------- shared bits ----------
 
@@ -296,8 +301,10 @@ export default async function ProfilePage() {
     .from(userMovies)
     .where(eq(userMovies.userId, userId));
 
-  const continueWatching = await getContinueWatching(userId, 10).catch(() => []);
-  const recentStreams = await getWatchHistory(userId, 30).catch(() => []);
+  const [continueWatching, recentStreams] = await Promise.all([
+    withDbRetry(() => getContinueWatching(userId, 10)).catch(() => []),
+    withDbRetry(() => getWatchHistory(userId, 30)).catch(() => []),
+  ]);
 
   const monthStart = new Date();
   monthStart.setDate(1);

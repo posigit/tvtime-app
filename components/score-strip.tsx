@@ -63,7 +63,7 @@ export function ScoreStrip({
   return (
     <div
       className={cn(
-        "grid gap-px overflow-hidden rounded-2xl bg-white/[0.07] ring-1 ring-white/[0.07]",
+        "grid divide-x divide-white/[0.1] border-y border-white/[0.1] py-2",
         className
       )}
       style={{
@@ -73,15 +73,15 @@ export function ScoreStrip({
       {cells.map((c) => (
         <div
           key={c.key}
-          className="flex flex-col items-center gap-1.5 bg-[#101011] px-2 py-3.5"
+          className="flex flex-col items-center gap-1 px-2 py-1.5"
         >
-          {c.icon}
+          <span className="[&>svg]:h-5 [&>svg]:w-5">{c.icon}</span>
           {c.value != null && (
-            <p className="text-lg font-black leading-none text-white">
+            <p className="text-base font-black leading-none text-white">
               {c.value}
             </p>
           )}
-          <p className="text-[9px] font-bold uppercase tracking-wider text-white/40">
+          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-white/35">
             {c.label}
           </p>
         </div>

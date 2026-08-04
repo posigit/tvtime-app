@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { db, withDbRetry } from "@/lib/db";
 import { playbackPositions } from "@/lib/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
@@ -57,22 +57,24 @@ export async function GET(req: NextRequest) {
   const p = parseMediaParams(req.nextUrl.searchParams);
   if (!p) return NextResponse.json({ error: "Invalid params" }, { status: 400 });
 
-  const [row] = await db
-    .select({
-      positionSeconds: playbackPositions.positionSeconds,
-      durationSeconds: playbackPositions.durationSeconds,
-    })
-    .from(playbackPositions)
-    .where(
-      and(
-        eq(playbackPositions.userId, session.user.id),
-        eq(playbackPositions.mediaType, p.type),
-        eq(playbackPositions.tmdbId, p.tmdbId),
-        eq(playbackPositions.seasonNumber, p.seasonNumber),
-        eq(playbackPositions.episodeNumber, p.episodeNumber)
+  const [row] = await withDbRetry(() =>
+    db
+      .select({
+        positionSeconds: playbackPositions.positionSeconds,
+        durationSeconds: playbackPositions.durationSeconds,
+      })
+      .from(playbackPositions)
+      .where(
+        and(
+          eq(playbackPositions.userId, session.user.id),
+          eq(playbackPositions.mediaType, p.type),
+          eq(playbackPositions.tmdbId, p.tmdbId),
+          eq(playbackPositions.seasonNumber, p.seasonNumber),
+          eq(playbackPositions.episodeNumber, p.episodeNumber)
+        )
       )
-    )
-    .limit(1);
+      .limit(1)
+  );
 
   if (!row) return NextResponse.json({ positionSeconds: 0 });
   return NextResponse.json(row);
@@ -126,40 +128,42 @@ export async function POST(req: NextRequest) {
     normalizedDuration > 0 ? normalizedDuration : MAX_SECONDS
   );
 
-  await db
-    .insert(playbackPositions)
-    .values({
-      userId: session.user.id,
-      mediaType: p.type,
-      tmdbId: p.tmdbId,
-      seasonNumber: p.seasonNumber,
-      episodeNumber: p.episodeNumber,
-      positionSeconds: normalizedPosition,
-      durationSeconds: normalizedDuration,
-    })
-    .onConflictDoUpdate({
-      target: [
-        playbackPositions.userId,
-        playbackPositions.mediaType,
-        playbackPositions.tmdbId,
-        playbackPositions.seasonNumber,
-        playbackPositions.episodeNumber,
-      ],
-      set: {
-        // Do not let an update without duration move past a known bookmark
-        // duration from an earlier player event.
-        positionSeconds:
-          normalizedDuration > 0
-            ? normalizedPosition
-            : sql`CASE WHEN ${playbackPositions.durationSeconds} > 0 THEN LEAST(${normalizedPosition}, ${playbackPositions.durationSeconds}) ELSE ${normalizedPosition} END`,
-        // Keep a known duration when a player update cannot report one.
-        durationSeconds:
-          normalizedDuration > 0
-            ? normalizedDuration
-            : sql`${playbackPositions.durationSeconds}`,
-        updatedAt: sql`now()`,
-      },
-    });
+  await withDbRetry(() =>
+    db
+      .insert(playbackPositions)
+      .values({
+        userId: session.user.id,
+        mediaType: p.type,
+        tmdbId: p.tmdbId,
+        seasonNumber: p.seasonNumber,
+        episodeNumber: p.episodeNumber,
+        positionSeconds: normalizedPosition,
+        durationSeconds: normalizedDuration,
+      })
+      .onConflictDoUpdate({
+        target: [
+          playbackPositions.userId,
+          playbackPositions.mediaType,
+          playbackPositions.tmdbId,
+          playbackPositions.seasonNumber,
+          playbackPositions.episodeNumber,
+        ],
+        set: {
+          // Do not let an update without duration move past a known bookmark
+          // duration from an earlier player event.
+          positionSeconds:
+            normalizedDuration > 0
+              ? normalizedPosition
+              : sql`CASE WHEN ${playbackPositions.durationSeconds} > 0 THEN LEAST(${normalizedPosition}, ${playbackPositions.durationSeconds}) ELSE ${normalizedPosition} END`,
+          // Keep a known duration when a player update cannot report one.
+          durationSeconds:
+            normalizedDuration > 0
+              ? normalizedDuration
+              : sql`${playbackPositions.durationSeconds}`,
+          updatedAt: sql`now()`,
+        },
+      })
+  );
 
   return NextResponse.json({ success: true });
 }
@@ -172,17 +176,19 @@ export async function DELETE(req: NextRequest) {
   const p = parseMediaParams(req.nextUrl.searchParams);
   if (!p) return NextResponse.json({ error: "Invalid params" }, { status: 400 });
 
-  await db
-    .delete(playbackPositions)
-    .where(
-      and(
-        eq(playbackPositions.userId, session.user.id),
-        eq(playbackPositions.mediaType, p.type),
-        eq(playbackPositions.tmdbId, p.tmdbId),
-        eq(playbackPositions.seasonNumber, p.seasonNumber),
-        eq(playbackPositions.episodeNumber, p.episodeNumber)
+  await withDbRetry(() =>
+    db
+      .delete(playbackPositions)
+      .where(
+        and(
+          eq(playbackPositions.userId, session.user.id),
+          eq(playbackPositions.mediaType, p.type),
+          eq(playbackPositions.tmdbId, p.tmdbId),
+          eq(playbackPositions.seasonNumber, p.seasonNumber),
+          eq(playbackPositions.episodeNumber, p.episodeNumber)
+        )
       )
-    );
+  );
 
   return NextResponse.json({ success: true });
 }

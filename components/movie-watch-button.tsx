@@ -115,40 +115,54 @@ export function MovieWatchButton({
   const inMyList = status === "want_to_watch";
   const watched = status === "watched";
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-start gap-5 px-1">
       <button
         onClick={() => update(inMyList ? null : "want_to_watch")}
         disabled={pending}
         aria-label={inMyList ? "Remove from My List" : "Add to My List"}
         aria-pressed={inMyList}
-        className={cn(
-          "inline-flex h-10 items-center gap-2 rounded-full px-3.5 text-sm font-semibold transition active:scale-[0.98]",
-          inMyList
-            ? "bg-primary/12 text-primary ring-1 ring-primary/45"
-            : "bg-white/[0.04] text-white/65 ring-1 ring-white/[0.1] hover:bg-white/[0.09] hover:text-white"
-        )}
+        title={inMyList ? "In My List" : "Add to My List"}
+        className="group flex min-w-[3.25rem] flex-col items-center gap-1"
       >
-        {inMyList ? (
-          <Check className="h-4 w-4" strokeWidth={3} />
-        ) : (
-          <Plus className="h-4 w-4" strokeWidth={3} />
-        )}
-        {inMyList ? "In My List" : "My List"}
+        <span
+          className={cn(
+            "flex h-11 w-11 items-center justify-center rounded-full transition group-active:scale-[0.94]",
+            inMyList
+              ? "bg-primary text-black"
+              : "bg-white/[0.07] text-white/75 ring-1 ring-white/15 hover:bg-white/[0.12] hover:text-white"
+          )}
+        >
+          {inMyList ? (
+            <Check className="h-4 w-4" strokeWidth={3} />
+          ) : (
+            <Plus className="h-4 w-4" strokeWidth={3} />
+          )}
+        </span>
+        <span className="text-[10px] font-semibold text-white/45">
+          {inMyList ? "In list" : "My list"}
+        </span>
       </button>
       <button
         onClick={() => update(watched ? null : "watched")}
         disabled={pending}
         aria-label={watched ? "Mark unwatched" : "Mark watched"}
         aria-pressed={watched}
-        className={cn(
-          "inline-flex h-10 items-center gap-2 rounded-full px-3.5 text-sm font-semibold transition active:scale-[0.98]",
-          watched
-            ? "bg-primary/12 text-primary ring-1 ring-primary/45"
-            : "bg-white/[0.04] text-white/65 ring-1 ring-white/[0.1] hover:bg-white/[0.09] hover:text-white"
-        )}
+        title={watched ? "Watched — tap to mark unwatched" : "Mark watched"}
+        className="group flex min-w-[3.25rem] flex-col items-center gap-1"
       >
-        <Check className="h-4 w-4" strokeWidth={3} />
-        {watched ? "Watched" : "Mark watched"}
+        <span
+          className={cn(
+            "flex h-11 w-11 items-center justify-center rounded-full transition group-active:scale-[0.94]",
+            watched
+              ? "bg-primary text-black"
+              : "bg-white/[0.07] text-white/75 ring-1 ring-white/15 hover:bg-white/[0.12] hover:text-white"
+          )}
+        >
+          <Check className="h-4 w-4" strokeWidth={3} />
+        </span>
+        <span className="text-[10px] font-semibold text-white/45">
+          {watched ? "Watched" : "Mark watched"}
+        </span>
       </button>
     </div>
   );

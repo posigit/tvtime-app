@@ -106,15 +106,15 @@ function ProfileStreamTile({ item }: { item: WatchHistoryItem }) {
     <button
       type="button"
       onClick={() => setOpen(true)}
-      className="group w-[16.5rem] shrink-0 overflow-hidden rounded-[1.15rem] bg-[#1d1d1f] text-left ring-1 ring-white/[0.06] transition hover:ring-white/20 active:scale-[0.98]"
+      className="group w-[15rem] shrink-0 overflow-hidden rounded-[1.1rem] bg-[#1d1d1f] text-left ring-1 ring-white/[0.06] transition hover:ring-white/20 active:scale-[0.98]"
     >
-      <div className="relative h-[9.25rem] overflow-hidden bg-secondary">
+      <div className="relative h-[8.5rem] overflow-hidden bg-secondary">
         {poster ? (
           <Image
             src={poster}
             alt={item.title}
             fill
-            sizes="184px"
+            sizes="240px"
             className="object-cover transition duration-300 group-hover:scale-105"
             unoptimized
           />

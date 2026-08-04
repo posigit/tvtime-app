@@ -43,6 +43,9 @@ export function BottomNav() {
             <Link
               key={tab.href}
               href={tab.href}
+              // Profile contains live playback/history data; do not reuse a
+              // prefetched RSC payload from before the last stream.
+              prefetch={tab.href === "/profile" ? false : undefined}
               aria-current={active ? "page" : undefined}
               onClick={(e) => {
                 // Re-tap active tab → scroll to top (native app pattern)
