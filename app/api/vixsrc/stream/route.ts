@@ -6,8 +6,14 @@ import { VIX_LANG } from "@/lib/vixsrc";
  *
  * vixsrc.to guards its HTML pages with Cloudflare bot protection (challenge in
  * cross-site iframes, blocks *.vercel.app referers), but its JSON/API and HLS
- * endpoints are open and CORS-permissive. This route resolves the full chain
- * server-side and hands back a playable master playlist URL:
+ * endpoints are open and CORS-permissive. Most of the app's hosts are
+ * Cloudflare-blocked (Vercel returns 403, public proxies return 403/52x), so
+ * on production the resolution happens on a small standalone service
+ * (resolver-server/) deployed on a network vixsrc accepts — pass its base URL
+ * as VIX_RESOLVER_URL. When unset, this route resolves directly (e.g.
+ * localhost).
+ *
+ * Both paths hand back a playable master playlist URL:
  *
  *   /api/movie|tv/{id}  ->  signed embed src  ->  embed page masterPlaylist  ->  m3u8
  *
@@ -18,6 +24,25 @@ export const dynamic = "force-dynamic";
 
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
+
+async function fetchImdbId(type: string, id: string): Promise<string | null> {
+  if (!process.env.TMDB_API_KEY) return null;
+  const extPath =
+    type === "tv" ? `/tv/${id}/external_ids` : `/movie/${id}/external_ids`;
+  try {
+    const extRes = await fetch(
+      `https://api.themoviedb.org/3${extPath}?api_key=${process.env.TMDB_API_KEY}`,
+      { cache: "no-store" }
+    );
+    if (extRes.ok) {
+      const ext = (await extRes.json()) as { imdb_id?: string | null };
+      if (ext.imdb_id) return ext.imdb_id;
+    }
+  } catch {
+    /* imdbId is optional — skip on failure */
+  }
+  return null;
+}
 
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
@@ -31,6 +56,34 @@ export async function GET(req: NextRequest) {
       { error: "type (movie|tv) and id are required" },
       { status: 400 }
     );
+  }
+
+  const resolver = process.env.VIX_RESOLVER_URL?.replace(/\/+$/, "");
+
+  // Deployed path: resolve from a non-blocked service, then enrich with IMDb.
+  if (resolver) {
+    try {
+      const rp = new URLSearchParams({
+        type,
+        id,
+      });
+      if (season != null) rp.set("season", season);
+      if (episode != null) rp.set("episode", episode);
+      const res = await fetch(`${resolver}/stream?${rp.toString()}`, {
+        cache: "no-store",
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return NextResponse.json({
+          ...data,
+          imdbId: await fetchImdbId(type, id),
+        });
+      }
+      // Non-2xx from the resolver: fall through to the direct attempt.
+    } catch {
+      // Resolver unreachable/error: fall through to the direct attempt.
+    }
   }
 
   const mediaPath =
@@ -80,31 +133,10 @@ export async function GET(req: NextRequest) {
     const playlist = new URL(urlMatch[1]);
     for (const [k, v] of params) playlist.searchParams.set(k, v);
 
-    // Resolve IMDb id (for OpenSubtitles lookups) via TMDB external_ids.
-    let imdbId: string | null = null;
-    if (process.env.TMDB_API_KEY) {
-      const extPath =
-        type === "tv"
-          ? `/tv/${id}/external_ids`
-          : `/movie/${id}/external_ids`;
-      try {
-        const extRes = await fetch(
-          `https://api.themoviedb.org/3${extPath}?api_key=${process.env.TMDB_API_KEY}`,
-          { cache: "no-store" }
-        );
-        if (extRes.ok) {
-          const ext = (await extRes.json()) as { imdb_id?: string | null };
-          if (ext.imdb_id) imdbId = ext.imdb_id;
-        }
-      } catch {
-        /* imdbId is optional — skip on failure */
-      }
-    }
-
     return NextResponse.json({
       playlistUrl: playlist.toString(),
       thumbnailsUrl: thumbMatch?.[1] ?? null,
-      imdbId,
+      imdbId: await fetchImdbId(type, id),
       season: type === "tv" ? season : null,
       episode: type === "tv" ? episode : null,
     });
