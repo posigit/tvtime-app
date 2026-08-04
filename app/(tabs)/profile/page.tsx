@@ -31,9 +31,8 @@ import { ProfileHeatmap } from "@/components/profile-heatmap";
 import { ProfileTaste } from "@/components/profile-taste";
 import { ProfileYearRecap } from "@/components/profile-year-recap";
 import { StarRatingDisplay } from "@/components/star-rating";
-import { ContinueWatchingRail } from "@/components/continue-watching";
+import { ProfilePlaybackShelf } from "@/components/recent-streams";
 import { getContinueWatching, getWatchHistory } from "@/lib/playback";
-import { formatEpisodeCode } from "@/lib/playback-format";
 import {
   aggregateGenres,
   currentStreak as calcCurrentStreak,
@@ -299,28 +298,6 @@ export default async function ProfilePage() {
 
   const continueWatching = await getContinueWatching(userId, 10).catch(() => []);
   const recentStreams = await getWatchHistory(userId, 30).catch(() => []);
-
-  // One tile per show/movie (latest stream wins) so the rail shows distinct posters.
-  const streamedCandidates: RailItem[] = [];
-  const seenStreamed = new Set<string>();
-  for (const h of recentStreams) {
-    const key = `${h.mediaType}:${h.tmdbId}`;
-    if (seenStreamed.has(key)) continue;
-    seenStreamed.add(key);
-    streamedCandidates.push({
-      key,
-      href: h.mediaType === "tv" ? `/show/${h.tmdbId}` : `/movie/${h.tmdbId}`,
-      title: h.title,
-      posterPath: h.posterPath,
-      sub:
-        h.mediaType === "tv"
-          ? formatEpisodeCode(h.seasonNumber, h.episodeNumber)
-          : "Movie",
-      subAccent: false,
-      rating: null,
-    });
-    if (streamedCandidates.length >= 12) break;
-  }
 
   const monthStart = new Date();
   monthStart.setDate(1);
@@ -1031,6 +1008,11 @@ export default async function ProfilePage() {
       </div>
 
       <div className="px-4">
+        <ProfilePlaybackShelf
+          continueItems={continueWatching}
+          recentItems={recentStreams}
+        />
+
         {/* ---------- Stats (one consolidated card) ---------- */}
         <section className="mb-8">
           <SectionHeader title="Stats" />
@@ -1100,21 +1082,6 @@ export default async function ProfilePage() {
           <SectionHeader title="Your taste" />
           <ProfileTaste taste={taste} />
         </section>
-
-        {/* ---------- Continue watching ---------- */}
-        {continueWatching.length > 0 && (
-          <section className="mb-8">
-            <ContinueWatchingRail items={continueWatching} className="mb-2" />
-          </section>
-        )}
-
-        {/* ---------- Recently streamed ---------- */}
-        {streamedCandidates.length > 0 && (
-          <section className="mb-8">
-            <SectionHeader title="Recently streamed" href="/profile/history" />
-            <CaptionedRail items={streamedCandidates} />
-          </section>
-        )}
 
         {/* ---------- Recently watched ---------- */}
         {recentItems.length > 0 && (

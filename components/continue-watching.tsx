@@ -2,15 +2,20 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Play } from "lucide-react";
 import { posterUrl } from "@/lib/tmdb";
 import { vixMovieUrl, vixTvUrl } from "@/lib/vixsrc";
 import { VixPlayer } from "@/components/vix-player";
 import type { ContinueWatchingItem } from "@/lib/playback";
 import { formatEpisodeCode, formatPlaybackTime } from "@/lib/playback-format";
+import { useToast } from "@/components/toast";
 
 function ResumeCard({ item }: { item: ContinueWatchingItem }) {
   const [open, setOpen] = useState(false);
+  const [completed, setCompleted] = useState(false);
+  const { toast } = useToast();
+  const router = useRouter();
   const poster = posterUrl(item.posterPath, "w342");
   const episodeCode =
     item.mediaType === "tv"
@@ -37,7 +42,41 @@ function ResumeCard({ item }: { item: ContinueWatchingItem }) {
         title={title}
         initialPosition={item.positionSeconds}
         autoResume
-        onClose={() => setOpen(false)}
+        onEvent={async (event) => {
+          if (event !== "ended" || completed) return;
+          setCompleted(true);
+          try {
+            const response =
+              item.mediaType === "movie"
+                ? await fetch("/api/movie-watch", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      tmdbId: item.tmdbId,
+                      status: "watched",
+                    }),
+                  })
+                : await fetch("/api/watch", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      showTmdbId: item.tmdbId,
+                      seasonNumber: item.seasonNumber,
+                      episodeNumber: item.episodeNumber,
+                      watched: true,
+                    }),
+                  });
+            if (!response.ok) throw new Error("completion failed");
+            toast("Saved as watched");
+          } catch {
+            setCompleted(false);
+            toast("Couldn’t save watched status", "error");
+          }
+        }}
+        onClose={() => {
+          setOpen(false);
+          router.refresh();
+        }}
       />
     );
   }

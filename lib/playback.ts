@@ -48,6 +48,10 @@ export type WatchHistoryItem = {
   episodeTitle: string | null;
   watchedAt: string;
   source: string;
+  positionSeconds: number | null;
+  durationSeconds: number | null;
+  timeLeftSeconds: number | null;
+  progressPercent: number | null;
 };
 
 function summary(
@@ -270,7 +274,7 @@ export async function getWatchHistory(
   userId: string,
   limit = 50
 ): Promise<WatchHistoryItem[]> {
-  const [historyRows, legacyEpisodes, legacyMovies] = await Promise.all([
+  const [historyRows, legacyEpisodes, legacyMovies, playbackRows] = await Promise.all([
     db
       .select({
         id: watchHistory.id,
@@ -312,6 +316,25 @@ export async function getWatchHistory(
           isNotNull(userMovies.watchedAt)
         )
       ),
+    db
+      .select({
+        mediaType: playbackPositions.mediaType,
+        tmdbId: playbackPositions.tmdbId,
+        seasonNumber: playbackPositions.seasonNumber,
+        episodeNumber: playbackPositions.episodeNumber,
+        positionSeconds: playbackPositions.positionSeconds,
+        durationSeconds: playbackPositions.durationSeconds,
+        updatedAt: playbackPositions.updatedAt,
+      })
+      .from(playbackPositions)
+      .where(
+        and(
+          eq(playbackPositions.userId, userId),
+          gt(playbackPositions.positionSeconds, 5)
+        )
+      )
+      .orderBy(desc(playbackPositions.updatedAt))
+      .limit(Math.max(limit * 2, limit)),
   ]);
 
   type RawHistory = {
@@ -322,6 +345,8 @@ export async function getWatchHistory(
     episodeNumber: number;
     watchedAt: Date;
     source: string;
+    positionSeconds?: number;
+    durationSeconds?: number;
   };
 
   const raw: RawHistory[] = historyRows
@@ -372,6 +397,47 @@ export async function getWatchHistory(
     });
   }
 
+  // A playback row is the source of truth for an in-progress stream. Merge it
+  // into history only when it is newer than the last completion for that same
+  // item, so returning to a finished title still appears at the top.
+  const latestActivityByKey = new Map<string, number>();
+  for (const row of raw) {
+    const key = playbackKey(
+      row.mediaType,
+      row.tmdbId,
+      row.seasonNumber,
+      row.episodeNumber
+    );
+    const timestamp = row.watchedAt.getTime();
+    latestActivityByKey.set(
+      key,
+      Math.max(latestActivityByKey.get(key) ?? 0, timestamp)
+    );
+  }
+  for (const row of playbackRows) {
+    if (row.mediaType !== "movie" && row.mediaType !== "tv") continue;
+    const key = playbackKey(
+      row.mediaType,
+      row.tmdbId,
+      row.seasonNumber,
+      row.episodeNumber
+    );
+    const timestamp = row.updatedAt.getTime();
+    if ((latestActivityByKey.get(key) ?? 0) >= timestamp) continue;
+    latestActivityByKey.set(key, timestamp);
+    raw.push({
+      id: `playback-${key}`,
+      mediaType: row.mediaType,
+      tmdbId: row.tmdbId,
+      seasonNumber: row.seasonNumber,
+      episodeNumber: row.episodeNumber,
+      watchedAt: row.updatedAt,
+      source: "resume",
+      positionSeconds: row.positionSeconds,
+      durationSeconds: row.durationSeconds,
+    });
+  }
+
   raw.sort((a, b) => b.watchedAt.getTime() - a.watchedAt.getTime());
   const selected = raw.slice(0, limit);
   const movieIds = selected.filter((row) => row.mediaType === "movie").map((row) => row.tmdbId);
@@ -417,6 +483,10 @@ export async function getWatchHistory(
     const episode = episodeByKey.get(
       `${row.tmdbId}:${row.seasonNumber}:${row.episodeNumber}`
     );
+    const activity =
+      row.positionSeconds != null
+        ? summary(row.positionSeconds, row.durationSeconds ?? 0, row.watchedAt)
+        : null;
     return [
       {
         id: row.id,
@@ -429,6 +499,10 @@ export async function getWatchHistory(
         episodeTitle: episode?.title ?? null,
         watchedAt: row.watchedAt.toISOString(),
         source: row.source,
+        positionSeconds: activity?.positionSeconds ?? null,
+        durationSeconds: activity?.durationSeconds ?? null,
+        timeLeftSeconds: activity?.timeLeftSeconds ?? null,
+        progressPercent: activity?.progressPercent ?? null,
       },
     ];
   });

@@ -5,27 +5,6 @@ import { ensureMovie } from "@/lib/ensure";
 import { eq, and } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
-async function clearMoviePlayback(userId: string, tmdbId: number) {
-  await db
-    .delete(playbackPositions)
-    .where(
-      and(
-        eq(playbackPositions.userId, userId),
-        eq(playbackPositions.mediaType, "movie"),
-        eq(playbackPositions.tmdbId, tmdbId)
-      )
-    );
-  await db
-    .delete(watchHistory)
-    .where(
-      and(
-        eq(watchHistory.userId, userId),
-        eq(watchHistory.mediaType, "movie"),
-        eq(watchHistory.tmdbId, tmdbId)
-      )
-    );
-}
-
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -51,7 +30,6 @@ export async function POST(request: Request) {
             eq(userMovies.tmdbId, tmdbId)
           )
         );
-      await clearMoviePlayback(session.user.id, tmdbId);
       return NextResponse.json({ success: true });
     }
 
@@ -103,8 +81,6 @@ export async function POST(request: Request) {
             eq(playbackPositions.tmdbId, tmdbId)
           )
         );
-    } else {
-      await clearMoviePlayback(session.user.id, tmdbId);
     }
 
     return NextResponse.json({ success: true });

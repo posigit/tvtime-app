@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Check, Plus } from "lucide-react";
+import { Bookmark, BookmarkCheck, Check, Plus } from "lucide-react";
 import { useToast } from "@/components/toast";
 
 export type MovieStatus = "want_to_watch" | "watched" | null;
@@ -55,7 +55,8 @@ export function MovieWatchButton({
         if (!res.ok) throw new Error("save failed");
         if (next === "watched") toast("Marked watched");
         else if (next === "want_to_watch") toast("Added to watchlist");
-        else toast("Removed from library", "info");
+        else if (prev === "watched") toast("Marked unwatched", "info");
+        else toast("Removed from My List", "info");
         router.refresh();
       } catch {
         setStatus(prev);
@@ -110,48 +111,44 @@ export function MovieWatchButton({
     );
   }
 
-  // ----- full: movie detail page, explicit watchlist vs watched -----
-  if (status === "watched") {
-    return (
-      <div className="flex gap-2">
-        <button
-          onClick={() => update("want_to_watch")}
-          disabled={pending}
-          className="flex-1 rounded-xl bg-primary py-3 text-sm font-bold text-black transition-colors"
-        >
-          ✓ Watched
-        </button>
-        <button
-          onClick={() => update(null)}
-          disabled={pending}
-          className="rounded-xl border border-white/25 px-4 py-3 text-sm font-bold text-white/80 transition-colors hover:bg-card"
-        >
-          Remove
-        </button>
-      </div>
-    );
-  }
-
+  // ----- full: detail page state controls stay secondary to playback -----
+  const inMyList = status === "want_to_watch";
+  const watched = status === "watched";
   return (
-    <div className="flex gap-2">
+    <div className="flex items-center gap-2">
       <button
-        onClick={() => update(status === "want_to_watch" ? null : "want_to_watch")}
+        onClick={() => update(inMyList ? null : "want_to_watch")}
         disabled={pending}
+        aria-label={inMyList ? "Remove from My List" : "Add to My List"}
+        aria-pressed={inMyList}
         className={cn(
-          "flex-1 rounded-xl py-3 text-sm font-bold transition-colors",
-          status === "want_to_watch"
-            ? "bg-primary text-black"
-            : "bg-card text-white hover:bg-secondary"
+          "inline-flex h-10 items-center gap-2 rounded-full px-3.5 text-sm font-semibold transition active:scale-[0.98]",
+          inMyList
+            ? "bg-white text-black"
+            : "bg-white/[0.07] text-white/75 hover:bg-white/[0.12] hover:text-white"
         )}
       >
-        {status === "want_to_watch" ? "✓ On Watchlist" : "+ Want to Watch"}
+        {inMyList ? (
+          <BookmarkCheck className="h-4 w-4" />
+        ) : (
+          <Bookmark className="h-4 w-4" />
+        )}
+        {inMyList ? "In My List" : "My List"}
       </button>
       <button
-        onClick={() => update("watched")}
+        onClick={() => update(watched ? null : "watched")}
         disabled={pending}
-        className="flex-1 rounded-xl bg-card py-3 text-sm font-bold text-white transition-colors hover:bg-secondary"
+        aria-label={watched ? "Mark unwatched" : "Mark watched"}
+        aria-pressed={watched}
+        className={cn(
+          "inline-flex h-10 items-center gap-2 rounded-full px-3.5 text-sm font-semibold transition active:scale-[0.98]",
+          watched
+            ? "bg-success/20 text-success ring-1 ring-success/35"
+            : "bg-white/[0.07] text-white/75 hover:bg-white/[0.12] hover:text-white"
+        )}
       >
-        Mark Watched
+        <Check className="h-4 w-4" strokeWidth={3} />
+        {watched ? "Watched" : "Mark watched"}
       </button>
     </div>
   );

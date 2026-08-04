@@ -388,10 +388,11 @@ export function VixPlayer({
     if (!params) return;
     if (mode === "iframe") {
       // No cross-origin seek API for the embed — resume via its startAt
-      // param instead, and keep saves enabled throughout.
-      saveEnabledRef.current = true;
+      // param instead. Keep saves disabled until the lookup completes so an
+      // iframe's initial 0–5s reports cannot overwrite a real bookmark.
       holdForResumeRef.current = false;
       if (initialResumePosition == null) {
+        saveEnabledRef.current = false;
         let cancelled = false;
         const controller = new AbortController();
         const timeout = window.setTimeout(() => controller.abort(), 8_000);
@@ -420,10 +421,17 @@ export function VixPlayer({
               if (pos > 5 && (dur === 0 || pos < dur * 0.92)) {
                 resumePosRef.current = pos;
                 setResumePosition(pos);
+                // The state update remounts the iframe with startAt. The
+                // resume gate above protects it until the embed reaches pos.
+                saveEnabledRef.current = true;
+              } else {
+                saveEnabledRef.current = true;
               }
             }
           )
-          .catch(() => {})
+          .catch(() => {
+            if (!cancelled) saveEnabledRef.current = true;
+          })
           .finally(() => window.clearTimeout(timeout));
         return () => {
           cancelled = true;
@@ -562,8 +570,11 @@ export function VixPlayer({
   useEffect(() => {
     if (mode !== "iframe") return;
     holdForResumeRef.current = false;
-    saveEnabledRef.current = true;
-  }, [mode]);
+    // With no supplied position, the lookup effect owns this gate until it
+    // has either found a bookmark or confirmed there is none.
+    saveEnabledRef.current =
+      initialResumePosition != null || resumePosition != null;
+  }, [initialResumePosition, mode, resumePosition]);
 
   // ---------- resolve native stream (single fetch, single source of truth) ----------
   useEffect(() => {
