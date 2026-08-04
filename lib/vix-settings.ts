@@ -74,6 +74,10 @@ export function saveVixSettings(patch: Partial<VixSettings>) {
   if (typeof window === "undefined") return;
   try {
     const next = { ...loadVixSettings(), ...patch };
+    // Never persist Italian (hard user rule) — clamp before storing so it
+    // can't survive a session and become a default later.
+    if (isBannedSubLang(next.subs)) next.subs = "en";
+    if (isBannedSubLang(next.audio)) next.audio = "en";
     window.localStorage.setItem(VIX_SETTINGS_KEY, JSON.stringify(next));
   } catch {
     /* storage unavailable — persistence is best-effort */

@@ -227,7 +227,11 @@ export function VixPlayer({
         video.playbackRate = s.speed;
         video.volume = s.volume;
         video.muted = s.muted;
-        everApplied = true;
+        // Only counts as "applied" once tracks actually exist — otherwise the
+        // empty MANIFEST_PARSED run would let early internal switches poison.
+        if (hls.audioTracks.length > 0 || hls.subtitleTracks.length > 0) {
+          everApplied = true;
+        }
       };
 
       // First attempt at manifest parse (usually empty — harmless), then
