@@ -94,7 +94,6 @@ export function VixPlayer({
 }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<Hls | null>(null);
   const imdbIdRef = useRef<string | null>(null);
   const onEventRef = useRef(onEvent);
   const onCloseRef = useRef(onClose);
@@ -170,7 +169,6 @@ export function VixPlayer({
 
     if (Hls.isSupported()) {
       hls = new Hls();
-      hlsRef.current = hls;
       hls.loadSource(playlistUrl);
       hls.attachMedia(video);
 
@@ -178,6 +176,7 @@ export function VixPlayer({
       // So: try on every track-population event, but only until the user
       // makes a live choice (userTouched) so we never stomp their selection.
       let userTouched = false;
+      let everApplied = false;
       let applying = false;
 
       const applySettings = () => {
@@ -202,10 +201,21 @@ export function VixPlayer({
           const st = hls.subtitleTracks.find((t) =>
             matchLang(t.lang, s.subs)
           );
-          if (st && hls.subtitleTrack !== st.id) {
-            applying = true;
-            hls.subtitleTrack = st.id;
-            applying = false;
+          if (st) {
+            if (hls.subtitleTrack !== st.id) {
+              applying = true;
+              hls.subtitleTrack = st.id;
+              applying = false;
+            }
+          } else {
+            // Saved language not in this stream (e.g. no English CC) — show
+            // NO subs rather than letting hls auto-pick an unwanted track.
+            hls.subtitleDisplay = false;
+            if (hls.subtitleTrack !== -1) {
+              applying = true;
+              hls.subtitleTrack = -1;
+              applying = false;
+            }
           }
         }
 
@@ -217,6 +227,7 @@ export function VixPlayer({
         video.playbackRate = s.speed;
         video.volume = s.volume;
         video.muted = s.muted;
+        everApplied = true;
       };
 
       // First attempt at manifest parse (usually empty — harmless), then
@@ -261,15 +272,16 @@ export function VixPlayer({
         void maybeLoadOpenSubtitles();
       });
 
-      // Persist user changes (and ignore switches caused by our own apply).
+      // Persist user changes (and ignore switches caused by our own apply
+      // or hls.js internals during initial load).
       hls.on(Hls.Events.AUDIO_TRACK_SWITCHED, (_evt, data) => {
-        if (applying) return;
+        if (applying || !everApplied) return;
         userTouched = true;
         const t = hls?.audioTracks.find((x) => x.id === data.id);
         saveVixSettings({ audio: t?.lang || "en" });
       });
       hls.on(Hls.Events.SUBTITLE_TRACK_SWITCH, (_evt, data) => {
-        if (applying) return;
+        if (applying || !everApplied) return;
         userTouched = true;
         const t = hls?.subtitleTracks.find((x) => x.id === data.id);
         saveVixSettings({ subs: t ? t.lang : "off" });
@@ -372,7 +384,6 @@ export function VixPlayer({
 
     return () => {
       hls?.destroy();
-      hlsRef.current = null;
       for (const fn of cleanup) fn();
     };
   }, [mode, playlistUrl, season, episode]);

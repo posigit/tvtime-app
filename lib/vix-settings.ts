@@ -3,9 +3,15 @@
  *
  * Stored in localStorage so audio/subtitle/quality/speed/volume choices
  * survive player remounts (episode-to-episode) and app restarts.
+ *
+ * Schema is versioned: older builds saved hls.js-internal track switches
+ * (e.g. auto-selected Italian subs) as if they were user choices. Bumping the
+ * version discards that poisoned state.
  */
 
 export type VixSettings = {
+  /** Settings schema version — bump to invalidate old stored state. */
+  v: number;
   /** Audio track language code, e.g. "en" | "it". */
   audio: string;
   /** Subtitle track language code, or "off". */
@@ -21,7 +27,10 @@ export type VixSettings = {
 
 export const VIX_SETTINGS_KEY = "vix-settings";
 
+export const VIX_SETTINGS_VERSION = 2;
+
 export const DEFAULT_VIX_SETTINGS: VixSettings = {
+  v: VIX_SETTINGS_VERSION,
   audio: "en",
   subs: "en",
   quality: "auto",
@@ -30,12 +39,31 @@ export const DEFAULT_VIX_SETTINGS: VixSettings = {
   muted: false,
 };
 
+/** Language codes that should NEVER apply as a default (hard user rule).
+ *  Bidirectional includes() below covers ita/forced-ita variants. */
+const BANNED_SUB_LANGS = ["it"];
+
+function isBannedSubLang(lang: string | undefined | null): boolean {
+  const l = (lang || "").toLowerCase();
+  return BANNED_SUB_LANGS.some(
+    (b) => l === b || l.includes(b) || b.includes(l)
+  );
+}
+
 export function loadVixSettings(): VixSettings {
   const base = { ...DEFAULT_VIX_SETTINGS };
   if (typeof window === "undefined") return base;
   try {
     const raw = window.localStorage.getItem(VIX_SETTINGS_KEY);
-    if (raw) return { ...base, ...(JSON.parse(raw) as Partial<VixSettings>) };
+    if (!raw) return base;
+    const parsed = JSON.parse(raw) as Partial<VixSettings>;
+    // Stale schema (pre-persistence-fix) — discard poisoned values entirely.
+    if (parsed.v !== VIX_SETTINGS_VERSION) return base;
+    const merged: VixSettings = { ...base, ...parsed };
+    // Hard rule: Italian must never come back as a default.
+    if (isBannedSubLang(merged.subs)) merged.subs = "en";
+    if (isBannedSubLang(merged.audio)) merged.audio = "en";
+    return merged;
   } catch {
     /* corrupt or unavailable storage — use defaults */
   }

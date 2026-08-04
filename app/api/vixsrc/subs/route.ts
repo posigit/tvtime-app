@@ -101,13 +101,17 @@ export async function GET(req: NextRequest) {
         attributes?: {
           files?: Array<{ file_id?: number }>;
           sub_format?: string;
+          language?: string;
           download_count?: number;
           release_name?: string;
         };
       }>;
     };
     const subs = (search.data ?? []).filter(
-      (s) => s.attributes?.files?.[0]?.file_id
+      (s) =>
+        s.attributes?.files?.[0]?.file_id &&
+        // Hard English filter — never return Italian subs.
+        (s.attributes.language ?? "").toLowerCase().startsWith("en")
     );
     if (subs.length === 0) {
       return NextResponse.json(
