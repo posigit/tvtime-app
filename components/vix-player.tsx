@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import { ExternalLink, LoaderCircle, X } from "lucide-react";
-import { VIX_PLAYER_ORIGIN, parseVixPlayerEvent } from "@/lib/vixsrc";
+import { VIX_PLAYER_ORIGIN, parseVixPlayerEvent, parseVixPlayerEventData } from "@/lib/vixsrc";
+import { ResumeOverlay } from "@/components/resume-overlay";
 import {
   loadVixSettings,
   saveVixSettings,
@@ -95,6 +96,8 @@ export function VixPlayer({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const imdbIdRef = useRef<string | null>(null);
+  const mediaKeyRef = useRef<string | null>(null);
+  const lastSavedPosRef = useRef(0);
   const onEventRef = useRef(onEvent);
   const onCloseRef = useRef(onClose);
   const endedRef = useRef(false);
@@ -105,6 +108,7 @@ export function VixPlayer({
   // Non-streamable mounts (no type/tmdbId) go straight to iframe fallback.
   const [streamFailed, setStreamFailed] = useState(() => !streamable);
   const [iframeError, setIframeError] = useState(false);
+  const [resumePosition, setResumePosition] = useState<number | null>(null);
 
   // mode: native -> iframe -> error
   const mode = streamFailed
@@ -135,6 +139,101 @@ export function VixPlayer({
     onEventRef.current?.(event);
   }, []);
 
+  // ---------- resume playback ----------
+
+  const playbackParams = useCallback(() => {
+    const key = mediaKeyRef.current;
+    if (!key) return null;
+    const [type, ...rest] = key.split(":");
+    if (type === "tv" && rest.length >= 3) {
+      return `type=tv&id=${rest[0]}&season=${rest[1]}&episode=${rest[2]}`;
+    }
+    return `type=movie&id=${rest[0]}`;
+  }, []);
+
+  const savePosition = useCallback(
+    (pos: number, duration: number, force = false) => {
+      const params = playbackParams();
+      if (!params) return;
+      const rounded = Math.round(pos);
+      if (rounded <= 0) return;
+      if (!force && Math.abs(rounded - lastSavedPosRef.current) < 5) return;
+      lastSavedPosRef.current = rounded;
+      void fetch(`/api/playback?${params}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          positionSeconds: rounded,
+          durationSeconds: Math.round(duration || 0),
+        }),
+        keepalive: true, // survives close/unmount
+      }).catch(() => {});
+    },
+    [playbackParams]
+  );
+
+  const clearPosition = useCallback(() => {
+    const params = playbackParams();
+    if (!params) return;
+    void fetch(`/api/playback?${params}`, {
+      method: "DELETE",
+      keepalive: true,
+    }).catch(() => {});
+  }, [playbackParams]);
+
+  const seekVideo = useCallback((t: number) => {
+    const v = videoRef.current;
+    if (!v) return;
+    const doSeek = () => {
+      v.currentTime = t;
+      void v.play().catch(() => {});
+    };
+    if (v.readyState >= 1) doSeek();
+    else v.addEventListener("loadedmetadata", doSeek, { once: true });
+  }, []);
+
+  const handleResume = useCallback(() => {
+    if (resumePosition != null) {
+      lastSavedPosRef.current = Math.round(resumePosition);
+      seekVideo(resumePosition);
+    }
+    setResumePosition(null);
+  }, [resumePosition, seekVideo]);
+
+  const handleRestart = useCallback(() => {
+    clearPosition();
+    lastSavedPosRef.current = 0;
+    seekVideo(0);
+    setResumePosition(null);
+  }, [clearPosition, seekVideo]);
+
+  // Fetch saved position once native playback starts.
+  useEffect(() => {
+    if (mode !== "native" || !playlistUrl) return;
+    const params = playbackParams();
+    if (!params) return;
+    let cancelled = false;
+    fetch(`/api/playback?${params}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then(
+        (
+          data: { positionSeconds?: number; durationSeconds?: number } | null
+        ) => {
+          if (cancelled || !data?.positionSeconds) return;
+          const pos = data.positionSeconds;
+          const dur = data.durationSeconds || 0;
+          // Resume only if meaningfully mid-way; near-complete counts as done.
+          if (pos > 30 && (dur === 0 || pos < dur * 0.92)) {
+            setResumePosition(pos);
+          }
+        }
+      )
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, playlistUrl, playbackParams]);
+
   // ---------- resolve native stream (single fetch, single source of truth) ----------
   useEffect(() => {
     if (!streamable || !tmdbId) return; // initial state already fell back
@@ -148,6 +247,10 @@ export function VixPlayer({
       .then((data: { playlistUrl?: string; imdbId?: string | null }) => {
         if (cancelled) return;
         imdbIdRef.current = data?.imdbId ?? null;
+        mediaKeyRef.current =
+          type === "tv"
+            ? `tv:${tmdbId}:${season ?? 0}:${episode ?? 0}`
+            : `movie:${tmdbId}`;
         if (data?.playlistUrl) setPlaylistUrl(data.playlistUrl);
         else setStreamFailed(true);
       })
@@ -398,14 +501,24 @@ export function VixPlayer({
     const video = videoRef.current;
 
     const onPlay = () => emit("play");
-    const onPause = () => emit("pause");
-    const onSeeked = () => emit("seeked");
-    const onEnded = () => emit("ended");
+    const onPause = () => {
+      emit("pause");
+      savePosition(video.currentTime, video.duration, true);
+    };
+    const onSeeked = () => {
+      emit("seeked");
+      savePosition(video.currentTime, video.duration, true);
+    };
+    const onEnded = () => {
+      emit("ended");
+      clearPosition();
+    };
     const onTime = () => {
       const now = Date.now();
       if (now - lastTimeRef.current < 1000) return;
       lastTimeRef.current = now;
       emit("timeupdate");
+      savePosition(video.currentTime, video.duration);
     };
 
     video.addEventListener("play", onPlay);
@@ -420,7 +533,7 @@ export function VixPlayer({
       video.removeEventListener("ended", onEnded);
       video.removeEventListener("timeupdate", onTime);
     };
-  }, [mode, emit]);
+  }, [mode, emit, savePosition, clearPosition]);
 
   // ---------- iframe fallback: postMessage bridge ----------
   useEffect(() => {
@@ -430,18 +543,31 @@ export function VixPlayer({
       const event = parseVixPlayerEvent(e.data);
       if (!event) return;
       emit(event);
+      // iframe fallback: persist progress from the remote player's timeupdate.
+      const d = parseVixPlayerEventData(e.data);
+      if (
+        d?.event === "timeupdate" &&
+        typeof d.currentTime === "number" &&
+        d.currentTime > 0
+      ) {
+        savePosition(d.currentTime, d.duration ?? 0);
+      }
     };
     window.addEventListener("message", handler);
     return () => window.removeEventListener("message", handler);
-  }, [emit]);
+  }, [emit, savePosition]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCloseRef.current();
+      if (e.key === "Escape") {
+        const v = videoRef.current;
+        if (v) savePosition(v.currentTime, v.duration, true);
+        onCloseRef.current();
+      }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  }, [savePosition]);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -488,6 +614,14 @@ export function VixPlayer({
         />
       )}
 
+      {mode === "native" && resumePosition != null && (
+        <ResumeOverlay
+          positionSeconds={resumePosition}
+          onResume={handleResume}
+          onRestart={handleRestart}
+        />
+      )}
+
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black/90 via-black/45 to-transparent pt-safe">
         <div className="flex items-start justify-between gap-3 px-4 pb-8 pt-3">
           <div className="min-w-0">
@@ -509,7 +643,11 @@ export function VixPlayer({
             </a>
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => {
+                const v = videoRef.current;
+                if (v) savePosition(v.currentTime, v.duration, true);
+                onClose();
+              }}
               aria-label="Close player"
               className="flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
             >

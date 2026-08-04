@@ -261,3 +261,28 @@ export const pushSubscriptions = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   }
 );
+
+/**
+ * Resume-playback positions. One row per user per media item.
+ * Movies use season_number=0 / episode_number=0.
+ */
+export const playbackPositions = pgTable(
+  "playback_positions",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    mediaType: text("media_type").notNull(), // "movie" | "tv"
+    tmdbId: integer("tmdb_id").notNull(),
+    seasonNumber: integer("season_number").notNull().default(0),
+    episodeNumber: integer("episode_number").notNull().default(0),
+    positionSeconds: integer("position_seconds").notNull().default(0),
+    durationSeconds: integer("duration_seconds").notNull().default(0),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({
+      columns: [t.userId, t.mediaType, t.tmdbId, t.seasonNumber, t.episodeNumber],
+    }),
+  })
+);

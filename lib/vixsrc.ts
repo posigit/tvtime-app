@@ -48,3 +48,38 @@ export function parseVixPlayerEvent(data: unknown): VixPlayerEvent | null {
     ? (event as VixPlayerEvent)
     : null;
 }
+
+export type VixPlayerEventData = {
+  event: VixPlayerEvent;
+  currentTime?: number;
+  duration?: number;
+};
+
+/** Like parseVixPlayerEvent but also surfaces currentTime/duration (resume saves). */
+export function parseVixPlayerEventData(
+  data: unknown
+): VixPlayerEventData | null {
+  if (!data || typeof data !== "object") return null;
+  const obj = data as {
+    type?: string;
+    data?: { event?: string; currentTime?: number; duration?: number };
+  };
+  if (obj.type !== "PLAYER_EVENT") return null;
+
+  const event = obj.data?.event;
+  if (
+    typeof event !== "string" ||
+    !(VIX_PLAYER_EVENTS as readonly string[]).includes(event)
+  ) {
+    return null;
+  }
+  return {
+    event: event as VixPlayerEvent,
+    currentTime:
+      typeof obj.data?.currentTime === "number"
+        ? obj.data.currentTime
+        : undefined,
+    duration:
+      typeof obj.data?.duration === "number" ? obj.data.duration : undefined,
+  };
+}
