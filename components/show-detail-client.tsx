@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { backdropUrl, stillUrl } from "@/lib/tmdb";
@@ -105,6 +105,7 @@ export function ShowDetailClient({
     }
     return map;
   });
+  const watchedMapRef = useRef(watchedMap);
   const [rewatchCounts, setRewatchCounts] = useState(initialRewatchCounts);
   const [activeTab, setActiveTab] = useState<"about" | "episodes">("episodes");
   const [confetti, setConfetti] = useState(false);
@@ -117,6 +118,7 @@ export function ShowDetailClient({
   const [pending, setPending] = useState(false);
   /** Episode currently open in the VixSrc player overlay. */
   const [playerEp, setPlayerEp] = useState<DetailEpisode | null>(null);
+  const playerSessionRef = useRef(0);
 
   const isWatched = (ep: DetailEpisode) =>
     watchedMap[watchKey(ep.seasonNumber, ep.episodeNumber)] ?? false;
@@ -222,11 +224,12 @@ export function ShowDetailClient({
   ): Promise<boolean> => {
     if (items.length === 0) return false;
 
-    const prev = watchedMap;
-    const next = { ...watchedMap };
+    const prev = watchedMapRef.current;
+    const next = { ...prev };
     for (const item of items) {
       next[watchKey(item.seasonNumber, item.episodeNumber)] = item.watched;
     }
+    watchedMapRef.current = next;
     setWatchedMap(next);
     if (items.some((i) => i.watched)) {
       celebrateIfComplete(next);
@@ -263,6 +266,7 @@ export function ShowDetailClient({
         );
       }
     } catch {
+      watchedMapRef.current = prev;
       setWatchedMap(prev);
       toast("Couldn't save — try again", "error");
       return false;
@@ -362,7 +366,10 @@ export function ShowDetailClient({
     }
   };
 
-  const openPlayer = (ep: DetailEpisode) => setPlayerEp(ep);
+  const openPlayer = (ep: DetailEpisode) => {
+    playerSessionRef.current += 1;
+    setPlayerEp(ep);
+  };
 
   /**
    * Streaming events from VixSrc. On "ended": mark the episode watched,
@@ -370,6 +377,7 @@ export function ShowDetailClient({
    */
   const handlePlayerEvent = async (event: string) => {
     if (event !== "ended" || !playerEp) return;
+    const session = playerSessionRef.current;
     const endedEpisode = playerEp;
     if (isWatched(endedEpisode)) {
       setPlayerEp(null);
@@ -384,17 +392,20 @@ export function ShowDetailClient({
       },
     ]);
     if (!saved) return;
+    // Closing or replacing the player while the watch request was pending
+    // cancels auto-advance instead of reopening the next episode.
+    if (playerSessionRef.current !== session) return;
 
     const next = [...episodes]
       .sort(compareEp)
       .find(
         (ep) =>
           compareEp(ep, endedEpisode) > 0 &&
-          !isWatched(ep) &&
+          !watchedMapRef.current[watchKey(ep.seasonNumber, ep.episodeNumber)] &&
           isEpisodeAired(ep.airDate)
       );
-    if (next) setPlayerEp(next);
-    else setPlayerEp(null);
+    playerSessionRef.current += 1;
+    setPlayerEp(next ?? null);
   };
 
   const confirmRewatch = async () => {
@@ -418,6 +429,7 @@ export function ShowDetailClient({
             next[watchKey(ep.seasonNumber, ep.episodeNumber)] = false;
           }
         }
+        watchedMapRef.current = next;
         return next;
       });
       setRewatchCounts((prev) => ({
@@ -1060,7 +1072,10 @@ export function ShowDetailClient({
           episode={playerEp.episodeNumber}
           title={`${show.title} — S${playerEp.seasonNumber}E${playerEp.episodeNumber} ${playerEp.title}`}
           onEvent={handlePlayerEvent}
-          onClose={() => setPlayerEp(null)}
+          onClose={() => {
+            playerSessionRef.current += 1;
+            setPlayerEp(null);
+          }}
         />
       )}
     </div>

@@ -7,20 +7,46 @@ import { NextRequest, NextResponse } from "next/server";
 /**
  * Resume-playback positions.
  *   GET    /api/playback?type=movie|tv&id=<tmdbId>[&season=N&episode=N]
- *   POST   { type, tmdbId, season?, episode?, positionSeconds, durationSeconds }
+ *   POST   ?type=...&id=... with { positionSeconds, durationSeconds }
  *   DELETE /api/playback?type=...&id=...
  * Movies use season/episode = 0 (defaults).
  */
 
+const MAX_SECONDS = 2_147_483_647;
+
+function parseNonNegativeInt(
+  value: string | null,
+  fallback: number
+): number | null {
+  if (value === null) return fallback;
+  if (!/^\d+$/.test(value)) return null;
+  const parsed = Number(value);
+  return Number.isSafeInteger(parsed) && parsed <= MAX_SECONDS ? parsed : null;
+}
+
 function parseMediaParams(sp: URLSearchParams) {
   const type = sp.get("type"); // "movie" | "tv"
-  const tmdbId = Number(sp.get("id"));
-  const seasonNumber = Number(sp.get("season") ?? 0);
-  const episodeNumber = Number(sp.get("episode") ?? 0);
-  if ((type !== "movie" && type !== "tv") || !Number.isFinite(tmdbId)) {
+  const tmdbId = parseNonNegativeInt(sp.get("id"), 0);
+  const seasonNumber = parseNonNegativeInt(sp.get("season"), 0);
+  const episodeNumber = parseNonNegativeInt(sp.get("episode"), 0);
+  if (
+    (type !== "movie" && type !== "tv") ||
+    tmdbId === null ||
+    tmdbId === 0 ||
+    seasonNumber === null ||
+    episodeNumber === null
+  ) {
     return null;
   }
-  return { type, tmdbId, seasonNumber, episodeNumber };
+  if (type === "tv" && (!sp.has("season") || !sp.has("episode"))) {
+    return null;
+  }
+  return {
+    type,
+    tmdbId,
+    seasonNumber: type === "movie" ? 0 : seasonNumber,
+    episodeNumber: type === "movie" ? 0 : episodeNumber,
+  };
 }
 
 export async function GET(req: NextRequest) {
@@ -62,13 +88,43 @@ export async function POST(req: NextRequest) {
   const p = parseMediaParams(req.nextUrl.searchParams);
   if (!p) return NextResponse.json({ error: "Invalid params" }, { status: 400 });
 
-  const body = await req.json();
-  const positionSeconds = Number(body.positionSeconds);
-  const durationSeconds = Number(body.durationSeconds ?? 0);
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
 
-  if (!Number.isFinite(positionSeconds)) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
+
+  const payload = body as {
+    positionSeconds?: unknown;
+    durationSeconds?: unknown;
+  };
+  const positionSeconds = payload.positionSeconds;
+  const durationSeconds =
+    payload.durationSeconds === undefined ? 0 : payload.durationSeconds;
+
+  if (
+    typeof positionSeconds !== "number" ||
+    !Number.isFinite(positionSeconds) ||
+    positionSeconds < 0 ||
+    positionSeconds > MAX_SECONDS ||
+    typeof durationSeconds !== "number" ||
+    !Number.isFinite(durationSeconds) ||
+    durationSeconds < 0 ||
+    durationSeconds > MAX_SECONDS
+  ) {
+    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+  }
+
+  const normalizedDuration = Math.round(durationSeconds);
+  const normalizedPosition = Math.min(
+    Math.round(positionSeconds),
+    normalizedDuration > 0 ? normalizedDuration : MAX_SECONDS
+  );
 
   await db
     .insert(playbackPositions)
@@ -78,8 +134,8 @@ export async function POST(req: NextRequest) {
       tmdbId: p.tmdbId,
       seasonNumber: p.seasonNumber,
       episodeNumber: p.episodeNumber,
-      positionSeconds: Math.max(0, Math.round(positionSeconds)),
-      durationSeconds: Math.max(0, Math.round(durationSeconds)),
+      positionSeconds: normalizedPosition,
+      durationSeconds: normalizedDuration,
     })
     .onConflictDoUpdate({
       target: [
@@ -90,8 +146,17 @@ export async function POST(req: NextRequest) {
         playbackPositions.episodeNumber,
       ],
       set: {
-        positionSeconds: Math.max(0, Math.round(positionSeconds)),
-        durationSeconds: Math.max(0, Math.round(durationSeconds)),
+        // Do not let an update without duration move past a known bookmark
+        // duration from an earlier player event.
+        positionSeconds:
+          normalizedDuration > 0
+            ? normalizedPosition
+            : sql`CASE WHEN ${playbackPositions.durationSeconds} > 0 THEN LEAST(${normalizedPosition}, ${playbackPositions.durationSeconds}) ELSE ${normalizedPosition} END`,
+        // Keep a known duration when a player update cannot report one.
+        durationSeconds:
+          normalizedDuration > 0
+            ? normalizedDuration
+            : sql`${playbackPositions.durationSeconds}`,
         updatedAt: sql`now()`,
       },
     });

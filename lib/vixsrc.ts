@@ -76,10 +76,16 @@ export function parseVixPlayerEventData(
   return {
     event: event as VixPlayerEvent,
     currentTime:
-      typeof obj.data?.currentTime === "number"
+      typeof obj.data?.currentTime === "number" &&
+      Number.isFinite(obj.data.currentTime) &&
+      obj.data.currentTime >= 0
         ? obj.data.currentTime
         : undefined,
     duration:
-      typeof obj.data?.duration === "number" ? obj.data.duration : undefined,
+      typeof obj.data?.duration === "number" &&
+      Number.isFinite(obj.data.duration) &&
+      obj.data.duration >= 0
+        ? obj.data.duration
+        : undefined,
   };
 }
