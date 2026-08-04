@@ -41,12 +41,12 @@ export function MovieVixButton({
           completionRef.current = false;
           setOpen(true);
         }}
-        className="group flex w-full items-center gap-3 rounded-2xl bg-primary px-4 py-3 text-left text-black transition hover:bg-primary/90 active:scale-[0.99]"
+        className="group relative flex w-full items-center justify-center gap-3 rounded-2xl bg-primary px-4 py-3 text-center text-black transition hover:bg-primary/90 active:scale-[0.99]"
       >
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black text-primary transition group-hover:scale-105">
           <Play className="h-4 w-4 fill-current" />
         </span>
-        <span className="min-w-0 flex-1">
+        <span className="min-w-0">
           <span className="block text-sm font-black">
             {resume ? "Resume" : "Watch now"}
           </span>
@@ -57,7 +57,7 @@ export function MovieVixButton({
           )}
         </span>
         {resume && (
-          <span className="flex h-1.5 w-14 shrink-0 overflow-hidden rounded-full bg-black/20">
+          <span className="absolute right-4 flex h-1.5 w-14 shrink-0 overflow-hidden rounded-full bg-black/20">
             <span
               className="block h-full rounded-full bg-black"
               style={{ width: `${playback?.progressPercent ?? 0}%` }}

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Play } from "lucide-react";
+import { Play, X } from "lucide-react";
 import { posterUrl } from "@/lib/tmdb";
 import { formatAppDateShort } from "@/lib/app-time";
 import { vixMovieUrl, vixTvUrl } from "@/lib/vixsrc";
@@ -23,6 +23,18 @@ function playerTitle(item: WatchHistoryItem) {
   return item.mediaType === "tv" && item.episodeTitle
     ? `${item.title} — ${itemLabel(item)}`
     : item.title;
+}
+
+function playbackQuery(item: WatchHistoryItem) {
+  const params = new URLSearchParams({
+    type: item.mediaType,
+    id: String(item.tmdbId),
+  });
+  if (item.mediaType === "tv") {
+    params.set("season", String(item.seasonNumber));
+    params.set("episode", String(item.episodeNumber));
+  }
+  return params.toString();
 }
 
 async function markComplete(item: WatchHistoryItem) {
@@ -92,7 +104,15 @@ function StreamPlayer({
   );
 }
 
-function ProfileStreamTile({ item }: { item: WatchHistoryItem }) {
+function ProfileStreamTile({
+  item,
+  onDismiss,
+  dismissing = false,
+}: {
+  item: WatchHistoryItem;
+  onDismiss?: () => void;
+  dismissing?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const poster = posterUrl(item.posterPath, "w342");
   const timeLeft = formatPlaybackTime(item.timeLeftSeconds);
@@ -103,11 +123,12 @@ function ProfileStreamTile({ item }: { item: WatchHistoryItem }) {
   }
 
   return (
-    <button
-      type="button"
-      onClick={() => setOpen(true)}
-      className="group w-[15rem] shrink-0 overflow-hidden rounded-[1.1rem] bg-[#1d1d1f] text-left ring-1 ring-white/[0.06] transition hover:ring-white/20 active:scale-[0.98]"
-    >
+    <div className="group/card relative w-[15rem] shrink-0 overflow-hidden rounded-[1.1rem] bg-[#1d1d1f] text-left ring-1 ring-white/[0.06] transition hover:ring-white/20">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="group block w-full text-left active:scale-[0.98]"
+      >
       <div className="relative h-[8.5rem] overflow-hidden bg-secondary">
         {poster ? (
           <Image
@@ -151,7 +172,23 @@ function ProfileStreamTile({ item }: { item: WatchHistoryItem }) {
             : `Played ${formatAppDateShort(item.watchedAt.slice(0, 10))}`}
         </p>
       </div>
-    </button>
+      </button>
+      {isInProgress && onDismiss && (
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onDismiss();
+          }}
+          disabled={dismissing}
+          aria-label="Remove from Continue watching"
+          title="Remove from Continue watching"
+          className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/65 text-white/80 ring-1 ring-white/20 backdrop-blur transition hover:bg-black/85 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-wait disabled:opacity-50 md:opacity-0 md:group-hover/card:opacity-100"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -231,18 +268,54 @@ export function ProfilePlaybackShelf({
   continueItems: ContinueWatchingItem[];
   recentItems: WatchHistoryItem[];
 }) {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [dismissedKeys, setDismissedKeys] = useState<Set<string>>(
+    () => new Set()
+  );
+  const [pendingKey, setPendingKey] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
   const seen = new Set<string>();
-  const items = [...continueItems.map(toHistoryItem), ...recentItems].filter(
-    (item) => {
+  const items = [...continueItems.map(toHistoryItem), ...recentItems]
+    .filter((item) => {
       const key = `${item.mediaType}:${item.tmdbId}`;
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
-    }
-  ).slice(0, 10);
+    })
+    .slice(0, 10)
+    .filter((item) => !dismissedKeys.has(item.id));
   if (items.length === 0) return null;
 
-  const hasProgress = continueItems.length > 0;
+  const hasProgress = items.some((item) => item.source === "resume");
+
+  const dismiss = (item: WatchHistoryItem) => {
+    setDismissedKeys((previous) => {
+      const next = new Set(previous);
+      next.add(item.id);
+      return next;
+    });
+    setPendingKey(item.id);
+    startTransition(async () => {
+      try {
+        const response = await fetch(`/api/playback?${playbackQuery(item)}`, {
+          method: "DELETE",
+        });
+        if (!response.ok) throw new Error("remove failed");
+        toast("Removed from Continue watching", "info");
+        router.refresh();
+      } catch {
+        setDismissedKeys((previous) => {
+          const next = new Set(previous);
+          next.delete(item.id);
+          return next;
+        });
+        toast("Couldn't remove this item", "error");
+      } finally {
+        setPendingKey(null);
+      }
+    });
+  };
 
   return (
     <section className="mb-10 pt-1">
@@ -266,7 +339,14 @@ export function ProfilePlaybackShelf({
       </div>
       <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {items.map((item) => (
-          <ProfileStreamTile key={item.id} item={item} />
+          <ProfileStreamTile
+            key={item.id}
+            item={item}
+            onDismiss={
+              item.source === "resume" ? () => dismiss(item) : undefined
+            }
+            dismissing={isPending && pendingKey === item.id}
+          />
         ))}
       </div>
     </section>
