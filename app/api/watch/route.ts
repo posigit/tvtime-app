@@ -1,6 +1,12 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { watchedEpisodes, userShows, episodes } from "@/lib/schema";
+import {
+  watchedEpisodes,
+  userShows,
+  episodes,
+  watchHistory,
+  playbackPositions,
+} from "@/lib/schema";
 import { eq, and } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { isEpisodeAired } from "@/lib/show-progress";
@@ -88,6 +94,30 @@ export async function POST(request: Request) {
           ],
           set: { watchedAt: new Date() },
         });
+
+      // Watch history entry (append-only — rewatches show up again)
+      await db.insert(watchHistory).values({
+        userId: session.user.id,
+        mediaType: "tv",
+        tmdbId: sid,
+        seasonNumber,
+        episodeNumber,
+        watchedAt: new Date(),
+        source: "manual",
+      });
+
+      // Episode finished — drop any stale resume bookmark
+      await db
+        .delete(playbackPositions)
+        .where(
+          and(
+            eq(playbackPositions.userId, session.user.id),
+            eq(playbackPositions.mediaType, "tv"),
+            eq(playbackPositions.tmdbId, sid),
+            eq(playbackPositions.seasonNumber, seasonNumber),
+            eq(playbackPositions.episodeNumber, episodeNumber)
+          )
+        );
     } else {
       await db
         .delete(watchedEpisodes)
@@ -97,6 +127,30 @@ export async function POST(request: Request) {
             eq(watchedEpisodes.showTmdbId, sid),
             eq(watchedEpisodes.seasonNumber, seasonNumber),
             eq(watchedEpisodes.episodeNumber, episodeNumber)
+          )
+        );
+
+      // Unmarking removes the matching history entries + resume bookmark
+      await db
+        .delete(watchHistory)
+        .where(
+          and(
+            eq(watchHistory.userId, session.user.id),
+            eq(watchHistory.mediaType, "tv"),
+            eq(watchHistory.tmdbId, sid),
+            eq(watchHistory.seasonNumber, seasonNumber),
+            eq(watchHistory.episodeNumber, episodeNumber)
+          )
+        );
+      await db
+        .delete(playbackPositions)
+        .where(
+          and(
+            eq(playbackPositions.userId, session.user.id),
+            eq(playbackPositions.mediaType, "tv"),
+            eq(playbackPositions.tmdbId, sid),
+            eq(playbackPositions.seasonNumber, seasonNumber),
+            eq(playbackPositions.episodeNumber, episodeNumber)
           )
         );
     }

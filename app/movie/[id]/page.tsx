@@ -29,6 +29,7 @@ import { ScoreStrip } from "@/components/score-strip";
 import { TrailerButton } from "@/components/trailer-button";
 import { MovieVixButton } from "@/components/movie-vix-button";
 import { TmdbIcon } from "@/components/rt-icons";
+import { getPlaybackPosition } from "@/lib/playback";
 
 function formatRuntime(minutes: number) {
   const h = Math.floor(minutes / 60);
@@ -67,7 +68,7 @@ export default async function MovieDetailPage({
   const movie = await ensureMovie(tmdbId);
   if (!movie) notFound();
 
-  const [userMovie, ownedMovies] = await Promise.all([
+  const [userMovie, ownedMovies, playback] = await Promise.all([
     db.query.userMovies.findFirst({
       where: and(eq(userMovies.userId, userId), eq(userMovies.tmdbId, tmdbId)),
     }),
@@ -75,6 +76,7 @@ export default async function MovieDetailPage({
       .select({ tmdbId: userMovies.tmdbId })
       .from(userMovies)
       .where(eq(userMovies.userId, userId)),
+    getPlaybackPosition(userId, "movie", tmdbId),
   ]);
 
   const ownedIds = new Set(ownedMovies.map((m) => m.tmdbId));
@@ -202,7 +204,12 @@ export default async function MovieDetailPage({
 
       {/* ---------- Body ---------- */}
       <div className="px-4 pt-4">
-        <MovieVixButton tmdbId={tmdbId} title={movie.title} isWatched={isWatched} />
+        <MovieVixButton
+          tmdbId={tmdbId}
+          title={movie.title}
+          isWatched={isWatched}
+          playback={playback}
+        />
 
         <div className="mt-3">
           <MovieWatchButton

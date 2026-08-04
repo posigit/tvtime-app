@@ -19,6 +19,8 @@ import { TmdbIcon } from "@/components/rt-icons";
 import { formatEpisodeLabel, useToast } from "@/components/toast";
 import type { TmdbMediaCard, WatchProvidersResult } from "@/lib/tmdb";
 import type { ReviewsPayload } from "@/lib/reviews";
+import type { PlaybackSummary } from "@/lib/playback";
+import { formatPlaybackTime } from "@/lib/playback-format";
 import { Check, ChevronDown, MoreHorizontal, Play } from "lucide-react";
 
 export type DetailEpisode = {
@@ -82,6 +84,7 @@ export function ShowDetailClient({
   providers = null,
   reviews,
   trailerKey = null,
+  playbackPositions = {},
 }: {
   show: DetailShow;
   episodes: DetailEpisode[];
@@ -94,6 +97,7 @@ export function ShowDetailClient({
   providers?: WatchProvidersResult | null;
   reviews?: ReviewsPayload;
   trailerKey?: string | null;
+  playbackPositions?: Record<string, PlaybackSummary>;
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -122,6 +126,16 @@ export function ShowDetailClient({
 
   const isWatched = (ep: DetailEpisode) =>
     watchedMap[watchKey(ep.seasonNumber, ep.episodeNumber)] ?? false;
+
+  const playbackFor = (ep: DetailEpisode) =>
+    playbackPositions[watchKey(ep.seasonNumber, ep.episodeNumber)] ?? null;
+
+  const resumeLabel = (ep: DetailEpisode) => {
+    const playback = playbackFor(ep);
+    if (!playback) return null;
+    const timeLeft = formatPlaybackTime(playback.timeLeftSeconds);
+    return timeLeft ? `Resume · ${timeLeft} left` : "Resume";
+  };
 
   // ---------- derived data ----------
 
@@ -932,6 +946,11 @@ export function ShowDetailClient({
                                   )}
                                 </p>
                               )}
+                              {resumeLabel(ep) && !watched && (
+                                <p className="mt-0.5 text-[11px] font-black text-primary">
+                                  {resumeLabel(ep)}
+                                </p>
+                              )}
                               {watched && (
                                 <EpisodeRating
                                   showTmdbId={show.tmdbId}
@@ -1071,6 +1090,8 @@ export function ShowDetailClient({
           season={playerEp.seasonNumber}
           episode={playerEp.episodeNumber}
           title={`${show.title} — S${playerEp.seasonNumber}E${playerEp.episodeNumber} ${playerEp.title}`}
+          initialPosition={playbackFor(playerEp)?.positionSeconds}
+          autoResume={Boolean(playbackFor(playerEp))}
           onEvent={handlePlayerEvent}
           onClose={() => {
             playerSessionRef.current += 1;

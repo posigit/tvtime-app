@@ -31,6 +31,8 @@ import { ProfileHeatmap } from "@/components/profile-heatmap";
 import { ProfileTaste } from "@/components/profile-taste";
 import { ProfileYearRecap } from "@/components/profile-year-recap";
 import { StarRatingDisplay } from "@/components/star-rating";
+import { ContinueWatchingRail } from "@/components/continue-watching";
+import { getContinueWatching } from "@/lib/playback";
 import {
   aggregateGenres,
   currentStreak as calcCurrentStreak,
@@ -293,6 +295,8 @@ export default async function ProfilePage() {
     .select({ value: count() })
     .from(userMovies)
     .where(eq(userMovies.userId, userId));
+
+  const continueWatching = await getContinueWatching(userId, 10).catch(() => []);
 
   const monthStart = new Date();
   monthStart.setDate(1);
@@ -1072,6 +1076,20 @@ export default async function ProfilePage() {
           <SectionHeader title="Your taste" />
           <ProfileTaste taste={taste} />
         </section>
+
+        {/* ---------- Continue watching ---------- */}
+        {continueWatching.length > 0 && (
+          <section className="mb-8">
+            <ContinueWatchingRail items={continueWatching} className="mb-2" />
+            <Link
+              href="/profile/history"
+              className="ml-1 inline-flex items-center gap-0.5 text-xs font-bold text-muted-foreground transition hover:text-white"
+            >
+              Watch history
+              <ChevronRight className="h-3.5 w-3.5" />
+            </Link>
+          </section>
+        )}
 
         {/* ---------- Recently watched ---------- */}
         {recentItems.length > 0 && (

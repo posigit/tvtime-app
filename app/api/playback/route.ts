@@ -120,9 +120,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  const normalizedDuration = Math.round(durationSeconds);
+  const normalizedDuration = Math.min(MAX_SECONDS, durationSeconds);
   const normalizedPosition = Math.min(
-    Math.round(positionSeconds),
+    positionSeconds,
     normalizedDuration > 0 ? normalizedDuration : MAX_SECONDS
   );
 

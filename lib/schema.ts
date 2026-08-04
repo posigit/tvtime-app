@@ -1,10 +1,12 @@
 import {
   boolean,
+  index,
   integer,
   jsonb,
   pgTable,
   primaryKey,
   real,
+  serial,
   text,
   timestamp,
   uniqueIndex,
@@ -276,13 +278,35 @@ export const playbackPositions = pgTable(
     tmdbId: integer("tmdb_id").notNull(),
     seasonNumber: integer("season_number").notNull().default(0),
     episodeNumber: integer("episode_number").notNull().default(0),
-    positionSeconds: integer("position_seconds").notNull().default(0),
-    durationSeconds: integer("duration_seconds").notNull().default(0),
+    positionSeconds: real("position_seconds").notNull().default(0),
+    durationSeconds: real("duration_seconds").notNull().default(0),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (t) => ({
-    pk: primaryKey({
+  (t) => [
+    primaryKey({
       columns: [t.userId, t.mediaType, t.tmdbId, t.seasonNumber, t.episodeNumber],
     }),
-  })
+    index("playback_positions_user_updated_idx").on(t.userId, t.updatedAt),
+  ]
+);
+
+/** Append-only completion history. Unlike watched state, rewatches remain visible. */
+export const watchHistory = pgTable(
+  "watch_history",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    mediaType: text("media_type").notNull(), // "movie" | "tv"
+    tmdbId: integer("tmdb_id").notNull(),
+    seasonNumber: integer("season_number").notNull().default(0),
+    episodeNumber: integer("episode_number").notNull().default(0),
+    watchedAt: timestamp("watched_at").defaultNow().notNull(),
+    source: text("source").notNull().default("player"), // "player" | "manual"
+  },
+  (t) => [
+    index("watch_history_user_watched_idx").on(t.userId, t.watchedAt),
+    index("watch_history_media_idx").on(t.mediaType, t.tmdbId),
+  ]
 );

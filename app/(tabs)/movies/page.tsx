@@ -15,6 +15,8 @@ import {
 } from "@/lib/movie-watchlist";
 import { getUnseenGreatMoviesPool } from "@/lib/surprise-movies";
 import { WatchLaterTools } from "@/components/watch-later-tools";
+import { ContinueWatchingRail } from "@/components/continue-watching";
+import { getContinueWatching } from "@/lib/playback";
 import {
   LEGACY_LAYOUT_COOKIE,
   layoutCookieName,
@@ -280,6 +282,11 @@ export default async function MoviesPage({
 
   const userId = await requireAuth();
 
+  const continueWatching =
+    currentView === "watchlist"
+      ? await getContinueWatching(userId, 10).catch(() => [])
+      : [];
+
   const userMoviesList = await db
     .select({
       tmdbId: movies.tmdbId,
@@ -346,6 +353,8 @@ export default async function MoviesPage({
 
       {currentView === "watchlist" && (
         <>
+          <ContinueWatchingRail items={continueWatching} className="mt-4" />
+
           {watchNext.length > 0 && (
             <section className="mb-6">
               <div className="relative mb-3 mt-2 flex justify-center">

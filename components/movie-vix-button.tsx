@@ -6,19 +6,24 @@ import { Play } from "lucide-react";
 import { VixPlayer } from "@/components/vix-player";
 import { vixMovieUrl } from "@/lib/vixsrc";
 import { useToast } from "@/components/toast";
+import type { PlaybackSummary } from "@/lib/playback";
+import { formatPlaybackTime } from "@/lib/playback-format";
 
 /**
  * Primary "Watch now" button for movies — opens the VixSrc player.
  * Auto-marks the movie watched when playback ends.
+ * When a saved position exists, becomes a "Resume · time left" CTA.
  */
 export function MovieVixButton({
   tmdbId,
   title,
   isWatched,
+  playback,
 }: {
   tmdbId: number;
   title: string;
   isWatched: boolean;
+  playback?: PlaybackSummary | null;
 }) {
   const [open, setOpen] = useState(false);
   const completionRef = useRef(false);
@@ -26,6 +31,9 @@ export function MovieVixButton({
   const { toast } = useToast();
 
   if (!open) {
+    const resume = playback
+      ? { timeLeft: formatPlaybackTime(playback.timeLeftSeconds) }
+      : null;
     return (
       <button
         type="button"
@@ -36,7 +44,15 @@ export function MovieVixButton({
         className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-black text-black transition hover:bg-primary/90 active:scale-[0.99]"
       >
         <Play className="h-4 w-4 fill-black" />
-        Watch now
+        {resume ? `Resume · ${resume.timeLeft} left` : "Watch now"}
+        {resume && (
+          <span className="ml-1 flex h-1.5 w-12 overflow-hidden rounded-full bg-black/20">
+            <span
+              className="block h-full rounded-full bg-black"
+              style={{ width: `${playback?.progressPercent ?? 0}%` }}
+            />
+          </span>
+        )}
       </button>
     );
   }
@@ -66,6 +82,8 @@ export function MovieVixButton({
       type="movie"
       tmdbId={tmdbId}
       title={title}
+      initialPosition={playback?.positionSeconds}
+      autoResume={Boolean(playback)}
       onEvent={handleEvent}
       onClose={() => setOpen(false)}
     />

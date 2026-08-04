@@ -25,6 +25,31 @@ type NativeAudioTrackList = {
 
 const MAX_PLAYBACK_SECONDS = 2_147_483_647;
 
+function makePlaybackKey(
+  type: "movie" | "tv" | undefined,
+  tmdbId: number | undefined,
+  season: number | undefined,
+  episode: number | undefined
+) {
+  if (!type || tmdbId == null) return null;
+  if (type === "tv") {
+    if (season == null || episode == null) return null;
+    return `type=tv&id=${tmdbId}&season=${season}&episode=${episode}`;
+  }
+  return `type=movie&id=${tmdbId}`;
+}
+
+function addStartAt(src: string, position: number | null) {
+  if (position == null || !Number.isFinite(position) || position <= 0) return src;
+  try {
+    const url = new URL(src);
+    url.searchParams.set("startAt", String(position));
+    return url.toString();
+  } catch {
+    return src;
+  }
+}
+
 // Keep playback mutations ordered across player remounts. A user can close
 // and reopen the player before the previous keepalive request has completed.
 let playbackRequestQueue: Promise<void> = Promise.resolve();
@@ -107,6 +132,8 @@ export function VixPlayer({
   tmdbId,
   season,
   episode,
+  initialPosition,
+  autoResume = false,
 }: {
   src: string;
   title: string;
@@ -116,11 +143,24 @@ export function VixPlayer({
   tmdbId?: number;
   season?: number;
   episode?: number;
+  /** Position supplied by a Continue Watching/detail CTA. */
+  initialPosition?: number;
+  /** Seek directly to initialPosition instead of showing the prompt. */
+  autoResume?: boolean;
 }) {
+  const initialPlaybackKey = makePlaybackKey(type, tmdbId, season, episode);
+  const initialResumePosition =
+    autoResume &&
+    initialPosition != null &&
+    Number.isFinite(initialPosition) &&
+    initialPosition > 5
+      ? Math.min(MAX_PLAYBACK_SECONDS, initialPosition)
+      : null;
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const imdbIdRef = useRef<string | null>(null);
   const lastSavedPosRef = useRef(0);
+  const lastSavedAtRef = useRef(0);
   const onEventRef = useRef(onEvent);
   const onCloseRef = useRef(onClose);
   const endedRef = useRef(false);
@@ -132,15 +172,19 @@ export function VixPlayer({
   const saveEnabledRef = useRef(false);
   /** While true, keep the video paused under the resume overlay. */
   const holdForResumeRef = useRef(false);
-  const resumePosRef = useRef(0);
+  const resumePosRef = useRef(initialResumePosition ?? 0);
 
   const streamable = type === "movie" || type === "tv";
   const [playlistUrl, setPlaylistUrl] = useState<string | null>(null);
   // Non-streamable mounts (no type/tmdbId) go straight to iframe fallback.
   const [streamFailed, setStreamFailed] = useState(() => !streamable);
   const [iframeError, setIframeError] = useState(false);
-  const [resumePosition, setResumePosition] = useState<number | null>(null);
-  const [resumeKey, setResumeKey] = useState<string | null>(null);
+  const [resumePosition, setResumePosition] = useState<number | null>(
+    initialResumePosition
+  );
+  const [resumeKey, setResumeKey] = useState<string | null>(
+    initialResumePosition != null ? initialPlaybackKey : null
+  );
 
   // mode: native -> iframe -> error
   const mode = streamFailed
@@ -163,6 +207,7 @@ export function VixPlayer({
     endedRef.current = false;
     lastTimeRef.current = 0;
     lastSavedPosRef.current = 0;
+    lastSavedAtRef.current = 0;
     remotePositionRef.current = 0;
     remoteDurationRef.current = 0;
     bookmarkClearedRef.current = false;
@@ -181,12 +226,7 @@ export function VixPlayer({
   // Build from props (not a post-stream ref) so progress saves still work if
   // the stream route fails and we fall back to the iframe.
   const playbackParams = useCallback(() => {
-    if (!type || tmdbId == null) return null;
-    if (type === "tv") {
-      if (season == null || episode == null) return null;
-      return `type=tv&id=${tmdbId}&season=${season}&episode=${episode}`;
-    }
-    return `type=movie&id=${tmdbId}`;
+    return makePlaybackKey(type, tmdbId, season, episode);
   }, [type, tmdbId, season, episode]);
 
   const enqueuePlaybackRequest = useCallback(
@@ -202,14 +242,14 @@ export function VixPlayer({
       const params = playbackParams();
       if (!params) return;
       if (!Number.isFinite(pos) || pos <= 0) return;
-      const rounded = Math.min(MAX_PLAYBACK_SECONDS, Math.round(pos));
-      if (!Number.isSafeInteger(rounded) || rounded <= 0) return;
+      const position = Math.min(MAX_PLAYBACK_SECONDS, pos);
+      if (!Number.isFinite(position) || position <= 0) return;
       // Near the end: drop the bookmark instead of thrashing 95%+ writes.
       const dur =
         Number.isFinite(duration) && duration > 0
-          ? Math.min(MAX_PLAYBACK_SECONDS, Math.round(duration))
+          ? Math.min(MAX_PLAYBACK_SECONDS, duration)
           : 0;
-      if (dur > 0 && rounded >= dur * 0.92) {
+      if (dur > 0 && position >= dur * 0.92) {
         if (!bookmarkClearedRef.current) {
           bookmarkClearedRef.current = true;
           lastSavedPosRef.current = 0;
@@ -221,13 +261,21 @@ export function VixPlayer({
         return;
       }
       bookmarkClearedRef.current = false;
-      if (!force && Math.abs(rounded - lastSavedPosRef.current) < 5) return;
-      lastSavedPosRef.current = rounded;
+      const now = Date.now();
+      if (
+        !force &&
+        (now - lastSavedAtRef.current < 2000 ||
+          Math.abs(position - lastSavedPosRef.current) < 1)
+      ) {
+        return;
+      }
+      lastSavedPosRef.current = position;
+      lastSavedAtRef.current = now;
       enqueuePlaybackRequest(params, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          positionSeconds: rounded,
+          positionSeconds: position,
           durationSeconds: dur,
         }),
         keepalive: true, // survives close/unmount
@@ -292,7 +340,8 @@ export function VixPlayer({
     releaseResumeHold();
     if (pos > 0) {
       bookmarkClearedRef.current = false;
-      lastSavedPosRef.current = Math.round(pos);
+      lastSavedPosRef.current = pos;
+      lastSavedAtRef.current = Date.now();
       seekVideo(pos);
     }
   }, [resumePosition, releaseResumeHold, seekVideo]);
@@ -320,8 +369,16 @@ export function VixPlayer({
 
     saveEnabledRef.current = false;
     holdForResumeRef.current = true;
-    resumePosRef.current = 0;
+    const suppliedPosition =
+      autoResume &&
+      initialResumePosition != null &&
+      initialPlaybackKey === params
+        ? initialResumePosition
+        : null;
+    resumePosRef.current = suppliedPosition ?? 0;
     videoRef.current?.pause();
+
+    if (suppliedPosition != null) return;
 
     let cancelled = false;
     const controller = new AbortController();
@@ -380,7 +437,14 @@ export function VixPlayer({
       controller.abort();
       window.clearTimeout(timeout);
     };
-  }, [mode, playbackParams, clearPosition]);
+  }, [
+    autoResume,
+    clearPosition,
+    initialPlaybackKey,
+    initialResumePosition,
+    mode,
+    playbackParams,
+  ]);
 
   // Keep native playback paused while the resume lookup or prompt is active.
   useEffect(() => {
@@ -398,6 +462,32 @@ export function VixPlayer({
       v.removeEventListener("loadedmetadata", hold);
     };
   }, [mode, playlistUrl]);
+
+  // A Continue Watching CTA supplies the position, so seek directly without
+  // putting a second confirmation prompt in front of the user.
+  useEffect(() => {
+    if (
+      !autoResume ||
+      mode !== "native" ||
+      resumePosition == null ||
+      resumeKey !== playbackParams()
+    ) {
+      return;
+    }
+    const position = resumePosition;
+    holdForResumeRef.current = false;
+    saveEnabledRef.current = true;
+    lastSavedPosRef.current = position;
+    lastSavedAtRef.current = Date.now();
+    seekVideo(position);
+  }, [
+    autoResume,
+    mode,
+    playbackParams,
+    resumeKey,
+    resumePosition,
+    seekVideo,
+  ]);
 
   // Iframe path: no seek API for the embed, so drop any resume prompt and
   // still allow progress saves for the next native session.
@@ -811,8 +901,13 @@ export function VixPlayer({
   const playbackKey = playbackParams();
   const showResume =
     mode === "native" &&
+    !autoResume &&
     resumePosition != null &&
     resumeKey === playbackKey;
+  const iframeSrc = addStartAt(
+    src,
+    autoResume ? resumePosition ?? initialResumePosition : null
+  );
 
   return (
     <div
@@ -833,9 +928,9 @@ export function VixPlayer({
 
       {mode === "iframe" && (
         <iframe
-          key={src}
+          key={iframeSrc}
           ref={iframeRef}
-          src={src}
+          src={iframeSrc}
           title={title}
           // vixsrc.to WAF blocks referers from *.vercel.app — strip it so the
           // fallback embed can load on Vercel-hosted prod.
@@ -866,7 +961,7 @@ export function VixPlayer({
           </div>
           <div className="pointer-events-auto flex shrink-0 items-center gap-2">
             <a
-              href={src}
+              href={iframeSrc}
               target="_blank"
               rel="noopener noreferrer"
               className="flex h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
@@ -907,7 +1002,7 @@ export function VixPlayer({
               Try opening it in your browser instead.
             </p>
             <a
-              href={src}
+              href={iframeSrc}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-bold text-black"

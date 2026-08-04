@@ -16,6 +16,7 @@ import {
   pickTrailerKey,
 } from "@/lib/tmdb";
 import { getCommunityReviews } from "@/lib/reviews";
+import { getShowPlaybackPositions } from "@/lib/playback";
 import { notFound } from "next/navigation";
 
 export default async function ShowDetailPage({
@@ -32,7 +33,7 @@ export default async function ShowDetailPage({
   const show = await ensureShow(tmdbId);
   if (!show) notFound();
 
-  const [userShow, allEpisodes, watched, rewatches, ownedShows] =
+  const [userShow, allEpisodes, watched, rewatches, ownedShows, playbackPositions] =
     await Promise.all([
       db.query.userShows.findFirst({
         where: and(eq(userShows.userId, userId), eq(userShows.tmdbId, tmdbId)),
@@ -67,6 +68,7 @@ export default async function ShowDetailPage({
         .select({ tmdbId: userShows.tmdbId })
         .from(userShows)
         .where(eq(userShows.userId, userId)),
+      getShowPlaybackPositions(userId, tmdbId, (show.episodeRuntime ?? 0) * 60),
     ]);
 
   const ownedIds = new Set(ownedShows.map((s) => s.tmdbId));
@@ -169,6 +171,7 @@ export default async function ShowDetailPage({
       initialFollowing={!!userShow}
       episodeRatings={episodeRatings}
       derivedScore={derivedScore}
+      playbackPositions={playbackPositions}
       moreLikeThis={moreLikeThis}
       recommended={recommended}
       providers={providers}

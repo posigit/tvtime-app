@@ -1,9 +1,30 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { userMovies } from "@/lib/schema";
+import { userMovies, watchHistory, playbackPositions } from "@/lib/schema";
 import { ensureMovie } from "@/lib/ensure";
 import { eq, and } from "drizzle-orm";
 import { NextResponse } from "next/server";
+
+async function clearMoviePlayback(userId: string, tmdbId: number) {
+  await db
+    .delete(playbackPositions)
+    .where(
+      and(
+        eq(playbackPositions.userId, userId),
+        eq(playbackPositions.mediaType, "movie"),
+        eq(playbackPositions.tmdbId, tmdbId)
+      )
+    );
+  await db
+    .delete(watchHistory)
+    .where(
+      and(
+        eq(watchHistory.userId, userId),
+        eq(watchHistory.mediaType, "movie"),
+        eq(watchHistory.tmdbId, tmdbId)
+      )
+    );
+}
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -30,6 +51,7 @@ export async function POST(request: Request) {
             eq(userMovies.tmdbId, tmdbId)
           )
         );
+      await clearMoviePlayback(session.user.id, tmdbId);
       return NextResponse.json({ success: true });
     }
 
@@ -62,6 +84,28 @@ export async function POST(request: Request) {
           updatedAt: now,
         },
       });
+
+    if (status === "watched") {
+      // Watch history entry + finished → drop any stale resume bookmark
+      await db.insert(watchHistory).values({
+        userId: session.user.id,
+        mediaType: "movie",
+        tmdbId,
+        watchedAt: now,
+        source: "manual",
+      });
+      await db
+        .delete(playbackPositions)
+        .where(
+          and(
+            eq(playbackPositions.userId, session.user.id),
+            eq(playbackPositions.mediaType, "movie"),
+            eq(playbackPositions.tmdbId, tmdbId)
+          )
+        );
+    } else {
+      await clearMoviePlayback(session.user.id, tmdbId);
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {

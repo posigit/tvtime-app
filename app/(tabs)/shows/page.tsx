@@ -35,6 +35,8 @@ import {
 } from "@/lib/app-time";
 import { ensureEpisodes } from "@/lib/ensure";
 import { UpcomingList, UpcomingGroup } from "@/components/upcoming-list";
+import { ContinueWatchingRail } from "@/components/continue-watching";
+import { getContinueWatching } from "@/lib/playback";
 import Link from "next/link";
 import { CalendarDays } from "lucide-react";
 
@@ -58,6 +60,11 @@ export default async function ShowsPage({
   const gridLayout = layoutPref === "grid";
 
   const userId = await requireAuth();
+
+  const continueWatching =
+    currentView === "watchlist"
+      ? await getContinueWatching(userId, 10).catch(() => [])
+      : [];
 
   // Retry: Railway cold starts / brief disconnects
   const userShowsList = await withDbRetry(() =>
@@ -396,6 +403,8 @@ export default async function ShowsPage({
 
       {currentView === "watchlist" && (
         <>
+          <ContinueWatchingRail items={continueWatching} className="mt-4" />
+
           {watchNext.length > 0 && (
             <section className="mb-6">
               <div className="relative mb-3 mt-2 flex justify-center">

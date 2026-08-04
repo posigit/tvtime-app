@@ -1,6 +1,11 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { seasonRewatches, userShows, watchedEpisodes } from "@/lib/schema";
+import {
+  seasonRewatches,
+  userShows,
+  watchedEpisodes,
+  playbackPositions,
+} from "@/lib/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
@@ -47,6 +52,18 @@ export async function POST(request: Request) {
         eq(watchedEpisodes.userId, userId),
         eq(watchedEpisodes.showTmdbId, showTmdbId),
         eq(watchedEpisodes.seasonNumber, seasonNumber)
+      )
+    );
+
+  // Reset resume bookmarks for this season's episodes
+  await db
+    .delete(playbackPositions)
+    .where(
+      and(
+        eq(playbackPositions.userId, userId),
+        eq(playbackPositions.mediaType, "tv"),
+        eq(playbackPositions.tmdbId, showTmdbId),
+        eq(playbackPositions.seasonNumber, seasonNumber)
       )
     );
 
