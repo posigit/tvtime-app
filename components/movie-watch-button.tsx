@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Bookmark, BookmarkCheck, Check, Plus } from "lucide-react";
+import { Check, Plus } from "lucide-react";
 import { useToast } from "@/components/toast";
 
 export type MovieStatus = "want_to_watch" | "watched" | null;
@@ -124,14 +124,14 @@ export function MovieWatchButton({
         className={cn(
           "inline-flex h-10 items-center gap-2 rounded-full px-3.5 text-sm font-semibold transition active:scale-[0.98]",
           inMyList
-            ? "bg-white text-black"
-            : "bg-white/[0.07] text-white/75 hover:bg-white/[0.12] hover:text-white"
+            ? "bg-primary/12 text-primary ring-1 ring-primary/45"
+            : "bg-white/[0.04] text-white/65 ring-1 ring-white/[0.1] hover:bg-white/[0.09] hover:text-white"
         )}
       >
         {inMyList ? (
-          <BookmarkCheck className="h-4 w-4" />
+          <Check className="h-4 w-4" strokeWidth={3} />
         ) : (
-          <Bookmark className="h-4 w-4" />
+          <Plus className="h-4 w-4" strokeWidth={3} />
         )}
         {inMyList ? "In My List" : "My List"}
       </button>
@@ -143,8 +143,8 @@ export function MovieWatchButton({
         className={cn(
           "inline-flex h-10 items-center gap-2 rounded-full px-3.5 text-sm font-semibold transition active:scale-[0.98]",
           watched
-            ? "bg-success/20 text-success ring-1 ring-success/35"
-            : "bg-white/[0.07] text-white/75 hover:bg-white/[0.12] hover:text-white"
+            ? "bg-primary/12 text-primary ring-1 ring-primary/45"
+            : "bg-white/[0.04] text-white/65 ring-1 ring-white/[0.1] hover:bg-white/[0.09] hover:text-white"
         )}
       >
         <Check className="h-4 w-4" strokeWidth={3} />

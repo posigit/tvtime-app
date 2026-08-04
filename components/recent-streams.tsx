@@ -106,9 +106,9 @@ function ProfileStreamTile({ item }: { item: WatchHistoryItem }) {
     <button
       type="button"
       onClick={() => setOpen(true)}
-      className="group w-[13rem] shrink-0 text-left active:scale-[0.98]"
+      className="group w-[16.5rem] shrink-0 overflow-hidden rounded-[1.15rem] bg-[#1d1d1f] text-left ring-1 ring-white/[0.06] transition hover:ring-white/20 active:scale-[0.98]"
     >
-      <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-secondary ring-1 ring-white/[0.08] transition group-hover:ring-primary/60">
+      <div className="relative h-[9.25rem] overflow-hidden bg-secondary">
         {poster ? (
           <Image
             src={poster}
@@ -123,8 +123,8 @@ function ProfileStreamTile({ item }: { item: WatchHistoryItem }) {
             {item.title}
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
-        <span className="absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-black shadow-lg">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent" />
+        <span className="absolute bottom-3 left-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-black shadow-lg transition group-hover:scale-105">
           <Play className="h-4 w-4 fill-current" />
         </span>
         {item.progressPercent != null && (
@@ -136,17 +136,17 @@ function ProfileStreamTile({ item }: { item: WatchHistoryItem }) {
           </span>
         )}
       </div>
-      <div className="pt-2">
-        <p className="truncate text-sm font-bold tracking-[-0.01em] text-white">
+      <div className="px-3.5 pb-3.5 pt-3">
+        <p className="truncate text-[15px] font-bold tracking-[-0.01em] text-white">
           {item.title}
         </p>
-        <p className="mt-0.5 truncate text-[11px] font-medium text-white/45">
+        <p className="mt-1 truncate text-xs font-medium text-white/45">
           {itemLabel(item)}
         </p>
-        <p className="mt-1.5 text-xs font-semibold text-primary">
+        <p className="mt-3 text-sm font-bold text-primary">
           {isInProgress
             ? timeLeft
-              ? `${timeLeft} remaining`
+              ? `Resume · ${timeLeft} left`
               : "Resume"
             : `Played ${formatAppDateShort(item.watchedAt.slice(0, 10))}`}
         </p>
@@ -248,12 +248,14 @@ export function ProfilePlaybackShelf({
     <section className="mb-10 pt-1">
       <div className="mb-3 flex items-end justify-between gap-3">
         <div>
-          <h2 className="text-xl font-black tracking-[-0.02em] text-white">
-            {hasProgress ? "Keep watching" : "Recently played"}
+          {hasProgress && (
+            <p className="mb-1 text-[10px] font-black uppercase tracking-[0.18em] text-primary">
+              Pick up where you left off
+            </p>
+          )}
+          <h2 className="text-[1.35rem] font-black tracking-[-0.025em] text-white">
+            {hasProgress ? "Continue watching" : "Recently played"}
           </h2>
-          <p className="mt-0.5 text-xs text-white/45">
-            {hasProgress ? "Pick up exactly where you left off." : "Your latest viewing activity."}
-          </p>
         </div>
         <Link
           href="/profile/history"
@@ -262,7 +264,7 @@ export function ProfilePlaybackShelf({
           History
         </Link>
       </div>
-      <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {items.map((item) => (
           <ProfileStreamTile key={item.id} item={item} />
         ))}
