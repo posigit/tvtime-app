@@ -188,6 +188,10 @@ export function VixPlayer({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const imdbIdRef = useRef<string | null>(null);
+  // Subtitles advertised by the goated resolver (VDRK open VTT + OpenSubtitles).
+  const goatedSubsRef = useRef<
+    Array<{ language: string; label: string; url: string; source: string }>
+  >([]);
   const lastSavedPosRef = useRef(0);
   const lastSavedAtRef = useRef(0);
   const onEventRef = useRef(onEvent);
@@ -251,6 +255,7 @@ export function VixPlayer({
     remotePositionRef.current = 0;
     remoteDurationRef.current = 0;
     bookmarkClearedRef.current = false;
+    goatedSubsRef.current = [];
     lastTapRef.current = null;
     if (tapCueTimerRef.current) {
       clearTimeout(tapCueTimerRef.current);
@@ -644,6 +649,7 @@ export function VixPlayer({
     setIframeError(false);
     endedRef.current = false;
     bookmarkClearedRef.current = false;
+    goatedSubsRef.current = [];
     lastSavedPosRef.current = 0;
     lastSavedAtRef.current = 0;
   }, [activeSource]);
@@ -674,9 +680,10 @@ export function VixPlayer({
         }
         return res.json();
       })
-      .then((data: { url?: string; playlistUrl?: string; imdbId?: string | null }) => {
+      .then((data: { url?: string; playlistUrl?: string; imdbId?: string | null; subtitles?: Array<{ language: string; label: string; url: string; source: string }> }) => {
         if (cancelled) return;
         imdbIdRef.current = data?.imdbId ?? null;
+        goatedSubsRef.current = data?.subtitles ?? [];
         const direct = data?.playlistUrl;
         const signed = data?.url;
         if (direct) {
@@ -784,14 +791,41 @@ export function VixPlayer({
         if (!userTouched) applySettings();
       });
 
-      // OpenSubtitles fallback: only when the stream has NO English CC.
+      // Fallback subtitles: goated's VDRK open VTT first (free, no auth), then
+      // OpenSubtitles — only when the stream has NO English CC.
       let osLoaded = false;
-      const maybeLoadOpenSubtitles = async () => {
-        if (osLoaded || !hls || !imdbIdRef.current) return;
+      const maybeLoadFallbackSubtitles = async () => {
+        if (osLoaded || !hls) return;
         const hasEng = hls.subtitleTracks.some((t) => matchLang(t.lang, "en"));
-        if (hasEng) return; // vixsrc already has English CC — prefer it
+        if (hasEng) return; // stream already has English CC — prefer it
         osLoaded = true;
+
+        // goated resolver advertises VDRK (open VTT) + OpenSubtitles URLs.
+        const goated = goatedSubsRef.current;
+        const vdrk = goated.find(
+          (s) => s.source === "VDRK" && s.language.toLowerCase().startsWith("en")
+        );
+        if (vdrk) {
+          try {
+            const res = await fetch(vdrk.url);
+            if (res.ok) {
+              const vtt = await res.text();
+              const show = loadVixSettings().subs !== "off";
+              injectVttTrack(
+                video,
+                vtt,
+                vdrk.label ?? "English",
+                show
+              );
+              return;
+            }
+          } catch {
+            /* non-fatal — fall through to OpenSubtitles */
+          }
+        }
+
         try {
+          if (!imdbIdRef.current) return;
           const q = new URLSearchParams({
             imdbId: imdbIdRef.current,
             lang: "en",
@@ -816,7 +850,7 @@ export function VixPlayer({
 
       hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, () => {
         if (!userTouched) applySettings();
-        void maybeLoadOpenSubtitles();
+        void maybeLoadFallbackSubtitles();
       });
 
       // Persist user changes (and ignore switches caused by our own apply

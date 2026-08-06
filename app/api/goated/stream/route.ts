@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { goatedResolve } from "@/lib/goated";
+import { goatedResolve, goatedSubtitles } from "@/lib/goated";
 
 /**
  * goated.cx stream resolver endpoint.
@@ -44,12 +44,21 @@ export async function GET(req: NextRequest) {
       source: source === "Valenox" ? "Valenox" : "Orbit",
     });
 
+    // Subtitles come from a separate endpoint — the resolve payload's
+    // "subtitles" field is always empty.
+    const subtitles = await goatedSubtitles({
+      type,
+      id,
+      season: season != null ? Number(season) : undefined,
+      episode: episode != null ? Number(episode) : undefined,
+    });
+
     // Return the raw signed url; the player routes it through the media proxy.
     return NextResponse.json({
       url: resolved.url,
       source: resolved.source,
       availableSources: resolved.availableSources,
-      subtitles: resolved.subtitles,
+      subtitles,
       imdbId: null, // kept for vixsrc-shape parity; goated keys on tmdb
       sourceApi: "goated",
     });
