@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
-import { ExternalLink, LoaderCircle, X } from "lucide-react";
+import { ExternalLink, LoaderCircle, Lock, LockOpen, X } from "lucide-react";
 import {
   isVixPlayerOrigin,
   parseVixPlayerEventData,
@@ -211,6 +211,14 @@ export function VixPlayer({
   const [resumeKey, setResumeKey] = useState<string | null>(
     initialResumePosition != null ? initialPlaybackKey : null
   );
+  const [locked, setLocked] = useState(false);
+  const [tapCue, setTapCue] = useState<{ side: "left" | "right" } | null>(
+    null
+  );
+  const lastTapRef = useRef<{ time: number; side: "left" | "right" } | null>(
+    null
+  );
+  const tapCueTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // mode: native -> iframe -> error
   const mode = streamFailed
@@ -237,6 +245,12 @@ export function VixPlayer({
     remotePositionRef.current = 0;
     remoteDurationRef.current = 0;
     bookmarkClearedRef.current = false;
+    lastTapRef.current = null;
+    if (tapCueTimerRef.current) {
+      clearTimeout(tapCueTimerRef.current);
+      tapCueTimerRef.current = null;
+    }
+    if (tapCueTimerRef.current) clearTimeout(tapCueTimerRef.current);
   }, [src]);
 
   const emit = useCallback((event: string) => {
@@ -353,6 +367,44 @@ export function VixPlayer({
     };
     doSeek();
   }, []);
+
+  /** Native-mode ±10s seek, with a transient on-screen cue. */
+  const seekBy = useCallback(
+    (side: "left" | "right") => {
+      const v = videoRef.current;
+      const delta = side === "right" ? 10 : -10;
+      if (!v || mode !== "native" || !Number.isFinite(v.currentTime)) return;
+      const target = Math.max(0, v.currentTime + delta);
+      const dur =
+        Number.isFinite(v.duration) && v.duration > 0 ? v.duration : null;
+      v.currentTime = dur == null ? target : Math.min(target, dur);
+      setTapCue({ side });
+      if (tapCueTimerRef.current) clearTimeout(tapCueTimerRef.current);
+      tapCueTimerRef.current = setTimeout(() => setTapCue(null), 650);
+    },
+    [mode]
+  );
+
+  /** Detects double-taps (same side, ~≤350ms apart) for ±10s seeks. */
+  const handleTap = useCallback(
+    (e: React.TouchEvent) => {
+      if (mode !== "native") return;
+      const t = e.changedTouches[0];
+      if (!t) return;
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      const side: "left" | "right" =
+        t.clientX < rect.left + rect.width / 2 ? "left" : "right";
+      const now = performance.now();
+      const prev = lastTapRef.current;
+      if (prev && prev.side === side && now - prev.time <= 350) {
+        lastTapRef.current = null;
+        seekBy(side);
+      } else {
+        lastTapRef.current = { time: now, side };
+      }
+    },
+    [mode, seekBy]
+  );
 
   const releaseResumeHold = useCallback(() => {
     holdForResumeRef.current = false;
@@ -912,6 +964,20 @@ export function VixPlayer({
       lastTimeRef.current = now;
       emit("timeupdate");
       savePosition(video.currentTime, video.duration);
+      // Auto-complete once playback crosses ~92% — vixsrc streams commonly
+      // drift the final second or stall near the end, so waiting for the
+      // native "ended" event can orphan an otherwise-finished watch. The
+      // emit("ended") dedup guard (endedRef) keeps this to a single fire,
+      // and the now-set endedRef blocks further bookmark writes.
+      const dur = Number.isFinite(video.duration) ? video.duration : 0;
+      if (
+        !endedRef.current &&
+        dur > 0 &&
+        video.currentTime >= dur * RESUME_END_RATIO
+      ) {
+        emit("ended");
+        clearPosition();
+      }
     };
 
     video.addEventListener("play", onPlay);
@@ -961,6 +1027,22 @@ export function VixPlayer({
 
       if (d.event === "ended") {
         clearPosition();
+        return;
+      }
+
+      // Auto-complete once the embed crosses ~92% (same rationale as the
+      // native path — a vixsrc iframe can stall/drift before firing its own
+      // "ended", leaving an otherwise-finished watch unmarked). emit("ended")
+      // is idempotent, so the dedup guard prevents duplicate marks.
+      if (
+        !endedRef.current &&
+        remoteDurationRef.current > 0 &&
+        remotePositionRef.current >=
+          remoteDurationRef.current * RESUME_END_RATIO
+      ) {
+        emit("ended");
+        clearPosition();
+        // Skip the resume-bookmark logic below; the item is now complete.
         return;
       }
 
@@ -1059,7 +1141,8 @@ export function VixPlayer({
           controls
           autoPlay
           playsInline
-          className="h-full w-full bg-black"
+          onTouchEnd={handleTap}
+          className="h-full w-full touch-manipulation bg-black"
         />
       )}
 
@@ -1088,41 +1171,79 @@ export function VixPlayer({
         />
       )}
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black/90 via-black/45 to-transparent pt-safe">
-        <div className="flex items-start justify-between gap-3 px-4 pb-8 pt-3">
-          <div className="min-w-0">
-            <p className="truncate text-sm font-bold text-white">{title}</p>
-            <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/50">
-              VixSrc
-            </p>
-          </div>
-          <div className="pointer-events-auto flex shrink-0 items-center gap-2">
-            <a
-              href={iframeSrc}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
-              aria-label="Open player in browser"
-            >
-              <ExternalLink className="h-4 w-4" />
-              <span className="hidden sm:inline">Open in browser</span>
-            </a>
-            <button
-              type="button"
-              onClick={() => {
-                // Let the final save land before the parent refreshes playback.
-                void flushPosition().then(() => {
-                  onClose();
-                });
-              }}
-              aria-label="Close player"
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
-            >
-              <X className="h-5 w-5" />
-            </button>
+      {!locked && (
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black/90 via-black/45 to-transparent pt-safe">
+          <div className="flex items-start justify-between gap-3 px-4 pb-8 pt-3">
+            <div className="min-w-0">
+              <p className="truncate text-sm font-bold text-white">{title}</p>
+              <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/50">
+                VixSrc
+              </p>
+            </div>
+            <div className="pointer-events-auto flex shrink-0 items-center gap-2">
+              <a
+                href={iframeSrc}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+                aria-label="Open player in browser"
+              >
+                <ExternalLink className="h-4 w-4" />
+                <span className="hidden sm:inline">Open in browser</span>
+              </a>
+              <button
+                type="button"
+                onClick={() => setLocked(true)}
+                aria-label="Lock player controls"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+              >
+                <Lock className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  // Let the final save land before the parent refreshes playback.
+                  void flushPosition().then(() => {
+                    onClose();
+                  });
+                }}
+                aria-label="Close player"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {locked && (
+        <button
+          type="button"
+          onClick={() => {
+            setLocked(false);
+            // Unlock pauses playback so the controls don't fight the video.
+            const v = videoRef.current;
+            if (v) void v.pause();
+          }}
+          aria-label="Unlock player controls"
+          className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+        >
+          <LockOpen className="h-5 w-5" />
+        </button>
+      )}
+
+      {mode === "native" && tapCue && (
+        <div
+          className={`pointer-events-none absolute inset-y-0 z-40 flex items-center ${
+            tapCue.side === "right" ? "justify-end pr-6" : "justify-start pl-6"
+          }`}
+        >
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-black/70 text-lg font-bold text-white backdrop-blur">
+            {tapCue.side === "right" ? "+10" : "−10"}
+          </span>
+        </div>
+      )}
 
       {isLoading && (
         <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center text-white/70">
