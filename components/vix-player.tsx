@@ -160,6 +160,7 @@ export function VixPlayer({
   episode,
   initialPosition,
   autoResume = false,
+  source = "vix",
 }: {
   src: string;
   title: string;
@@ -173,6 +174,8 @@ export function VixPlayer({
   initialPosition?: number;
   /** Seek directly to initialPosition instead of showing the prompt. */
   autoResume?: boolean;
+  /** Stream backend: "vix" (default) or "goated". */
+  source?: "vix" | "goated";
 }) {
   const initialPlaybackKey = makePlaybackKey(type, tmdbId, season, episode);
   const initialResumePosition =
@@ -201,6 +204,9 @@ export function VixPlayer({
   const resumePosRef = useRef(initialResumePosition ?? 0);
 
   const streamable = type === "movie" || type === "tv";
+  // Source backend — internal state so the user can toggle it live, defaulting
+  // to the prop (which defaults to "vix", preserving existing behavior).
+  const [activeSource, setActiveSource] = useState<"vix" | "goated">(source);
   const [playlistUrl, setPlaylistUrl] = useState<string | null>(null);
   // Non-streamable mounts (no type/tmdbId) go straight to iframe fallback.
   const [streamFailed, setStreamFailed] = useState(() => !streamable);
@@ -628,6 +634,20 @@ export function VixPlayer({
       initialResumePosition != null || resumePosition != null;
   }, [initialResumePosition, mode, resumePosition]);
 
+  // ---------- source switching ----------
+  const switchSource = useCallback((next: "vix" | "goated") => {
+    if (next === activeSource) return;
+    setActiveSource(next);
+    // Reset playback state so the resolution effect re-runs fresh.
+    setPlaylistUrl(null);
+    setStreamFailed(false);
+    setIframeError(false);
+    endedRef.current = false;
+    bookmarkClearedRef.current = false;
+    lastSavedPosRef.current = 0;
+    lastSavedAtRef.current = 0;
+  }, [activeSource]);
+
   // ---------- resolve native stream (single fetch, single source of truth) ----------
   useEffect(() => {
     if (!streamable || !tmdbId) return; // initial state already fell back
@@ -636,7 +656,11 @@ export function VixPlayer({
     if (season != null) params.set("season", String(season));
     if (episode != null) params.set("episode", String(episode));
 
-    fetch(`/api/vixsrc/stream?${params.toString()}`)
+    const isGoated = activeSource === "goated";
+    // goated resolves to a signed master URL; the browser must play it through
+    // the media proxy (referer/origin-locked upstream). vixsrc playlists are
+    // CORS-open so the browser fetches them directly.
+    fetch(`${isGoated ? "/api/goated/stream" : "/api/vixsrc/stream"}?${params.toString()}`)
       .then((res) => {
         if (!res.ok) {
           return res
@@ -650,15 +674,25 @@ export function VixPlayer({
         }
         return res.json();
       })
-      .then((data: { playlistUrl?: string; imdbId?: string | null }) => {
+      .then((data: { url?: string; playlistUrl?: string; imdbId?: string | null }) => {
         if (cancelled) return;
         imdbIdRef.current = data?.imdbId ?? null;
-        if (data?.playlistUrl) setPlaylistUrl(data.playlistUrl);
-        else setStreamFailed(true);
+        const direct = data?.playlistUrl;
+        const signed = data?.url;
+        if (direct) {
+          setPlaylistUrl(direct);
+          return;
+        }
+        if (signed) {
+          // Route the locked upstream through our same-origin proxy.
+          setPlaylistUrl(`/api/goated/media?url=${encodeURIComponent(signed)}`);
+          return;
+        }
+        setStreamFailed(true);
       })
       .catch((err) => {
         console.warn(
-          "[player] stream resolution failed — falling back to iframe:",
+          `[player] ${activeSource} stream resolution failed — falling back to iframe:`,
           err instanceof Error ? err.message : err
         );
         if (!cancelled) setStreamFailed(true);
@@ -667,7 +701,7 @@ export function VixPlayer({
     return () => {
       cancelled = true;
     };
-  }, [streamable, type, tmdbId, season, episode]);
+  }, [streamable, type, tmdbId, season, episode, activeSource]);
 
   // ---------- native playback (hls.js / Safari native) ----------
   useEffect(() => {
@@ -1177,10 +1211,21 @@ export function VixPlayer({
             <div className="min-w-0">
               <p className="truncate text-sm font-bold text-white">{title}</p>
               <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/50">
-                VixSrc
+                {activeSource === "goated" ? "Goated · Orbit" : "VixSrc"}
               </p>
             </div>
             <div className="pointer-events-auto flex shrink-0 items-center gap-2">
+              {streamable && (
+                <button
+                  type="button"
+                  onClick={() => switchSource(activeSource === "vix" ? "goated" : "vix")}
+                  aria-label={`Switch source (currently ${activeSource})`}
+                  className="flex h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+                >
+                  <span className="hidden sm:inline">Source</span>
+                  <span className="text-white/60">{activeSource === "vix" ? "Vix" : "Goated"}</span>
+                </button>
+              )}
               <a
                 href={iframeSrc}
                 target="_blank"
