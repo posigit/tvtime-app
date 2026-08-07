@@ -1,6 +1,6 @@
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { userShows, watchedEpisodes, seasonRewatches } from "@/lib/schema";
+import { userShows, watchedEpisodes, seasonRewatches, episodeReactions } from "@/lib/schema";
 import { eq, and } from "drizzle-orm";
 import { ensureShow, ensureEpisodes } from "@/lib/ensure";
 import {
@@ -33,7 +33,7 @@ export default async function ShowDetailPage({
   const show = await ensureShow(tmdbId);
   if (!show) notFound();
 
-  const [userShow, allEpisodes, watched, rewatches, ownedShows, playbackPositions] =
+  const [userShow, allEpisodes, watched, rewatches, ownedShows, playbackPositions, episodeReactionRows] =
     await Promise.all([
       db.query.userShows.findFirst({
         where: and(eq(userShows.userId, userId), eq(userShows.tmdbId, tmdbId)),
@@ -69,6 +69,19 @@ export default async function ShowDetailPage({
         .from(userShows)
         .where(eq(userShows.userId, userId)),
       getShowPlaybackPositions(userId, tmdbId, (show.episodeRuntime ?? 0) * 60),
+      db
+        .select({
+          seasonNumber: episodeReactions.seasonNumber,
+          episodeNumber: episodeReactions.episodeNumber,
+          reactionKey: episodeReactions.reactionKey,
+        })
+        .from(episodeReactions)
+        .where(
+          and(
+            eq(episodeReactions.userId, userId),
+            eq(episodeReactions.showTmdbId, tmdbId)
+          )
+        ),
     ]);
 
   const ownedIds = new Set(ownedShows.map((s) => s.tmdbId));
@@ -149,6 +162,13 @@ export default async function ShowDetailPage({
     rewatchCounts[r.seasonNumber] = r.count;
   }
 
+  /** Episode reactions keyed by "season:episode" → set of reaction keys. */
+  const episodeReactionsMap: Record<string, string[]> = {};
+  for (const r of episodeReactionRows) {
+    const k = `${r.seasonNumber}:${r.episodeNumber}`;
+    (episodeReactionsMap[k] ??= []).push(r.reactionKey);
+  }
+
   return (
     <ShowDetailClient
       show={{
@@ -168,6 +188,7 @@ export default async function ShowDetailPage({
       }}
       episodes={episodes}
       rewatchCounts={rewatchCounts}
+      episodeReactionsMap={episodeReactionsMap}
       initialFollowing={!!userShow}
       initialFavorite={userShow?.favorite ?? false}
       episodeRatings={episodeRatings}

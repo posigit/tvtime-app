@@ -1,6 +1,6 @@
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { userMovies, watchHistory } from "@/lib/schema";
+import { userMovies, watchHistory, movieReactions } from "@/lib/schema";
 import { eq, and, sql } from "drizzle-orm";
 import {
   backdropUrl,
@@ -23,6 +23,7 @@ import { ChevronLeft } from "lucide-react";
 import { MovieWatchButton } from "@/components/movie-watch-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { MovieRewatchButton } from "@/components/movie-rewatch-button";
+import { ReactionPicker } from "@/components/reaction-picker";
 import { MovieRating } from "@/components/star-rating";
 import { DiscoverRail } from "@/components/discover-rail";
 import { WatchProviders } from "@/components/watch-providers";
@@ -70,7 +71,7 @@ export default async function MovieDetailPage({
   const movie = await ensureMovie(tmdbId);
   if (!movie) notFound();
 
-  const [userMovie, ownedMovies, playback, movieRewatchCount] =
+  const [userMovie, ownedMovies, playback, movieRewatchCount, movieReactionRows] =
     await Promise.all([
       db.query.userMovies.findFirst({
         where: and(eq(userMovies.userId, userId), eq(userMovies.tmdbId, tmdbId)),
@@ -90,9 +91,16 @@ export default async function MovieDetailPage({
             eq(watchHistory.tmdbId, tmdbId)
           )
         ),
+      db
+        .select({ reactionKey: movieReactions.reactionKey })
+        .from(movieReactions)
+        .where(
+          and(eq(movieReactions.userId, userId), eq(movieReactions.tmdbId, tmdbId))
+        ),
     ]);
 
   const ownedIds = new Set(ownedMovies.map((m) => m.tmdbId));
+  const movieReactionKeys = movieReactionRows.map((r) => r.reactionKey);
 
   const [similarRaw, recsRaw, providers, credits, reviews, videos] =
     await Promise.all([
@@ -244,6 +252,14 @@ export default async function MovieDetailPage({
               initialCount={Number(movieRewatchCount[0]?.count ?? 0)}
             />
           )}
+        </div>
+
+        <div className="mt-3">
+          <ReactionPicker
+            size="md"
+            item={{ type: "movie", tmdbId }}
+            initialKeys={movieReactionKeys}
+          />
         </div>
 
         {/* Critic + audience scores */}

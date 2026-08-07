@@ -15,6 +15,7 @@ import { CommunityReviews } from "@/components/community-reviews";
 import { TrailerButton } from "@/components/trailer-button";
 import { VixPlayer } from "@/components/vix-player";
 import { UpNextCard } from "@/components/up-next-card";
+import { ReactionPicker } from "@/components/reaction-picker";
 import { FavoriteButton } from "@/components/favorite-button";
 import { vixTvUrl } from "@/lib/vixsrc";
 import { loadVixSettings } from "@/lib/vix-settings";
@@ -79,6 +80,7 @@ export function ShowDetailClient({
   show,
   episodes,
   rewatchCounts: initialRewatchCounts,
+  episodeReactionsMap = {},
   initialFollowing,
   initialFavorite = false,
   episodeRatings,
@@ -103,6 +105,7 @@ export function ShowDetailClient({
   reviews?: ReviewsPayload;
   trailerKey?: string | null;
   playbackPositions?: Record<string, PlaybackSummary>;
+  episodeReactionsMap?: Record<string, string[]>;
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -1009,7 +1012,7 @@ export function ShowDetailClient({
                           <div
                             key={`${ep.seasonNumber}-${ep.episodeNumber}`}
                             className={cn(
-                              "flex items-center gap-3 rounded-lg bg-card p-2.5",
+                              "flex flex-wrap items-center gap-3 rounded-lg bg-card p-2.5",
                               !aired && !watched && "opacity-60"
                             )}
                           >
@@ -1099,6 +1102,27 @@ export function ShowDetailClient({
                             >
                               <Check className="h-4 w-4" strokeWidth={3} />
                             </button>
+                            {aired && (
+                              <div className="basis-full">
+                                <ReactionPicker
+                                  size="sm"
+                                  item={{
+                                    type: "episode",
+                                    showTmdbId: show.tmdbId,
+                                    seasonNumber: ep.seasonNumber,
+                                    episodeNumber: ep.episodeNumber,
+                                  }}
+                                  initialKeys={
+                                    episodeReactionsMap[
+                                      watchKey(
+                                        ep.seasonNumber,
+                                        ep.episodeNumber
+                                      )
+                                    ] ?? []
+                                  }
+                                />
+                              </div>
+                            )}
                           </div>
                         );
                       })}

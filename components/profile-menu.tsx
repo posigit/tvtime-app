@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
-import { History, MoreHorizontal } from "lucide-react";
+import { History, MoreHorizontal, CalendarDays } from "lucide-react";
 
 /** Profile "⋯" menu: Watch history, Import data + Sign out */
 export function ProfileMenu() {
@@ -47,6 +47,14 @@ export function ProfileMenu() {
             className="block w-full px-4 py-3 text-left text-sm font-medium text-white hover:bg-secondary"
           >
             Import data
+          </Link>
+          <Link
+            href="/calendar"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 px-4 py-3 text-left text-sm font-medium text-white hover:bg-secondary"
+          >
+            <CalendarDays className="h-4 w-4" />
+            Calendar
           </Link>
           <button
             type="button"
