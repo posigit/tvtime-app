@@ -290,6 +290,24 @@ export function VixPlayer({
     null
   );
   const [subMenuOpen, setSubMenuOpen] = useState(false);
+  // Dismiss the subtitle picker on outside tap, Escape, or scroll (mobile).
+  useEffect(() => {
+    if (!subMenuOpen) return;
+    const close = () => setSubMenuOpen(false);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+    document.addEventListener("mousedown", close);
+    document.addEventListener("touchstart", close, { passive: true });
+    document.addEventListener("keydown", onKey);
+    window.addEventListener("scroll", close, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", close);
+      document.removeEventListener("touchstart", close);
+      document.removeEventListener("keydown", onKey);
+      window.removeEventListener("scroll", close);
+    };
+  }, [subMenuOpen]);
   const lastTapRef = useRef<{ time: number; side: "left" | "right" } | null>(
     null
   );
@@ -1451,19 +1469,28 @@ export function VixPlayer({
                 </button>
               )}
               {mode === "native" && (
-                <div className="relative">
+                <div
+                  className="relative"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                >
                   <button
                     type="button"
                     onClick={() => setSubMenuOpen((v) => !v)}
                     aria-label="Subtitles"
                     aria-expanded={subMenuOpen}
+                    aria-haspopup="menu"
                     className="flex h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
                   >
                     <Captions className="h-4 w-4" />
                     <span className="hidden sm:inline">CC</span>
                   </button>
                   {subMenuOpen && (
-                    <div className="absolute right-0 top-11 z-30 w-52 overflow-hidden rounded-xl border border-white/10 bg-card shadow-xl">
+                    <div
+                      role="menu"
+                      aria-label="Subtitle source"
+                      className="absolute right-0 top-full z-30 mt-2 max-h-[60vh] w-52 min-w-44 max-w-[min(13rem,calc(100vw-2rem))] overflow-y-auto rounded-xl border border-white/10 bg-card shadow-xl"
+                    >
                       {(
                         [
                           ["auto", "Auto (stream → VDRK → OS)"],

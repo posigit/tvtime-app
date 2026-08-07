@@ -15,6 +15,7 @@ import { CommunityReviews } from "@/components/community-reviews";
 import { TrailerButton } from "@/components/trailer-button";
 import { VixPlayer } from "@/components/vix-player";
 import { UpNextCard } from "@/components/up-next-card";
+import { EndOfLineCard } from "@/components/end-of-line-card";
 import { ReactionPicker } from "@/components/reaction-picker";
 import { FavoriteButton } from "@/components/favorite-button";
 import { vixTvUrl } from "@/lib/vixsrc";
@@ -136,6 +137,8 @@ export function ShowDetailClient({
   /** Next episode queued after the current one ends (autoplay countdown). */
   const [upNext, setUpNext] = useState<DetailEpisode | null>(null);
   const [upNextCount, setUpNextCount] = useState(0);
+  /** True when the played episode ended and there's no next aired episode. */
+  const [seriesEnded, setSeriesEnded] = useState(false);
 
   const isWatched = (ep: DetailEpisode) =>
     watchedMap[watchKey(ep.seasonNumber, ep.episodeNumber)] ?? false;
@@ -396,6 +399,7 @@ export function ShowDetailClient({
   const openPlayer = (ep: DetailEpisode) => {
     playerSessionRef.current += 1;
     setPlayerEp(ep);
+    setSeriesEnded(false);
   };
 
   /**
@@ -440,9 +444,25 @@ export function ShowDetailClient({
       setUpNextCount(10);
       return;
     }
+
+    // No next aired episode (series finale, or waiting for next week): keep the
+    // player OPEN so the final scene plays to the true end, and surface an
+    // "end of the line" card instead of slamming the player shut at 92%.
+    // (Previous behavior closed the player here — cutting the last 8% and
+    //  creating a reopen → auto-close loop on last-aired episodes.)
+    if (!next) {
+      setUpNext(null);
+      setUpNextCount(0);
+      setSeriesEnded(true);
+      return;
+    }
+
+    // A next episode exists but autoplay is disabled — close the player;
+    // the user can tap it when ready.
     playerSessionRef.current += 1;
-    setPlayerEp(next ?? null);
+    setPlayerEp(null);
     setUpNext(null);
+    setSeriesEnded(false);
   };
 
   /** Play the queued "up next" episode immediately (skip the countdown). */
@@ -452,6 +472,7 @@ export function ShowDetailClient({
     setPlayerEp(upNext);
     setUpNext(null);
     setUpNextCount(0);
+    setSeriesEnded(false);
   }, [upNext]);
 
   /** Cancel the autoplay, leaving the player closed on the finished ep. */
@@ -1243,6 +1264,24 @@ export function ShowDetailClient({
         />
       )}
 
+      {/* End of the line: the played episode ended and there's no next aired
+          episode — keep the player open so the finale plays to the true end,
+          and give the user an explicit close instead of the missing Up Next. */}
+      {seriesEnded && playerEp && (
+        <EndOfLineCard
+          showTitle={show.title}
+          seasonNumber={playerEp.seasonNumber}
+          episodeNumber={playerEp.episodeNumber}
+          episodeTitle={playerEp.title}
+          onClose={() => {
+            playerSessionRef.current += 1;
+            setPlayerEp(null);
+            setSeriesEnded(false);
+            router.refresh();
+          }}
+        />
+      )}
+
       {/* ---------- VixSrc streaming player ---------- */}
       {playerEp && (
         <VixPlayer
@@ -1263,6 +1302,7 @@ export function ShowDetailClient({
           onClose={() => {
             playerSessionRef.current += 1;
             setPlayerEp(null);
+            setSeriesEnded(false);
             // Re-fetch playback server state so resume labels reflect saves.
             router.refresh();
           }}

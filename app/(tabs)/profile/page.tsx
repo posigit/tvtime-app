@@ -979,9 +979,10 @@ export default async function ProfilePage() {
             <div className="h-full w-full bg-gradient-to-br from-primary/40 via-[#1c1c1e] to-black" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20" />
-          <div className="absolute right-3 top-safe-float z-20">
-            <ProfileMenu />
-          </div>
+        </div>
+        {/* Hosted OUTSIDE the overflow-hidden hero so the dropdown is never clipped. */}
+        <div className="absolute right-3 top-safe-float z-20">
+          <ProfileMenu />
         </div>
 
         {/* Sits on top of the banner edge — outside the overflow-hidden image box */}
