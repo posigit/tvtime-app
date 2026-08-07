@@ -1,18 +1,22 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import {
-  seasonRewatches,
-  userShows,
-  watchedEpisodes,
-  playbackPositions,
-} from "@/lib/schema";
+import { seasonRewatches, playbackPositions } from "@/lib/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 /**
- * POST { showTmdbId, seasonNumber }
- * Starts a rewatch of a season: wipes the user's watched rows for that season
- * and bumps the rewatch counter (displayed as ×N on the season row).
+ * POST { showTmdbId, seasonNumber }  — rewatch one season
+ * POST { showTmdbId, season: "all" } — rewatch the whole series
+ *
+ * Rewatch is NON-DESTRUCTIVE: it clears only the resume bookmarks for the
+ * target (so playback restarts from the top) and bumps the ×N badge counter.
+ * It deliberately does NOT delete `watchedEpisodes` — that preserves per-episode
+ * ratings and keeps `watchHistory`'s old completion dates intact (re-watching
+ * appends a NEW history row, so both old and new watch dates remain logged).
+ *
+ * Whole-series counts live in a sentinel row `seasonNumber = 0` in the same
+ * seasonRewatches table (no migration; kept out of the season badges to avoid
+ * colliding with a "Specials" S0 label).
  */
 export async function POST(request: Request) {
   const session = await auth();
@@ -22,15 +26,20 @@ export async function POST(request: Request) {
 
   const body = await request.json();
   const showTmdbId = Number(body.showTmdbId);
-  const seasonNumber = Number(body.seasonNumber);
+  const seasonAll = body.season === "all";
+  const seasonNumber = seasonAll ? 0 : Number(body.seasonNumber);
 
-  if (!Number.isFinite(showTmdbId) || !Number.isFinite(seasonNumber)) {
+  if (
+    body.showTmdbId == null ||
+    !Number.isFinite(showTmdbId) ||
+    (!seasonAll && (body.seasonNumber == null || !Number.isFinite(seasonNumber)))
+  ) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
   const userId = session.user.id;
 
-  // Bump rewatch count (upsert)
+  // Bump rewatch count (upsert). seasonNumber = 0 → whole-series counter.
   const [row] = await db
     .insert(seasonRewatches)
     .values({ userId, showTmdbId, seasonNumber, count: 1 })
@@ -44,65 +53,34 @@ export async function POST(request: Request) {
     })
     .returning({ count: seasonRewatches.count });
 
-  // Reset watched progress for this season
-  await db
-    .delete(watchedEpisodes)
-    .where(
-      and(
-        eq(watchedEpisodes.userId, userId),
-        eq(watchedEpisodes.showTmdbId, showTmdbId),
-        eq(watchedEpisodes.seasonNumber, seasonNumber)
-      )
-    );
+  // Clear resume bookmarks so playback restarts from the top. For "all",
+  // clear every episode's bookmark (no season filter).
+  if (seasonAll) {
+    await db
+      .delete(playbackPositions)
+      .where(
+        and(
+          eq(playbackPositions.userId, userId),
+          eq(playbackPositions.mediaType, "tv"),
+          eq(playbackPositions.tmdbId, showTmdbId)
+        )
+      );
+  } else {
+    await db
+      .delete(playbackPositions)
+      .where(
+        and(
+          eq(playbackPositions.userId, userId),
+          eq(playbackPositions.mediaType, "tv"),
+          eq(playbackPositions.tmdbId, showTmdbId),
+          eq(playbackPositions.seasonNumber, seasonNumber)
+        )
+      );
+  }
 
-  // Reset resume bookmarks for this season's episodes
-  await db
-    .delete(playbackPositions)
-    .where(
-      and(
-        eq(playbackPositions.userId, userId),
-        eq(playbackPositions.mediaType, "tv"),
-        eq(playbackPositions.tmdbId, showTmdbId),
-        eq(playbackPositions.seasonNumber, seasonNumber)
-      )
-    );
-
-  // Recompute aggregate show state
-  const watchedRows = await db
-    .select({
-      seasonNumber: watchedEpisodes.seasonNumber,
-      episodeNumber: watchedEpisodes.episodeNumber,
-    })
-    .from(watchedEpisodes)
-    .where(
-      and(
-        eq(watchedEpisodes.userId, userId),
-        eq(watchedEpisodes.showTmdbId, showTmdbId)
-      )
-    );
-
-  const count = watchedRows.length;
-  const lastWatched = watchedRows
-    .sort(
-      (a, b) =>
-        a.seasonNumber * 1000 +
-        a.episodeNumber -
-        (b.seasonNumber * 1000 + b.episodeNumber)
-    )
-    .at(-1);
-
-  await db
-    .update(userShows)
-    .set({
-      lastSeason: lastWatched?.seasonNumber ?? null,
-      lastEpisode: lastWatched?.episodeNumber ?? null,
-      lastWatchedAt: count > 0 ? new Date() : null,
-      episodesWatched: count,
-      updatedAt: new Date(),
-    })
-    .where(
-      and(eq(userShows.userId, userId), eq(userShows.tmdbId, showTmdbId))
-    );
-
-  return NextResponse.json({ success: true, count: row?.count ?? 1 });
+  return NextResponse.json({
+    success: true,
+    count: row?.count ?? 1,
+    season: seasonAll ? "all" : seasonNumber,
+  });
 }

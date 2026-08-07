@@ -121,7 +121,9 @@ export function ShowDetailClient({
   const [menuOpen, setMenuOpen] = useState(false);
   const [following, setFollowing] = useState(initialFollowing);
 
-  const [rewatchSeason, setRewatchSeason] = useState<number | null>(null);
+  const [rewatchSeason, setRewatchSeason] = useState<number | "all" | null>(
+    null
+  );
   const [markPreviousTarget, setMarkPreviousTarget] =
     useState<DetailEpisode | null>(null);
   const [pending, setPending] = useState(false);
@@ -473,34 +475,44 @@ export function ShowDetailClient({
 
   const confirmRewatch = async () => {
     if (rewatchSeason === null) return;
-    const seasonNumber = rewatchSeason;
+    const target = rewatchSeason; // number (season) | "all" (whole series)
     setPending(true);
     try {
       const res = await fetch("/api/rewatch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ showTmdbId: show.tmdbId, seasonNumber }),
+        body: JSON.stringify({
+          showTmdbId: show.tmdbId,
+          ...(target === "all"
+            ? { season: "all" }
+            : { seasonNumber: target }),
+        }),
       });
       if (!res.ok) throw new Error("rewatch failed");
       const data = await res.json();
 
-      // Reset local watched state for that season
-      setWatchedMap((prev) => {
-        const next = { ...prev };
-        for (const ep of episodes) {
-          if (ep.seasonNumber === seasonNumber) {
-            next[watchKey(ep.seasonNumber, ep.episodeNumber)] = false;
-          }
-        }
-        watchedMapRef.current = next;
-        return next;
-      });
-      setRewatchCounts((prev) => ({
-        ...prev,
-        [seasonNumber]: data.count ?? (prev[seasonNumber] ?? 0) + 1,
-      }));
-      setExpandedSeasons((prev) => new Set(prev).add(seasonNumber));
-      toast(`Season ${seasonNumber} rewatch started`);
+      // Non-destructive: server cleared resume bookmarks only. Local watched
+      // state (and ratings/history) intentionally untouched — bump the badge
+      // locally and let router.refresh() sync resume labels from the DB.
+      if (target === "all") {
+        setRewatchCounts((prev) => ({
+          ...prev,
+          [0]: data.count ?? (prev[0] ?? 0) + 1,
+        }));
+        setExpandedSeasons((prev) => {
+          const first = seasons[0]?.seasonNumber;
+          return first != null ? new Set(prev).add(first) : prev;
+        });
+        toast("Series rewatch started");
+      } else {
+        setRewatchCounts((prev) => ({
+          ...prev,
+          [target]: data.count ?? (prev[target] ?? 0) + 1,
+        }));
+        setExpandedSeasons((prev) => new Set(prev).add(target));
+        toast(`Season ${target} rewatch started`);
+      }
+      router.refresh();
     } catch {
       toast("Couldn't start rewatch — try again", "error");
     } finally {
@@ -618,6 +630,34 @@ export function ShowDetailClient({
                 className="w-full px-4 py-3 text-left text-sm font-medium text-white hover:bg-secondary"
               >
                 {following ? "Remove from watch list" : "Add to watch list"}
+              </button>
+              <button
+                onClick={() => {
+                  setRewatchSeason("all");
+                  setMenuOpen(false);
+                }}
+                className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-white hover:bg-secondary"
+              >
+                <span>Rewatch series</span>
+                {rewatchCounts[0] > 0 && (
+                  <span className="text-xs font-bold text-success">
+                    ×{rewatchCounts[0] + 1}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => {
+                  const complete = seasons.filter((s) => s.complete);
+                  const target =
+                    complete.at(-1)?.seasonNumber ?? seasons[0]?.seasonNumber;
+                  if (target != null) {
+                    setRewatchSeason(target);
+                    setMenuOpen(false);
+                  }
+                }}
+                className="w-full px-4 py-3 text-left text-sm font-medium text-white hover:bg-secondary"
+              >
+                Rewatch season
               </button>
             </div>
           )}
@@ -1075,14 +1115,30 @@ export function ShowDetailClient({
       {rewatchSeason !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-card p-6">
-            <p className="mb-2 text-lg font-bold text-white">
-              Rewatch {seasonLabel(rewatchSeason)}?
-            </p>
-            <p className="mb-6 text-sm text-muted-foreground">
-              Your progress for {seasonLabel(rewatchSeason).toLowerCase()} will
-              be reset so you can watch it again. Your rewatch badge becomes ×
-              {(rewatchCounts[rewatchSeason] ?? 0) + 2}.
-            </p>
+            {rewatchSeason === "all" ? (
+              <>
+                <p className="mb-2 text-lg font-bold text-white">
+                  Rewatch {show.title}?
+                </p>
+                <p className="mb-6 text-sm text-muted-foreground">
+                  Every season&apos;s resume points clear so you can binge it again.
+                  Your progress, ratings and watch history stay. Your series
+                  rewatch badge becomes ×{(rewatchCounts[0] ?? 0) + 2}.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="mb-2 text-lg font-bold text-white">
+                  Rewatch {seasonLabel(rewatchSeason)}?
+                </p>
+                <p className="mb-6 text-sm text-muted-foreground">
+                  {seasonLabel(rewatchSeason)}&apos;s resume points clear so you can
+                  watch it again. Your progress, ratings and watch history stay.
+                  Your rewatch badge becomes ×
+                  {(rewatchCounts[rewatchSeason] ?? 0) + 2}.
+                </p>
+              </>
+            )}
             <div className="flex gap-3">
               <button
                 onClick={() => setRewatchSeason(null)}

@@ -1,7 +1,7 @@
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { userMovies } from "@/lib/schema";
-import { eq, and } from "drizzle-orm";
+import { userMovies, watchHistory } from "@/lib/schema";
+import { eq, and, sql } from "drizzle-orm";
 import {
   backdropUrl,
   posterUrl,
@@ -22,6 +22,7 @@ import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
 import { MovieWatchButton } from "@/components/movie-watch-button";
 import { FavoriteButton } from "@/components/favorite-button";
+import { MovieRewatchButton } from "@/components/movie-rewatch-button";
 import { MovieRating } from "@/components/star-rating";
 import { DiscoverRail } from "@/components/discover-rail";
 import { WatchProviders } from "@/components/watch-providers";
@@ -69,16 +70,27 @@ export default async function MovieDetailPage({
   const movie = await ensureMovie(tmdbId);
   if (!movie) notFound();
 
-  const [userMovie, ownedMovies, playback] = await Promise.all([
-    db.query.userMovies.findFirst({
-      where: and(eq(userMovies.userId, userId), eq(userMovies.tmdbId, tmdbId)),
-    }),
-    db
-      .select({ tmdbId: userMovies.tmdbId })
-      .from(userMovies)
-      .where(eq(userMovies.userId, userId)),
-    getPlaybackPosition(userId, "movie", tmdbId),
-  ]);
+  const [userMovie, ownedMovies, playback, movieRewatchCount] =
+    await Promise.all([
+      db.query.userMovies.findFirst({
+        where: and(eq(userMovies.userId, userId), eq(userMovies.tmdbId, tmdbId)),
+      }),
+      db
+        .select({ tmdbId: userMovies.tmdbId })
+        .from(userMovies)
+        .where(eq(userMovies.userId, userId)),
+      getPlaybackPosition(userId, "movie", tmdbId),
+      db
+        .select({ count: sql<number>`count(*)` })
+        .from(watchHistory)
+        .where(
+          and(
+            eq(watchHistory.userId, userId),
+            eq(watchHistory.mediaType, "movie"),
+            eq(watchHistory.tmdbId, tmdbId)
+          )
+        ),
+    ]);
 
   const ownedIds = new Set(ownedMovies.map((m) => m.tmdbId));
 
@@ -224,6 +236,12 @@ export default async function MovieDetailPage({
               mediaType="movie"
               tmdbId={tmdbId}
               initialFavorite={userMovie?.favorite ?? false}
+            />
+          )}
+          {isWatched && (
+            <MovieRewatchButton
+              tmdbId={tmdbId}
+              initialCount={Number(movieRewatchCount[0]?.count ?? 0)}
             />
           )}
         </div>
