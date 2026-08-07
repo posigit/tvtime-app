@@ -169,6 +169,7 @@ export default async function ShowDetailPage({
       episodes={episodes}
       rewatchCounts={rewatchCounts}
       initialFollowing={!!userShow}
+      initialFavorite={userShow?.favorite ?? false}
       episodeRatings={episodeRatings}
       derivedScore={derivedScore}
       playbackPositions={playbackPositions}

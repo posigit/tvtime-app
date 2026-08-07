@@ -218,6 +218,9 @@ export function VixPlayer({
     initialResumePosition != null ? initialPlaybackKey : null
   );
   const [locked, setLocked] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(
+    () => loadVixSettings().speed
+  );
   const [tapCue, setTapCue] = useState<{ side: "left" | "right" } | null>(
     null
   );
@@ -1252,6 +1255,26 @@ export function VixPlayer({
               </p>
             </div>
             <div className="pointer-events-auto flex shrink-0 items-center gap-2">
+              {mode === "native" && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const v = videoRef.current;
+                    const speeds = [0.75, 1, 1.25, 1.5, 2];
+                    const next =
+                      speeds[
+                        (speeds.indexOf(playbackSpeed) + 1) % speeds.length
+                      ] ?? 1;
+                    setPlaybackSpeed(next);
+                    saveVixSettings({ speed: next });
+                    if (v) v.playbackRate = next;
+                  }}
+                  aria-label="Playback speed"
+                  className="flex h-9 items-center rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+                >
+                  {playbackSpeed}×
+                </button>
+              )}
               {streamable && (
                 <button
                   type="button"

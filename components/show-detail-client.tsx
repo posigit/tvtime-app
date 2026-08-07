@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { backdropUrl, stillUrl } from "@/lib/tmdb";
@@ -14,7 +14,10 @@ import { WatchProviders } from "@/components/watch-providers";
 import { CommunityReviews } from "@/components/community-reviews";
 import { TrailerButton } from "@/components/trailer-button";
 import { VixPlayer } from "@/components/vix-player";
+import { UpNextCard } from "@/components/up-next-card";
+import { FavoriteButton } from "@/components/favorite-button";
 import { vixTvUrl } from "@/lib/vixsrc";
+import { loadVixSettings } from "@/lib/vix-settings";
 import { TmdbIcon } from "@/components/rt-icons";
 import { formatEpisodeLabel, useToast } from "@/components/toast";
 import type { TmdbMediaCard, WatchProvidersResult } from "@/lib/tmdb";
@@ -77,6 +80,7 @@ export function ShowDetailClient({
   episodes,
   rewatchCounts: initialRewatchCounts,
   initialFollowing,
+  initialFavorite = false,
   episodeRatings,
   derivedScore,
   moreLikeThis = [],
@@ -90,6 +94,7 @@ export function ShowDetailClient({
   episodes: DetailEpisode[];
   rewatchCounts: Record<number, number>;
   initialFollowing: boolean;
+  initialFavorite?: boolean;
   episodeRatings: Record<string, number>;
   derivedScore: { value: number; count: number } | null;
   moreLikeThis?: TmdbMediaCard[];
@@ -123,6 +128,9 @@ export function ShowDetailClient({
   /** Episode currently open in the VixSrc player overlay. */
   const [playerEp, setPlayerEp] = useState<DetailEpisode | null>(null);
   const playerSessionRef = useRef(0);
+  /** Next episode queued after the current one ends (autoplay countdown). */
+  const [upNext, setUpNext] = useState<DetailEpisode | null>(null);
+  const [upNextCount, setUpNextCount] = useState(0);
 
   const isWatched = (ep: DetailEpisode) =>
     watchedMap[watchKey(ep.seasonNumber, ep.episodeNumber)] ?? false;
@@ -418,9 +426,50 @@ export function ShowDetailClient({
           !watchedMapRef.current[watchKey(ep.seasonNumber, ep.episodeNumber)] &&
           isEpisodeAired(ep.airDate)
       );
+
+    // Only queue an auto-play when a real next episode exists AND the user
+    // hasn't disabled autoplay. A season finale that has a next season (S+1 E1)
+    // is eligible — `next` is found across all seasons.
+    if (next && loadVixSettings().autoplayNext) {
+      setUpNext(next);
+      setUpNextCount(10);
+      return;
+    }
     playerSessionRef.current += 1;
     setPlayerEp(next ?? null);
+    setUpNext(null);
   };
+
+  /** Play the queued "up next" episode immediately (skip the countdown). */
+  const playUpNext = useCallback(() => {
+    if (!upNext) return;
+    playerSessionRef.current += 1;
+    setPlayerEp(upNext);
+    setUpNext(null);
+    setUpNextCount(0);
+  }, [upNext]);
+
+  /** Cancel the autoplay, leaving the player closed on the finished ep. */
+  const cancelUpNext = useCallback(() => {
+    setUpNext(null);
+    setUpNextCount(0);
+  }, []);
+
+  // Count down the "up next" overlay; when it hits 0, auto-play the next ep.
+  // Auto-fire happens in the timeout callback (event context), never in the
+  // render phase. Bail if the player was closed mid-countdown (playerEp gone) —
+  // never reopen an episode the user dismissed.
+  useEffect(() => {
+    if (!upNext || !playerEp) return;
+    const t = window.setTimeout(() => {
+      if (upNextCount <= 1) {
+        playUpNext();
+      } else {
+        setUpNextCount(upNextCount - 1);
+      }
+    }, 1000);
+    return () => window.clearTimeout(t);
+  }, [upNext, upNextCount, playerEp, playUpNext]);
 
   const confirmRewatch = async () => {
     if (rewatchSeason === null) return;
@@ -474,6 +523,9 @@ export function ShowDetailClient({
       setFollowing(!next);
     }
   };
+
+  /** Show the favorite affordance only once something's been watched. */
+  const hasWatchedEpisodes = episodes.some((ep) => isWatched(ep));
 
   const toggleSeason = (seasonNumber: number) => {
     setExpandedSeasons((prev) => {
@@ -543,13 +595,22 @@ export function ShowDetailClient({
           <ChevronDown className="h-5 w-5" />
         </button>
         <div className="absolute right-4 top-safe-float">
-          <button
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-label="More"
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white"
-          >
-            <MoreHorizontal className="h-5 w-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {hasWatchedEpisodes && (
+              <FavoriteButton
+                mediaType="tv"
+                tmdbId={show.tmdbId}
+                initialFavorite={initialFavorite}
+              />
+            )}
+            <button
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label="More"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white"
+            >
+              <MoreHorizontal className="h-5 w-5" />
+            </button>
+          </div>
           {menuOpen && (
             <div className="absolute right-0 top-11 z-30 w-44 overflow-hidden rounded-xl border border-white/10 bg-card shadow-xl">
               <button
@@ -1074,6 +1135,17 @@ export function ShowDetailClient({
             </div>
           </div>
         </div>
+      )}
+
+      {/* ---------- Up-next autoplay overlay (over the player) ---------- */}
+      {upNext && playerEp && (
+        <UpNextCard
+          episode={upNext}
+          currentSeason={playerEp.seasonNumber}
+          countdown={upNextCount}
+          onPlay={playUpNext}
+          onCancel={cancelUpNext}
+        />
       )}
 
       {/* ---------- VixSrc streaming player ---------- */}

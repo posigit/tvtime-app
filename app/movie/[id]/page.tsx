@@ -21,6 +21,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
 import { MovieWatchButton } from "@/components/movie-watch-button";
+import { FavoriteButton } from "@/components/favorite-button";
 import { MovieRating } from "@/components/star-rating";
 import { DiscoverRail } from "@/components/discover-rail";
 import { WatchProviders } from "@/components/watch-providers";
@@ -211,11 +212,20 @@ export default async function MovieDetailPage({
           playback={playback}
         />
 
-        <div className="mt-3">
-          <MovieWatchButton
-            tmdbId={tmdbId}
-            initialStatus={userMovie?.status || null}
-          />
+        <div className="mt-3 flex items-center gap-3">
+          <div className="flex-1">
+            <MovieWatchButton
+              tmdbId={tmdbId}
+              initialStatus={userMovie?.status || null}
+            />
+          </div>
+          {isWatched && (
+            <FavoriteButton
+              mediaType="movie"
+              tmdbId={tmdbId}
+              initialFavorite={userMovie?.favorite ?? false}
+            />
+          )}
         </div>
 
         {/* Critic + audience scores */}

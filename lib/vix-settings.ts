@@ -23,6 +23,8 @@ export type VixSettings = {
   /** 0..1 */
   volume: number;
   muted: boolean;
+  /** Auto-play the next episode when the current one ends (TV only). */
+  autoplayNext: boolean;
 };
 
 export const VIX_SETTINGS_KEY = "vix-settings";
@@ -37,6 +39,7 @@ export const DEFAULT_VIX_SETTINGS: VixSettings = {
   speed: 1,
   volume: 1,
   muted: false,
+  autoplayNext: true,
 };
 
 /** Language codes that should NEVER apply as a default (hard user rule).
