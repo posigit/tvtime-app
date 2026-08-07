@@ -1265,20 +1265,12 @@ export function ShowDetailClient({
       )}
 
       {/* End of the line: the played episode ended and there's no next aired
-          episode — keep the player open so the finale plays to the true end,
-          and give the user an explicit close instead of the missing Up Next. */}
+          episode — keep the player open so the finale plays to the true end.
+          Small bottom-right card, auto-dismisses; X dismisses only the card. */}
       {seriesEnded && playerEp && (
         <EndOfLineCard
-          showTitle={show.title}
-          seasonNumber={playerEp.seasonNumber}
-          episodeNumber={playerEp.episodeNumber}
-          episodeTitle={playerEp.title}
-          onClose={() => {
-            playerSessionRef.current += 1;
-            setPlayerEp(null);
-            setSeriesEnded(false);
-            router.refresh();
-          }}
+          episodeLabel={`${show.title} — S${playerEp.seasonNumber}E${playerEp.episodeNumber}`}
+          onDismiss={() => setSeriesEnded(false)}
         />
       )}
 
