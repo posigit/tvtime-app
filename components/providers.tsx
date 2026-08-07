@@ -1,8 +1,18 @@
 "use client";
 
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 import { ReactNode, useEffect } from "react";
 import { ToastProvider } from "@/components/toast";
+import { hydrateVixSettings } from "@/lib/vix-settings";
+
+/** Hydrates player settings once the session is known (per-user data). */
+function SettingsHydrator() {
+  const { status } = useSession();
+  useEffect(() => {
+    if (status === "authenticated") void hydrateVixSettings();
+  }, [status]);
+  return null;
+}
 
 export function Providers({ children }: { children: ReactNode }) {
   useEffect(() => {
@@ -44,6 +54,7 @@ export function Providers({ children }: { children: ReactNode }) {
       refetchWhenOffline={false}
       refetchInterval={0}
     >
+      <SettingsHydrator />
       <ToastProvider>{children}</ToastProvider>
     </SessionProvider>
   );

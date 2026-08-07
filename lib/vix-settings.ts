@@ -46,7 +46,7 @@ export const DEFAULT_VIX_SETTINGS: VixSettings = {
  *  Bidirectional includes() below covers ita/forced-ita variants. */
 const BANNED_SUB_LANGS = ["it"];
 
-function isBannedSubLang(lang: string | undefined | null): boolean {
+export function isBannedSubLang(lang: string | undefined | null): boolean {
   const l = (lang || "").toLowerCase();
   return BANNED_SUB_LANGS.some(
     (b) => l === b || l.includes(b) || b.includes(l)
@@ -82,9 +82,69 @@ export function saveVixSettings(patch: Partial<VixSettings>) {
     if (isBannedSubLang(next.subs)) next.subs = "en";
     if (isBannedSubLang(next.audio)) next.audio = "en";
     window.localStorage.setItem(VIX_SETTINGS_KEY, JSON.stringify(next));
+    queueServerSync();
   } catch {
     /* storage unavailable — persistence is best-effort */
   }
+}
+
+/** Debounce window for server sync (ms). */
+const SERVER_SYNC_DELAY = 800;
+let syncTimer: ReturnType<typeof setTimeout> | null = null;
+
+/**
+ * Fire-and-forget server sync of the current settings. Debounced so rapid
+ * track/quality changes (multiple saveVixSettings calls per second) coalesce
+ * into one POST. Never throws; unauthenticated/offline calls are no-ops.
+ */
+function queueServerSync() {
+  if (typeof window === "undefined") return;
+  if (syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => {
+    syncTimer = null;
+    try {
+      void fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ settings: loadVixSettings() }),
+      }).catch(() => {
+        /* offline / 401 — localStorage still holds the value */
+      });
+    } catch {
+      /* no-op */
+    }
+  }, SERVER_SYNC_DELAY);
+}
+
+/**
+ * Pull server-side settings once per session and overwrite localStorage so
+ * cross-device choices apply immediately. Called from the app Providers on
+ * mount. Server is the source of truth across devices; localStorage is the
+ * cache. No-op when unauthenticated (per-user data) or already hydrated.
+ */
+let hydrated = false;
+export function hydrateVixSettings(): Promise<void> {
+  if (typeof window === "undefined" || hydrated) return Promise.resolve();
+  hydrated = true;
+  return fetch("/api/settings")
+    .then((res) => (res.ok ? res.json() : null))
+    .then((data: { settings?: Partial<VixSettings> } | null) => {
+      if (!data?.settings) return;
+      const merged = { ...DEFAULT_VIX_SETTINGS, ...data.settings };
+      if (isBannedSubLang(merged.subs)) merged.subs = "en";
+      if (isBannedSubLang(merged.audio)) merged.audio = "en";
+      try {
+        window.localStorage.setItem(
+          VIX_SETTINGS_KEY,
+          JSON.stringify({ ...merged, v: VIX_SETTINGS_VERSION })
+        );
+      } catch {
+        /* storage unavailable — nothing to do */
+      }
+    })
+    .catch(() => {
+      /* network/auth failure — keep localStorage as-is */
+    });
 }
 
 /** Loose language matcher: "en" matches "eng", "it" matches "ita"/"forced-ita". */

@@ -310,3 +310,21 @@ export const watchHistory = pgTable(
     index("watch_history_media_idx").on(t.mediaType, t.tmdbId),
   ]
 );
+
+/**
+ * Server-side copy of player settings (vix-settings). localStorage remains
+ * the fast path; this table is the source of truth across devices/browsers.
+ * Single JSONB blob — validation/normalization lives in the API route and
+ * mirrors lib/vix-settings.ts (defaults merge + banned-language clamp).
+ */
+export const userSettings = pgTable(
+  "user_settings",
+  {
+    userId: text("user_id")
+      .primaryKey()
+      .references(() => users.id, { onDelete: "cascade" }),
+    settings: jsonb("settings").notNull().default({}),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => [index("user_settings_updated_idx").on(t.updatedAt)]
+);
