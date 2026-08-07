@@ -42,18 +42,12 @@ export function SearchBar() {
   useEffect(() => {
     const q = query.trim().toLowerCase();
     if (q.length < 2) {
-      setResults([]);
-      setError(null);
+      // results/error cleared in onChange for short queries
       return;
     }
 
-    const cached = searchCache.get(q);
-    if (cached) {
-      setResults(cached);
-      setLoading(false);
-      setError(null);
-      return;
-    }
+    // short queries + cache hits resolved in onChange (sync state stays out of effect)
+    if (searchCache.has(q)) return;
 
     const timer = setTimeout(async () => {
       setLoading(true);
@@ -103,7 +97,22 @@ export function SearchBar() {
           type="text"
           placeholder="Search"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            const v = e.target.value;
+            setQuery(v);
+            const t = v.trim().toLowerCase();
+            if (t.length < 2) {
+              setResults([]);
+              setError(null);
+              return;
+            }
+            const cached = searchCache.get(t);
+            if (cached) {
+              setResults(cached);
+              setLoading(false);
+              setError(null);
+            }
+          }}
           onFocus={() => setFocused(true)}
           onBlur={() => setTimeout(() => setFocused(false), 200)}
           className="w-full bg-transparent text-[15px] text-white placeholder:text-muted-foreground focus:outline-none"

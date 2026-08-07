@@ -3,10 +3,10 @@
  *
  * Production hosts run in UTC; comparing with local `setHours(0,0,0,0)` made
  * episodes unlock at UTC midnight — often ~1 day early for US evenings.
- * Everything date-based should use APP_TIMEZONE (default America/New_York).
+ * Everything date-based should use APP_TIMEZONE (default Africa/Lagos).
  */
 
-const DEFAULT_TZ = "America/New_York";
+const DEFAULT_TZ = "Africa/Lagos";
 
 export function getAppTimeZone(): string {
   // NEXT_PUBLIC_ so client components (show detail) match the server calendar
