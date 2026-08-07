@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
-import { ExternalLink, LoaderCircle, Lock, LockOpen, X } from "lucide-react";
+import { Captions, Check, ExternalLink, LoaderCircle, Lock, LockOpen, X } from "lucide-react";
 import {
   isVixPlayerOrigin,
   parseVixPlayerEventData,
 } from "@/lib/vixsrc";
 import { ResumeOverlay } from "@/components/resume-overlay";
+import { cn } from "@/lib/utils";
 import {
   loadVixSettings,
   saveVixSettings,
@@ -108,7 +109,7 @@ function injectVttTrack(
   vtt: string,
   label: string,
   show: boolean
-) {
+): TextTrack | null {
   const track = video.addTextTrack("subtitles", label, "en");
   track.mode = show ? "showing" : "disabled";
   const lines = vtt.split(/\r?\n/);
@@ -134,6 +135,54 @@ function injectVttTrack(
     } else {
       i++;
     }
+  }
+  return track;
+}
+
+/**
+ * Fetch an external VTT (VDRK or OpenSubtitles) for the current item.
+ * Returns { vtt, label } or null. Shared by the hls.js and Safari paths.
+ */
+async function fetchExternalVtt(opts: {
+  source: "vdrk" | "opensub";
+  type?: "movie" | "tv";
+  tmdbId?: number;
+  season?: number;
+  episode?: number;
+  imdbId?: string | null;
+}): Promise<{ vtt: string; label: string } | null> {
+  if (opts.source === "vdrk") {
+    if (!opts.tmdbId) return null;
+    try {
+      const base = `https://cache.vdrk.site/v1/vtt/${opts.type === "tv" ? "tv" : "movie"}/${opts.tmdbId}`;
+      const path =
+        opts.type === "tv" && opts.season != null && opts.episode != null
+          ? `${base}/${opts.season}/${opts.episode}/English.vtt`
+          : `${base}/English.vtt`;
+      const res = await fetch(path);
+      if (!res.ok) return null;
+      const vtt = await res.text();
+      // VDRK returns 200 with an empty body for titles it lacks.
+      if (vtt.trim().length === 0) return null;
+      return { vtt, label: "English (VDRK)" };
+    } catch {
+      return null;
+    }
+  }
+
+  // opensub
+  if (!opts.imdbId) return null;
+  try {
+    const q = new URLSearchParams({ imdbId: opts.imdbId, lang: "en" });
+    if (opts.season != null) q.set("season", String(opts.season));
+    if (opts.episode != null) q.set("episode", String(opts.episode));
+    const res = await fetch(`/api/vixsrc/subs?${q.toString()}`);
+    if (!res.ok) return null;
+    const data = (await res.json()) as { vtt?: string; label?: string };
+    if (!data.vtt) return null;
+    return { vtt: data.vtt, label: data.label ?? "OpenSubtitles (English)" };
+  } catch {
+    return null;
   }
 }
 
@@ -221,9 +270,26 @@ export function VixPlayer({
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(
     () => loadVixSettings().speed
   );
+  const [subSource, setSubSource] = useState<"auto" | "off" | "stream" | "vdrk" | "opensub">(
+    () => loadVixSettings().subSource
+  );
+  /** Latest subSource for async closures inside the native-playback effect. */
+  const subSourceRef = useRef(subSource);
+  useEffect(() => {
+    subSourceRef.current = subSource;
+  }, [subSource]);
+  /** Externally injected VTT tracks (VDRK / OpenSubtitles) so we can hide them. */
+  const injectedTracksRef = useRef<TextTrack[]>([]);
+  /** Set by the native effect; lets the picker re-run subtitle loading. */
+  const reloadSubsRef = useRef<(() => void) | null>(null);
+  /** Safari forced-source delayed load handle (cleared on unmount). */
+  // window.setTimeout returns number (DOM); bare setTimeout returns Timeout
+  // (Node). We call window.setTimeout, so the ref is number.
+  const safariTimerRef = useRef<number | null>(null);
   const [tapCue, setTapCue] = useState<{ side: "left" | "right" } | null>(
     null
   );
+  const [subMenuOpen, setSubMenuOpen] = useState(false);
   const lastTapRef = useRef<{ time: number; side: "left" | "right" } | null>(
     null
   );
@@ -651,6 +717,25 @@ export function VixPlayer({
     lastSavedAtRef.current = 0;
   }, [activeSource]);
 
+  /** Subtitle source picker: persist choice + re-run the subtitle loader. */
+  const handleSubSource = useCallback(
+    (next: "auto" | "off" | "stream" | "vdrk" | "opensub") => {
+      setSubSource(next);
+      // Sync the ref synchronously so the immediate reload reads the NEW
+      // source (passive useEffect would run only after the commit).
+      subSourceRef.current = next;
+      setSubMenuOpen(false);
+      // subs mirrors the source so applySettings() can drive off/stream
+      // (subs === "off" hides; otherwise the language preference applies).
+      saveVixSettings({
+        subSource: next,
+        subs: next === "off" ? "off" : "en",
+      });
+      reloadSubsRef.current?.();
+    },
+    []
+  );
+
   // ---------- resolve native stream (single fetch, single source of truth) ----------
   useEffect(() => {
     if (!streamable || !tmdbId) return; // initial state already fell back
@@ -737,7 +822,16 @@ export function VixPlayer({
         }
 
         hls.subtitleDisplay = s.subs !== "off";
-        if (s.subs === "off") {
+        // Forced external modes (vdrk/opensub) own the subtitle surface: never
+        // re-enable the stream's CC track here — the injected track is the one.
+        const forcedExternal = subSourceRef.current === "vdrk" || subSourceRef.current === "opensub";
+        if (forcedExternal) {
+          if (hls.subtitleTrack !== -1) {
+            applying = true;
+            hls.subtitleTrack = -1;
+            applying = false;
+          }
+        } else if (s.subs === "off") {
           if (hls.subtitleTrack !== -1) {
             applying = true;
             hls.subtitleTrack = -1;
@@ -797,61 +891,87 @@ export function VixPlayer({
 
       // Fallback subtitles — Tier 1: goated VDRK open VTT built directly from
       // tmdbId (no API call, no PoW, CORS-open). Tier 3: OpenSubtitles.
-      // Only loads when the stream has NO English CC.
+      // Respects the user's subSource preference:
+      //   auto   = stream CC when present, else VDRK → OpenSubtitles
+      //   stream = stream's own English CC only (never inject)
+      //   vdrk   = force VDRK, even if stream has CC
+      //   opensub= force OpenSubtitles
+      //   off    = never
       let osLoaded = false;
       const maybeLoadFallbackSubtitles = async () => {
         if (osLoaded || !hls) return;
+        const src = subSourceRef.current;
+        if (src === "off" || src === "stream") return; // handled by applySettings
         const hasEng = hls.subtitleTracks.some((t) => matchLang(t.lang, "en"));
-        if (hasEng) return; // stream already has English CC — prefer it
+        // In auto mode, a stream with English CC is preferred — no injection.
+        if (src === "auto" && hasEng) return;
+        // Forced external mode on a CC-bearing stream: disable the stream's own
+        // CC so the injected VDRK/OS track is the ONLY one (no double subs).
+        if ((src === "vdrk" || src === "opensub") && hasEng) {
+          applying = true;
+          hls.subtitleDisplay = false;
+          hls.subtitleTrack = -1;
+          applying = false;
+        }
         osLoaded = true;
 
-        // Tier 1 — VDRK direct: movie => /vtt/movie/{id}/English.vtt,
-        // tv => /vtt/tv/{id}/{season}/{episode}/English.vtt
-        if (activeSource === "goated" && tmdbId) {
-          try {
-            const base = `https://cache.vdrk.site/v1/vtt/${type === "tv" ? "tv" : "movie"}/${tmdbId}`;
-            const path =
-              type === "tv" && season != null && episode != null
-                ? `${base}/${season}/${episode}/English.vtt`
-                : `${base}/English.vtt`;
-            const res = await fetch(path);
-            if (res.ok) {
-              const vtt = await res.text();
-              // VDRK returns 200 with an empty body for titles it lacks.
-              if (vtt.trim().length > 0) {
-                const show = loadVixSettings().subs !== "off";
-                injectVttTrack(video, vtt, "English (VDRK)", show);
-                return;
-              }
+        // Tier 1 — VDRK direct, or Tier 3 — OpenSubtitles.
+        const wantVdrk = src === "vdrk" || (src === "auto" && activeSource === "goated");
+        const wantOs = src === "opensub" || src === "auto";
+        if (wantVdrk || wantOs) {
+          const source = wantVdrk ? "vdrk" : "opensub";
+          const ext = await fetchExternalVtt({
+            source,
+            type,
+            tmdbId,
+            season,
+            episode,
+            imdbId: imdbIdRef.current,
+          });
+          if (ext) {
+            const show = loadVixSettings().subs !== "off";
+            const tr = injectVttTrack(video, ext.vtt, ext.label, show);
+            if (tr) injectedTracksRef.current.push(tr);
+            return;
+          }
+          // VDRK failed/empty → fall through to OpenSubtitles in auto mode.
+          if (wantVdrk && src === "auto") {
+            const os = await fetchExternalVtt({
+              source: "opensub",
+              type,
+              tmdbId,
+              season,
+              episode,
+              imdbId: imdbIdRef.current,
+            });
+            if (os) {
+              const show = loadVixSettings().subs !== "off";
+              const tr = injectVttTrack(video, os.vtt, os.label, show);
+              if (tr) injectedTracksRef.current.push(tr);
             }
-          } catch {
-            /* non-fatal — fall through to OpenSubtitles */
           }
         }
+      };
 
-        // Tier 3 — OpenSubtitles fallback.
-        try {
-          if (!imdbIdRef.current) return;
-          const q = new URLSearchParams({
-            imdbId: imdbIdRef.current,
-            lang: "en",
-          });
-          if (season != null) q.set("season", String(season));
-          if (episode != null) q.set("episode", String(episode));
-          const res = await fetch(`/api/vixsrc/subs?${q.toString()}`);
-          if (!res.ok) return;
-          const data = (await res.json()) as { vtt?: string; label?: string };
-          if (!data.vtt) return;
-          const show = loadVixSettings().subs !== "off";
-          injectVttTrack(
-            video,
-            data.vtt,
-            data.label ?? "OpenSubtitles (English)",
-            show
-          );
-        } catch {
-          /* non-fatal */
+      // Expose a re-run hook so the picker can force a source without remount.
+      reloadSubsRef.current = () => {
+        osLoaded = false;
+        const src = subSourceRef.current;
+        // Hide any previously injected external tracks.
+        for (const t of injectedTracksRef.current) t.mode = "disabled";
+        if (src === "vdrk" || src === "opensub") {
+          // Forced external source: kill the stream's own CC track so only the
+          // injected VDRK/OS track shows (no double subtitles).
+          if (hls) {
+            applying = true;
+            hls.subtitleDisplay = false;
+            hls.subtitleTrack = -1;
+            applying = false;
+          }
         }
+        // Re-apply persisted subs (handles off / stream-C C cases).
+        applySettings();
+        void maybeLoadFallbackSubtitles();
       };
 
       hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, () => {
@@ -957,6 +1077,51 @@ export function VixPlayer({
         at?.removeEventListener?.("change", onNativeChange);
         tt?.removeEventListener?.("change", onNativeChange);
       });
+
+      // Safari native path: support the same forced VDRK/OpenSubtitles sources
+      // via injected text tracks. Native HLS has no hls.subtitleTrack, so we
+      // manage modes directly on video.textTracks.
+      const loadSafariExternal = async () => {
+        const src = subSourceRef.current;
+        if (src === "auto" || src === "off" || src === "stream") {
+          applyNative();
+          return;
+        }
+        // Hide the stream's native CC tracks so only the injected one shows.
+        const ttl = video.textTracks as unknown as TextTrackList | undefined;
+        if (ttl) {
+          for (let i = 0; i < ttl.length; i++) {
+            const t = ttl[i];
+            if (t.kind === "subtitles" || t.kind === "captions") {
+              t.mode = "hidden";
+            }
+          }
+        }
+        const ext = await fetchExternalVtt({
+          source: src,
+          type,
+          tmdbId,
+          season,
+          episode,
+          imdbId: imdbIdRef.current,
+        });
+        if (ext) {
+          const tr = injectVttTrack(video, ext.vtt, ext.label, true);
+          if (tr) injectedTracksRef.current.push(tr);
+        }
+      };
+      reloadSubsRef.current = () => {
+        for (const t of injectedTracksRef.current) t.mode = "disabled";
+        void loadSafariExternal();
+      };
+      // On load, honor a persisted forced source.
+      const src0 = subSourceRef.current;
+      if (src0 === "vdrk" || src0 === "opensub") {
+        safariTimerRef.current = window.setTimeout(
+          () => void loadSafariExternal(),
+          1200
+        );
+      }
     } else {
       setStreamFailed(true);
     }
@@ -974,6 +1139,16 @@ export function VixPlayer({
 
     return () => {
       hls?.destroy();
+      // Disable + drop injected external tracks so an episode change (or an
+      // in-place vix↔goated source switch that reuses the same <video>) never
+      // leaves a stale "showing" track or leaks duplicates.
+      for (const t of injectedTracksRef.current) t.mode = "disabled";
+      injectedTracksRef.current = [];
+      reloadSubsRef.current = null;
+      if (safariTimerRef.current) {
+        clearTimeout(safariTimerRef.current);
+        safariTimerRef.current = null;
+      }
       for (const fn of cleanup) fn();
     };
   }, [mode, playlistUrl, savePosition, season, episode, activeSource, tmdbId, type]);
@@ -1274,6 +1449,46 @@ export function VixPlayer({
                 >
                   {playbackSpeed}×
                 </button>
+              )}
+              {mode === "native" && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setSubMenuOpen((v) => !v)}
+                    aria-label="Subtitles"
+                    aria-expanded={subMenuOpen}
+                    className="flex h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+                  >
+                    <Captions className="h-4 w-4" />
+                    <span className="hidden sm:inline">CC</span>
+                  </button>
+                  {subMenuOpen && (
+                    <div className="absolute right-0 top-11 z-30 w-52 overflow-hidden rounded-xl border border-white/10 bg-card shadow-xl">
+                      {(
+                        [
+                          ["auto", "Auto (stream → VDRK → OS)"],
+                          ["stream", "Stream CC"],
+                          ["vdrk", "VDRK English"],
+                          ["opensub", "OpenSubtitles"],
+                          ["off", "Off"],
+                        ] as const
+                      ).map(([key, label]) => (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={() => handleSubSource(key)}
+                          className={cn(
+                            "flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-white transition hover:bg-secondary",
+                            subSource === key && "text-primary"
+                          )}
+                        >
+                          {label}
+                          {subSource === key && <Check className="h-4 w-4" />}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               )}
               {streamable && (
                 <button

@@ -672,6 +672,11 @@ export function ShowDetailClient({
             <h1 className="text-2xl font-black text-white drop-shadow">
               {show.title}
             </h1>
+            {rewatchCounts[0] > 0 && (
+              <span className="mt-1 inline-flex items-center rounded-full bg-success/20 px-2.5 py-0.5 text-[11px] font-bold text-success ring-1 ring-success/40">
+                Rewatched ×{rewatchCounts[0] + 1}
+              </span>
+            )}
             <p className="mt-0.5 truncate text-sm text-white/80">
               {metaParts.join(" · ")}
             </p>
@@ -978,6 +983,11 @@ export function ShowDetailClient({
                     <span className="flex-shrink-0 text-sm text-muted-foreground">
                       {season.watchedCount}/{season.total}
                     </span>
+                    {rewatchCount > 0 && (
+                      <span className="flex-shrink-0 rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-bold text-success ring-1 ring-success/30">
+                        Rewatch ×{rewatchCount + 1}
+                      </span>
+                    )}
                     <button
                       onClick={() => handleSeasonBadge(season)}
                       aria-label={
@@ -1051,9 +1061,14 @@ export function ShowDetailClient({
                                 </p>
                               )}
                               {resumeLabel(ep) && !watched && (
-                                <p className="mt-0.5 text-[11px] font-black text-primary">
+                                <button
+                                  type="button"
+                                  onClick={() => openPlayer(ep)}
+                                  className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-2.5 py-1 text-[11px] font-bold text-primary ring-1 ring-primary/30 transition hover:bg-primary/25 active:scale-95"
+                                >
+                                  <Play className="h-3 w-3 fill-current" />
                                   {resumeLabel(ep)}
-                                </p>
+                                </button>
                               )}
                               {watched && (
                                 <EpisodeRating

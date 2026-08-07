@@ -52,13 +52,13 @@ export function MovieRewatchButton({
         disabled={pending}
         aria-label="Rewatch movie"
         title="Rewatch movie"
-        className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-card text-white ring-1 ring-white/15 transition-colors hover:bg-secondary disabled:opacity-50"
+        className="flex h-9 flex-shrink-0 items-center gap-1.5 rounded-full bg-card px-3 text-white ring-1 ring-white/15 transition-colors hover:bg-secondary disabled:opacity-50"
       >
         <RotateCcw className="h-4 w-4" strokeWidth={2.5} />
-        {count > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-success px-1 text-[10px] font-black text-white">
-            ×{count}
-          </span>
+        {count > 0 ? (
+          <span className="text-xs font-bold text-success">×{count}</span>
+        ) : (
+          <span className="text-xs font-bold text-white/60">Rewatch</span>
         )}
       </button>
       {confirming && (

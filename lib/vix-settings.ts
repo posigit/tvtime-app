@@ -25,6 +25,13 @@ export type VixSettings = {
   muted: boolean;
   /** Auto-play the next episode when the current one ends (TV only). */
   autoplayNext: boolean;
+  /**
+   * Subtitle source preference (picker in the player):
+   * "auto" (default) = stream CC when present, else VDRK → OpenSubtitles;
+   * "off" = never show; "stream" = stream's own English CC only;
+   * "vdrk" = force VDRK VTT; "opensub" = force OpenSubtitles VTT.
+   */
+  subSource: "auto" | "off" | "stream" | "vdrk" | "opensub";
 };
 
 export const VIX_SETTINGS_KEY = "vix-settings";
@@ -40,6 +47,7 @@ export const DEFAULT_VIX_SETTINGS: VixSettings = {
   volume: 1,
   muted: false,
   autoplayNext: true,
+  subSource: "auto",
 };
 
 /** Language codes that should NEVER apply as a default (hard user rule).
