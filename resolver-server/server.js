@@ -10,6 +10,7 @@
  * returns a signed HLS master playlist URL. No CORS needed because the Vercel
  * route calls it server-to-server.
  */
+/* eslint-disable @typescript-eslint/no-require-imports */
 const http = require("http");
 const { URL } = require("url");
 
