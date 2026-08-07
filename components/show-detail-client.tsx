@@ -410,22 +410,21 @@ export function ShowDetailClient({
     if (event !== "ended" || !playerEp) return;
     const session = playerSessionRef.current;
     const endedEpisode = playerEp;
-    if (isWatched(endedEpisode)) {
-      setPlayerEp(null);
-      return;
-    }
+    const alreadyWatched = isWatched(endedEpisode);
 
-    const saved = await applyWatched([
-      {
-        seasonNumber: endedEpisode.seasonNumber,
-        episodeNumber: endedEpisode.episodeNumber,
-        watched: true,
-      },
-    ]);
-    if (!saved) return;
-    // Closing or replacing the player while the watch request was pending
-    // cancels auto-advance instead of reopening the next episode.
-    if (playerSessionRef.current !== session) return;
+    if (!alreadyWatched) {
+      const saved = await applyWatched([
+        {
+          seasonNumber: endedEpisode.seasonNumber,
+          episodeNumber: endedEpisode.episodeNumber,
+          watched: true,
+        },
+      ]);
+      if (!saved) return;
+      // Closing or replacing the player while the watch request was pending
+      // cancels auto-advance instead of reopening the next episode.
+      if (playerSessionRef.current !== session) return;
+    }
 
     const next = [...episodes]
       .sort(compareEp)
@@ -448,8 +447,9 @@ export function ShowDetailClient({
     // No next aired episode (series finale, or waiting for next week): keep the
     // player OPEN so the final scene plays to the true end, and surface an
     // "end of the line" card instead of slamming the player shut at 92%.
-    // (Previous behavior closed the player here — cutting the last 8% and
-    //  creating a reopen → auto-close loop on last-aired episodes.)
+    // Handles both first-run and rewatched episodes (an episode auto-completed
+    // at 92% on a prior attempt is already watched — it must still show the
+    // card instead of closing silently).
     if (!next) {
       setUpNext(null);
       setUpNextCount(0);
