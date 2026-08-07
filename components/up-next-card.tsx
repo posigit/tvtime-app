@@ -1,10 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { Play } from "lucide-react";
+import { X } from "lucide-react";
 import { stillUrl } from "@/lib/tmdb";
 
-/** Overlay card shown when an episode ends and autoplay is queued. */
+/**
+ * Netflix-style up-next toast: small, bottom-right, subtle. A compact poster
+ * thumbnail + "Up next" + title + circular countdown ring. No big buttons —
+ * the whole card plays on tap, X cancels. Countdown ticks 9 → 1.
+ */
 export function UpNextCard({
   episode,
   currentSeason,
@@ -23,58 +27,96 @@ export function UpNextCard({
   onPlay: () => void;
   onCancel: () => void;
 }) {
-  const still = stillUrl(episode.stillPath);
+  const still = stillUrl(episode.stillPath, "w185");
+  // Ring progress: countdown 10 → 0. Clamp so it never renders negative.
+  const progress = Math.max(0, Math.min(1, countdown / 10));
+  const R = 14;
+  const CIRC = 2 * Math.PI * R;
+
   return (
-    <div className="fixed inset-0 z-[110] flex items-end justify-end p-5 sm:items-start sm:p-6">
-      <div className="w-full max-w-xs overflow-hidden rounded-2xl border border-white/10 bg-card/95 shadow-2xl backdrop-blur">
-        <div className="relative aspect-video bg-black">
+    <div className="fixed inset-x-0 bottom-0 z-[110] flex justify-end p-3 pb-4 sm:p-5">
+      {/* Play surface — whole card is the play button */}
+      <button
+        type="button"
+        onClick={onPlay}
+        className="relative flex w-72 items-center gap-3 overflow-hidden rounded-xl border border-white/10 bg-black/85 p-2.5 pl-3 pr-10 text-left shadow-2xl backdrop-blur transition hover:bg-black/90"
+      >
+        <div className="relative h-16 w-11 flex-shrink-0 overflow-hidden rounded-md bg-[#2c2c2e]">
           {still ? (
             <Image
               src={still}
               alt=""
               fill
-              sizes="(max-width: 24rem) 100vw"
-              className="object-cover opacity-90"
+              sizes="44px"
+              className="object-cover"
+              unoptimized
             />
           ) : (
             <div className="flex h-full items-center justify-center text-white/40">
-              <Play className="h-8 w-8" />
+              <span className="text-[8px] font-black">▶</span>
             </div>
           )}
-          <div className="absolute left-3 top-3 rounded-full bg-primary px-2.5 py-1 text-xs font-bold text-black">
-            Up next in {countdown}s
-          </div>
         </div>
-        <div className="space-y-3 p-4">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-              {episode.seasonNumber > (currentSeason ?? 0)
-                ? "Next season"
-                : "Next episode"}
-            </p>
-            <p className="text-sm font-bold leading-snug text-white">
-              {episode.title ||
-                `S${episode.seasonNumber}E${episode.episodeNumber}`}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={onPlay}
-              className="flex-1 rounded-full bg-primary py-2 text-sm font-bold text-black transition hover:bg-primary/90"
-            >
-              Play now
-            </button>
-            <button
-              type="button"
-              onClick={onCancel}
-              className="flex-1 rounded-full border border-white/20 py-2 text-sm font-medium text-white transition hover:bg-white/10"
-            >
-              Cancel
-            </button>
-          </div>
+
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-primary">
+            {episode.seasonNumber > (currentSeason ?? 0)
+              ? "Next season"
+              : "Up next"}
+          </p>
+          <p className="truncate text-sm font-semibold text-white">
+            {episode.title ||
+              `S${episode.seasonNumber}E${episode.episodeNumber}`}
+          </p>
+          <p className="text-[10px] text-white/40">
+            S{episode.seasonNumber}E{episode.episodeNumber}
+          </p>
         </div>
-      </div>
+
+        {/* Circular countdown ring */}
+        <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2">
+          <svg
+            width="34"
+            height="34"
+            viewBox="0 0 34 34"
+            className="-rotate-90"
+            aria-hidden="true"
+          >
+            <circle
+              cx="17"
+              cy="17"
+              r={R}
+              fill="none"
+              stroke="rgba(255,255,255,0.15)"
+              strokeWidth="3"
+            />
+            <circle
+              cx="17"
+              cy="17"
+              r={R}
+              fill="none"
+              stroke="#f5c518"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeDasharray={CIRC}
+              strokeDashoffset={CIRC * (1 - progress)}
+            />
+          </svg>
+          <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-white">
+            {Math.max(1, Math.ceil(countdown))}
+          </span>
+        </div>
+      </button>
+
+      {/* Cancel — sibling X, separate hit area (not nested inside the button) */}
+      <button
+        type="button"
+        onClick={onCancel}
+        aria-label="Cancel"
+        className="relative -ml-11 mr-4 mt-auto flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-white/10 text-white/70 transition hover:bg-white/20 hover:text-white"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
     </div>
   );
 }
