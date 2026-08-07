@@ -25,7 +25,7 @@ export function UpNextCard({
 }) {
   const still = stillUrl(episode.stillPath);
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-end p-5 sm:items-start sm:p-6">
+    <div className="fixed inset-0 z-[110] flex items-end justify-end p-5 sm:items-start sm:p-6">
       <div className="w-full max-w-xs overflow-hidden rounded-2xl border border-white/10 bg-card/95 shadow-2xl backdrop-blur">
         <div className="relative aspect-video bg-black">
           {still ? (
