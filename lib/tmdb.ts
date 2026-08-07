@@ -415,6 +415,9 @@ export async function getTopRatedMoviesPage(page = 1): Promise<TmdbMovieCard[]> 
 /**
  * Highly rated "classics" — strong scores + real vote volume.
  * Optional max year biases toward older films when set.
+ * `sortBy` rotates per week so different populations surface (vote avg,
+ * popularity, revenue, vote count, release date) instead of the same
+ * top-rated wall every single time.
  */
 export async function discoverGreatMovies(
   page = 1,
@@ -426,6 +429,13 @@ export async function discoverGreatMovies(
     maxVoteCount?: number;
     /** ISO 639-1 code(s), e.g. "ja" or "fr|ko" — for world-cinema slices */
     originalLanguage?: string;
+    sortBy?:
+      | "vote_average.desc"
+      | "popularity.desc"
+      | "revenue.desc"
+      | "vote_count.desc"
+      | "primary_release_date.desc";
+    withGenres?: string;
   }
 ): Promise<TmdbMovieCard[]> {
   const maxYear = opts?.maxYear;
@@ -435,7 +445,7 @@ export async function discoverGreatMovies(
       TmdbListItem & { release_date?: string; overview?: string }
     >;
   }>("/discover/movie", {
-    sort_by: "vote_average.desc",
+    sort_by: opts?.sortBy ?? "vote_average.desc",
     "vote_count.gte": String(opts?.minVoteCount ?? 800),
     "vote_average.gte": String(minVote),
     ...(opts?.maxVoteCount
@@ -450,6 +460,7 @@ export async function discoverGreatMovies(
     ...(opts?.originalLanguage
       ? { with_original_language: opts.originalLanguage }
       : {}),
+    ...(opts?.withGenres ? { with_genres: opts.withGenres } : {}),
     page: String(page),
     include_adult: "false",
   });

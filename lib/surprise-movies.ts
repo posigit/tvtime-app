@@ -58,79 +58,135 @@ function weekNumber(weekKey: string): number {
 type Slice = { badge: string; fetch: () => Promise<TmdbMovieCard[]> };
 
 /**
- * Pool slices. Canon slices are stable; discover slices rotate pages by ISO
- * week so the pool composition changes at every weekly rebuild.
+ * Deterministic weekly rotation helpers. The KEY insight: rotating only the
+ * PAGE number of a fixed sort returns the same ~250 movies every week (they're
+ * the only ones clearing the filter). Real rotation rotates the SORT AXIS and
+ * samples deeper pages, so each week genuinely pulls a different population.
  */
+const SORTS = [
+  "popularity.desc",
+  "revenue.desc",
+  "vote_count.desc",
+  "primary_release_date.desc",
+  "vote_average.desc",
+] as const;
+
+/** Genre id → badge. Rotating genre axes add variety that can't collapse. */
+const GENRES: Array<{ id: string; label: string }> = [
+  { id: "878", label: "Sci-fi" },
+  { id: "53", label: "Thriller" },
+  { id: "18", label: "Drama" },
+  { id: "35", label: "Comedy" },
+  { id: "9648", label: "Mystery" },
+  { id: "28", label: "Action" },
+  { id: "10749", label: "Romance" },
+  { id: "27", label: "Horror" },
+  { id: "16", label: "Animation" },
+  { id: "10752", label: "War" },
+  { id: "36", label: "History" },
+  { id: "10402", label: "Music" },
+];
+
 function poolSlices(weekKey: string): Slice[] {
   const w = weekNumber(weekKey);
-  const rot = (n: number) => 1 + (w % n); // 1-based rotating page
-
-  const decades: Array<{ label: string; gte: number; lte: number }> = [
-    { label: "60s classic", gte: 1960, lte: 1969 },
-    { label: "70s classic", gte: 1970, lte: 1979 },
-    { label: "80s classic", gte: 1980, lte: 1989 },
-    { label: "90s classic", gte: 1990, lte: 1999 },
-    { label: "2000s favorite", gte: 2000, lte: 2009 },
-    { label: "2010s favorite", gte: 2010, lte: 2019 },
+  // Pick 3 genre axes per week (rotating offset so all 12 surface over time)
+  const genreStart = (w * 2) % GENRES.length;
+  const genres = [
+    GENRES[genreStart],
+    GENRES[(genreStart + 4) % GENRES.length],
+    GENRES[(genreStart + 8) % GENRES.length],
   ];
 
   const fail = () => Promise.resolve([] as TmdbMovieCard[]);
   const safe = (p: Promise<TmdbMovieCard[]>) => p.catch(fail);
+  const sort = () => SORTS[w % SORTS.length];
+  // Sample a deeper page so each week pulls a fresh slice of the catalog.
+  const deepPage = (n: number) => 1 + ((w * 7 + n) % 12);
+  // Looser gate: minVoteAverage 7.0 / count 300 keeps quality while massively
+  // widening the pool of eligible films vs the old 7.5/800 wall.
+  const L = { minVoteAverage: 7, minVoteCount: 300 };
 
   return [
-    // The canon — always included
-    ...[1, 2, 3, 4, 5].map((page) => ({
-      badge: "Top rated",
-      fetch: () => safe(getTopRatedMoviesPage(page)),
+    // Canon — keep just ONE page of top-rated as an anchor (was 5 pages of
+    // the same ~100 movies; that wall is why the pool never looked different).
+    { badge: "Top rated", fetch: () => safe(getTopRatedMoviesPage(1)) },
+
+    // Rotating sort axis — the same discover call but a different population
+    // every week (popularity / revenue / vote count / release date / score).
+    ...[1, 2, 3].map((n) => ({
+      badge: "Now trending",
+      fetch: () => safe(discoverGreatMovies(deepPage(n), { sortBy: sort(), ...L })),
     })),
-    // Critically acclaimed, rotating pages 1–4
-    ...[rot(4), ((rot(4) + 1) % 4) + 1].map((page) => ({
-      badge: "Critically acclaimed",
-      fetch: () => safe(discoverGreatMovies(page)),
-    })),
-    // All-time classics, rotating
-    ...[rot(4), ((rot(4) + 1) % 4) + 1].map((page) => ({
-      badge: "Classic",
-      fetch: () =>
-        safe(discoverGreatMovies(page, { maxYear: 1999, minVoteAverage: 7.8 })),
-    })),
-    // Decade slices
-    ...decades.map((d) => ({
-      badge: d.label,
+
+    // Genre axes (3 per week) — each with its own sort for variety.
+    ...genres.map((g, i) => ({
+      badge: g.label,
       fetch: () =>
         safe(
-          discoverGreatMovies(rot(3), {
-            minYear: d.gte,
-            maxYear: d.lte,
-            minVoteAverage: 7.5,
+          discoverGreatMovies(deepPage(i + 1), {
+            withGenres: g.id,
+            sortBy: SORTS[(w + i) % SORTS.length],
+            ...L,
+          })
+        ),
+    })),
+
+    // Critically acclaimed, rotating sort + deeper pages
+    ...[1, 2].map((n) => ({
+      badge: "Critically acclaimed",
+      fetch: () =>
+        safe(
+          discoverGreatMovies(deepPage(n + 2), {
+            sortBy: sort(),
+            minVoteAverage: 7.6,
             minVoteCount: 400,
           })
         ),
     })),
-    // Hidden gems: strong rating, low vote volume, rotating pages 1–5
-    ...[rot(5), ((rot(5) + 2) % 5) + 1].map((page) => ({
-      badge: "Hidden gem",
+
+    // All-time classics (pre-2000), rotating
+    ...[1, 2].map((n) => ({
+      badge: "Classic",
       fetch: () =>
         safe(
-          discoverGreatMovies(page, {
-            minVoteAverage: 7.3,
-            minVoteCount: 150,
-            maxVoteCount: 799,
+          discoverGreatMovies(deepPage(n + 4), {
+            maxYear: 1999,
+            minVoteAverage: 7.6,
+            sortBy: sort(),
           })
         ),
     })),
-    // World cinema
-    {
-      badge: "World cinema",
+
+    // Hidden gems: strong rating, low vote volume, rotating sort
+    ...[1, 2].map((n) => ({
+      badge: "Hidden gem",
       fetch: () =>
         safe(
-          discoverGreatMovies(rot(3), {
-            minVoteAverage: 7.5,
-            minVoteCount: 300,
-            originalLanguage: "fr|ja|ko|it|es|de",
+          discoverGreatMovies(deepPage(n + 6), {
+            minVoteAverage: 7.2,
+            minVoteCount: 150,
+            maxVoteCount: 799,
+            sortBy: sort(),
           })
         ),
-    },
+    })),
+
+    // World cinema — rotating language groups
+    ...[
+      { lang: "fr|de|es|it", label: "European cinema" },
+      { lang: "ja|ko|zh", label: "Asian cinema" },
+      { lang: "hi|ar|tr|pt", label: "Global cinema" },
+    ].map((g) => ({
+      badge: g.label,
+      fetch: () =>
+        safe(
+          discoverGreatMovies(deepPage(2), {
+            originalLanguage: g.lang,
+            sortBy: sort(),
+            ...L,
+          })
+        ),
+    })),
   ];
 }
 
