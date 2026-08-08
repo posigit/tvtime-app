@@ -75,8 +75,17 @@ export async function GET(req: NextRequest) {
       });
       if (res.ok) {
         const data = await res.json();
+        // The resolver hands back a RELATIVE /media?url=... (it proxies the
+        // playlist + segments through itself). Prefix the resolver base so
+        // hls.js fetches the whole chain from the resolver, which vixsrc
+        // accepts — the browser could never fetch vixsrc.to directly (403).
+        let playlistUrl = data.playlistUrl;
+        if (typeof playlistUrl === "string" && playlistUrl.startsWith("/media")) {
+          playlistUrl = `${resolver}${playlistUrl}`;
+        }
         return NextResponse.json({
           ...data,
+          playlistUrl,
           imdbId: await fetchImdbId(type, id),
         });
       }
