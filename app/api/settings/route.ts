@@ -52,7 +52,13 @@ export async function POST(request: Request) {
   }
 
   // Normalize exactly like the client: merge defaults, clamp banned langs.
-  const merged: VixSettings = { ...DEFAULT_VIX_SETTINGS, ...incoming };
+  // muted is session-only — never persist true (autoplay/PWA re-poison).
+  const merged: VixSettings = {
+    ...DEFAULT_VIX_SETTINGS,
+    ...incoming,
+    muted: false,
+    v: DEFAULT_VIX_SETTINGS.v,
+  };
   if (typeof merged.subs !== "string") merged.subs = DEFAULT_VIX_SETTINGS.subs;
   if (typeof merged.audio !== "string") merged.audio = DEFAULT_VIX_SETTINGS.audio;
   if (isBannedSubLang(merged.subs)) merged.subs = "en";

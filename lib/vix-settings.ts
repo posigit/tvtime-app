@@ -22,6 +22,10 @@ export type VixSettings = {
   speed: number;
   /** 0..1 */
   volume: number;
+  /**
+   * Session-only mute. Never restored from localStorage/server — autoplay and
+   * PWA caches were permanently silencing users (e.g. ola).
+   */
   muted: boolean;
   /** Auto-play the next episode when the current one ends (TV only). */
   autoplayNext: boolean;
@@ -49,7 +53,8 @@ export type VixSettings = {
 
 export const VIX_SETTINGS_KEY = "vix-settings";
 
-export const VIX_SETTINGS_VERSION = 2;
+/** v3: drop persisted mute (autoplay/PWA poison). */
+export const VIX_SETTINGS_VERSION = 3;
 
 export const DEFAULT_VIX_SETTINGS: VixSettings = {
   v: VIX_SETTINGS_VERSION,
@@ -60,8 +65,8 @@ export const DEFAULT_VIX_SETTINGS: VixSettings = {
   volume: 1,
   muted: false,
   autoplayNext: true,
-  subSource: "auto",
   preferredSource: "vix",
+  subSource: "auto",
   subDelaySeconds: 0,
   subFontSize: "md",
   subColor: "white",
@@ -73,10 +78,57 @@ export const DEFAULT_VIX_SETTINGS: VixSettings = {
 const BANNED_SUB_LANGS = ["it"];
 
 export function isBannedSubLang(lang: string | undefined | null): boolean {
-  const l = (lang || "").toLowerCase();
+  const l = (lang || "").toLowerCase().trim();
+  if (!l) return false;
   return BANNED_SUB_LANGS.some(
     (b) => l === b || l.includes(b) || b.includes(l)
   );
+}
+
+/** Always strip mute — it is session-only. */
+function clampSettings(merged: VixSettings): VixSettings {
+  const next = { ...merged, v: VIX_SETTINGS_VERSION, muted: false };
+  if (isBannedSubLang(next.subs)) next.subs = "en";
+  if (isBannedSubLang(next.audio)) next.audio = "en";
+  if (next.preferredSource !== "vix" && next.preferredSource !== "goated") {
+    next.preferredSource = "vix";
+  }
+  if (
+    typeof next.subDelaySeconds !== "number" ||
+    !Number.isFinite(next.subDelaySeconds)
+  ) {
+    next.subDelaySeconds = 0;
+  } else {
+    next.subDelaySeconds = Math.max(-10, Math.min(10, next.subDelaySeconds));
+  }
+  if (
+    next.subFontSize !== "sm" &&
+    next.subFontSize !== "md" &&
+    next.subFontSize !== "lg"
+  ) {
+    next.subFontSize = "md";
+  }
+  if (
+    next.subColor !== "white" &&
+    next.subColor !== "yellow" &&
+    next.subColor !== "cyan"
+  ) {
+    next.subColor = "white";
+  }
+  if (
+    typeof next.subBgOpacity !== "number" ||
+    !Number.isFinite(next.subBgOpacity)
+  ) {
+    next.subBgOpacity = 0.35;
+  } else {
+    next.subBgOpacity = Math.max(0, Math.min(1, next.subBgOpacity));
+  }
+  if (typeof next.volume !== "number" || !Number.isFinite(next.volume)) {
+    next.volume = 1;
+  } else {
+    next.volume = Math.max(0, Math.min(1, next.volume));
+  }
+  return next;
 }
 
 export function loadVixSettings(): VixSettings {
@@ -86,46 +138,9 @@ export function loadVixSettings(): VixSettings {
     const raw = window.localStorage.getItem(VIX_SETTINGS_KEY);
     if (!raw) return base;
     const parsed = JSON.parse(raw) as Partial<VixSettings>;
-    // Stale schema (pre-persistence-fix) — discard poisoned values entirely.
+    // Stale schema — discard poisoned values entirely (includes v2 muted:true).
     if (parsed.v !== VIX_SETTINGS_VERSION) return base;
-    const merged: VixSettings = { ...base, ...parsed };
-    // Hard rule: Italian must never come back as a default.
-    if (isBannedSubLang(merged.subs)) merged.subs = "en";
-    if (isBannedSubLang(merged.audio)) merged.audio = "en";
-    if (merged.preferredSource !== "vix" && merged.preferredSource !== "goated") {
-      merged.preferredSource = "vix";
-    }
-    if (
-      typeof merged.subDelaySeconds !== "number" ||
-      !Number.isFinite(merged.subDelaySeconds)
-    ) {
-      merged.subDelaySeconds = 0;
-    } else {
-      merged.subDelaySeconds = Math.max(-10, Math.min(10, merged.subDelaySeconds));
-    }
-    if (
-      merged.subFontSize !== "sm" &&
-      merged.subFontSize !== "md" &&
-      merged.subFontSize !== "lg"
-    ) {
-      merged.subFontSize = "md";
-    }
-    if (
-      merged.subColor !== "white" &&
-      merged.subColor !== "yellow" &&
-      merged.subColor !== "cyan"
-    ) {
-      merged.subColor = "white";
-    }
-    if (
-      typeof merged.subBgOpacity !== "number" ||
-      !Number.isFinite(merged.subBgOpacity)
-    ) {
-      merged.subBgOpacity = 0.35;
-    } else {
-      merged.subBgOpacity = Math.max(0, Math.min(1, merged.subBgOpacity));
-    }
-    return merged;
+    return clampSettings({ ...base, ...parsed });
   } catch {
     /* corrupt or unavailable storage — use defaults */
   }
@@ -135,11 +150,9 @@ export function loadVixSettings(): VixSettings {
 export function saveVixSettings(patch: Partial<VixSettings>) {
   if (typeof window === "undefined") return;
   try {
-    const next = { ...loadVixSettings(), ...patch };
-    // Never persist Italian (hard user rule) — clamp before storing so it
-    // can't survive a session and become a default later.
-    if (isBannedSubLang(next.subs)) next.subs = "en";
-    if (isBannedSubLang(next.audio)) next.audio = "en";
+    // muted is intentionally ignored — session-only via the <video> element.
+    const { muted: _muted, ...safePatch } = patch;
+    const next = clampSettings({ ...loadVixSettings(), ...safePatch });
     window.localStorage.setItem(VIX_SETTINGS_KEY, JSON.stringify(next));
     queueServerSync();
   } catch {
@@ -155,23 +168,28 @@ let syncTimer: ReturnType<typeof setTimeout> | null = null;
  * Fire-and-forget server sync of the current settings. Debounced so rapid
  * track/quality changes (multiple saveVixSettings calls per second) coalesce
  * into one POST. Never throws; unauthenticated/offline calls are no-ops.
+ * Waits for hydrate so a stale PWA cache cannot overwrite a server unmute.
  */
 function queueServerSync() {
   if (typeof window === "undefined") return;
   if (syncTimer) clearTimeout(syncTimer);
   syncTimer = setTimeout(() => {
     syncTimer = null;
-    try {
-      void fetch("/api/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ settings: loadVixSettings() }),
-      }).catch(() => {
-        /* offline / 401 — localStorage still holds the value */
-      });
-    } catch {
-      /* no-op */
-    }
+    const run = () => {
+      try {
+        void fetch("/api/settings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ settings: loadVixSettings() }),
+        }).catch(() => {
+          /* offline / 401 — localStorage still holds the value */
+        });
+      } catch {
+        /* no-op */
+      }
+    };
+    if (hydratePromise) void hydratePromise.finally(run);
+    else run();
   }, SERVER_SYNC_DELAY);
 }
 
@@ -182,33 +200,60 @@ function queueServerSync() {
  * cache. No-op when unauthenticated (per-user data) or already hydrated.
  */
 let hydrated = false;
+let hydratePromise: Promise<void> | null = null;
+
 export function hydrateVixSettings(): Promise<void> {
-  if (typeof window === "undefined" || hydrated) return Promise.resolve();
-  hydrated = true;
-  return fetch("/api/settings")
+  if (typeof window === "undefined") return Promise.resolve();
+  if (hydrated) return Promise.resolve();
+  if (hydratePromise) return hydratePromise;
+  hydratePromise = fetch("/api/settings")
     .then((res) => (res.ok ? res.json() : null))
     .then((data: { settings?: Partial<VixSettings> } | null) => {
-      if (!data?.settings) return;
-      const merged = { ...DEFAULT_VIX_SETTINGS, ...data.settings };
-      if (isBannedSubLang(merged.subs)) merged.subs = "en";
-      if (isBannedSubLang(merged.audio)) merged.audio = "en";
+      if (!data?.settings) {
+        // Still wipe mute from any pre-hydrate local cache.
+        try {
+          const local = loadVixSettings();
+          window.localStorage.setItem(
+            VIX_SETTINGS_KEY,
+            JSON.stringify(clampSettings(local))
+          );
+        } catch {
+          /* ignore */
+        }
+        return;
+      }
+      const merged = clampSettings({
+        ...DEFAULT_VIX_SETTINGS,
+        ...data.settings,
+      });
       try {
-        window.localStorage.setItem(
-          VIX_SETTINGS_KEY,
-          JSON.stringify({ ...merged, v: VIX_SETTINGS_VERSION })
-        );
+        window.localStorage.setItem(VIX_SETTINGS_KEY, JSON.stringify(merged));
       } catch {
         /* storage unavailable — nothing to do */
       }
     })
     .catch(() => {
-      /* network/auth failure — keep localStorage as-is */
+      /* network/auth failure — keep localStorage as-is but strip mute */
+      try {
+        window.localStorage.setItem(
+          VIX_SETTINGS_KEY,
+          JSON.stringify(clampSettings(loadVixSettings()))
+        );
+      } catch {
+        /* ignore */
+      }
+    })
+    .finally(() => {
+      hydrated = true;
     });
+  return hydratePromise;
 }
 
 /** Loose language matcher: "en" matches "eng", "it" matches "ita"/"forced-ita". */
 export function matchLang(lang: string | undefined, want: string): boolean {
-  const l = (lang || "").toLowerCase();
-  const w = want.toLowerCase();
+  const l = (lang || "").toLowerCase().trim();
+  const w = (want || "").toLowerCase().trim();
+  // Empty codes must not match everything (`"en".includes("") === true`).
+  if (!l || !w) return false;
   return l === w || l.includes(w) || w.includes(l);
 }

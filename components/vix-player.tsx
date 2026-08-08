@@ -998,6 +998,8 @@ export function VixPlayer({
       let everApplied = false;
       let applying = false;
       let bootstrapDone = false;
+      /** Apply volume/mute once — re-applying muted:true after user unmute was killing audio. */
+      let avPrimed = false;
       bootstrapTimer = window.setTimeout(() => {
         bootstrapDone = true;
       }, 2500);
@@ -1132,8 +1134,12 @@ export function VixPlayer({
         }
 
         video.playbackRate = s.speed;
-        video.volume = s.volume;
-        video.muted = s.muted;
+        // Volume once; always start unmuted (mute is session-only, never restored).
+        if (!avPrimed) {
+          video.volume = s.volume;
+          video.muted = false;
+          avPrimed = true;
+        }
         // Only counts as "applied" once subtitle tracks exist — audio-only
         // must not open the door for SUBTITLE_TRACK_SWITCH poison.
         if (hls.subtitleTracks.length > 0) {
@@ -1389,6 +1395,7 @@ export function VixPlayer({
       video.src = playlistUrl;
 
       const s = loadVixSettings();
+      let avPrimed = false;
       const applyNative = () => {
         const at = (video as unknown as { audioTracks?: NativeAudioTrackList })
           .audioTracks;
@@ -1414,8 +1421,11 @@ export function VixPlayer({
           }
         }
         video.playbackRate = s.speed;
-        video.volume = s.volume;
-        video.muted = s.muted;
+        if (!avPrimed) {
+          video.volume = s.volume;
+          video.muted = false;
+          avPrimed = true;
+        }
       };
       video.addEventListener("loadedmetadata", applyNative, { once: true });
       cleanup.push(() =>
@@ -1610,8 +1620,10 @@ export function VixPlayer({
 
     // Speed + volume persist on both paths.
     const onRate = () => saveVixSettings({ speed: video.playbackRate });
-    const onVol = () =>
-      saveVixSettings({ volume: video.volume, muted: video.muted });
+    const onVol = () => {
+      // Persist volume only — muted is session-only (never sync / restore).
+      saveVixSettings({ volume: video.volume });
+    };
     video.addEventListener("ratechange", onRate);
     video.addEventListener("volumechange", onVol);
     cleanup.push(() => {
