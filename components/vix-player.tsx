@@ -267,6 +267,8 @@ export function VixPlayer({
       : null;
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  /** Fullscreen this shell (not <video>) so SubtitleOverlay + chrome stay visible. */
+  const shellRef = useRef<HTMLDivElement>(null);
   const imdbIdRef = useRef<string | null>(null);
   const lastSavedPosRef = useRef(0);
   const lastSavedAtRef = useRef(0);
@@ -1850,6 +1852,12 @@ export function VixPlayer({
       if (e.key !== "Escape") return;
       // Subtitle/audio menus own Escape while open (capture listener closes them).
       if (subMenuOpen || audioMenuOpen || qualityMenuOpen) return;
+      // First Escape exits fullscreen; second closes the player.
+      if (document.fullscreenElement) {
+        e.preventDefault();
+        void document.exitFullscreen();
+        return;
+      }
       void flushPosition().then(() => {
         onCloseRef.current();
       });
@@ -1858,31 +1866,41 @@ export function VixPlayer({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [flushPosition, subMenuOpen, audioMenuOpen, qualityMenuOpen]);
 
-  // Desktop keyboard shortcuts (native only).
+  // Desktop keyboard shortcuts (native only). Capture + preventDefault so
+  // focused <video controls> does not double-toggle play/pause / seek.
   useEffect(() => {
     if (mode !== "native" || locked) return;
     const onKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
       if (subMenuOpen || audioMenuOpen || qualityMenuOpen) return;
       const tag = (e.target as HTMLElement | null)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
       const v = videoRef.current;
       if (!v) return;
-      if (e.key === " " || e.key === "k" || e.key === "K") {
+      const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      if (key === " " || key === "k") {
         e.preventDefault();
+        e.stopPropagation();
         if (v.paused) void v.play();
         else v.pause();
-      } else if (e.key === "ArrowRight" || e.key === "l" || e.key === "L") {
+      } else if (key === "ArrowRight" || key === "l") {
         e.preventDefault();
+        e.stopPropagation();
         v.currentTime = Math.min(v.duration || 1e9, v.currentTime + 10);
-      } else if (e.key === "ArrowLeft" || e.key === "j" || e.key === "J") {
+      } else if (key === "ArrowLeft" || key === "j") {
         e.preventDefault();
+        e.stopPropagation();
         v.currentTime = Math.max(0, v.currentTime - 10);
-      } else if (e.key === "f" || e.key === "F") {
+      } else if (key === "f") {
         e.preventDefault();
+        e.stopPropagation();
+        const root = shellRef.current;
+        if (!root) return;
         if (document.fullscreenElement) void document.exitFullscreen();
-        else void v.requestFullscreen?.();
-      } else if (e.key === "p" || e.key === "P") {
+        else void root.requestFullscreen?.();
+      } else if (key === "p") {
         e.preventDefault();
+        e.stopPropagation();
         if (document.pictureInPictureElement) {
           void document.exitPictureInPicture();
         } else if (document.pictureInPictureEnabled) {
@@ -1890,9 +1908,27 @@ export function VixPlayer({
         }
       }
     };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
   }, [mode, locked, subMenuOpen, audioMenuOpen, qualityMenuOpen]);
+
+  // Native <video controls> FS button only fullscreens the video node — pull
+  // that up to the shell so SubtitleOverlay + chrome stay in the FS tree.
+  useEffect(() => {
+    if (mode !== "native") return;
+    const onFs = () => {
+      const v = videoRef.current;
+      const shell = shellRef.current;
+      if (!v || !shell) return;
+      if (document.fullscreenElement === v) {
+        void document.exitFullscreen().then(() => {
+          if (!document.fullscreenElement) void shell.requestFullscreen?.();
+        });
+      }
+    };
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
+  }, [mode]);
 
   const adjustSubDelay = useCallback((delta: number) => {
     const next = Math.max(
@@ -1951,6 +1987,7 @@ export function VixPlayer({
 
   return (
     <div
+      ref={shellRef}
       role="dialog"
       aria-modal="true"
       aria-label={`${title} player`}

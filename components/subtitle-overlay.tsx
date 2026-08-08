@@ -80,17 +80,18 @@ export function SubtitleOverlay({
 
   const fontPx = Math.round(18 * fontScale);
 
+  // Sit just above native control chrome (~48–56px), not mid-frame.
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-[12%] z-[15] flex justify-center px-4">
+    <div className="pointer-events-none absolute inset-x-0 bottom-14 z-[15] flex justify-center px-4 pb-[env(safe-area-inset-bottom)]">
       <p
-        className="max-w-[90%] whitespace-pre-wrap text-center font-semibold leading-snug shadow-black/80"
+        className="max-w-[90%] whitespace-pre-wrap text-center font-medium leading-snug"
         style={{
           fontSize: fontPx,
           color,
           backgroundColor:
             bgOpacity > 0 ? `rgba(0, 0, 0, ${bgOpacity})` : "transparent",
-          padding: bgOpacity > 0 ? "0.2em 0.55em" : 0,
-          borderRadius: 6,
+          padding: bgOpacity > 0 ? "0.15em 0.5em" : 0,
+          borderRadius: 4,
           textShadow:
             bgOpacity > 0
               ? "none"
