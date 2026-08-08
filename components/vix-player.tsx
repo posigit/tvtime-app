@@ -601,7 +601,10 @@ export function VixPlayer({
     // it re-arms the hold and re-pops the Resume overlay mid-playback, which
     // freezes the timer and makes the video look like it restarted.
     if (resumeLookupDoneRef.current === params) return;
-    resumeLookupDoneRef.current = params;
+    // NOTE: the ref is set on COMPLETION (non-cancelled paths below), NOT
+    // here — setting it eagerly would let a source switch that lands
+    // mid-lookup abort the fetch, skip the re-run, and deadlock the video
+    // paused with the hold armed and no overlay to escape through.
 
     saveEnabledRef.current = false;
     holdForResumeRef.current = true;
@@ -614,13 +617,17 @@ export function VixPlayer({
     resumePosRef.current = suppliedPosition ?? 0;
     videoRef.current?.pause();
 
-    if (suppliedPosition != null) return;
+    if (suppliedPosition != null) {
+      resumeLookupDoneRef.current = params;
+      return;
+    }
 
     let cancelled = false;
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 8_000);
     const finishWithoutResume = () => {
       if (cancelled) return;
+      resumeLookupDoneRef.current = params;
       resumePosRef.current = 0;
       setResumeKey(null);
       setResumePosition(null);
@@ -652,6 +659,7 @@ export function VixPlayer({
               : 0;
           // Resume only if meaningfully mid-way; near-complete counts as done.
           if (pos > 5 && (dur === 0 || pos < dur * 0.92)) {
+            resumeLookupDoneRef.current = params;
             resumePosRef.current = pos;
             setResumeKey(params);
             holdForResumeRef.current = true;
@@ -672,6 +680,14 @@ export function VixPlayer({
       cancelled = true;
       controller.abort();
       window.clearTimeout(timeout);
+      // If the lookup was aborted mid-flight (source switch landed in the
+      // window), it never set resumeLookupDoneRef — release the hold so the
+      // video can't deadlock paused. Completed lookups manage their own hold
+      // (the resume overlay keeps it armed until Resume/Restart).
+      if (resumeLookupDoneRef.current !== params) {
+        holdForResumeRef.current = false;
+        saveEnabledRef.current = true;
+      }
     };
   }, [
     autoResume,
