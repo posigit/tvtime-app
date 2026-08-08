@@ -27,6 +27,8 @@ type NativeAudioTrackList = {
 const MAX_PLAYBACK_SECONDS = 2_147_483_647;
 const RESUME_MIN_SECONDS = 5;
 const RESUME_END_RATIO = 0.92;
+/** Host glass Next FAB: fire once when playback crosses this ratio. */
+const NEXT_FAB_RATIO = 0.97;
 
 function makePlaybackKey(
   type: "movie" | "tv" | undefined,
@@ -203,6 +205,7 @@ export function VixPlayer({
   title,
   onEvent,
   onClose,
+  onNearEnd,
   type,
   tmdbId,
   season,
@@ -215,6 +218,8 @@ export function VixPlayer({
   title: string;
   onEvent?: (event: string) => void;
   onClose: () => void;
+  /** Fires once when playback reaches ~97% (sticky Next FAB gate). */
+  onNearEnd?: () => void;
   type?: "movie" | "tv";
   tmdbId?: number;
   season?: number;
@@ -241,7 +246,9 @@ export function VixPlayer({
   const lastSavedAtRef = useRef(0);
   const onEventRef = useRef(onEvent);
   const onCloseRef = useRef(onClose);
+  const onNearEndRef = useRef(onNearEnd);
   const endedRef = useRef(false);
+  const nearEndFiredRef = useRef(false);
   const lastTimeRef = useRef(0);
   const remotePositionRef = useRef(0);
   const remoteDurationRef = useRef(0);
@@ -298,22 +305,33 @@ export function VixPlayer({
   const [subMenuOpen, setSubMenuOpen] = useState(false);
   /** Surface external-subtitle fetch failures instead of stranding the picker. */
   const [subError, setSubError] = useState<string | null>(null);
-  // Dismiss the subtitle picker on outside tap, Escape, or scroll (mobile).
+  const subMenuRef = useRef<HTMLDivElement>(null);
+  // ProfileMenu-style outside dismiss: only close when the event is outside
+  // the menu so touch/mousedown never unmounts options before click fires.
   useEffect(() => {
     if (!subMenuOpen) return;
-    const close = () => setSubMenuOpen(false);
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+    const onPointer = (e: MouseEvent | TouchEvent) => {
+      const node = e.target as Node | null;
+      if (subMenuRef.current && node && !subMenuRef.current.contains(node)) {
+        setSubMenuOpen(false);
+      }
     };
-    document.addEventListener("mousedown", close);
-    document.addEventListener("touchstart", close, { passive: true });
-    document.addEventListener("keydown", onKey);
-    window.addEventListener("scroll", close, { passive: true });
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        setSubMenuOpen(false);
+      }
+    };
+    const onScroll = () => setSubMenuOpen(false);
+    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("touchstart", onPointer, { passive: true });
+    document.addEventListener("keydown", onKey, true);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
-      document.removeEventListener("mousedown", close);
-      document.removeEventListener("touchstart", close);
-      document.removeEventListener("keydown", onKey);
-      window.removeEventListener("scroll", close);
+      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("touchstart", onPointer);
+      document.removeEventListener("keydown", onKey, true);
+      window.removeEventListener("scroll", onScroll);
     };
   }, [subMenuOpen]);
   const lastTapRef = useRef<{ time: number; side: "left" | "right" } | null>(
@@ -337,6 +355,10 @@ export function VixPlayer({
   useEffect(() => {
     onCloseRef.current = onClose;
   }, [onClose]);
+
+  useEffect(() => {
+    onNearEndRef.current = onNearEnd;
+  }, [onNearEnd]);
 
   useEffect(() => {
     endedRef.current = false;
@@ -761,6 +783,7 @@ export function VixPlayer({
     setStreamFailed(false);
     setIframeError(false);
     endedRef.current = false;
+    nearEndFiredRef.current = false;
     bookmarkClearedRef.current = false;
     lastSavedPosRef.current = 0;
     lastSavedAtRef.current = 0;
@@ -789,7 +812,8 @@ export function VixPlayer({
   /**
    * Revert the picker to "auto" when a forced external source (VDRK /
    * OpenSubtitles) fails to load. Without this the checkmark strands on a
-   * dead source and the user sees no subs and no error.
+   * dead source and the user sees no subs and no error. Re-run Auto load so
+   * stream/VDRK/OS cascade actually applies after the revert.
    */
   const revertExternalSub = useCallback((failed: "vdrk" | "opensub") => {
     subSourceRef.current = "auto";
@@ -798,6 +822,7 @@ export function VixPlayer({
       `${failed === "vdrk" ? "VDRK" : "OpenSubtitles"} subtitles unavailable — switched to Auto`
     );
     saveVixSettings({ subSource: "auto", subs: "en" });
+    queueMicrotask(() => reloadSubsRef.current?.());
   }, []);
 
   // ---------- resolve native stream (single fetch, single source of truth) ----------
@@ -980,7 +1005,8 @@ export function VixPlayer({
         osLoaded = true;
 
         // Tier 1 — VDRK direct, or Tier 3 — OpenSubtitles.
-        const wantVdrk = src === "vdrk" || (src === "auto" && activeSource === "goated");
+        // Auto on both Vix and Goated: stream CC (handled above) → VDRK → OS.
+        const wantVdrk = src === "vdrk" || src === "auto";
         const wantOs = src === "opensub" || src === "auto";
         if (wantVdrk || wantOs) {
           const source = wantVdrk ? "vdrk" : "opensub";
@@ -1287,6 +1313,10 @@ export function VixPlayer({
       savePosition(video.currentTime, video.duration, true);
     };
     const onEnded = () => {
+      if (!nearEndFiredRef.current) {
+        nearEndFiredRef.current = true;
+        onNearEndRef.current?.();
+      }
       emit("ended");
       clearPosition();
     };
@@ -1302,6 +1332,12 @@ export function VixPlayer({
       // emit("ended") dedup guard (endedRef) keeps this to a single fire,
       // and the now-set endedRef blocks further bookmark writes.
       const dur = Number.isFinite(video.duration) ? video.duration : 0;
+      if (dur > 0 && !nearEndFiredRef.current) {
+        if (video.currentTime >= dur * NEXT_FAB_RATIO) {
+          nearEndFiredRef.current = true;
+          onNearEndRef.current?.();
+        }
+      }
       if (
         !endedRef.current &&
         dur > 0 &&
@@ -1358,8 +1394,22 @@ export function VixPlayer({
       }
 
       if (d.event === "ended") {
+        if (!nearEndFiredRef.current) {
+          nearEndFiredRef.current = true;
+          onNearEndRef.current?.();
+        }
         clearPosition();
         return;
+      }
+
+      if (
+        !nearEndFiredRef.current &&
+        remoteDurationRef.current > 0 &&
+        remotePositionRef.current >=
+          remoteDurationRef.current * NEXT_FAB_RATIO
+      ) {
+        nearEndFiredRef.current = true;
+        onNearEndRef.current?.();
       }
 
       // Auto-complete once the embed crosses ~92% (same rationale as the
@@ -1416,16 +1466,17 @@ export function VixPlayer({
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        // Let the final save land before the parent refreshes playback state.
-        void flushPosition().then(() => {
-          onCloseRef.current();
-        });
-      }
+      if (e.key !== "Escape") return;
+      // Subtitle menu owns Escape while open (capture listener closes it).
+      if (subMenuOpen) return;
+      // Let the final save land before the parent refreshes playback state.
+      void flushPosition().then(() => {
+        onCloseRef.current();
+      });
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [flushPosition]);
+  }, [flushPosition, subMenuOpen]);
 
   // Mobile / tab kill: flush position on hide (keepalive survives the unload).
   useEffect(() => {
@@ -1534,11 +1585,7 @@ export function VixPlayer({
                 </button>
               )}
               {mode === "native" && (
-                <div
-                  className="relative"
-                  onMouseDown={(e) => e.stopPropagation()}
-                  onTouchStart={(e) => e.stopPropagation()}
-                >
+                <div ref={subMenuRef} className="relative">
                   <button
                     type="button"
                     onClick={() => setSubMenuOpen((v) => !v)}
@@ -1554,28 +1601,40 @@ export function VixPlayer({
                     <div
                       role="menu"
                       aria-label="Subtitle source"
-                      className="absolute right-0 top-full z-30 mt-2 max-h-[60vh] w-52 min-w-44 max-w-[min(13rem,calc(100vw-2rem))] overflow-y-auto rounded-xl border border-white/10 bg-card shadow-xl"
+                      className="absolute right-0 top-full z-30 mt-2 max-h-[60vh] w-64 min-w-[14rem] max-w-[min(16rem,calc(100vw-2rem))] overflow-y-auto rounded-xl border border-white/10 bg-card shadow-xl"
                     >
                       {(
                         [
-                          ["auto", "Auto (stream → VDRK → OS)"],
-                          ["stream", "Stream CC"],
-                          ["vdrk", "VDRK English"],
-                          ["opensub", "OpenSubtitles"],
-                          ["off", "Off"],
+                          ["auto", "Auto", "Stream → VDRK → OS"],
+                          ["stream", "Stream CC", null],
+                          ["vdrk", "VDRK English", null],
+                          ["opensub", "OpenSubtitles", null],
+                          ["off", "Off", null],
                         ] as const
-                      ).map(([key, label]) => (
+                      ).map(([key, label, hint]) => (
                         <button
                           key={key}
                           type="button"
+                          role="menuitem"
                           onClick={() => handleSubSource(key)}
                           className={cn(
-                            "flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-white transition hover:bg-secondary",
+                            "flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-white transition hover:bg-secondary",
                             subSource === key && "text-primary"
                           )}
                         >
-                          {label}
-                          {subSource === key && <Check className="h-4 w-4" />}
+                          <span className="min-w-0">
+                            <span className="block text-sm font-medium text-inherit">
+                              {label}
+                            </span>
+                            {hint && (
+                              <span className="block text-[10px] font-medium text-muted-foreground">
+                                {hint}
+                              </span>
+                            )}
+                          </span>
+                          {subSource === key && (
+                            <Check className="h-4 w-4 flex-shrink-0" />
+                          )}
                         </button>
                       ))}
                       {subError && (

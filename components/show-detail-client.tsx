@@ -16,6 +16,7 @@ import { TrailerButton } from "@/components/trailer-button";
 import { VixPlayer } from "@/components/vix-player";
 import { UpNextCard } from "@/components/up-next-card";
 import { EndOfLineCard } from "@/components/end-of-line-card";
+import { NextEpisodeFab } from "@/components/next-episode-fab";
 import { ReactionPicker } from "@/components/reaction-picker";
 import { FavoriteButton } from "@/components/favorite-button";
 import { vixTvUrl } from "@/lib/vixsrc";
@@ -137,6 +138,14 @@ export function ShowDetailClient({
   /** Next episode queued after the current one ends (autoplay countdown). */
   const [upNext, setUpNext] = useState<DetailEpisode | null>(null);
   const [upNextCount, setUpNextCount] = useState(0);
+  /**
+   * Stashed next ep after the user cancels Up Next. The glass Next FAB only
+   * appears once playback hits ~97% (see nearEnd) — cancel alone does not
+   * show it early.
+   */
+  const [manualNext, setManualNext] = useState<DetailEpisode | null>(null);
+  /** True once VixPlayer reports progress ≥ NEXT_FAB_RATIO (0.97). */
+  const [nearEnd, setNearEnd] = useState(false);
   /** True when the played episode ended and there's no next aired episode. */
   const [seriesEnded, setSeriesEnded] = useState(false);
 
@@ -400,6 +409,10 @@ export function ShowDetailClient({
     playerSessionRef.current += 1;
     setPlayerEp(ep);
     setSeriesEnded(false);
+    setManualNext(null);
+    setNearEnd(false);
+    setUpNext(null);
+    setUpNextCount(0);
   };
 
   /**
@@ -439,6 +452,7 @@ export function ShowDetailClient({
     // hasn't disabled autoplay. A season finale that has a next season (S+1 E1)
     // is eligible — `next` is found across all seasons.
     if (next && loadVixSettings().autoplayNext) {
+      setManualNext(null);
       setUpNext(next);
       setUpNextCount(10);
       return;
@@ -453,6 +467,7 @@ export function ShowDetailClient({
     if (!next) {
       setUpNext(null);
       setUpNextCount(0);
+      setManualNext(null);
       setSeriesEnded(true);
       return;
     }
@@ -462,24 +477,33 @@ export function ShowDetailClient({
     playerSessionRef.current += 1;
     setPlayerEp(null);
     setUpNext(null);
+    setManualNext(null);
+    setNearEnd(false);
     setSeriesEnded(false);
   };
 
-  /** Play the queued "up next" episode immediately (skip the countdown). */
+  /** Play the queued "up next" (or post-cancel manual) episode immediately. */
   const playUpNext = useCallback(() => {
-    if (!upNext) return;
+    const next = upNext ?? manualNext;
+    if (!next) return;
     playerSessionRef.current += 1;
-    setPlayerEp(upNext);
+    setPlayerEp(next);
     setUpNext(null);
     setUpNextCount(0);
+    setManualNext(null);
+    setNearEnd(false);
     setSeriesEnded(false);
-  }, [upNext]);
+  }, [upNext, manualNext]);
 
-  /** Cancel the autoplay, leaving the player closed on the finished ep. */
+  /**
+   * Cancel autoplay countdown only. Stash the next ep for the glass FAB;
+   * do not show the FAB until nearEnd (≥97%) — unless already past that.
+   */
   const cancelUpNext = useCallback(() => {
+    if (upNext) setManualNext(upNext);
     setUpNext(null);
     setUpNextCount(0);
-  }, []);
+  }, [upNext]);
 
   // Count down the "up next" overlay; when it hits 0, auto-play the next ep.
   // Auto-fire happens in the timeout callback (event context), never in the
@@ -1066,7 +1090,7 @@ export function ShowDetailClient({
                                 <div className="absolute inset-0 bg-black/50" />
                               )}
                             </div>
-                            <div className="min-w-0 flex-1">
+                            <div className="min-w-0 flex-1 overflow-hidden">
                               <p className="truncate text-sm font-semibold text-white">
                                 E{ep.episodeNumber}. {ep.title}
                               </p>
@@ -1085,10 +1109,12 @@ export function ShowDetailClient({
                                 <button
                                   type="button"
                                   onClick={() => openPlayer(ep)}
-                                  className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-2.5 py-1 text-[11px] font-bold text-primary ring-1 ring-primary/30 transition hover:bg-primary/25 active:scale-95"
+                                  className="mt-1 inline-flex max-w-full items-center gap-1.5 rounded-full bg-primary/15 px-2.5 py-1 text-[11px] font-bold text-primary ring-1 ring-primary/30 transition hover:bg-primary/25 active:scale-95"
                                 >
-                                  <Play className="h-3 w-3 fill-current" />
-                                  {resumeLabel(ep)}
+                                  <Play className="h-3 w-3 flex-shrink-0 fill-current" />
+                                  <span className="truncate">
+                                    {resumeLabel(ep)}
+                                  </span>
                                 </button>
                               )}
                               {watched && (
@@ -1104,23 +1130,27 @@ export function ShowDetailClient({
                                 />
                               )}
                             </div>
-                            <button
-                              onClick={() => openPlayer(ep)}
-                              disabled={!aired}
-                              aria-label={
-                                aired
-                                  ? `Play ${ep.title}`
-                                  : "Not aired yet"
-                              }
-                              className={cn(
-                                "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors",
-                                aired
-                                  ? "bg-primary text-black active:scale-95"
-                                  : "cursor-not-allowed bg-white/[0.04] text-white/20"
-                              )}
-                            >
-                              <Play className="h-3.5 w-3.5 fill-current" />
-                            </button>
+                            {/* Resume pill is already the play CTA — hide the
+                                circular Play so they don't overlap on mobile. */}
+                            {!(resumeLabel(ep) && !watched) && (
+                              <button
+                                onClick={() => openPlayer(ep)}
+                                disabled={!aired}
+                                aria-label={
+                                  aired
+                                    ? `Play ${ep.title}`
+                                    : "Not aired yet"
+                                }
+                                className={cn(
+                                  "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors",
+                                  aired
+                                    ? "bg-primary text-black active:scale-95"
+                                    : "cursor-not-allowed bg-white/[0.04] text-white/20"
+                                )}
+                              >
+                                <Play className="h-3.5 w-3.5 fill-current" />
+                              </button>
+                            )}
                             <button
                               onClick={() => handleEpisodeToggle(ep, !watched)}
                               disabled={!aired && !watched}
@@ -1138,7 +1168,7 @@ export function ShowDetailClient({
                             >
                               <Check className="h-4 w-4" strokeWidth={3} />
                             </button>
-                            {aired && (
+                            {watched && (
                               <div className="basis-full">
                                 <ReactionPicker
                                   size="sm"
@@ -1264,6 +1294,11 @@ export function ShowDetailClient({
         />
       )}
 
+      {/* Glass Next: only after ≥97% AND countdown is gone (post-cancel). */}
+      {nearEnd && manualNext && playerEp && !upNext && (
+        <NextEpisodeFab onNext={playUpNext} />
+      )}
+
       {/* End of the line: the played episode ended and there's no next aired
           episode — keep the player open so the finale plays to the true end.
           Small bottom-right card, auto-dismisses; X dismisses only the card. */}
@@ -1291,10 +1326,15 @@ export function ShowDetailClient({
           initialPosition={playbackFor(playerEp)?.positionSeconds}
           autoResume={Boolean(playbackFor(playerEp))}
           onEvent={handlePlayerEvent}
+          onNearEnd={() => setNearEnd(true)}
           onClose={() => {
             playerSessionRef.current += 1;
             setPlayerEp(null);
             setSeriesEnded(false);
+            setManualNext(null);
+            setNearEnd(false);
+            setUpNext(null);
+            setUpNextCount(0);
             // Re-fetch playback server state so resume labels reflect saves.
             router.refresh();
           }}
