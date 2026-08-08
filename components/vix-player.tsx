@@ -290,6 +290,8 @@ export function VixPlayer({
     null
   );
   const [subMenuOpen, setSubMenuOpen] = useState(false);
+  /** Surface external-subtitle fetch failures instead of stranding the picker. */
+  const [subError, setSubError] = useState<string | null>(null);
   // Dismiss the subtitle picker on outside tap, Escape, or scroll (mobile).
   useEffect(() => {
     if (!subMenuOpen) return;
@@ -743,6 +745,7 @@ export function VixPlayer({
       // source (passive useEffect would run only after the commit).
       subSourceRef.current = next;
       setSubMenuOpen(false);
+      setSubError(null);
       // subs mirrors the source so applySettings() can drive off/stream
       // (subs === "off" hides; otherwise the language preference applies).
       saveVixSettings({
@@ -753,6 +756,20 @@ export function VixPlayer({
     },
     []
   );
+
+  /**
+   * Revert the picker to "auto" when a forced external source (VDRK /
+   * OpenSubtitles) fails to load. Without this the checkmark strands on a
+   * dead source and the user sees no subs and no error.
+   */
+  const revertExternalSub = useCallback((failed: "vdrk" | "opensub") => {
+    subSourceRef.current = "auto";
+    setSubSource("auto");
+    setSubError(
+      `${failed === "vdrk" ? "VDRK" : "OpenSubtitles"} subtitles unavailable — switched to Auto`
+    );
+    saveVixSettings({ subSource: "auto", subs: "en" });
+  }, []);
 
   // ---------- resolve native stream (single fetch, single source of truth) ----------
   useEffect(() => {
@@ -952,6 +969,13 @@ export function VixPlayer({
             if (tr) injectedTracksRef.current.push(tr);
             return;
           }
+          // Forced external source failed (dead API key / empty result):
+          // don't strand the picker on it — revert to Auto so stream CC (if
+          // present) keeps working and the user sees WHY.
+          if (src === "vdrk" || src === "opensub") {
+            revertExternalSub(src);
+            return;
+          }
           // VDRK failed/empty → fall through to OpenSubtitles in auto mode.
           if (wantVdrk && src === "auto") {
             const os = await fetchExternalVtt({
@@ -1126,6 +1150,9 @@ export function VixPlayer({
         if (ext) {
           const tr = injectVttTrack(video, ext.vtt, ext.label, true);
           if (tr) injectedTracksRef.current.push(tr);
+        } else if (src === "vdrk" || src === "opensub") {
+          // Forced external source failed — revert to Auto (same rule as hls).
+          revertExternalSub(src);
         }
       };
       reloadSubsRef.current = () => {
@@ -1169,7 +1196,7 @@ export function VixPlayer({
       }
       for (const fn of cleanup) fn();
     };
-  }, [mode, playlistUrl, savePosition, season, episode, activeSource, tmdbId, type]);
+  }, [mode, playlistUrl, savePosition, season, episode, activeSource, tmdbId, type, revertExternalSub]);
 
   const flushPosition = useCallback(() => {
     if (
@@ -1513,6 +1540,11 @@ export function VixPlayer({
                           {subSource === key && <Check className="h-4 w-4" />}
                         </button>
                       ))}
+                      {subError && (
+                        <p className="border-t border-white/10 px-4 py-2 text-[10px] font-medium text-red-400">
+                          {subError}
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>
