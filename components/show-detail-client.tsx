@@ -1090,7 +1090,7 @@ export function ShowDetailClient({
                                 <div className="absolute inset-0 bg-black/50" />
                               )}
                             </div>
-                            <div className="min-w-0 flex-1 overflow-hidden">
+                            <div className="min-w-0 flex-1">
                               <p className="truncate text-sm font-semibold text-white">
                                 E{ep.episodeNumber}. {ep.title}
                               </p>
