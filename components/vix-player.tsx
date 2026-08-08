@@ -2,17 +2,19 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
-import { Captions, Check, ExternalLink, LoaderCircle, Lock, LockOpen, X } from "lucide-react";
+import { Captions, Check, Gauge, LoaderCircle, Lock, LockOpen, PictureInPicture2, Volume2, X } from "lucide-react";
 import {
   isVixPlayerOrigin,
   parseVixPlayerEventData,
 } from "@/lib/vixsrc";
 import { ResumeOverlay } from "@/components/resume-overlay";
+import { SubtitleOverlay } from "@/components/subtitle-overlay";
 import { cn } from "@/lib/utils";
 import {
   loadVixSettings,
   saveVixSettings,
   matchLang,
+  type VixSettings,
 } from "@/lib/vix-settings";
 
 /** Safari-only audio-track API — not present in TS's DOM lib. */
@@ -28,7 +30,18 @@ const MAX_PLAYBACK_SECONDS = 2_147_483_647;
 const RESUME_MIN_SECONDS = 5;
 const RESUME_END_RATIO = 0.92;
 /** Host glass Next FAB: fire once when playback crosses this ratio. */
-const NEXT_FAB_RATIO = 0.97;
+const NEXT_FAB_RATIO = 0.96;
+
+const SUB_FONT_SCALE: Record<VixSettings["subFontSize"], number> = {
+  sm: 1,
+  md: 1.12,
+  lg: 1.25, // +25%
+};
+const SUB_COLORS: Record<VixSettings["subColor"], string> = {
+  white: "#ffffff",
+  yellow: "#ffe566",
+  cyan: "#7dd3fc",
+};
 
 function makePlaybackKey(
   type: "movie" | "tv" | undefined,
@@ -105,15 +118,28 @@ function parseVttTime(t: string): number {
   return 0;
 }
 
+/** Keep cues active for SubtitleOverlay without native ::cue paint. */
+function demoteShowingTracks(video: HTMLVideoElement) {
+  const ttl = video.textTracks;
+  for (let i = 0; i < ttl.length; i++) {
+    const t = ttl[i];
+    if (t.kind !== "subtitles" && t.kind !== "captions") continue;
+    if (t.mode === "showing") t.mode = "hidden";
+  }
+}
+
 /** Inject an external VTT as a native text track (shows in the CC menu). */
 function injectVttTrack(
   video: HTMLVideoElement,
   vtt: string,
   label: string,
-  show: boolean
+  show: boolean,
+  delaySeconds = 0
 ): TextTrack | null {
   const track = video.addTextTrack("subtitles", label, "en");
-  track.mode = show ? "showing" : "disabled";
+  // Always "hidden": we draw cues ourselves via SubtitleOverlay (::cue is unreliable).
+  track.mode = show ? "hidden" : "disabled";
+  const delay = Number.isFinite(delaySeconds) ? delaySeconds : 0;
   const lines = vtt.split(/\r?\n/);
   let i = 0;
   while (i < lines.length) {
@@ -121,8 +147,8 @@ function injectVttTrack(
       /(\d{2}:\d{2}:\d{2}\.\d{3}|\d{2}:\d{2}\.\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}\.\d{3}|\d{2}:\d{2}\.\d{3})/
     );
     if (m) {
-      const start = parseVttTime(m[1]);
-      const end = parseVttTime(m[2]);
+      const start = Math.max(0, parseVttTime(m[1]) + delay);
+      const end = Math.max(start + 0.05, parseVttTime(m[2]) + delay);
       i++;
       const text: string[] = [];
       while (i < lines.length && lines[i].trim() !== "") {
@@ -218,7 +244,7 @@ export function VixPlayer({
   title: string;
   onEvent?: (event: string) => void;
   onClose: () => void;
-  /** Fires once when playback reaches ~97% (sticky Next FAB gate). */
+  /** Fires once when playback reaches ~96% (sticky Next FAB gate). */
   onNearEnd?: () => void;
   type?: "movie" | "tv";
   tmdbId?: number;
@@ -264,11 +290,14 @@ export function VixPlayer({
    */
   const resumeLookupDoneRef = useRef<string | null>(null);
   const resumePosRef = useRef(initialResumePosition ?? 0);
+  /** Seek here after a Vix↔Goated switch once the new playlist is ready. */
+  const switchRestorePosRef = useRef<number | null>(null);
 
   const streamable = type === "movie" || type === "tv";
-  // Source backend — internal state so the user can toggle it live, defaulting
-  // to the prop (which defaults to "vix", preserving existing behavior).
-  const [activeSource, setActiveSource] = useState<"vix" | "goated">(source);
+  // Source backend — prefer last user choice, then prop default.
+  const [activeSource, setActiveSource] = useState<"vix" | "goated">(
+    () => loadVixSettings().preferredSource || source
+  );
   const [playlistUrl, setPlaylistUrl] = useState<string | null>(null);
   // Non-streamable mounts (no type/tmdbId) go straight to iframe fallback.
   const [streamFailed, setStreamFailed] = useState(() => !streamable);
@@ -283,8 +312,43 @@ export function VixPlayer({
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(
     () => loadVixSettings().speed
   );
+  const [subDelay, setSubDelay] = useState(
+    () => loadVixSettings().subDelaySeconds
+  );
+  const [subFontSize, setSubFontSize] = useState<VixSettings["subFontSize"]>(
+    () => loadVixSettings().subFontSize
+  );
+  const [subColor, setSubColor] = useState<VixSettings["subColor"]>(
+    () => loadVixSettings().subColor
+  );
+  const [subBgOpacity, setSubBgOpacity] = useState(
+    () => loadVixSettings().subBgOpacity
+  );
+  /** True once an external VTT is loaded — Sync can re-time it. */
+  const [hasExternalSubs, setHasExternalSubs] = useState(false);
+  const [audioTracks, setAudioTracks] = useState<
+    { id: number; lang: string; name: string }[]
+  >([]);
+  const [audioTrackId, setAudioTrackId] = useState<number>(-1);
+  const setHlsAudioTrackRef = useRef<((id: number) => void) | null>(null);
+  const [qualityLevels, setQualityLevels] = useState<
+    { height: number; index: number }[]
+  >([]);
+  const [qualitySelection, setQualitySelection] = useState<"auto" | number>(
+    () => loadVixSettings().quality
+  );
+  const setHlsQualityRef = useRef<((next: "auto" | number) => void) | null>(
+    null
+  );
   const [subSource, setSubSource] = useState<"auto" | "off" | "stream" | "vdrk" | "opensub">(
-    () => loadVixSettings().subSource
+    () => {
+      const s = loadVixSettings();
+      // Repair bootstrap poison: Auto/stream/external must not keep subs:"off".
+      if (s.subSource !== "off" && s.subs === "off") {
+        saveVixSettings({ subs: "en" });
+      }
+      return s.subSource;
+    }
   );
   /** Latest subSource for async closures inside the native-playback effect. */
   const subSourceRef = useRef(subSource);
@@ -293,8 +357,12 @@ export function VixPlayer({
   }, [subSource]);
   /** Externally injected VTT tracks (VDRK / OpenSubtitles) so we can hide them. */
   const injectedTracksRef = useRef<TextTrack[]>([]);
+  /** Last fetched external VTT — re-used when adjusting sync delay (no re-fetch). */
+  const externalVttRef = useRef<{ vtt: string; label: string } | null>(null);
   /** Set by the native effect; lets the picker re-run subtitle loading. */
   const reloadSubsRef = useRef<(() => void) | null>(null);
+  /** Re-inject cached VTT with current delay only. */
+  const reapplyExternalSubsRef = useRef<(() => void) | null>(null);
   /** Safari forced-source delayed load handle (cleared on unmount). */
   // window.setTimeout returns number (DOM); bare setTimeout returns Timeout
   // (Node). We call window.setTimeout, so the ref is number.
@@ -303,26 +371,41 @@ export function VixPlayer({
     null
   );
   const [subMenuOpen, setSubMenuOpen] = useState(false);
+  const [audioMenuOpen, setAudioMenuOpen] = useState(false);
+  const [qualityMenuOpen, setQualityMenuOpen] = useState(false);
   /** Surface external-subtitle fetch failures instead of stranding the picker. */
   const [subError, setSubError] = useState<string | null>(null);
   const subMenuRef = useRef<HTMLDivElement>(null);
-  // ProfileMenu-style outside dismiss: only close when the event is outside
-  // the menu so touch/mousedown never unmounts options before click fires.
+  const audioMenuRef = useRef<HTMLDivElement>(null);
+  const qualityMenuRef = useRef<HTMLDivElement>(null);
+  // ProfileMenu-style outside dismiss for CC + audio + quality menus.
   useEffect(() => {
-    if (!subMenuOpen) return;
+    if (!subMenuOpen && !audioMenuOpen && !qualityMenuOpen) return;
     const onPointer = (e: MouseEvent | TouchEvent) => {
       const node = e.target as Node | null;
-      if (subMenuRef.current && node && !subMenuRef.current.contains(node)) {
+      if (subMenuOpen && subMenuRef.current && node && !subMenuRef.current.contains(node)) {
         setSubMenuOpen(false);
+      }
+      if (audioMenuOpen && audioMenuRef.current && node && !audioMenuRef.current.contains(node)) {
+        setAudioMenuOpen(false);
+      }
+      if (qualityMenuOpen && qualityMenuRef.current && node && !qualityMenuRef.current.contains(node)) {
+        setQualityMenuOpen(false);
       }
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.stopPropagation();
         setSubMenuOpen(false);
+        setAudioMenuOpen(false);
+        setQualityMenuOpen(false);
       }
     };
-    const onScroll = () => setSubMenuOpen(false);
+    const onScroll = () => {
+      setSubMenuOpen(false);
+      setAudioMenuOpen(false);
+      setQualityMenuOpen(false);
+    };
     document.addEventListener("mousedown", onPointer);
     document.addEventListener("touchstart", onPointer, { passive: true });
     document.addEventListener("keydown", onKey, true);
@@ -333,7 +416,7 @@ export function VixPlayer({
       document.removeEventListener("keydown", onKey, true);
       window.removeEventListener("scroll", onScroll);
     };
-  }, [subMenuOpen]);
+  }, [subMenuOpen, audioMenuOpen, qualityMenuOpen]);
   const lastTapRef = useRef<{ time: number; side: "left" | "right" } | null>(
     null
   );
@@ -777,13 +860,26 @@ export function VixPlayer({
   // ---------- source switching ----------
   const switchSource = useCallback((next: "vix" | "goated") => {
     if (next === activeSource) return;
+    const v = videoRef.current;
+    const pos =
+      v && Number.isFinite(v.currentTime) && v.currentTime > RESUME_MIN_SECONDS
+        ? v.currentTime
+        : lastSavedPosRef.current > RESUME_MIN_SECONDS
+          ? lastSavedPosRef.current
+          : remotePositionRef.current > RESUME_MIN_SECONDS
+            ? remotePositionRef.current
+            : null;
+    if (pos != null) switchRestorePosRef.current = pos;
+    saveVixSettings({ preferredSource: next });
     setActiveSource(next);
     // Reset playback state so the resolution effect re-runs fresh.
     setPlaylistUrl(null);
     setStreamFailed(false);
     setIframeError(false);
-    endedRef.current = false;
-    nearEndFiredRef.current = false;
+    setAudioTracks([]);
+    setAudioTrackId(-1);
+    setQualityLevels([]);
+    // Keep ended/nearEnd so binge overlays don't double-fire after a switch.
     bookmarkClearedRef.current = false;
     lastSavedPosRef.current = 0;
     lastSavedAtRef.current = 0;
@@ -886,6 +982,7 @@ export function VixPlayer({
     const video = videoRef.current;
     let hls: Hls | null = null;
     const cleanup: Array<() => void> = [];
+    let bootstrapTimer: number | null = null;
 
     if (Hls.isSupported()) {
       hls = new Hls();
@@ -898,10 +995,75 @@ export function VixPlayer({
       let userTouched = false;
       let everApplied = false;
       let applying = false;
+      let bootstrapDone = false;
+      bootstrapTimer = window.setTimeout(() => {
+        bootstrapDone = true;
+      }, 2500);
+
+      const syncAudioMenu = () => {
+        if (!hls) return;
+        setAudioTracks(
+          hls.audioTracks.map((t) => ({
+            id: t.id,
+            lang: t.lang || "",
+            name: t.name || t.lang || `Audio ${t.id}`,
+          }))
+        );
+        setAudioTrackId(hls.audioTrack);
+      };
+
+      const syncQualityMenu = () => {
+        if (!hls) return;
+        const seen = new Set<number>();
+        const levels: { height: number; index: number }[] = [];
+        hls.levels.forEach((lv, index) => {
+          const h = lv.height || 0;
+          if (h > 0 && !seen.has(h)) {
+            seen.add(h);
+            levels.push({ height: h, index });
+          }
+        });
+        levels.sort((a, b) => b.height - a.height);
+        setQualityLevels(levels);
+      };
+
+      setHlsAudioTrackRef.current = (id: number) => {
+        if (!hls) return;
+        applying = true;
+        userTouched = true;
+        hls.audioTrack = id;
+        applying = false;
+        const t = hls.audioTracks.find((x) => x.id === id);
+        if (t?.lang) saveVixSettings({ audio: t.lang });
+        setAudioTrackId(id);
+      };
+
+      setHlsQualityRef.current = (next: "auto" | number) => {
+        if (!hls) return;
+        applying = true;
+        if (next === "auto") {
+          hls.currentLevel = -1;
+          hls.loadLevel = -1;
+        } else {
+          const li = hls.levels.findIndex((lv) => lv.height === next);
+          if (li >= 0) {
+            hls.currentLevel = li;
+            hls.loadLevel = li;
+          }
+        }
+        applying = false;
+        setQualitySelection(next);
+        saveVixSettings({ quality: next });
+      };
 
       const applySettings = () => {
         if (!hls) return;
         const s = loadVixSettings();
+        // Keep Auto/source prefs from being stuck on poisoned subs:"off".
+        if (subSourceRef.current !== "off" && s.subs === "off") {
+          saveVixSettings({ subs: "en" });
+          s.subs = "en";
+        }
 
         const at = hls.audioTracks.find((t) => matchLang(t.lang, s.audio));
         if (at && hls.audioTrack !== at.id) {
@@ -910,17 +1072,20 @@ export function VixPlayer({
           applying = false;
         }
 
-        hls.subtitleDisplay = s.subs !== "off";
+        hls.subtitleDisplay = false; // we render via SubtitleOverlay, not native ::cue
         // Forced external modes (vdrk/opensub) own the subtitle surface: never
         // re-enable the stream's CC track here — the injected track is the one.
         const forcedExternal = subSourceRef.current === "vdrk" || subSourceRef.current === "opensub";
-        if (forcedExternal) {
+        const externalActive = injectedTracksRef.current.some(
+          (t) => t.mode !== "disabled"
+        );
+        if (forcedExternal || (subSourceRef.current === "auto" && externalActive)) {
           if (hls.subtitleTrack !== -1) {
             applying = true;
             hls.subtitleTrack = -1;
             applying = false;
           }
-        } else if (s.subs === "off") {
+        } else if (s.subs === "off" || subSourceRef.current === "off") {
           if (hls.subtitleTrack !== -1) {
             applying = true;
             hls.subtitleTrack = -1;
@@ -936,46 +1101,76 @@ export function VixPlayer({
               hls.subtitleTrack = st.id;
               applying = false;
             }
-          } else {
-            // Saved language not in this stream (e.g. no English CC) — show
-            // NO subs rather than letting hls auto-pick an unwanted track.
-            hls.subtitleDisplay = false;
-            if (hls.subtitleTrack !== -1) {
-              applying = true;
-              hls.subtitleTrack = -1;
-              applying = false;
-            }
+          } else if (hls.subtitleTrack !== -1) {
+            applying = true;
+            hls.subtitleTrack = -1;
+            applying = false;
           }
         }
+        // Keep tracks "hidden" so cues fire without native double-draw.
+        demoteShowingTracks(video);
 
-        if (typeof s.quality === "number") {
+        if (s.quality === "auto") {
+          if (hls.currentLevel !== -1) {
+            applying = true;
+            hls.currentLevel = -1;
+            hls.loadLevel = -1;
+            applying = false;
+          }
+          setQualitySelection("auto");
+        } else if (typeof s.quality === "number") {
           const li = hls.levels.findIndex((lv) => lv.height === s.quality);
-          if (li >= 0 && hls.currentLevel !== li) hls.currentLevel = li;
+          if (li >= 0 && hls.currentLevel !== li) {
+            applying = true;
+            hls.currentLevel = li;
+            hls.loadLevel = li;
+            applying = false;
+          }
+          setQualitySelection(s.quality);
         }
 
         video.playbackRate = s.speed;
         video.volume = s.volume;
         video.muted = s.muted;
-        // Only counts as "applied" once tracks actually exist — otherwise the
-        // empty MANIFEST_PARSED run would let early internal switches poison.
-        if (hls.audioTracks.length > 0 || hls.subtitleTracks.length > 0) {
+        // Only counts as "applied" once subtitle tracks exist — audio-only
+        // must not open the door for SUBTITLE_TRACK_SWITCH poison.
+        if (hls.subtitleTracks.length > 0) {
           everApplied = true;
         }
+        syncAudioMenu();
+        syncQualityMenu();
+      };
+
+      const restoreSwitchPos = () => {
+        const pos = switchRestorePosRef.current;
+        if (pos == null || !Number.isFinite(pos) || pos <= RESUME_MIN_SECONDS) {
+          return;
+        }
+        switchRestorePosRef.current = null;
+        const seek = () => {
+          try {
+            video.currentTime = pos;
+            void video.play().catch(() => {});
+          } catch {
+            /* ignore */
+          }
+        };
+        if (video.readyState >= 1) seek();
+        else video.addEventListener("loadedmetadata", seek, { once: true });
       };
 
       // First attempt at manifest parse (usually empty — harmless), then
       // re-apply whenever the track lists actually populate.
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         applySettings();
-        // goated Orbit playlists carry NO subtitle tracks, so the
-        // SUBTITLE_TRACKS_UPDATED event below never fires — load the VDRK
-        // fallback directly once the manifest is ready.
-        if (activeSource === "goated") {
-          window.setTimeout(() => void maybeLoadFallbackSubtitles(), 1200);
-        }
+        restoreSwitchPos();
+        // Always schedule Auto cascade — Vix with zero CC never fires
+        // SUBTITLE_TRACKS_UPDATED (same gap Goated had).
+        window.setTimeout(() => void maybeLoadFallbackSubtitles(), 1200);
       });
       hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, () => {
         if (!userTouched) applySettings();
+        else syncAudioMenu();
       });
 
       // Fallback subtitles — Tier 1: goated VDRK open VTT built directly from
@@ -987,75 +1182,108 @@ export function VixPlayer({
       //   opensub= force OpenSubtitles
       //   off    = never
       let osLoaded = false;
+      let osLoading = false;
       const maybeLoadFallbackSubtitles = async () => {
-        if (osLoaded || !hls) return;
+        if (osLoaded || osLoading || !hls) return;
         const src = subSourceRef.current;
         if (src === "off" || src === "stream") return; // handled by applySettings
-        const hasEng = hls.subtitleTracks.some((t) => matchLang(t.lang, "en"));
-        // In auto mode, a stream with English CC is preferred — no injection.
-        if (src === "auto" && hasEng) return;
+        const engTrack = hls.subtitleTracks.find((t) => matchLang(t.lang, "en"));
+        const engSelected =
+          !!engTrack && hls.subtitleTrack === engTrack.id;
+        // In auto mode, prefer stream English CC only when it is selected.
+        if (src === "auto" && engSelected) {
+          osLoaded = true;
+          return;
+        }
+        // Listed but not selected yet — select it for cue data (overlay draws).
+        if (src === "auto" && engTrack && loadVixSettings().subs !== "off") {
+          applying = true;
+          hls.subtitleDisplay = false;
+          hls.subtitleTrack = engTrack.id;
+          applying = false;
+          demoteShowingTracks(video);
+          osLoaded = true;
+          return;
+        }
         // Forced external mode on a CC-bearing stream: disable the stream's own
         // CC so the injected VDRK/OS track is the ONLY one (no double subs).
-        if ((src === "vdrk" || src === "opensub") && hasEng) {
+        if ((src === "vdrk" || src === "opensub") && engTrack) {
           applying = true;
           hls.subtitleDisplay = false;
           hls.subtitleTrack = -1;
           applying = false;
         }
-        osLoaded = true;
+        osLoading = true;
 
+        const delay = loadVixSettings().subDelaySeconds;
         // Tier 1 — VDRK direct, or Tier 3 — OpenSubtitles.
         // Auto on both Vix and Goated: stream CC (handled above) → VDRK → OS.
         const wantVdrk = src === "vdrk" || src === "auto";
         const wantOs = src === "opensub" || src === "auto";
-        if (wantVdrk || wantOs) {
-          const source = wantVdrk ? "vdrk" : "opensub";
-          const ext = await fetchExternalVtt({
-            source,
-            type,
-            tmdbId,
-            season,
-            episode,
-            imdbId: imdbIdRef.current,
-          });
-          if (ext) {
-            const show = loadVixSettings().subs !== "off";
-            const tr = injectVttTrack(video, ext.vtt, ext.label, show);
-            if (tr) injectedTracksRef.current.push(tr);
-            return;
-          }
-          // Forced external source failed (dead API key / empty result):
-          // don't strand the picker on it — revert to Auto so stream CC (if
-          // present) keeps working and the user sees WHY.
-          if (src === "vdrk" || src === "opensub") {
-            revertExternalSub(src);
-            return;
-          }
-          // VDRK failed/empty → fall through to OpenSubtitles in auto mode.
-          if (wantVdrk && src === "auto") {
-            const os = await fetchExternalVtt({
-              source: "opensub",
+        try {
+          if (wantVdrk || wantOs) {
+            const source = wantVdrk ? "vdrk" : "opensub";
+            const ext = await fetchExternalVtt({
+              source,
               type,
               tmdbId,
               season,
               episode,
               imdbId: imdbIdRef.current,
             });
-            if (os) {
+            if (ext) {
               const show = loadVixSettings().subs !== "off";
-              const tr = injectVttTrack(video, os.vtt, os.label, show);
+              externalVttRef.current = { vtt: ext.vtt, label: ext.label };
+              setHasExternalSubs(true);
+              const tr = injectVttTrack(video, ext.vtt, ext.label, show, delay);
               if (tr) injectedTracksRef.current.push(tr);
+              osLoaded = true;
+              return;
+            }
+            // Forced external source failed (dead API key / empty result):
+            // don't strand the picker on it — revert to Auto so stream CC (if
+            // present) keeps working and the user sees WHY.
+            if (src === "vdrk" || src === "opensub") {
+              revertExternalSub(src);
+              return;
+            }
+            // VDRK failed/empty → fall through to OpenSubtitles in auto mode.
+            if (wantVdrk && src === "auto") {
+              const os = await fetchExternalVtt({
+                source: "opensub",
+                type,
+                tmdbId,
+                season,
+                episode,
+                imdbId: imdbIdRef.current,
+              });
+              if (os) {
+                const show = loadVixSettings().subs !== "off";
+                externalVttRef.current = { vtt: os.vtt, label: os.label };
+                setHasExternalSubs(true);
+                const tr = injectVttTrack(video, os.vtt, os.label, show, delay);
+                if (tr) injectedTracksRef.current.push(tr);
+                osLoaded = true;
+                return;
+              }
             }
           }
+        } finally {
+          osLoading = false;
+          // Only latch "done" on success; leave retryable on total miss.
         }
       };
 
       // Expose a re-run hook so the picker can force a source without remount.
       reloadSubsRef.current = () => {
         osLoaded = false;
+        osLoading = false;
+        externalVttRef.current = null;
+        setHasExternalSubs(false);
         const src = subSourceRef.current;
         // Hide any previously injected external tracks.
         for (const t of injectedTracksRef.current) t.mode = "disabled";
+        injectedTracksRef.current = [];
         if (src === "vdrk" || src === "opensub") {
           // Forced external source: kill the stream's own CC track so only the
           // injected VDRK/OS track shows (no double subtitles).
@@ -1071,6 +1299,30 @@ export function VixPlayer({
         void maybeLoadFallbackSubtitles();
       };
 
+      reapplyExternalSubsRef.current = () => {
+        const cached = externalVttRef.current;
+        if (!cached) return;
+        for (const t of injectedTracksRef.current) t.mode = "disabled";
+        injectedTracksRef.current = [];
+        const delay = loadVixSettings().subDelaySeconds;
+        const show = loadVixSettings().subs !== "off";
+        // Disable stream CC while showing timed external track.
+        if (hls) {
+          applying = true;
+          hls.subtitleDisplay = false;
+          hls.subtitleTrack = -1;
+          applying = false;
+        }
+        const tr = injectVttTrack(
+          video,
+          cached.vtt,
+          cached.label,
+          show,
+          delay
+        );
+        if (tr) injectedTracksRef.current.push(tr);
+      };
+
       hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, () => {
         if (!userTouched) applySettings();
         void maybeLoadFallbackSubtitles();
@@ -1079,21 +1331,42 @@ export function VixPlayer({
       // Persist user changes (and ignore switches caused by our own apply
       // or hls.js internals during initial load).
       hls.on(Hls.Events.AUDIO_TRACK_SWITCHED, (_evt, data) => {
-        if (applying || !everApplied) return;
+        if (applying) return;
+        if (!hls || hls.audioTracks.length === 0) return;
         userTouched = true;
-        const t = hls?.audioTracks.find((x) => x.id === data.id);
+        const t = hls.audioTracks.find((x) => x.id === data.id);
         saveVixSettings({ audio: t?.lang || "en" });
+        setAudioTrackId(data.id);
       });
       hls.on(Hls.Events.SUBTITLE_TRACK_SWITCH, (_evt, data) => {
-        if (applying || !everApplied) return;
+        // hls.js may flip the track to "showing"; demote so overlay owns paint.
+        demoteShowingTracks(video);
+        // Ignore bootstrap / internal clears — they were poisoning subs:"off"
+        // while the picker still showed Auto.
+        if (applying || !everApplied || !bootstrapDone) return;
+        if (data.id === -1) {
+          if (subSourceRef.current !== "off") return;
+        }
         userTouched = true;
         const t = hls?.subtitleTracks.find((x) => x.id === data.id);
+        if (subSourceRef.current === "auto" && !t) return;
         saveVixSettings({ subs: t ? t.lang : "off" });
       });
+      const onTextTrackChange = () => demoteShowingTracks(video);
+      video.textTracks.addEventListener("change", onTextTrackChange);
+      cleanup.push(() =>
+        video.textTracks.removeEventListener("change", onTextTrackChange)
+      );
       hls.on(Hls.Events.LEVEL_SWITCHED, (_evt, data) => {
+        // Don't persist ABR hops while Auto is selected — that used to turn
+        // Auto into a sticky fixed height after the first switch.
         if (applying) return;
+        if (loadVixSettings().quality === "auto") return;
         const lv = hls?.levels[data.level];
-        saveVixSettings({ quality: lv?.height ?? "auto" });
+        if (lv?.height) setQualitySelection(lv.height);
+      });
+      hls.on(Hls.Events.MANIFEST_LOADED, () => {
+        syncQualityMenu();
       });
 
       hls.on(Hls.Events.ERROR, (_evt, data) => {
@@ -1131,7 +1404,10 @@ export function VixPlayer({
           for (let i = 0; i < tt.length; i++) {
             const t = tt[i];
             if (t.kind === "subtitles" || t.kind === "captions") {
-              t.mode = matchLang(t.language, s.subs) ? "showing" : "hidden";
+              t.mode =
+                s.subs !== "off" && matchLang(t.language, s.subs)
+                  ? "hidden"
+                  : "disabled";
             }
           }
         }
@@ -1155,14 +1431,17 @@ export function VixPlayer({
             if (at[i].enabled) audio = at[i].language;
           }
         }
+        // Overlay uses mode "hidden" (not "showing") — treat both as active
+        // so we don't poison persisted settings back to subs:"off".
+        demoteShowingTracks(video);
         if (tt) {
           for (let i = 0; i < tt.length; i++) {
             const t = tt[i];
             if (
               (t.kind === "subtitles" || t.kind === "captions") &&
-              t.mode === "showing"
+              t.mode !== "disabled"
             ) {
-              subs = t.language;
+              subs = t.language || "en";
             }
           }
         }
@@ -1175,17 +1454,75 @@ export function VixPlayer({
         tt?.removeEventListener?.("change", onNativeChange);
       });
 
-      // Safari native path: support the same forced VDRK/OpenSubtitles sources
-      // via injected text tracks. Native HLS has no hls.subtitleTrack, so we
-      // manage modes directly on video.textTracks.
+      // Safari native path: Auto cascade + forced VDRK/OpenSubtitles via
+      // injected text tracks. Native HLS has no hls.subtitleTrack.
       const loadSafariExternal = async () => {
         const src = subSourceRef.current;
-        if (src === "auto" || src === "off" || src === "stream") {
+        if (src === "off") {
           applyNative();
           return;
         }
-        // Hide the stream's native CC tracks so only the injected one shows.
+        if (src === "stream") {
+          applyNative();
+          return;
+        }
+
+        const delay = loadVixSettings().subDelaySeconds;
         const ttl = video.textTracks as unknown as TextTrackList | undefined;
+        const hasEngTrack = (() => {
+          if (!ttl) return false;
+          for (let i = 0; i < ttl.length; i++) {
+            const t = ttl[i];
+            if (
+              (t.kind === "subtitles" || t.kind === "captions") &&
+              t.mode !== "disabled" &&
+              matchLang(t.language, "en")
+            ) {
+              return true;
+            }
+          }
+          return false;
+        })();
+
+        if (src === "auto") {
+          applyNative();
+          if (hasEngTrack) return;
+          // Cascade VDRK → OS when stream has no English CC showing.
+          for (const source of ["vdrk", "opensub"] as const) {
+            const ext = await fetchExternalVtt({
+              source,
+              type,
+              tmdbId,
+              season,
+              episode,
+              imdbId: imdbIdRef.current,
+            });
+            if (ext) {
+              if (ttl) {
+                for (let i = 0; i < ttl.length; i++) {
+                  const t = ttl[i];
+                  if (t.kind === "subtitles" || t.kind === "captions") {
+                    t.mode = "hidden";
+                  }
+                }
+              }
+              externalVttRef.current = { vtt: ext.vtt, label: ext.label };
+              setHasExternalSubs(true);
+              const tr = injectVttTrack(
+                video,
+                ext.vtt,
+                ext.label,
+                loadVixSettings().subs !== "off",
+                delay
+              );
+              if (tr) injectedTracksRef.current.push(tr);
+              return;
+            }
+          }
+          return;
+        }
+
+        // Forced external — hide stream CC first.
         if (ttl) {
           for (let i = 0; i < ttl.length; i++) {
             const t = ttl[i];
@@ -1203,24 +1540,67 @@ export function VixPlayer({
           imdbId: imdbIdRef.current,
         });
         if (ext) {
-          const tr = injectVttTrack(video, ext.vtt, ext.label, true);
+          externalVttRef.current = { vtt: ext.vtt, label: ext.label };
+          setHasExternalSubs(true);
+          const tr = injectVttTrack(video, ext.vtt, ext.label, true, delay);
           if (tr) injectedTracksRef.current.push(tr);
         } else if (src === "vdrk" || src === "opensub") {
-          // Forced external source failed — revert to Auto (same rule as hls).
           revertExternalSub(src);
         }
       };
       reloadSubsRef.current = () => {
         for (const t of injectedTracksRef.current) t.mode = "disabled";
+        injectedTracksRef.current = [];
+        externalVttRef.current = null;
+        setHasExternalSubs(false);
         void loadSafariExternal();
       };
-      // On load, honor a persisted forced source.
+      reapplyExternalSubsRef.current = () => {
+        const cached = externalVttRef.current;
+        if (!cached) return;
+        for (const t of injectedTracksRef.current) t.mode = "disabled";
+        injectedTracksRef.current = [];
+        const ttl = video.textTracks as unknown as TextTrackList | undefined;
+        if (ttl) {
+          for (let i = 0; i < ttl.length; i++) {
+            const t = ttl[i];
+            if (t.kind === "subtitles" || t.kind === "captions") {
+              t.mode = "hidden";
+            }
+          }
+        }
+        const delay = loadVixSettings().subDelaySeconds;
+        const tr = injectVttTrack(
+          video,
+          cached.vtt,
+          cached.label,
+          loadVixSettings().subs !== "off",
+          delay
+        );
+        if (tr) injectedTracksRef.current.push(tr);
+      };
+      // Auto + forced external both need a settle delay for textTracks.
       const src0 = subSourceRef.current;
-      if (src0 === "vdrk" || src0 === "opensub") {
+      if (src0 !== "off") {
         safariTimerRef.current = window.setTimeout(
           () => void loadSafariExternal(),
           1200
         );
+      }
+      // Restore position after a source switch on Safari path too.
+      const pos = switchRestorePosRef.current;
+      if (pos != null && Number.isFinite(pos) && pos > RESUME_MIN_SECONDS) {
+        switchRestorePosRef.current = null;
+        const seek = () => {
+          try {
+            video.currentTime = pos;
+            void video.play().catch(() => {});
+          } catch {
+            /* ignore */
+          }
+        };
+        if (video.readyState >= 1) seek();
+        else video.addEventListener("loadedmetadata", seek, { once: true });
       }
     } else {
       setStreamFailed(true);
@@ -1239,14 +1619,22 @@ export function VixPlayer({
 
     return () => {
       hls?.destroy();
+      if (bootstrapTimer != null) window.clearTimeout(bootstrapTimer);
+      setHlsAudioTrackRef.current = null;
+      setHlsQualityRef.current = null;
+      setAudioTracks([]);
+      setQualityLevels([]);
       // Disable + drop injected external tracks so an episode change (or an
       // in-place vix↔goated source switch that reuses the same <video>) never
       // leaves a stale "showing" track or leaks duplicates.
       for (const t of injectedTracksRef.current) t.mode = "disabled";
       injectedTracksRef.current = [];
+      externalVttRef.current = null;
+      setHasExternalSubs(false);
       reloadSubsRef.current = null;
-      if (safariTimerRef.current) {
-        clearTimeout(safariTimerRef.current);
+      reapplyExternalSubsRef.current = null;
+      if (safariTimerRef.current != null) {
+        window.clearTimeout(safariTimerRef.current);
         safariTimerRef.current = null;
       }
       for (const fn of cleanup) fn();
@@ -1326,23 +1714,16 @@ export function VixPlayer({
       lastTimeRef.current = now;
       emit("timeupdate");
       savePosition(video.currentTime, video.duration);
-      // Auto-complete once playback crosses ~92% — vixsrc streams commonly
-      // drift the final second or stall near the end, so waiting for the
-      // native "ended" event can orphan an otherwise-finished watch. The
-      // emit("ended") dedup guard (endedRef) keeps this to a single fire,
-      // and the now-set endedRef blocks further bookmark writes.
       const dur = Number.isFinite(video.duration) ? video.duration : 0;
+      const t = video.currentTime;
+
       if (dur > 0 && !nearEndFiredRef.current) {
-        if (video.currentTime >= dur * NEXT_FAB_RATIO) {
+        if (t >= dur * NEXT_FAB_RATIO) {
           nearEndFiredRef.current = true;
           onNearEndRef.current?.();
         }
       }
-      if (
-        !endedRef.current &&
-        dur > 0 &&
-        video.currentTime >= dur * RESUME_END_RATIO
-      ) {
+      if (!endedRef.current && dur > 0 && t >= dur * RESUME_END_RATIO) {
         emit("ended");
         clearPosition();
       }
@@ -1467,16 +1848,74 @@ export function VixPlayer({
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      // Subtitle menu owns Escape while open (capture listener closes it).
-      if (subMenuOpen) return;
-      // Let the final save land before the parent refreshes playback state.
+      // Subtitle/audio menus own Escape while open (capture listener closes them).
+      if (subMenuOpen || audioMenuOpen || qualityMenuOpen) return;
       void flushPosition().then(() => {
         onCloseRef.current();
       });
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [flushPosition, subMenuOpen]);
+  }, [flushPosition, subMenuOpen, audioMenuOpen, qualityMenuOpen]);
+
+  // Desktop keyboard shortcuts (native only).
+  useEffect(() => {
+    if (mode !== "native" || locked) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (subMenuOpen || audioMenuOpen || qualityMenuOpen) return;
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      const v = videoRef.current;
+      if (!v) return;
+      if (e.key === " " || e.key === "k" || e.key === "K") {
+        e.preventDefault();
+        if (v.paused) void v.play();
+        else v.pause();
+      } else if (e.key === "ArrowRight" || e.key === "l" || e.key === "L") {
+        e.preventDefault();
+        v.currentTime = Math.min(v.duration || 1e9, v.currentTime + 10);
+      } else if (e.key === "ArrowLeft" || e.key === "j" || e.key === "J") {
+        e.preventDefault();
+        v.currentTime = Math.max(0, v.currentTime - 10);
+      } else if (e.key === "f" || e.key === "F") {
+        e.preventDefault();
+        if (document.fullscreenElement) void document.exitFullscreen();
+        else void v.requestFullscreen?.();
+      } else if (e.key === "p" || e.key === "P") {
+        e.preventDefault();
+        if (document.pictureInPictureElement) {
+          void document.exitPictureInPicture();
+        } else if (document.pictureInPictureEnabled) {
+          void v.requestPictureInPicture?.();
+        }
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mode, locked, subMenuOpen, audioMenuOpen, qualityMenuOpen]);
+
+  const adjustSubDelay = useCallback((delta: number) => {
+    const next = Math.max(
+      -10,
+      Math.min(10, Math.round((subDelay + delta) * 2) / 2)
+    );
+    setSubDelay(next);
+    saveVixSettings({ subDelaySeconds: next });
+    // Prefer re-timing the cached VTT — do NOT re-fetch (that was the sync bug).
+    if (externalVttRef.current && reapplyExternalSubsRef.current) {
+      reapplyExternalSubsRef.current();
+    }
+  }, [subDelay]);
+
+  const patchSubStyle = useCallback(
+    (patch: Partial<Pick<VixSettings, "subFontSize" | "subColor" | "subBgOpacity">>) => {
+      if (patch.subFontSize) setSubFontSize(patch.subFontSize);
+      if (patch.subColor) setSubColor(patch.subColor);
+      if (typeof patch.subBgOpacity === "number") setSubBgOpacity(patch.subBgOpacity);
+      saveVixSettings(patch);
+    },
+    []
+  );
 
   // Mobile / tab kill: flush position on hide (keepalive survives the unload).
   useEffect(() => {
@@ -1488,7 +1927,6 @@ export function VixPlayer({
     return () => {
       window.removeEventListener("pagehide", flushPosition);
       document.removeEventListener("visibilitychange", onVis);
-      // Final flush on unmount (close button already saves; this is a backstop).
       flushPosition();
     };
   }, [flushPosition]);
@@ -1529,6 +1967,16 @@ export function VixPlayer({
         />
       )}
 
+      {mode === "native" && (
+        <SubtitleOverlay
+          videoRef={videoRef}
+          enabled={subSource !== "off"}
+          fontScale={SUB_FONT_SCALE[subFontSize]}
+          color={SUB_COLORS[subColor]}
+          bgOpacity={subBgOpacity}
+        />
+      )}
+
       {mode === "iframe" && (
         <iframe
           key={iframeSrc}
@@ -1563,7 +2011,7 @@ export function VixPlayer({
                 {activeSource === "goated" ? "Goated · Orbit" : "VixSrc"}
               </p>
             </div>
-            <div className="pointer-events-auto flex shrink-0 items-center gap-2">
+            <div className="pointer-events-auto flex shrink-0 flex-wrap items-center justify-end gap-2">
               {mode === "native" && (
                 <button
                   type="button"
@@ -1584,11 +2032,130 @@ export function VixPlayer({
                   {playbackSpeed}×
                 </button>
               )}
+              {mode === "native" && audioTracks.length > 1 && (
+                <div ref={audioMenuRef} className="relative">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAudioMenuOpen((v) => !v);
+                      setSubMenuOpen(false);
+                      setQualityMenuOpen(false);
+                    }}
+                    aria-label="Audio track"
+                    aria-expanded={audioMenuOpen}
+                    className="flex h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+                  >
+                    <Volume2 className="h-4 w-4" />
+                    <span className="hidden sm:inline">Audio</span>
+                  </button>
+                  {audioMenuOpen && (
+                    <div
+                      role="menu"
+                      aria-label="Audio tracks"
+                      className="absolute right-0 top-full z-30 mt-2 max-h-[50vh] w-56 overflow-y-auto rounded-xl border border-white/10 bg-card shadow-xl"
+                    >
+                      {audioTracks.map((t) => (
+                        <button
+                          key={t.id}
+                          type="button"
+                          role="menuitem"
+                          onClick={() => {
+                            setHlsAudioTrackRef.current?.(t.id);
+                            setAudioMenuOpen(false);
+                          }}
+                          className={cn(
+                            "flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-sm font-medium text-white transition hover:bg-secondary",
+                            audioTrackId === t.id && "text-primary"
+                          )}
+                        >
+                          <span className="truncate">
+                            {t.name || t.lang || `Track ${t.id}`}
+                          </span>
+                          {audioTrackId === t.id && (
+                            <Check className="h-4 w-4 flex-shrink-0" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              {mode === "native" && qualityLevels.length > 0 && (
+                <div ref={qualityMenuRef} className="relative">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQualityMenuOpen((v) => !v);
+                      setSubMenuOpen(false);
+                      setAudioMenuOpen(false);
+                    }}
+                    aria-label="Quality"
+                    aria-expanded={qualityMenuOpen}
+                    className="flex h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+                  >
+                    <Gauge className="h-4 w-4" />
+                    <span className="hidden sm:inline">
+                      {qualitySelection === "auto"
+                        ? "Auto"
+                        : `${qualitySelection}p`}
+                    </span>
+                  </button>
+                  {qualityMenuOpen && (
+                    <div
+                      role="menu"
+                      aria-label="Video quality"
+                      className="absolute right-0 top-full z-30 mt-2 max-h-[50vh] w-44 overflow-y-auto rounded-xl border border-white/10 bg-card shadow-xl"
+                    >
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={() => {
+                          setHlsQualityRef.current?.("auto");
+                          setQualityMenuOpen(false);
+                        }}
+                        className={cn(
+                          "flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-sm font-medium text-white transition hover:bg-secondary",
+                          qualitySelection === "auto" && "text-primary"
+                        )}
+                      >
+                        Auto
+                        {qualitySelection === "auto" && (
+                          <Check className="h-4 w-4 flex-shrink-0" />
+                        )}
+                      </button>
+                      {qualityLevels.map((lv) => (
+                        <button
+                          key={lv.height}
+                          type="button"
+                          role="menuitem"
+                          onClick={() => {
+                            setHlsQualityRef.current?.(lv.height);
+                            setQualityMenuOpen(false);
+                          }}
+                          className={cn(
+                            "flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-sm font-medium text-white transition hover:bg-secondary",
+                            qualitySelection === lv.height && "text-primary"
+                          )}
+                        >
+                          {lv.height}p
+                          {qualitySelection === lv.height && (
+                            <Check className="h-4 w-4 flex-shrink-0" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
               {mode === "native" && (
                 <div ref={subMenuRef} className="relative">
                   <button
                     type="button"
-                    onClick={() => setSubMenuOpen((v) => !v)}
+                    onClick={() => {
+                      setSubMenuOpen((v) => !v);
+                      setAudioMenuOpen(false);
+                      setQualityMenuOpen(false);
+                    }}
                     aria-label="Subtitles"
                     aria-expanded={subMenuOpen}
                     aria-haspopup="menu"
@@ -1600,45 +2167,163 @@ export function VixPlayer({
                   {subMenuOpen && (
                     <div
                       role="menu"
-                      aria-label="Subtitle source"
-                      className="absolute right-0 top-full z-30 mt-2 max-h-[60vh] w-64 min-w-[14rem] max-w-[min(16rem,calc(100vw-2rem))] overflow-y-auto rounded-xl border border-white/10 bg-card shadow-xl"
+                      aria-label="Subtitles"
+                      className="absolute right-0 top-full z-30 mt-2 w-56 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-white/10 bg-card shadow-xl"
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onTouchStart={(e) => e.stopPropagation()}
                     >
                       {(
                         [
-                          ["auto", "Auto", "Stream → VDRK → OS"],
-                          ["stream", "Stream CC", null],
-                          ["vdrk", "VDRK English", null],
-                          ["opensub", "OpenSubtitles", null],
-                          ["off", "Off", null],
+                          ["auto", "Auto"],
+                          ["stream", "Stream"],
+                          ["vdrk", "VDRK"],
+                          ["opensub", "OpenSubs"],
+                          ["off", "Off"],
                         ] as const
-                      ).map(([key, label, hint]) => (
+                      ).map(([key, label]) => (
                         <button
                           key={key}
                           type="button"
                           role="menuitem"
                           onClick={() => handleSubSource(key)}
                           className={cn(
-                            "flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-white transition hover:bg-secondary",
-                            subSource === key && "text-primary"
+                            "flex w-full items-center justify-between px-3.5 py-2.5 text-left text-sm font-semibold text-white hover:bg-secondary",
+                            subSource === key && "bg-secondary/60 text-primary"
                           )}
                         >
-                          <span className="min-w-0">
-                            <span className="block text-sm font-medium text-inherit">
-                              {label}
-                            </span>
-                            {hint && (
-                              <span className="block text-[10px] font-medium text-muted-foreground">
-                                {hint}
-                              </span>
-                            )}
-                          </span>
+                          {label}
                           {subSource === key && (
                             <Check className="h-4 w-4 flex-shrink-0" />
                           )}
                         </button>
                       ))}
+
+                      {subSource !== "off" &&
+                        (subSource === "vdrk" ||
+                          subSource === "opensub" ||
+                          hasExternalSubs) && (
+                        <div className="flex items-center justify-between border-t border-white/10 px-3.5 py-2.5">
+                          <span className="text-xs font-semibold text-white/70">
+                            Sync
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                adjustSubDelay(-0.5);
+                              }}
+                              className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-sm font-bold text-white"
+                              aria-label="Earlier"
+                            >
+                              −
+                            </button>
+                            <span className="min-w-[2.75rem] text-center text-xs font-bold tabular-nums text-primary">
+                              {subDelay > 0 ? "+" : ""}
+                              {subDelay.toFixed(1)}s
+                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                adjustSubDelay(0.5);
+                              }}
+                              className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-sm font-bold text-white"
+                              aria-label="Later"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {subSource !== "off" && (
+                        <div className="space-y-2.5 border-t border-white/10 px-3.5 py-3">
+                          <div className="flex items-center gap-1.5">
+                            {(
+                              [
+                                ["sm", "100%"],
+                                ["md", "112%"],
+                                ["lg", "125%"],
+                              ] as const
+                            ).map(([key, label]) => (
+                              <button
+                                key={key}
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  patchSubStyle({ subFontSize: key });
+                                }}
+                                className={cn(
+                                  "flex h-8 flex-1 items-center justify-center rounded-lg text-[11px] font-bold",
+                                  subFontSize === key
+                                    ? "bg-primary text-black"
+                                    : "bg-secondary text-white"
+                                )}
+                                aria-label={`Size ${label}`}
+                              >
+                                {label}
+                              </button>
+                            ))}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {(
+                              [
+                                ["white", "#fff"],
+                                ["yellow", "#ffe566"],
+                                ["cyan", "#7dd3fc"],
+                              ] as const
+                            ).map(([key, hex]) => (
+                              <button
+                                key={key}
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  patchSubStyle({ subColor: key });
+                                }}
+                                aria-label={key}
+                                className={cn(
+                                  "h-8 w-8 rounded-full ring-2",
+                                  subColor === key
+                                    ? "ring-primary"
+                                    : "ring-white/20"
+                                )}
+                                style={{ backgroundColor: hex }}
+                              />
+                            ))}
+                            <div className="ml-auto flex gap-1">
+                              {(
+                                [
+                                  [0, "0"],
+                                  [0.4, "½"],
+                                  [0.85, "1"],
+                                ] as const
+                              ).map(([value, label]) => (
+                                <button
+                                  key={value}
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    patchSubStyle({ subBgOpacity: value });
+                                  }}
+                                  className={cn(
+                                    "h-8 min-w-8 rounded-lg px-1.5 text-[10px] font-bold",
+                                    subBgOpacity === value
+                                      ? "bg-primary text-black"
+                                      : "bg-secondary text-white"
+                                  )}
+                                  aria-label={`Background ${label}`}
+                                >
+                                  {label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       {subError && (
-                        <p className="border-t border-white/10 px-4 py-2 text-[10px] font-medium text-red-400">
+                        <p className="border-t border-white/10 px-3.5 py-2 text-[10px] font-medium text-red-400">
                           {subError}
                         </p>
                       )}
@@ -1649,24 +2334,39 @@ export function VixPlayer({
               {streamable && (
                 <button
                   type="button"
-                  onClick={() => switchSource(activeSource === "vix" ? "goated" : "vix")}
+                  disabled={isLoading}
+                  onClick={() =>
+                    switchSource(activeSource === "vix" ? "goated" : "vix")
+                  }
                   aria-label={`Switch source (currently ${activeSource})`}
-                  className="flex h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+                  className="flex h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80 disabled:opacity-50"
                 >
                   <span className="hidden sm:inline">Source</span>
-                  <span className="text-white/60">{activeSource === "vix" ? "Vix" : "Goated"}</span>
+                  <span className="text-white/60">
+                    {activeSource === "vix" ? "Vix" : "Goated"}
+                  </span>
                 </button>
               )}
-              <a
-                href={iframeSrc}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
-                aria-label="Open player in browser"
-              >
-                <ExternalLink className="h-4 w-4" />
-                <span className="hidden sm:inline">Open in browser</span>
-              </a>
+              {mode === "native" &&
+                typeof document !== "undefined" &&
+                document.pictureInPictureEnabled && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const v = videoRef.current;
+                      if (!v) return;
+                      if (document.pictureInPictureElement) {
+                        void document.exitPictureInPicture();
+                      } else {
+                        void v.requestPictureInPicture?.();
+                      }
+                    }}
+                    aria-label="Picture in picture"
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+                  >
+                    <PictureInPicture2 className="h-4 w-4" />
+                  </button>
+                )}
               <button
                 type="button"
                 onClick={() => setLocked(true)}
@@ -1678,7 +2378,6 @@ export function VixPlayer({
               <button
                 type="button"
                 onClick={() => {
-                  // Let the final save land before the parent refreshes playback.
                   void flushPosition().then(() => {
                     onClose();
                   });
@@ -1696,17 +2395,18 @@ export function VixPlayer({
       {locked && (
         <button
           type="button"
-          onClick={() => {
-            setLocked(false);
-            // Unlock pauses playback so the controls don't fight the video.
-            const v = videoRef.current;
-            if (v) void v.pause();
-          }}
+          onClick={() => setLocked(false)}
           aria-label="Unlock player controls"
           className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
         >
           <LockOpen className="h-5 w-5" />
         </button>
+      )}
+
+      {mode === "iframe" && !locked && (
+        <p className="pointer-events-none absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full bg-black/70 px-3 py-1.5 text-[10px] font-semibold text-white/70 backdrop-blur">
+          Embed controls only — switch source for CC / speed / audio
+        </p>
       )}
 
       {mode === "native" && tapCue && (
@@ -1725,7 +2425,7 @@ export function VixPlayer({
         <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center text-white/70">
           <div className="flex items-center gap-2 rounded-full bg-black/60 px-4 py-2 text-xs font-semibold backdrop-blur">
             <LoaderCircle className="h-4 w-4 animate-spin" />
-            Loading player…
+            Loading {activeSource === "goated" ? "Goated" : "Vix"}…
           </div>
         </div>
       )}
@@ -1735,17 +2435,19 @@ export function VixPlayer({
           <div>
             <p className="font-bold text-white">Player unavailable here</p>
             <p className="mt-1 text-sm text-white/55">
-              Try opening it in your browser instead.
+              Try switching to another source.
             </p>
-            <a
-              href={iframeSrc}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-bold text-black"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Open player
-            </a>
+            {streamable && (
+              <button
+                type="button"
+                onClick={() =>
+                  switchSource(activeSource === "vix" ? "goated" : "vix")
+                }
+                className="mt-4 inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-bold text-black"
+              >
+                Try {activeSource === "vix" ? "Goated" : "Vix"}
+              </button>
+            )}
           </div>
         </div>
       )}

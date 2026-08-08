@@ -32,6 +32,19 @@ export type VixSettings = {
    * "vdrk" = force VDRK VTT; "opensub" = force OpenSubtitles VTT.
    */
   subSource: "auto" | "off" | "stream" | "vdrk" | "opensub";
+  /** Last stream backend the user picked (Vix ↔ Goated). */
+  preferredSource: "vix" | "goated";
+  /**
+   * Subtitle timing offset in seconds (positive = later). Applies to
+   * injected VDRK/OpenSubtitles cues; stream-embedded CC is unaffected.
+   */
+  subDelaySeconds: number;
+  /** Cue text size. */
+  subFontSize: "sm" | "md" | "lg";
+  /** Cue text color. */
+  subColor: "white" | "yellow" | "cyan";
+  /** Cue background opacity 0..1. */
+  subBgOpacity: number;
 };
 
 export const VIX_SETTINGS_KEY = "vix-settings";
@@ -48,6 +61,11 @@ export const DEFAULT_VIX_SETTINGS: VixSettings = {
   muted: false,
   autoplayNext: true,
   subSource: "auto",
+  preferredSource: "vix",
+  subDelaySeconds: 0,
+  subFontSize: "md",
+  subColor: "white",
+  subBgOpacity: 0.35,
 };
 
 /** Language codes that should NEVER apply as a default (hard user rule).
@@ -74,6 +92,39 @@ export function loadVixSettings(): VixSettings {
     // Hard rule: Italian must never come back as a default.
     if (isBannedSubLang(merged.subs)) merged.subs = "en";
     if (isBannedSubLang(merged.audio)) merged.audio = "en";
+    if (merged.preferredSource !== "vix" && merged.preferredSource !== "goated") {
+      merged.preferredSource = "vix";
+    }
+    if (
+      typeof merged.subDelaySeconds !== "number" ||
+      !Number.isFinite(merged.subDelaySeconds)
+    ) {
+      merged.subDelaySeconds = 0;
+    } else {
+      merged.subDelaySeconds = Math.max(-10, Math.min(10, merged.subDelaySeconds));
+    }
+    if (
+      merged.subFontSize !== "sm" &&
+      merged.subFontSize !== "md" &&
+      merged.subFontSize !== "lg"
+    ) {
+      merged.subFontSize = "md";
+    }
+    if (
+      merged.subColor !== "white" &&
+      merged.subColor !== "yellow" &&
+      merged.subColor !== "cyan"
+    ) {
+      merged.subColor = "white";
+    }
+    if (
+      typeof merged.subBgOpacity !== "number" ||
+      !Number.isFinite(merged.subBgOpacity)
+    ) {
+      merged.subBgOpacity = 0.35;
+    } else {
+      merged.subBgOpacity = Math.max(0, Math.min(1, merged.subBgOpacity));
+    }
     return merged;
   } catch {
     /* corrupt or unavailable storage — use defaults */

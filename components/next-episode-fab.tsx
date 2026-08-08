@@ -4,7 +4,7 @@ import { SkipForward } from "lucide-react";
 
 /**
  * Non-blocking liquid-glass Next control. Icon-only so it stays out of the
- * center of the frame; parent decides when to show (e.g. ≥97% after cancel).
+ * center of the frame; parent decides when to show (e.g. ≥96% after cancel).
  */
 export function NextEpisodeFab({
   onNext,

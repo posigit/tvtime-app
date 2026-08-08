@@ -137,11 +137,11 @@ export function ShowDetailClient({
   const [upNextCount, setUpNextCount] = useState(0);
   /**
    * Stashed next ep after the user cancels Up Next. The glass Next FAB only
-   * appears once playback hits ~97% (see nearEnd) — cancel alone does not
+   * appears once playback hits ~96% (see nearEnd) — cancel alone does not
    * show it early.
    */
   const [manualNext, setManualNext] = useState<DetailEpisode | null>(null);
-  /** True once VixPlayer reports progress ≥ NEXT_FAB_RATIO (0.97). */
+  /** True once VixPlayer reports progress ≥ NEXT_FAB_RATIO (0.96). */
   const [nearEnd, setNearEnd] = useState(false);
   /** True when the played episode ended and there's no next aired episode. */
   const [seriesEnded, setSeriesEnded] = useState(false);
@@ -494,7 +494,7 @@ export function ShowDetailClient({
 
   /**
    * Cancel autoplay countdown only. Stash the next ep for the glass FAB;
-   * do not show the FAB until nearEnd (≥97%) — unless already past that.
+   * do not show the FAB until nearEnd (≥96%) — unless already past that.
    */
   const cancelUpNext = useCallback(() => {
     if (upNext) setManualNext(upNext);
@@ -1270,7 +1270,7 @@ export function ShowDetailClient({
         />
       )}
 
-      {/* Glass Next: only after ≥97% AND countdown is gone (post-cancel). */}
+      {/* Glass Next: only after ≥96% AND countdown is gone (post-cancel). */}
       {nearEnd && manualNext && playerEp && !upNext && (
         <NextEpisodeFab onNext={playUpNext} />
       )}
