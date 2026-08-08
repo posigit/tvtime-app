@@ -250,6 +250,12 @@ export function VixPlayer({
   const saveEnabledRef = useRef(false);
   /** While true, keep the video paused under the resume overlay. */
   const holdForResumeRef = useRef(false);
+  /**
+   * Key of the episode the resume lookup has already run for. The lookup is a
+   * per-episode fact — running it again on mode flips (source switches flip
+   * native→loading→native) re-arms the hold and re-pops the overlay mid-play.
+   */
+  const resumeLookupDoneRef = useRef<string | null>(null);
   const resumePosRef = useRef(initialResumePosition ?? 0);
 
   const streamable = type === "movie" || type === "tv";
@@ -589,6 +595,13 @@ export function VixPlayer({
       return;
     }
     if (mode !== "native") return;
+
+    // The resume lookup is a per-episode fact. A source switch flips mode
+    // (native→loading→native), which re-runs this effect — without this guard
+    // it re-arms the hold and re-pops the Resume overlay mid-playback, which
+    // freezes the timer and makes the video look like it restarted.
+    if (resumeLookupDoneRef.current === params) return;
+    resumeLookupDoneRef.current = params;
 
     saveEnabledRef.current = false;
     holdForResumeRef.current = true;
@@ -1246,6 +1259,15 @@ export function VixPlayer({
     };
     const onSeeked = () => {
       emit("seeked");
+      // A manual scrub during the resume hold means the user wants to watch
+      // from where they dragged — release the hold and drop the overlay so
+      // their seek wins (was: the hold re-paused and froze the timer).
+      if (holdForResumeRef.current) {
+        holdForResumeRef.current = false;
+        saveEnabledRef.current = true;
+        setResumePosition(null);
+        setResumeKey(null);
+      }
       savePosition(video.currentTime, video.duration, true);
     };
     const onEnded = () => {
