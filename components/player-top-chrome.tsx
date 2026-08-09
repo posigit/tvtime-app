@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { VixSettings } from "@/lib/vix-settings";
-import type { SubSource } from "@/lib/player-subs";
+import type { OpenSubListItem, SubSource } from "@/lib/player-subs";
 import type {
   AudioTrackInfo,
   PlayerMode,
@@ -39,6 +39,11 @@ type PlayerTopChromeProps = {
   subMenuOpen: boolean;
   setSubMenuOpen: (open: boolean | ((v: boolean) => boolean)) => void;
   onSubSource: (next: SubSource) => void;
+  /** Top OpenSubtitles files (max 3). */
+  openSubItems: OpenSubListItem[];
+  openSubFileId: number | null;
+  openSubListLoading: boolean;
+  onOpenSubPick: (item: OpenSubListItem) => void;
   hasExternalSubs: boolean;
   subDelay: number;
   onAdjustSubDelay: (delta: number) => void;
@@ -86,6 +91,10 @@ export function PlayerTopChrome({
   subMenuOpen,
   setSubMenuOpen,
   onSubSource,
+  openSubItems,
+  openSubFileId,
+  openSubListLoading,
+  onOpenSubPick,
   hasExternalSubs,
   subDelay,
   onAdjustSubDelay,
@@ -290,7 +299,12 @@ export function PlayerTopChrome({
                       onClick={() => onSubSource(key)}
                       className={cn(
                         "flex w-full items-center justify-between px-3.5 py-2.5 text-left text-sm font-semibold text-white hover:bg-secondary",
-                        subSource === key && "bg-secondary/60 text-primary"
+                        subSource === key &&
+                          key !== "opensub" &&
+                          "bg-secondary/60 text-primary",
+                        subSource === "opensub" &&
+                          key === "opensub" &&
+                          "bg-secondary/60 text-primary"
                       )}
                     >
                       {label}
@@ -299,6 +313,53 @@ export function PlayerTopChrome({
                       )}
                     </button>
                   ))}
+
+                  {/* Top 3 OpenSubtitles releases — pick the one that syncs. */}
+                  {subSource === "opensub" && (
+                    <div className="border-t border-white/10 py-1">
+                      <p className="px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-white/45">
+                        Top 3 files
+                      </p>
+                      {openSubListLoading && (
+                        <p className="px-3.5 py-2 text-[11px] text-white/50">
+                          Loading…
+                        </p>
+                      )}
+                      {!openSubListLoading && openSubItems.length === 0 && (
+                        <p className="px-3.5 py-2 text-[11px] text-white/50">
+                          No English files found
+                        </p>
+                      )}
+                      {openSubItems.map((item, i) => (
+                        <button
+                          key={item.fileId}
+                          type="button"
+                          role="menuitem"
+                          onClick={() => onOpenSubPick(item)}
+                          className={cn(
+                            "flex w-full flex-col gap-0.5 px-3.5 py-2 text-left hover:bg-secondary",
+                            openSubFileId === item.fileId &&
+                              "bg-secondary/60 text-primary"
+                          )}
+                        >
+                          <span className="flex items-center justify-between gap-2 text-xs font-semibold text-white">
+                            <span className="truncate">
+                              {i + 1}. {item.label}
+                            </span>
+                            {openSubFileId === item.fileId && (
+                              <Check className="h-3.5 w-3.5 shrink-0" />
+                            )}
+                          </span>
+                          <span className="text-[10px] font-medium text-white/40">
+                            {item.format.toUpperCase()}
+                            {item.downloads > 0
+                              ? ` · ${item.downloads.toLocaleString()} dl`
+                              : ""}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
                   {subSource !== "off" &&
                     (subSource === "vdrk" ||

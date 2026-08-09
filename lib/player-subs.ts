@@ -74,11 +74,19 @@ export function injectVttTrack(
   return track;
 }
 
-export type ExternalVttResult = { vtt: string; label: string };
+export type ExternalVttResult = { vtt: string; label: string; fileId?: number };
+
+export type OpenSubListItem = {
+  fileId: number;
+  label: string;
+  downloads: number;
+  format: string;
+};
 
 /**
  * Fetch an external VTT (VDRK or OpenSubtitles) for the current item.
  * Returns { vtt, label } or null.
+ * For opensub, pass fileId to download a specific list pick.
  */
 export async function fetchExternalVtt(opts: {
   source: "vdrk" | "opensub";
@@ -87,6 +95,9 @@ export async function fetchExternalVtt(opts: {
   season?: number;
   episode?: number;
   imdbId?: string | null;
+  /** OpenSubtitles: download this file instead of auto-best. */
+  fileId?: number;
+  label?: string;
 }): Promise<ExternalVttResult | null> {
   if (opts.source === "vdrk") {
     if (!opts.tmdbId) return null;
@@ -111,12 +122,49 @@ export async function fetchExternalVtt(opts: {
     const q = new URLSearchParams({ imdbId: opts.imdbId, lang: "en" });
     if (opts.season != null) q.set("season", String(opts.season));
     if (opts.episode != null) q.set("episode", String(opts.episode));
+    if (opts.fileId != null) {
+      q.set("fileId", String(opts.fileId));
+      if (opts.label) q.set("label", opts.label);
+    }
     const res = await fetch(`/api/vixsrc/subs?${q.toString()}`);
     if (!res.ok) return null;
-    const data = (await res.json()) as { vtt?: string; label?: string };
+    const data = (await res.json()) as {
+      vtt?: string;
+      label?: string;
+      fileId?: number;
+    };
     if (!data.vtt) return null;
-    return { vtt: data.vtt, label: data.label ?? "OpenSubtitles (English)" };
+    return {
+      vtt: data.vtt,
+      label: data.label ?? "OpenSubtitles (English)",
+      fileId: data.fileId,
+    };
   } catch {
     return null;
+  }
+}
+
+/** List OpenSubtitles English files (no download). */
+export async function listOpenSubtitles(opts: {
+  imdbId?: string | null;
+  season?: number;
+  episode?: number;
+}): Promise<OpenSubListItem[]> {
+  if (!opts.imdbId) return [];
+  try {
+    const q = new URLSearchParams({
+      imdbId: opts.imdbId,
+      lang: "en",
+      list: "1",
+    });
+    if (opts.season != null) q.set("season", String(opts.season));
+    if (opts.episode != null) q.set("episode", String(opts.episode));
+    const res = await fetch(`/api/vixsrc/subs?${q.toString()}`);
+    if (!res.ok) return [];
+    const data = (await res.json()) as { items?: OpenSubListItem[] };
+    // Player only needs the top 3 ranked files.
+    return Array.isArray(data.items) ? data.items.slice(0, 3) : [];
+  } catch {
+    return [];
   }
 }

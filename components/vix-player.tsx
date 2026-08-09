@@ -32,7 +32,15 @@ import {
   createSavePosition,
   waitForPlaybackRequests,
 } from "@/lib/player-progress-save";
-import { SUB_COLORS, SUB_FONT_SCALE, type SubSource } from "@/lib/player-subs";
+import {
+  SUB_COLORS,
+  SUB_FONT_SCALE,
+  fetchExternalVtt,
+  injectVttTrack,
+  listOpenSubtitles,
+  type OpenSubListItem,
+  type SubSource,
+} from "@/lib/player-subs";
 import { attachNativePlayback } from "@/lib/player-engine";
 import { resolveStreamPlaylist } from "@/lib/player-stream";
 import { seekVideoElement } from "@/lib/player-seek";
@@ -229,6 +237,11 @@ export function VixPlayer({
   const [qualityMenuOpen, setQualityMenuOpen] = useState(false);
   /** Surface external-subtitle fetch failures instead of stranding the picker. */
   const [subError, setSubError] = useState<string | null>(null);
+  /** Top OpenSubtitles files (max 3) for the CC picker. */
+  const [openSubItems, setOpenSubItems] = useState<OpenSubListItem[]>([]);
+  const [openSubFileId, setOpenSubFileId] = useState<number | null>(null);
+  const [openSubListLoading, setOpenSubListLoading] = useState(false);
+  const openSubListKeyRef = useRef<string | null>(null);
   const subMenuRef = useRef<HTMLDivElement>(null);
   const audioMenuRef = useRef<HTMLDivElement>(null);
   const qualityMenuRef = useRef<HTMLDivElement>(null);
@@ -836,6 +849,29 @@ export function VixPlayer({
     bookmarkClearedRef.current = false;
   }, [activeSource, savePosition]);
 
+  /** Load top-3 OpenSubtitles list once per episode (no download quota). */
+  const ensureOpenSubList = useCallback(async () => {
+    const imdb = imdbIdRef.current;
+    if (!imdb) {
+      setOpenSubItems([]);
+      return;
+    }
+    const key = `${imdb}:${season ?? ""}:${episode ?? ""}`;
+    if (openSubListKeyRef.current === key && openSubItems.length > 0) return;
+    setOpenSubListLoading(true);
+    try {
+      const items = await listOpenSubtitles({
+        imdbId: imdb,
+        season,
+        episode,
+      });
+      openSubListKeyRef.current = key;
+      setOpenSubItems(items);
+    } finally {
+      setOpenSubListLoading(false);
+    }
+  }, [season, episode, openSubItems.length]);
+
   /** Subtitle source picker: persist choice + re-run the subtitle loader. */
   const handleSubSource = useCallback(
     (next: SubSource) => {
@@ -843,18 +879,70 @@ export function VixPlayer({
       // Sync the ref synchronously so the immediate reload reads the NEW
       // source (passive useEffect would run only after the commit).
       subSourceRef.current = next;
-      setSubMenuOpen(false);
       setSubError(null);
+      if (next !== "opensub") {
+        setOpenSubFileId(null);
+        setSubMenuOpen(false);
+      }
       // subs mirrors the source so applySettings() can drive off/stream
       // (subs === "off" hides; otherwise the language preference applies).
       saveVixSettings({
         subSource: next,
         subs: next === "off" ? "off" : "en",
       });
+      // OpenSubs: keep menu open, list top 3, still load best as default.
+      if (next === "opensub") {
+        void ensureOpenSubList();
+      }
       reloadSubsRef.current?.();
     },
-    []
+    [ensureOpenSubList]
   );
+
+  /** User picked one of the top-3 OpenSubtitles files. */
+  const handleOpenSubPick = useCallback(
+    async (item: OpenSubListItem) => {
+      const video = videoRef.current;
+      const imdb = imdbIdRef.current;
+      if (!video || !imdb) {
+        setSubError("Subtitles unavailable");
+        return;
+      }
+      setOpenSubFileId(item.fileId);
+      setSubSource("opensub");
+      subSourceRef.current = "opensub";
+      setSubError(null);
+      saveVixSettings({ subSource: "opensub", subs: "en" });
+      const ext = await fetchExternalVtt({
+        source: "opensub",
+        imdbId: imdb,
+        season,
+        episode,
+        fileId: item.fileId,
+        label: item.label,
+      });
+      if (!ext?.vtt) {
+        setSubError("Couldn’t download that subtitle");
+        return;
+      }
+      for (const t of injectedTracksRef.current) t.mode = "disabled";
+      injectedTracksRef.current = [];
+      externalVttRef.current = { vtt: ext.vtt, label: ext.label };
+      setHasExternalSubs(true);
+      const delay = loadVixSettings().subDelaySeconds;
+      const tr = injectVttTrack(video, ext.vtt, ext.label, true, delay);
+      if (tr) injectedTracksRef.current.push(tr);
+      setSubMenuOpen(false);
+    },
+    [season, episode]
+  );
+
+  // Prefetch OS list when CC menu opens on OpenSubs.
+  useEffect(() => {
+    if (subMenuOpen && subSource === "opensub") {
+      void ensureOpenSubList();
+    }
+  }, [subMenuOpen, subSource, ensureOpenSubList]);
 
   /**
    * Revert the picker to "auto" when a forced external source (VDRK /
@@ -1504,6 +1592,12 @@ export function VixPlayer({
           subMenuOpen={subMenuOpen}
           setSubMenuOpen={setSubMenuOpen}
           onSubSource={handleSubSource}
+          openSubItems={openSubItems}
+          openSubFileId={openSubFileId}
+          openSubListLoading={openSubListLoading}
+          onOpenSubPick={(item) => {
+            void handleOpenSubPick(item);
+          }}
           hasExternalSubs={hasExternalSubs}
           subDelay={subDelay}
           onAdjustSubDelay={adjustSubDelay}
