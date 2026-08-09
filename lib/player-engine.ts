@@ -100,6 +100,10 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
   } = args;
 
     let hls: Hls | null = null;
+    /** Fatal-error recoveries (network startLoad / media recover). Capped so
+     * a dead stream can't loop forever behind a "Loading…" spinner. */
+    let fatalErrorCount = 0;
+    const MAX_FATAL_ERRORS = 3;
     const cleanup: Array<() => void> = [];
     let bootstrapTimer: number | null = null;
     let pendingSeekTimer: number | null = null;
@@ -530,6 +534,18 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
 
       hls.on(Hls.Events.ERROR, (_evt, data) => {
         if (!data.fatal) return;
+        // Cap recoveries: an endlessly retrying loader looks like a frozen
+        // player ("Loading…" forever). After 3 fatal errors, bail to the
+        // streamFailed/iframe path so the user can act (or the cascade tries
+        // the next source on a remount).
+        if (fatalErrorCount >= MAX_FATAL_ERRORS) {
+          if (Number.isFinite(video.currentTime) && video.currentTime > 0) {
+            savePosition(video.currentTime, video.duration, true);
+          }
+          setStreamFailed(true);
+          return;
+        }
+        fatalErrorCount += 1;
         if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
           hls?.startLoad();
         } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {

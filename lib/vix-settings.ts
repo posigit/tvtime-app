@@ -8,6 +8,7 @@
  * (e.g. auto-selected Italian subs) as if they were user choices. Bumping the
  * version discards that poisoned state.
  */
+import type { StreamSource } from "@/lib/player-native-types";
 
 export type VixSettings = {
   /** Settings schema version — bump to invalidate old stored state. */
@@ -36,8 +37,8 @@ export type VixSettings = {
    * "vdrk" = force VDRK VTT; "opensub" = force OpenSubtitles VTT.
    */
   subSource: "auto" | "off" | "stream" | "vdrk" | "opensub";
-  /** Last stream backend the user picked (Vix ↔ Goated). */
-  preferredSource: "vix" | "goated";
+  /** Last stream backend the user picked (native or embed source). */
+  preferredSource: StreamSource;
   /**
    * Subtitle timing offset in seconds (positive = later). Applies to
    * injected VDRK/OpenSubtitles cues; stream-embedded CC is unaffected.
@@ -90,7 +91,16 @@ function clampSettings(merged: VixSettings): VixSettings {
   const next = { ...merged, v: VIX_SETTINGS_VERSION, muted: false };
   if (isBannedSubLang(next.subs)) next.subs = "en";
   if (isBannedSubLang(next.audio)) next.audio = "en";
-  if (next.preferredSource !== "vix" && next.preferredSource !== "goated") {
+  const SOURCE_VALUES = [
+    "vix",
+    "goated",
+    "vidfast",
+    "vidlink",
+    "vidzee",
+    "vidnest",
+    "cinesrc",
+  ] as const;
+  if (!(SOURCE_VALUES as readonly string[]).includes(next.preferredSource)) {
     next.preferredSource = "vix";
   }
   if (

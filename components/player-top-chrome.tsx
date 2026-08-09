@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { sourceLabel } from "@/lib/embed-sources";
 import type { VixSettings } from "@/lib/vix-settings";
 import type { OpenSubListItem, SubSource } from "@/lib/player-subs";
 import type {
@@ -19,6 +20,7 @@ import type {
   QualityLevelInfo,
   StreamSource,
 } from "@/lib/player-native-types";
+import { useEffect, useRef, useState } from "react";
 
 type PlayerTopChromeProps = {
   title: string;
@@ -58,6 +60,12 @@ type PlayerTopChromeProps = {
   ) => void;
   subError: string | null;
   onSwitchSource: () => void;
+  /** Pick a specific source from the menu (sourceOptions). */
+  onPickSource: (source: StreamSource) => void;
+  /** All selectable sources for the picker (labels + active marker). */
+  sourceOptions: StreamSource[];
+  /** Sources that must render disabled (e.g. degraded backends). */
+  disabledSources?: StreamSource[];
   /** TV only — toggle 10…0 auto-advance after Up Next appears. */
   showAutoplayToggle?: boolean;
   autoplayNext?: boolean;
@@ -109,6 +117,9 @@ export function PlayerTopChrome({
   onPatchSubStyle,
   subError,
   onSwitchSource,
+  onPickSource,
+  sourceOptions,
+  disabledSources = [],
   showAutoplayToggle = false,
   autoplayNext = true,
   onToggleAutoplayNext,
@@ -121,6 +132,35 @@ export function PlayerTopChrome({
   setHlsAudioTrackRef,
   setHlsQualityRef,
 }: PlayerTopChromeProps) {
+  const [sourceMenuOpen, setSourceMenuOpen] = useState(false);
+  const sourceMenuRef = useRef<HTMLDivElement>(null);
+  // Outside-dismiss + Escape + scroll — mirrors the sub/audio/quality menus.
+  useEffect(() => {
+    if (!sourceMenuOpen) return;
+    const onPointer = (e: MouseEvent | TouchEvent) => {
+      const node = e.target as Node | null;
+      if (sourceMenuRef.current && node && !sourceMenuRef.current.contains(node)) {
+        setSourceMenuOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        setSourceMenuOpen(false);
+      }
+    };
+    const onScroll = () => setSourceMenuOpen(false);
+    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("touchstart", onPointer, { passive: true });
+    document.addEventListener("keydown", onKey, true);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("touchstart", onPointer);
+      document.removeEventListener("keydown", onKey, true);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [sourceMenuOpen]);
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-30 bg-gradient-to-b from-black/90 via-black/50 to-transparent pt-[max(0.5rem,env(safe-area-inset-top))]">
       {/*
@@ -132,7 +172,7 @@ export function PlayerTopChrome({
         <div className="min-w-0 sm:max-w-[40%]">
           <p className="truncate text-sm font-bold text-white">{title}</p>
           <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/50">
-            {activeSource === "goated" ? "Goated · Orbit" : "VixSrc"}
+            {sourceLabel(activeSource)}
           </p>
         </div>
         <div className="pointer-events-auto flex max-w-full shrink-0 items-center gap-1.5 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] sm:flex-wrap sm:justify-end sm:gap-2 sm:overflow-visible sm:pb-0 [&::-webkit-scrollbar]:hidden">
@@ -510,18 +550,62 @@ export function PlayerTopChrome({
             </div>
           )}
           {streamable && (
-            <button
-              type="button"
-              disabled={isLoading}
-              onClick={onSwitchSource}
-              aria-label={`Switch source (currently ${activeSource})`}
-              className="flex h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80 disabled:opacity-50"
-            >
-              <span className="hidden sm:inline">Source</span>
-              <span className="text-white/60">
-                {activeSource === "vix" ? "Vix" : "Goated"}
-              </span>
-            </button>
+            <div ref={sourceMenuRef} className="relative">
+              <button
+                type="button"
+                onClick={() => {
+                  onKeepChrome();
+                  setSourceMenuOpen((v) => !v);
+                }}
+                aria-label={`Switch source (currently ${activeSource})`}
+                aria-expanded={sourceMenuOpen}
+                aria-haspopup="menu"
+                className="flex h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+              >
+                <span className="hidden sm:inline">Source</span>
+                <span className="text-white/60">
+                  {sourceLabel(activeSource)}
+                </span>
+              </button>
+              {sourceMenuOpen && (
+                <div
+                  role="menu"
+                  aria-label="Stream sources"
+                  className="absolute right-0 top-full z-30 mt-2 w-48 overflow-hidden rounded-xl border border-white/15 bg-white/[0.06] shadow-2xl backdrop-blur-2xl"
+                >
+                  {sourceOptions.map((key) => {
+                    const disabled = disabledSources.includes(key);
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        role="menuitem"
+                        disabled={disabled}
+                        onClick={() => {
+                          setSourceMenuOpen(false);
+                          onPickSource(key);
+                        }}
+                        className={cn(
+                          "flex w-full items-center justify-between px-4 py-2.5 text-left text-sm font-medium text-white transition hover:bg-white/10",
+                          activeSource === key && "text-primary",
+                          disabled && "cursor-not-allowed opacity-40 hover:bg-transparent"
+                        )}
+                      >
+                        {sourceLabel(key)}
+                        {disabled && (
+                          <span className="text-[10px] font-semibold uppercase tracking-wide text-white/50">
+                            Off
+                          </span>
+                        )}
+                        {!disabled && activeSource === key && (
+                          <Check className="h-4 w-4 flex-shrink-0" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           )}
           {showAutoplayToggle && onToggleAutoplayNext && (
             <button

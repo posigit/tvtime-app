@@ -3,6 +3,11 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   outputFileTracingRoot: __dirname,
   reactStrictMode: true,
+  allowedDevOrigins: [
+    "soft-naturely.outray.app",
+    "*.outray.app",
+    "*.trycloudflare.com",
+  ],
   images: {
     remotePatterns: [
       {

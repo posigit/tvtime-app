@@ -3,9 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LoaderCircle, LockOpen } from "lucide-react";
 import {
-  isVixPlayerOrigin,
   parseVixPlayerEventData,
 } from "@/lib/vixsrc";
+import {
+  EMBED_SOURCES,
+  embedUrlFor,
+  isEmbedPlayerOrigin,
+  sourceLabel,
+} from "@/lib/embed-sources";
 import { ResumeOverlay } from "@/components/resume-overlay";
 import { SubtitleOverlay } from "@/components/subtitle-overlay";
 import { PlayerTransport } from "@/components/player-transport";
@@ -65,6 +70,21 @@ let loggedRejectedOrigin = false;
  *
  * Events (both paths): play / pause / seeked / ended / timeupdate.
  */
+
+/** One-time 4s hint shown when playing inside an embed (iframe controls only). */
+function EmbedHint() {
+  const [visible, setVisible] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(false), 4000);
+    return () => clearTimeout(t);
+  }, []);
+  if (!visible) return null;
+  return (
+    <p className="pointer-events-none absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full bg-black/70 px-3 py-1.5 text-[10px] font-semibold text-white/70 backdrop-blur">
+      Embed controls only — switch source for CC / speed / audio
+    </p>
+  );
+}
 export function VixPlayer({
   src,
   title,
@@ -292,14 +312,23 @@ export function VixPlayer({
   );
   const tapCueTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Embed sources have no native resolver — always play as iframe.
+  // (Registered embed keys count even when they have no URL for this media
+  // shape — e.g. movie-only embeds on a TV show — so we fall back to the
+  // vixsrc iframe instead of running the native goated cascade.)
+  const isEmbedActive = EMBED_SOURCES.some((s) => s.key === activeSource);
   // mode: native -> iframe -> error
-  const mode = streamFailed
+  const mode = isEmbedActive
     ? iframeError
       ? "error"
       : "iframe"
-    : playlistUrl
-      ? "native"
-      : "loading";
+    : streamFailed
+      ? iframeError
+        ? "error"
+        : "iframe"
+      : playlistUrl
+        ? "native"
+        : "loading";
 
   useEffect(() => {
     onEventRef.current = onEvent;
@@ -815,6 +844,12 @@ export function VixPlayer({
   }, [initialResumePosition, mode, resumePosition]);
 
   // ---------- source switching ----------
+  // Order: vix (default native), embed sources, goated LAST (degraded backend).
+  const ALL_SOURCES: StreamSource[] = [
+    "vix",
+    ...EMBED_SOURCES.map((s) => s.key as StreamSource),
+    "goated",
+  ];
   const switchSource = useCallback((next: StreamSource) => {
     if (next === activeSource) return;
     const v = videoRef.current;
@@ -966,6 +1001,8 @@ export function VixPlayer({
   // ---------- resolve native stream (single fetch, single source of truth) ----------
   useEffect(() => {
     if (!streamable || !tmdbId || !type) return;
+    // Embed sources have no native resolver — mode is already "iframe".
+    if (isEmbedActive) return;
     let cancelled = false;
     const controller = new AbortController();
     void resolveStreamPlaylist({
@@ -994,7 +1031,7 @@ export function VixPlayer({
       cancelled = true;
       controller.abort();
     };
-  }, [streamable, type, tmdbId, season, episode, activeSource]);
+  }, [streamable, type, tmdbId, season, episode, activeSource, isEmbedActive]);
 
   // ---------- native playback (hls.js / Safari native) ----------
   useEffect(() => {
@@ -1263,15 +1300,15 @@ export function VixPlayer({
         typeof e.data === "object" &&
         e.data !== null &&
         (e.data as { type?: unknown }).type === "PLAYER_EVENT";
-      // Nested player frames post from inner windows, so trust any VixSrc
-      // player origin instead of requiring the exact embed frame/source.
-      if (!isVixPlayerOrigin(e.origin)) {
+      // Nested player frames post from inner windows, so trust any registered
+      // embed player origin instead of requiring the exact embed frame/source.
+      if (!isEmbedPlayerOrigin(e.origin)) {
         if (isPlayerEvent && !loggedRejectedOrigin) {
           loggedRejectedOrigin = true;
           console.warn(
             "[player] PLAYER_EVENT from origin",
             e.origin,
-            "ignored (expected vixsrc.to)"
+            "ignored (expected registered embed source)"
           );
         }
         return;
@@ -1481,7 +1518,14 @@ export function VixPlayer({
     !autoResume &&
     resumePosition != null &&
     resumeKey === playbackKey;
-  const iframeSrc = addStartAt(src, resumePosition ?? initialResumePosition);
+  const iframeBaseSrc =
+    type && tmdbId
+      ? embedUrlFor(activeSource, type, tmdbId, season, episode) ?? src
+      : src;
+  const iframeSrc = addStartAt(
+    iframeBaseSrc,
+    resumePosition ?? initialResumePosition
+  );
   // Transport only after media can play — otherwise black screen + fake pause/±10.
   const showTransport =
     !locked &&
@@ -1609,9 +1653,15 @@ export function VixPlayer({
           subBgOpacity={subBgOpacity}
           onPatchSubStyle={patchSubStyle}
           subError={subError}
-          onSwitchSource={() =>
-            switchSource(activeSource === "vix" ? "goated" : "vix")
-          }
+          onSwitchSource={() => {
+            const idx = ALL_SOURCES.indexOf(activeSource);
+            switchSource(
+              ALL_SOURCES[(idx + 1) % ALL_SOURCES.length] ?? "vix"
+            );
+          }}
+          onPickSource={(source) => switchSource(source)}
+          sourceOptions={ALL_SOURCES}
+          disabledSources={["goated"]}
           showAutoplayToggle={type === "tv"}
           autoplayNext={autoplayNext}
           onToggleAutoplayNext={() => {
@@ -1655,11 +1705,7 @@ export function VixPlayer({
         </button>
       )}
 
-      {mode === "iframe" && !locked && (
-        <p className="pointer-events-none absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full bg-black/70 px-3 py-1.5 text-[10px] font-semibold text-white/70 backdrop-blur">
-          Embed controls only — switch source for CC / speed / audio
-        </p>
-      )}
+      {mode === "iframe" && !locked && <EmbedHint />}
 
       {mode === "native" && tapCue && (
         <div
@@ -1677,7 +1723,7 @@ export function VixPlayer({
         <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center text-white/70">
           <div className="flex items-center gap-2 rounded-full bg-black/60 px-4 py-2 text-xs font-semibold backdrop-blur">
             <LoaderCircle className="h-4 w-4 animate-spin" />
-            Loading {activeSource === "goated" ? "Goated" : "Vix"}…
+            Loading {sourceLabel(activeSource)}…
           </div>
         </div>
       )}
@@ -1692,12 +1738,15 @@ export function VixPlayer({
             {streamable && (
               <button
                 type="button"
-                onClick={() =>
-                  switchSource(activeSource === "vix" ? "goated" : "vix")
-                }
+                onClick={() => {
+                  const idx = ALL_SOURCES.indexOf(activeSource);
+                  switchSource(
+                    ALL_SOURCES[(idx + 1) % ALL_SOURCES.length] ?? "vix"
+                  );
+                }}
                 className="mt-4 inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-bold text-black"
               >
-                Try {activeSource === "vix" ? "Goated" : "Vix"}
+                Try {sourceLabel(ALL_SOURCES[(ALL_SOURCES.indexOf(activeSource) + 1) % ALL_SOURCES.length] ?? "vix")}
               </button>
             )}
           </div>

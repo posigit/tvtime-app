@@ -9,7 +9,14 @@ export type NativeAudioTrackList = {
 
 export type PlayerMode = "loading" | "native" | "iframe" | "error";
 
-export type StreamSource = "vix" | "goated";
+export type StreamSource =
+  | "vix"
+  | "goated"
+  | "vidfast"
+  | "vidlink"
+  | "vidzee"
+  | "vidnest"
+  | "cinesrc";
 
 export type AudioTrackInfo = { id: number; lang: string; name: string };
 export type QualityLevelInfo = { height: number; index: number };

@@ -5,8 +5,10 @@ import { GOATED_ORIGIN } from "@/lib/goated";
  * goated media proxy.
  *
  * goated's playlists (cdn.reallyfast.xyz) and segments (hls.cdn8012.workers.dev)
- * are referer + CORS locked to https://goated.cx. This route re-hosts them on
- * the app's own origin so hls.js can play them same-origin.
+  * are referer + CORS locked to https://goated.cx. This route re-hosts them on
+  * the app's own origin so hls.js can play them same-origin.
+  * Valenox backend serves through hls-proxy.cdn8012.workers.dev (same family,
+  * allowlisted too — 2026-08-09).
  *
  * Contract (stream route hands OUT these URLs):
  *   /api/goated/media?url=<enc(https://cdn.reallyfast.xyz/playlist/xxx.m3u8?t=..&s=..)>
@@ -26,6 +28,7 @@ export const dynamic = "force-dynamic";
 const REWRITE_HOSTS = new Set([
   "cdn.reallyfast.xyz",
   "hls.cdn8012.workers.dev",
+  "hls-proxy.cdn8012.workers.dev", // Valenox backend (same reallyfast family)
 ]);
 
 function isPlaylistContentType(ct: string | null): boolean {
