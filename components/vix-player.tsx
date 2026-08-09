@@ -9,6 +9,7 @@ import {
 } from "@/lib/vixsrc";
 import { ResumeOverlay } from "@/components/resume-overlay";
 import { SubtitleOverlay } from "@/components/subtitle-overlay";
+import { PlayerTransport } from "@/components/player-transport";
 import { cn } from "@/lib/utils";
 import {
   loadVixSettings,
@@ -16,6 +17,19 @@ import {
   matchLang,
   type VixSettings,
 } from "@/lib/vix-settings";
+import {
+  MAX_PLAYBACK_SECONDS,
+  NEXT_FAB_RATIO,
+  RESUME_MIN_SECONDS,
+} from "@/lib/player-constants";
+import {
+  addStartAt,
+  isFinishedPosition,
+  isNearEndPosition,
+  isResumablePosition,
+  makePlaybackKey,
+  shouldSaveProgress,
+} from "@/lib/player-progress";
 
 /** Safari-only audio-track API — not present in TS's DOM lib. */
 type NativeAudioTrack = { language: string; enabled: boolean };
@@ -25,12 +39,6 @@ type NativeAudioTrackList = {
   addEventListener?: (type: string, listener: () => void) => void;
   removeEventListener?: (type: string, listener: () => void) => void;
 };
-
-const MAX_PLAYBACK_SECONDS = 2_147_483_647;
-const RESUME_MIN_SECONDS = 5;
-const RESUME_END_RATIO = 0.92;
-/** Host glass Next FAB: fire once when playback crosses this ratio. */
-const NEXT_FAB_RATIO = 0.96;
 
 const SUB_FONT_SCALE: Record<VixSettings["subFontSize"], number> = {
   sm: 1,
@@ -42,35 +50,6 @@ const SUB_COLORS: Record<VixSettings["subColor"], string> = {
   yellow: "#ffe566",
   cyan: "#7dd3fc",
 };
-
-function makePlaybackKey(
-  type: "movie" | "tv" | undefined,
-  tmdbId: number | undefined,
-  season: number | undefined,
-  episode: number | undefined
-) {
-  if (!type || tmdbId == null) return null;
-  if (type === "tv") {
-    if (season == null || episode == null) return null;
-    return `type=tv&id=${tmdbId}&season=${season}&episode=${episode}`;
-  }
-  return `type=movie&id=${tmdbId}`;
-}
-
-function addStartAt(src: string, position: number | null) {
-  if (position == null || !Number.isFinite(position) || position <= 0) return src;
-  try {
-    const url = new URL(src);
-    url.searchParams.set("startAt", String(Math.floor(position)));
-    return url.toString();
-  } catch {
-    return src;
-  }
-}
-
-function isResumablePosition(pos: number, dur: number) {
-  return pos > RESUME_MIN_SECONDS && (dur <= 0 || pos < dur * RESUME_END_RATIO);
-}
 
 // Keep playback mutations ordered across player remounts. A user can close
 // and reopen the player before the previous keepalive request has completed.
@@ -311,6 +290,19 @@ export function VixPlayer({
     initialResumePosition != null ? initialPlaybackKey : null
   );
   const [locked, setLocked] = useState(false);
+  /** Custom chrome only — native <video controls> are off (dual-layer fix). */
+  const [chromeVisible, setChromeVisible] = useState(true);
+  const [transport, setTransport] = useState({
+    currentTime: 0,
+    duration: 0,
+    paused: true,
+    muted: false,
+    volume: 1,
+  });
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const chromeHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Blocks synthetic mouse click after touch chrome toggle. */
+  const lastTouchChromeRef = useRef(0);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(
     () => loadVixSettings().speed
   );
@@ -492,12 +484,12 @@ export function VixPlayer({
       if (!Number.isFinite(pos) || pos <= 0) return;
       const position = Math.min(MAX_PLAYBACK_SECONDS, pos);
       if (!Number.isFinite(position) || position <= 0) return;
-      // Near the end: drop the bookmark instead of thrashing 95%+ writes.
+      // Near the end (92%): drop the bookmark instead of thrashing writes.
       const dur =
         Number.isFinite(duration) && duration > 0
           ? Math.min(MAX_PLAYBACK_SECONDS, duration)
           : 0;
-      if (dur > 0 && position >= dur * 0.92) {
+      if (isFinishedPosition(position, dur)) {
         if (!bookmarkClearedRef.current) {
           bookmarkClearedRef.current = true;
           lastSavedPosRef.current = 0;
@@ -511,9 +503,13 @@ export function VixPlayer({
       bookmarkClearedRef.current = false;
       const now = Date.now();
       if (
-        !force &&
-        (now - lastSavedAtRef.current < 2000 ||
-          Math.abs(position - lastSavedPosRef.current) < 1)
+        !shouldSaveProgress({
+          pos: position,
+          force,
+          lastSavedPos: lastSavedPosRef.current,
+          lastSavedAt: lastSavedAtRef.current,
+          now,
+        })
       ) {
         return;
       }
@@ -593,10 +589,25 @@ export function VixPlayer({
     [mode]
   );
 
-  /** Detects double-taps (same side, ~≤350ms apart) for ±10s seeks. */
+  const bumpChrome = useCallback(() => {
+    if (locked) return;
+    setChromeVisible(true);
+    if (chromeHideTimerRef.current) clearTimeout(chromeHideTimerRef.current);
+    const v = videoRef.current;
+    // Auto-hide only while playing and no menus are open.
+    if (v && !v.paused) {
+      chromeHideTimerRef.current = setTimeout(() => {
+        if (!subMenuOpen && !audioMenuOpen && !qualityMenuOpen) {
+          setChromeVisible(false);
+        }
+      }, 3200);
+    }
+  }, [locked, subMenuOpen, audioMenuOpen, qualityMenuOpen]);
+
+  /** Double-tap ±10s; single tap toggles custom chrome (no native controls). */
   const handleTap = useCallback(
     (e: React.TouchEvent) => {
-      if (mode !== "native") return;
+      if (mode !== "native" || locked) return;
       const t = e.changedTouches[0];
       if (!t) return;
       const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -607,11 +618,35 @@ export function VixPlayer({
       if (prev && prev.side === side && now - prev.time <= 350) {
         lastTapRef.current = null;
         seekBy(side);
+        bumpChrome();
       } else {
         lastTapRef.current = { time: now, side };
+        // Defer single-tap chrome toggle so a double-tap can cancel it.
+        window.setTimeout(() => {
+          if (lastTapRef.current?.time === now) {
+            lastTouchChromeRef.current = performance.now();
+            setChromeVisible((v) => !v);
+            if (!videoRef.current?.paused) bumpChrome();
+          }
+        }, 360);
       }
     },
-    [mode, seekBy]
+    [mode, locked, seekBy, bumpChrome]
+  );
+
+  const handleVideoClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (mode !== "native" || locked) return;
+      // Ignore the synthetic click that follows touchend on mobile.
+      if (performance.now() - lastTouchChromeRef.current < 500) return;
+      // Ignore clicks that originate from chrome buttons (they stopPropagation).
+      if ((e.target as HTMLElement).closest("button, input, [role='menu']")) {
+        return;
+      }
+      setChromeVisible((v) => !v);
+      bumpChrome();
+    },
+    [mode, locked, bumpChrome]
   );
 
   const releaseResumeHold = useCallback(() => {
@@ -678,7 +713,7 @@ export function VixPlayer({
                 Number.isFinite(data.durationSeconds)
                   ? Math.max(0, data.durationSeconds)
                   : 0;
-              if (pos > 5 && (dur === 0 || pos < dur * 0.92)) {
+              if (isResumablePosition(pos, dur)) {
                 resumePosRef.current = pos;
                 setResumePosition(pos);
                 // The state update remounts the iframe with startAt. The
@@ -765,7 +800,7 @@ export function VixPlayer({
               ? Math.max(0, data.durationSeconds)
               : 0;
           // Resume only if meaningfully mid-way; near-complete counts as done.
-          if (pos > 5 && (dur === 0 || pos < dur * 0.92)) {
+          if (isResumablePosition(pos, dur)) {
             resumeLookupDoneRef.current = params;
             resumePosRef.current = pos;
             setResumeKey(params);
@@ -775,7 +810,7 @@ export function VixPlayer({
             return;
           }
           // Stale near-end bookmark — clear so the next open starts clean.
-          if (pos > 0 && dur > 0 && pos >= dur * 0.92) {
+          if (isFinishedPosition(pos, dur)) {
             clearPosition();
           }
           finishWithoutResume();
@@ -1691,15 +1726,32 @@ export function VixPlayer({
     return Promise.resolve();
   }, [mode, savePosition]);
 
-  // ---------- native video -> event bridge ----------
+  // ---------- native video -> event bridge + transport UI ----------
   useEffect(() => {
     if (mode !== "native" || !videoRef.current) return;
     const video = videoRef.current;
 
-    const onPlay = () => emit("play");
+    const syncTransport = () => {
+      setTransport({
+        currentTime: Number.isFinite(video.currentTime) ? video.currentTime : 0,
+        duration: Number.isFinite(video.duration) ? video.duration : 0,
+        paused: video.paused,
+        muted: video.muted,
+        volume: Number.isFinite(video.volume) ? video.volume : 1,
+      });
+    };
+
+    const onPlay = () => {
+      emit("play");
+      syncTransport();
+      bumpChrome();
+    };
     const onPause = () => {
       emit("pause");
       savePosition(video.currentTime, video.duration, true);
+      syncTransport();
+      setChromeVisible(true);
+      if (chromeHideTimerRef.current) clearTimeout(chromeHideTimerRef.current);
     };
     const onSeeked = () => {
       emit("seeked");
@@ -1713,6 +1765,7 @@ export function VixPlayer({
         setResumeKey(null);
       }
       savePosition(video.currentTime, video.duration, true);
+      syncTransport();
     };
     const onEnded = () => {
       if (!nearEndFiredRef.current) {
@@ -1721,8 +1774,11 @@ export function VixPlayer({
       }
       emit("ended");
       clearPosition();
+      syncTransport();
     };
     const onTime = () => {
+      // Transport scrubber needs frequent ticks; progress save stays throttled.
+      syncTransport();
       const now = Date.now();
       if (now - lastTimeRef.current < 1000) return;
       lastTimeRef.current = now;
@@ -1731,31 +1787,111 @@ export function VixPlayer({
       const dur = Number.isFinite(video.duration) ? video.duration : 0;
       const t = video.currentTime;
 
-      if (dur > 0 && !nearEndFiredRef.current) {
-        if (t >= dur * NEXT_FAB_RATIO) {
-          nearEndFiredRef.current = true;
-          onNearEndRef.current?.();
-        }
+      if (!nearEndFiredRef.current && isNearEndPosition(t, dur, NEXT_FAB_RATIO)) {
+        nearEndFiredRef.current = true;
+        onNearEndRef.current?.();
       }
-      if (!endedRef.current && dur > 0 && t >= dur * RESUME_END_RATIO) {
+      if (!endedRef.current && isFinishedPosition(t, dur)) {
         emit("ended");
         clearPosition();
       }
     };
+    const onVol = () => syncTransport();
+    const onMeta = () => syncTransport();
 
+    syncTransport();
     video.addEventListener("play", onPlay);
     video.addEventListener("pause", onPause);
     video.addEventListener("seeked", onSeeked);
     video.addEventListener("ended", onEnded);
     video.addEventListener("timeupdate", onTime);
+    video.addEventListener("volumechange", onVol);
+    video.addEventListener("loadedmetadata", onMeta);
+    video.addEventListener("durationchange", onMeta);
     return () => {
       video.removeEventListener("play", onPlay);
       video.removeEventListener("pause", onPause);
       video.removeEventListener("seeked", onSeeked);
       video.removeEventListener("ended", onEnded);
       video.removeEventListener("timeupdate", onTime);
+      video.removeEventListener("volumechange", onVol);
+      video.removeEventListener("loadedmetadata", onMeta);
+      video.removeEventListener("durationchange", onMeta);
     };
-  }, [mode, emit, savePosition, clearPosition]);
+  }, [mode, emit, savePosition, clearPosition, bumpChrome]);
+
+  useEffect(() => {
+    const onFs = () => {
+      const shell = shellRef.current;
+      setIsFullscreen(
+        !!document.fullscreenElement &&
+          (document.fullscreenElement === shell ||
+            shell?.contains(document.fullscreenElement) === true)
+      );
+    };
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
+  }, []);
+
+  const togglePlay = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) void v.play().catch(() => {});
+    else v.pause();
+    bumpChrome();
+  }, [bumpChrome]);
+
+  const seekBySeconds = useCallback(
+    (delta: number) => {
+      const v = videoRef.current;
+      if (!v || !Number.isFinite(v.currentTime)) return;
+      const dur =
+        Number.isFinite(v.duration) && v.duration > 0 ? v.duration : null;
+      const target = Math.max(0, v.currentTime + delta);
+      v.currentTime = dur == null ? target : Math.min(target, dur);
+      bumpChrome();
+    },
+    [bumpChrome]
+  );
+
+  const seekRatio = useCallback(
+    (ratio: number) => {
+      const v = videoRef.current;
+      if (!v || !Number.isFinite(v.duration) || v.duration <= 0) return;
+      v.currentTime = Math.max(0, Math.min(v.duration, ratio * v.duration));
+      bumpChrome();
+    },
+    [bumpChrome]
+  );
+
+  const toggleMute = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    // Session-only mute — never persisted (see vix-settings).
+    v.muted = !v.muted;
+    bumpChrome();
+  }, [bumpChrome]);
+
+  const setVolume = useCallback(
+    (vol: number) => {
+      const v = videoRef.current;
+      if (!v) return;
+      const next = Math.max(0, Math.min(1, vol));
+      v.volume = next;
+      v.muted = next === 0;
+      saveVixSettings({ volume: next });
+      bumpChrome();
+    },
+    [bumpChrome]
+  );
+
+  const toggleFullscreen = useCallback(() => {
+    const root = shellRef.current;
+    if (!root) return;
+    if (document.fullscreenElement) void document.exitFullscreen();
+    else void root.requestFullscreen?.();
+    bumpChrome();
+  }, [bumpChrome]);
 
   // ---------- iframe fallback: postMessage bridge ----------
   useEffect(() => {
@@ -1799,9 +1935,11 @@ export function VixPlayer({
 
       if (
         !nearEndFiredRef.current &&
-        remoteDurationRef.current > 0 &&
-        remotePositionRef.current >=
-          remoteDurationRef.current * NEXT_FAB_RATIO
+        isNearEndPosition(
+          remotePositionRef.current,
+          remoteDurationRef.current,
+          NEXT_FAB_RATIO
+        )
       ) {
         nearEndFiredRef.current = true;
         onNearEndRef.current?.();
@@ -1813,9 +1951,10 @@ export function VixPlayer({
       // is idempotent, so the dedup guard prevents duplicate marks.
       if (
         !endedRef.current &&
-        remoteDurationRef.current > 0 &&
-        remotePositionRef.current >=
-          remoteDurationRef.current * RESUME_END_RATIO
+        isFinishedPosition(
+          remotePositionRef.current,
+          remoteDurationRef.current
+        )
       ) {
         emit("ended");
         clearPosition();
@@ -1878,8 +2017,8 @@ export function VixPlayer({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [flushPosition, subMenuOpen, audioMenuOpen, qualityMenuOpen]);
 
-  // Desktop keyboard shortcuts (native only). Capture + preventDefault so
-  // focused <video controls> does not double-toggle play/pause / seek.
+  // Desktop keyboard shortcuts (native only). Custom chrome owns transport —
+  // no native <video controls> to double-toggle against.
   useEffect(() => {
     if (mode !== "native" || locked) return;
     const onKey = (e: KeyboardEvent) => {
@@ -1895,14 +2034,22 @@ export function VixPlayer({
         e.stopPropagation();
         if (v.paused) void v.play();
         else v.pause();
+        bumpChrome();
       } else if (key === "ArrowRight" || key === "l") {
         e.preventDefault();
         e.stopPropagation();
         v.currentTime = Math.min(v.duration || 1e9, v.currentTime + 10);
+        bumpChrome();
       } else if (key === "ArrowLeft" || key === "j") {
         e.preventDefault();
         e.stopPropagation();
         v.currentTime = Math.max(0, v.currentTime - 10);
+        bumpChrome();
+      } else if (key === "m") {
+        e.preventDefault();
+        e.stopPropagation();
+        v.muted = !v.muted;
+        bumpChrome();
       } else if (key === "f") {
         e.preventDefault();
         e.stopPropagation();
@@ -1910,6 +2057,7 @@ export function VixPlayer({
         if (!root) return;
         if (document.fullscreenElement) void document.exitFullscreen();
         else void root.requestFullscreen?.();
+        bumpChrome();
       } else if (key === "p") {
         e.preventDefault();
         e.stopPropagation();
@@ -1922,25 +2070,7 @@ export function VixPlayer({
     };
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
-  }, [mode, locked, subMenuOpen, audioMenuOpen, qualityMenuOpen]);
-
-  // Native <video controls> FS button only fullscreens the video node — pull
-  // that up to the shell so SubtitleOverlay + chrome stay in the FS tree.
-  useEffect(() => {
-    if (mode !== "native") return;
-    const onFs = () => {
-      const v = videoRef.current;
-      const shell = shellRef.current;
-      if (!v || !shell) return;
-      if (document.fullscreenElement === v) {
-        void document.exitFullscreen().then(() => {
-          if (!document.fullscreenElement) void shell.requestFullscreen?.();
-        });
-      }
-    };
-    document.addEventListener("fullscreenchange", onFs);
-    return () => document.removeEventListener("fullscreenchange", onFs);
-  }, [mode]);
+  }, [mode, locked, subMenuOpen, audioMenuOpen, qualityMenuOpen, bumpChrome]);
 
   const adjustSubDelay = useCallback((delta: number) => {
     const next = Math.max(
@@ -2008,10 +2138,13 @@ export function VixPlayer({
       {mode === "native" && (
         <video
           ref={videoRef}
-          controls
+          // Custom chrome only — native controls caused dual-layer lock UI.
+          controls={false}
           autoPlay
           playsInline
+          disablePictureInPicture={false}
           onTouchEnd={handleTap}
+          onClick={handleVideoClick}
           className="h-full w-full touch-manipulation bg-black"
         />
       )}
@@ -2051,8 +2184,25 @@ export function VixPlayer({
         />
       )}
 
-      {!locked && (
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black/90 via-black/45 to-transparent pt-safe">
+      {!locked && chromeVisible && mode === "native" && (
+        <PlayerTransport
+          currentTime={transport.currentTime}
+          duration={transport.duration}
+          paused={transport.paused}
+          muted={transport.muted}
+          volume={transport.volume}
+          isFullscreen={isFullscreen}
+          onTogglePlay={togglePlay}
+          onSeekBy={seekBySeconds}
+          onSeekRatio={seekRatio}
+          onToggleMute={toggleMute}
+          onVolume={setVolume}
+          onToggleFullscreen={toggleFullscreen}
+        />
+      )}
+
+      {!locked && chromeVisible && (
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-30 bg-gradient-to-b from-black/90 via-black/45 to-transparent pt-safe">
           <div className="flex items-start justify-between gap-3 px-4 pb-8 pt-3">
             <div className="min-w-0">
               <p className="truncate text-sm font-bold text-white">{title}</p>
@@ -2086,6 +2236,10 @@ export function VixPlayer({
                   <button
                     type="button"
                     onClick={() => {
+                      setChromeVisible(true);
+                      if (chromeHideTimerRef.current) {
+                        clearTimeout(chromeHideTimerRef.current);
+                      }
                       setAudioMenuOpen((v) => !v);
                       setSubMenuOpen(false);
                       setQualityMenuOpen(false);
@@ -2134,6 +2288,10 @@ export function VixPlayer({
                   <button
                     type="button"
                     onClick={() => {
+                      setChromeVisible(true);
+                      if (chromeHideTimerRef.current) {
+                        clearTimeout(chromeHideTimerRef.current);
+                      }
                       setQualityMenuOpen((v) => !v);
                       setSubMenuOpen(false);
                       setAudioMenuOpen(false);
@@ -2201,6 +2359,10 @@ export function VixPlayer({
                   <button
                     type="button"
                     onClick={() => {
+                      setChromeVisible(true);
+                      if (chromeHideTimerRef.current) {
+                        clearTimeout(chromeHideTimerRef.current);
+                      }
                       setSubMenuOpen((v) => !v);
                       setAudioMenuOpen(false);
                       setQualityMenuOpen(false);
@@ -2444,9 +2606,12 @@ export function VixPlayer({
       {locked && (
         <button
           type="button"
-          onClick={() => setLocked(false)}
+          onClick={() => {
+            setLocked(false);
+            setChromeVisible(true);
+          }}
           aria-label="Unlock player controls"
-          className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+          className="absolute right-4 top-4 z-40 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
         >
           <LockOpen className="h-5 w-5" />
         </button>

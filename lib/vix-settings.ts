@@ -138,8 +138,8 @@ export function loadVixSettings(): VixSettings {
     const raw = window.localStorage.getItem(VIX_SETTINGS_KEY);
     if (!raw) return base;
     const parsed = JSON.parse(raw) as Partial<VixSettings>;
-    // Stale schema — discard poisoned values entirely (includes v2 muted:true).
-    if (parsed.v !== VIX_SETTINGS_VERSION) return base;
+    // Field-level migrate (not full wipe): clampSettings always strips mute and
+    // rewrites v. Older schemas keep speed/subs/quality/source prefs.
     return clampSettings({ ...base, ...parsed });
   } catch {
     /* corrupt or unavailable storage — use defaults */
@@ -151,7 +151,8 @@ export function saveVixSettings(patch: Partial<VixSettings>) {
   if (typeof window === "undefined") return;
   try {
     // muted is intentionally ignored — session-only via the <video> element.
-    const { muted: _muted, ...safePatch } = patch;
+    const safePatch = { ...patch };
+    delete safePatch.muted;
     const next = clampSettings({ ...loadVixSettings(), ...safePatch });
     window.localStorage.setItem(VIX_SETTINGS_KEY, JSON.stringify(next));
     queueServerSync();
