@@ -1572,7 +1572,7 @@ export function VixPlayer({
           mode={mode}
           activeSource={activeSource}
           streamable={streamable}
-          isLoading={isLoading || !mediaReady}
+          isLoading={isLoading || (mode === "native" && !mediaReady)}
           playbackSpeed={playbackSpeed}
           onCycleSpeed={() => {
             const v = videoRef.current;
