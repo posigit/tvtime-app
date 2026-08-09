@@ -1196,6 +1196,7 @@ export function VixPlayer({
         if (document.fullscreenElement) void document.exitFullscreen();
         else void root.requestFullscreen?.();
         bumpChrome();
+      }
     };
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
