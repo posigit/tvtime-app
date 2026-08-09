@@ -13,6 +13,8 @@ export function SubtitleOverlay({
   fontScale,
   color,
   bgOpacity,
+  /** When true, sit above the transport scrubber; otherwise low on the frame. */
+  chromeRaised = false,
 }: {
   videoRef: RefObject<HTMLVideoElement | null>;
   enabled: boolean;
@@ -20,6 +22,7 @@ export function SubtitleOverlay({
   fontScale: number;
   color: string;
   bgOpacity: number;
+  chromeRaised?: boolean;
 }) {
   const [text, setText] = useState("");
 
@@ -80,10 +83,17 @@ export function SubtitleOverlay({
 
   const fontPx = Math.round(18 * fontScale);
 
-  // Above custom transport scrubber (~72–96px with safe area), not mid-frame
-  // and not under the bottom chrome (mobile portrait was sitting on the bar).
+  // Mobile locked/immersive was stuck at 5.5rem (too high mid-frame).
+  // Raise only while transport chrome is visible so cues clear the scrubber;
+  // otherwise sit low like desktop Netflix-style.
+  const positionClass = chromeRaised
+    ? "bottom-[4.5rem] sm:bottom-16"
+    : "bottom-8 sm:bottom-10";
+
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-[5.5rem] z-[25] flex justify-center px-4 sm:bottom-20 pb-[env(safe-area-inset-bottom)]">
+    <div
+      className={`pointer-events-none absolute inset-x-0 z-[25] flex justify-center px-4 pb-[env(safe-area-inset-bottom)] ${positionClass}`}
+    >
       <p
         className="max-w-[92%] whitespace-pre-wrap text-center font-medium leading-snug sm:max-w-[90%]"
         style={{

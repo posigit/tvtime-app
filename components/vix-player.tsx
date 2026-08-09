@@ -36,7 +36,6 @@ import { SUB_COLORS, SUB_FONT_SCALE, type SubSource } from "@/lib/player-subs";
 import { attachNativePlayback } from "@/lib/player-engine";
 import { resolveStreamPlaylist } from "@/lib/player-stream";
 import { seekVideoElement } from "@/lib/player-seek";
-import { togglePictureInPicture } from "@/lib/player-pip";
 import type {
   AudioTrackInfo,
   QualityLevelInfo,
@@ -1197,11 +1196,6 @@ export function VixPlayer({
         if (document.fullscreenElement) void document.exitFullscreen();
         else void root.requestFullscreen?.();
         bumpChrome();
-      } else if (key === "p") {
-        e.preventDefault();
-        e.stopPropagation();
-        void togglePictureInPicture(v);
-      }
     };
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
@@ -1291,6 +1285,7 @@ export function VixPlayer({
           fontScale={SUB_FONT_SCALE[subFontSize]}
           color={SUB_COLORS[subColor]}
           bgOpacity={subBgOpacity}
+          chromeRaised={!locked && chromeVisible}
         />
       )}
 
@@ -1376,24 +1371,6 @@ export function VixPlayer({
           onSwitchSource={() =>
             switchSource(activeSource === "vix" ? "goated" : "vix")
           }
-          onPictureInPicture={() => {
-            const v = videoRef.current;
-            if (!v) return;
-            // iOS prefers the video to be playing before PiP enters.
-            const go = () =>
-              void togglePictureInPicture(v).then((result) => {
-                if (result === "unsupported" || result === "failed") {
-                  console.warn(
-                    "[player] PiP unavailable — on iPhone open the site in Safari (not Home Screen app), ensure video is playing"
-                  );
-                }
-              });
-            if (v.paused) {
-              void v.play().then(go).catch(go);
-            } else {
-              go();
-            }
-          }}
           onLock={() => setLocked(true)}
           onClose={() => {
             void flushPosition().then(() => {

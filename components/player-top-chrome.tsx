@@ -6,7 +6,6 @@ import {
   Check,
   Gauge,
   Lock,
-  PictureInPicture2,
   Volume2,
   X,
 } from "lucide-react";
@@ -53,7 +52,6 @@ type PlayerTopChromeProps = {
   ) => void;
   subError: string | null;
   onSwitchSource: () => void;
-  onPictureInPicture: () => void;
   onLock: () => void;
   onClose: () => void;
   onKeepChrome: () => void;
@@ -65,7 +63,7 @@ type PlayerTopChromeProps = {
 };
 
 /**
- * Top bar: title, speed/audio/quality/CC Look, source switch, PiP, lock, close.
+ * Top bar: title, speed/audio/quality/CC Look, source switch, lock, close.
  * Transport (play/scrub) lives in PlayerTransport.
  */
 export function PlayerTopChrome({
@@ -97,7 +95,6 @@ export function PlayerTopChrome({
   onPatchSubStyle,
   subError,
   onSwitchSource,
-  onPictureInPicture,
   onLock,
   onClose,
   onKeepChrome,
@@ -455,16 +452,6 @@ export function PlayerTopChrome({
               <span className="text-white/60">
                 {activeSource === "vix" ? "Vix" : "Goated"}
               </span>
-            </button>
-          )}
-          {mode === "native" && (
-            <button
-              type="button"
-              onClick={onPictureInPicture}
-              aria-label="Picture in picture"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
-            >
-              <PictureInPicture2 className="h-4 w-4" />
             </button>
           )}
           <button
