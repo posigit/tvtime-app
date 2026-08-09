@@ -144,6 +144,10 @@ export function VixPlayer({
   const [locked, setLocked] = useState(false);
   /** Custom chrome only — native <video controls> are off (dual-layer fix). */
   const [chromeVisible, setChromeVisible] = useState(true);
+  /** True once the media element can actually play (not just playlist resolved). */
+  const [mediaReady, setMediaReady] = useState(false);
+  /** True while a resume seek is in flight (hide transport so we don't flash 0:00). */
+  const [resumeSeeking, setResumeSeeking] = useState(false);
   const [transport, setTransport] = useState({
     currentTime: 0,
     duration: 0,
@@ -363,10 +367,47 @@ export function VixPlayer({
 
   const seekVideo = useCallback((t: number) => {
     const v = videoRef.current;
-    if (!v || !Number.isFinite(t)) return;
+    if (!v || !Number.isFinite(t)) return Promise.resolve(false);
     // Shared robust seek (HLS often needs retries before currentTime sticks).
-    seekVideoElement(v, t, { play: true });
+    return seekVideoElement(v, t, { play: true });
   }, []);
+
+  /**
+   * Seek to a resume bookmark and only then allow progress saves.
+   * Confirmed bug: enabling saves before HLS lands the seek let timeupdate@0
+   * wipe the server bookmark so the next open always started at 0.
+   */
+  const seekAndArmSaves = useCallback(
+    async (pos: number) => {
+      if (!(pos > 0)) {
+        holdForResumeRef.current = false;
+        saveEnabledRef.current = true;
+        setResumeSeeking(false);
+        return;
+      }
+      setResumeSeeking(true);
+      resumePosRef.current = pos;
+      holdForResumeRef.current = true;
+      saveEnabledRef.current = false;
+      bookmarkClearedRef.current = false;
+      lastSavedPosRef.current = pos;
+      lastSavedAtRef.current = Date.now();
+      const ok = await seekVideo(pos);
+      holdForResumeRef.current = false;
+      saveEnabledRef.current = true;
+      setResumeSeeking(false);
+      if (ok) {
+        const v = videoRef.current;
+        const t = v && Number.isFinite(v.currentTime) ? v.currentTime : pos;
+        savePosition(t, v?.duration ?? 0, true);
+      }
+      // Clear floor after a beat so intentional rewinds can save again.
+      window.setTimeout(() => {
+        if (resumePosRef.current === pos) resumePosRef.current = 0;
+      }, 4000);
+    },
+    [seekVideo, savePosition]
+  );
 
   /** Native-mode ±10s seek, with a transient on-screen cue. */
   const seekBy = useCallback(
@@ -445,31 +486,24 @@ export function VixPlayer({
     [mode, locked, bumpChrome]
   );
 
-  const releaseResumeHold = useCallback(() => {
-    holdForResumeRef.current = false;
-    saveEnabledRef.current = true;
-    setResumeKey(null);
-    setResumePosition(null);
-  }, []);
-
   const handleResume = useCallback(() => {
     const pos = resumePosRef.current || resumePosition || 0;
-    releaseResumeHold();
-    if (pos > 0) {
-      bookmarkClearedRef.current = false;
-      lastSavedPosRef.current = pos;
-      lastSavedAtRef.current = Date.now();
-      seekVideo(pos);
-    }
-  }, [resumePosition, releaseResumeHold, seekVideo]);
+    setResumeKey(null);
+    setResumePosition(null);
+    void seekAndArmSaves(pos);
+  }, [resumePosition, seekAndArmSaves]);
 
   const handleRestart = useCallback(() => {
     clearPosition();
     endedRef.current = false;
     lastSavedPosRef.current = 0;
-    releaseResumeHold();
-    seekVideo(0);
-  }, [clearPosition, releaseResumeHold, seekVideo]);
+    resumePosRef.current = 0;
+    holdForResumeRef.current = false;
+    saveEnabledRef.current = true;
+    setResumeKey(null);
+    setResumePosition(null);
+    void seekVideo(0);
+  }, [clearPosition, seekVideo]);
 
   // Fetch saved position before native playback starts. Block saves and pause
   // autoplay until this resolves so playback cannot start at 0 or wipe a good
@@ -655,28 +689,33 @@ export function VixPlayer({
 
   // A Continue Watching CTA supplies the position, so seek directly without
   // putting a second confirmation prompt in front of the user.
+  // IMPORTANT: do not enable saves until seek lands (see seekAndArmSaves).
+  const autoResumeStartedRef = useRef(false);
   useEffect(() => {
     if (
       !autoResume ||
       mode !== "native" ||
       resumePosition == null ||
-      resumeKey !== playbackParams()
+      resumeKey !== playbackParams() ||
+      autoResumeStartedRef.current
     ) {
       return;
     }
+    autoResumeStartedRef.current = true;
     const position = resumePosition;
-    holdForResumeRef.current = false;
-    saveEnabledRef.current = true;
-    lastSavedPosRef.current = position;
-    lastSavedAtRef.current = Date.now();
-    seekVideo(position);
+    // Clear overlay state in microtask (not sync setState-in-effect).
+    queueMicrotask(() => {
+      setResumeKey(null);
+      setResumePosition(null);
+    });
+    void seekAndArmSaves(position);
   }, [
     autoResume,
     mode,
     playbackParams,
     resumeKey,
     resumePosition,
-    seekVideo,
+    seekAndArmSaves,
   ]);
 
   // Iframe path: no seek API for the embed, so drop any resume prompt.
@@ -868,6 +907,7 @@ export function VixPlayer({
   useEffect(() => {
     if (mode !== "native" || !videoRef.current) return;
     const video = videoRef.current;
+    setMediaReady(false);
 
     const syncTransport = () => {
       setTransport({
@@ -877,6 +917,10 @@ export function VixPlayer({
         muted: video.muted,
         volume: Number.isFinite(video.volume) ? video.volume : 1,
       });
+    };
+
+    const markReady = () => {
+      if (video.readyState >= 2) setMediaReady(true);
     };
 
     const onPlay = () => {
@@ -938,6 +982,7 @@ export function VixPlayer({
     const onMeta = () => syncTransport();
 
     syncTransport();
+    markReady();
     video.addEventListener("play", onPlay);
     video.addEventListener("pause", onPause);
     video.addEventListener("seeked", onSeeked);
@@ -946,6 +991,9 @@ export function VixPlayer({
     video.addEventListener("volumechange", onVol);
     video.addEventListener("loadedmetadata", onMeta);
     video.addEventListener("durationchange", onMeta);
+    video.addEventListener("loadeddata", markReady);
+    video.addEventListener("canplay", markReady);
+    video.addEventListener("playing", markReady);
     return () => {
       video.removeEventListener("play", onPlay);
       video.removeEventListener("pause", onPause);
@@ -955,6 +1003,10 @@ export function VixPlayer({
       video.removeEventListener("volumechange", onVol);
       video.removeEventListener("loadedmetadata", onMeta);
       video.removeEventListener("durationchange", onMeta);
+      video.removeEventListener("loadeddata", markReady);
+      video.removeEventListener("canplay", markReady);
+      video.removeEventListener("playing", markReady);
+      setMediaReady(false);
     };
   }, [mode, emit, savePosition, clearPosition, bumpChrome]);
 
@@ -1247,15 +1299,24 @@ export function VixPlayer({
     };
   }, []);
 
-  const isLoading = mode === "loading";
+  const isLoading = mode === "loading" || (mode === "native" && !mediaReady);
   const hasError = mode === "error";
   const playbackKey = playbackParams();
   const showResume =
     mode === "native" &&
+    mediaReady &&
     !autoResume &&
     resumePosition != null &&
     resumeKey === playbackKey;
   const iframeSrc = addStartAt(src, resumePosition ?? initialResumePosition);
+  // Transport only after media can play — otherwise black screen + fake pause/±10.
+  const showTransport =
+    !locked &&
+    chromeVisible &&
+    mode === "native" &&
+    mediaReady &&
+    !showResume &&
+    !resumeSeeking;
 
   return (
     <div
@@ -1315,7 +1376,7 @@ export function VixPlayer({
         />
       )}
 
-      {!locked && chromeVisible && mode === "native" && (
+      {showTransport && (
         <PlayerTransport
           currentTime={transport.currentTime}
           duration={transport.duration}
@@ -1338,7 +1399,7 @@ export function VixPlayer({
           mode={mode}
           activeSource={activeSource}
           streamable={streamable}
-          isLoading={isLoading}
+          isLoading={isLoading || !mediaReady}
           playbackSpeed={playbackSpeed}
           onCycleSpeed={() => {
             const v = videoRef.current;

@@ -83,16 +83,20 @@ export function SubtitleOverlay({
 
   const fontPx = Math.round(18 * fontScale);
 
-  // Mobile locked/immersive was stuck at 5.5rem (too high mid-frame).
-  // Raise only while transport chrome is visible so cues clear the scrubber;
-  // otherwise sit low like desktop Netflix-style.
+  // Sit near the bottom of the frame (Netflix-style). Only lift when the
+  // transport scrubber is on screen so cues don't sit under the bar.
+  // Mobile was reading as "mid frame" at 5.5rem / 2rem — keep these tight.
   const positionClass = chromeRaised
-    ? "bottom-[4.5rem] sm:bottom-16"
-    : "bottom-8 sm:bottom-10";
+    ? "bottom-14 sm:bottom-16"
+    : "bottom-3 sm:bottom-6";
 
   return (
     <div
-      className={`pointer-events-none absolute inset-x-0 z-[25] flex justify-center px-4 pb-[env(safe-area-inset-bottom)] ${positionClass}`}
+      className={`pointer-events-none absolute inset-x-0 z-[25] flex justify-center px-3 sm:px-4 ${positionClass}`}
+      style={{
+        // Safe area without adding a large permanent lift on notched phones.
+        paddingBottom: "max(0px, env(safe-area-inset-bottom))",
+      }}
     >
       <p
         className="max-w-[92%] whitespace-pre-wrap text-center font-medium leading-snug sm:max-w-[90%]"
