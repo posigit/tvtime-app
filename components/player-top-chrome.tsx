@@ -108,15 +108,20 @@ export function PlayerTopChrome({
   setHlsQualityRef,
 }: PlayerTopChromeProps) {
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 z-30 bg-gradient-to-b from-black/90 via-black/45 to-transparent pt-safe">
-      <div className="flex items-start justify-between gap-3 px-4 pb-8 pt-3">
-        <div className="min-w-0">
+    <div className="pointer-events-none absolute inset-x-0 top-0 z-30 bg-gradient-to-b from-black/90 via-black/50 to-transparent pt-[max(0.5rem,env(safe-area-inset-top))]">
+      {/*
+        Mobile: title on its own row, controls in a horizontal scroller so
+        buttons never clamp over the title (portrait screenshot bug).
+        Desktop: classic side-by-side.
+      */}
+      <div className="flex flex-col gap-2 px-3 pb-8 pt-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3 sm:px-4 sm:pt-3">
+        <div className="min-w-0 sm:max-w-[40%]">
           <p className="truncate text-sm font-bold text-white">{title}</p>
           <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/50">
             {activeSource === "goated" ? "Goated · Orbit" : "VixSrc"}
           </p>
         </div>
-        <div className="pointer-events-auto flex shrink-0 flex-wrap items-center justify-end gap-2">
+        <div className="pointer-events-auto flex max-w-full shrink-0 items-center gap-1.5 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] sm:flex-wrap sm:justify-end sm:gap-2 sm:overflow-visible sm:pb-0 [&::-webkit-scrollbar]:hidden">
           {mode === "native" && (
             <button
               type="button"
@@ -266,7 +271,9 @@ export function PlayerTopChrome({
                 <div
                   role="menu"
                   aria-label="Subtitles"
-                  className="absolute right-0 top-full z-30 mt-2 w-56 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-white/10 bg-card shadow-xl"
+                  // overflow-y-auto + max height: was overflow-hidden which
+                  // clipped Look (colors/bg) at the bottom of the panel.
+                  className="absolute right-0 top-full z-40 mt-2 w-60 max-h-[min(70vh,28rem)] max-w-[calc(100vw-1.5rem)] overflow-y-auto overscroll-contain rounded-xl border border-white/10 bg-card py-1 shadow-xl"
                   onMouseDown={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
                 >
@@ -336,7 +343,7 @@ export function PlayerTopChrome({
                     )}
 
                   {subSource !== "off" && (
-                    <div className="space-y-2.5 border-t border-white/10 px-3.5 py-3">
+                    <div className="space-y-3 border-t border-white/10 px-3.5 py-3">
                       <div className="flex items-center gap-1.5">
                         {(
                           [
@@ -364,7 +371,11 @@ export function PlayerTopChrome({
                           </button>
                         ))}
                       </div>
+                      {/* Stack color + bg on separate rows so nothing clips. */}
                       <div className="flex items-center gap-2">
+                        <span className="w-8 shrink-0 text-[10px] font-semibold uppercase tracking-wide text-white/45">
+                          Color
+                        </span>
                         {(
                           [
                             ["white", "#fff"],
@@ -381,7 +392,7 @@ export function PlayerTopChrome({
                             }}
                             aria-label={key}
                             className={cn(
-                              "h-8 w-8 rounded-full ring-2",
+                              "h-8 w-8 shrink-0 rounded-full ring-2",
                               subColor === key
                                 ? "ring-primary"
                                 : "ring-white/20"
@@ -389,33 +400,36 @@ export function PlayerTopChrome({
                             style={{ backgroundColor: hex }}
                           />
                         ))}
-                        <div className="ml-auto flex gap-1">
-                          {(
-                            [
-                              [0, "0"],
-                              [0.4, "½"],
-                              [0.85, "1"],
-                            ] as const
-                          ).map(([value, label]) => (
-                            <button
-                              key={value}
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onPatchSubStyle({ subBgOpacity: value });
-                              }}
-                              className={cn(
-                                "h-8 min-w-8 rounded-lg px-1.5 text-[10px] font-bold",
-                                subBgOpacity === value
-                                  ? "bg-primary text-black"
-                                  : "bg-secondary text-white"
-                              )}
-                              aria-label={`Background ${label}`}
-                            >
-                              {label}
-                            </button>
-                          ))}
-                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-8 shrink-0 text-[10px] font-semibold uppercase tracking-wide text-white/45">
+                          BG
+                        </span>
+                        {(
+                          [
+                            [0, "0"],
+                            [0.4, "½"],
+                            [0.85, "1"],
+                          ] as const
+                        ).map(([value, label]) => (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onPatchSubStyle({ subBgOpacity: value });
+                            }}
+                            className={cn(
+                              "h-8 min-w-8 flex-1 rounded-lg px-1.5 text-[10px] font-bold",
+                              subBgOpacity === value
+                                ? "bg-primary text-black"
+                                : "bg-secondary text-white"
+                            )}
+                            aria-label={`Background ${label}`}
+                          >
+                            {label}
+                          </button>
+                        ))}
                       </div>
                     </div>
                   )}
@@ -443,18 +457,16 @@ export function PlayerTopChrome({
               </span>
             </button>
           )}
-          {mode === "native" &&
-            typeof document !== "undefined" &&
-            document.pictureInPictureEnabled && (
-              <button
-                type="button"
-                onClick={onPictureInPicture}
-                aria-label="Picture in picture"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
-              >
-                <PictureInPicture2 className="h-4 w-4" />
-              </button>
-            )}
+          {mode === "native" && (
+            <button
+              type="button"
+              onClick={onPictureInPicture}
+              aria-label="Picture in picture"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+            >
+              <PictureInPicture2 className="h-4 w-4" />
+            </button>
+          )}
           <button
             type="button"
             onClick={onLock}

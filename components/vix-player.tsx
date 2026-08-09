@@ -35,6 +35,8 @@ import {
 import { SUB_COLORS, SUB_FONT_SCALE, type SubSource } from "@/lib/player-subs";
 import { attachNativePlayback } from "@/lib/player-engine";
 import { resolveStreamPlaylist } from "@/lib/player-stream";
+import { seekVideoElement } from "@/lib/player-seek";
+import { togglePictureInPicture } from "@/lib/player-pip";
 import type {
   AudioTrackInfo,
   QualityLevelInfo,
@@ -316,6 +318,26 @@ export function VixPlayer({
 
   const savePosition = useCallback(
     (pos: number, duration: number, force = false) => {
+      // Source switch: HLS often reports 0–few seconds before the restore
+      // seek lands. Never let those wipe a good mid-episode bookmark (this is
+      // why Goated→Vix looked like it "lost" resume).
+      const pendingSwitch = switchRestorePosRef.current;
+      if (
+        pendingSwitch != null &&
+        Number.isFinite(pendingSwitch) &&
+        pos < pendingSwitch - 2
+      ) {
+        return;
+      }
+      // Same gate while the resume overlay / lookup is holding.
+      const pendingResume = resumePosRef.current;
+      if (
+        holdForResumeRef.current &&
+        pendingResume > 0 &&
+        pos < pendingResume - 2
+      ) {
+        return;
+      }
       // Delegate to shared save rules (throttle, 92% clear, ordered queue).
       const run = createSavePosition(playbackParams, {
         saveEnabledRef,
@@ -343,35 +365,8 @@ export function VixPlayer({
   const seekVideo = useCallback((t: number) => {
     const v = videoRef.current;
     if (!v || !Number.isFinite(t)) return;
-
-    let attempts = 0;
-    const retry = () => {
-      if (attempts++ >= 20 || videoRef.current !== v) return;
-      window.setTimeout(doSeek, 250);
-    };
-    const doSeek = () => {
-      if (videoRef.current !== v) return;
-      if (v.readyState < 1) {
-        retry();
-        return;
-      }
-      const duration = Number.isFinite(v.duration) && v.duration > 0
-        ? v.duration
-        : null;
-      const target = Math.min(Math.max(0, t), duration ?? t);
-      try {
-        v.currentTime = target;
-      } catch {
-        retry();
-        return;
-      }
-      if (!Number.isFinite(v.currentTime) || Math.abs(v.currentTime - target) > 1) {
-        retry();
-        return;
-      }
-      void v.play().catch(() => {});
-    };
-    doSeek();
+    // Shared robust seek (HLS often needs retries before currentTime sticks).
+    seekVideoElement(v, t, { play: true });
   }, []);
 
   /** Native-mode ±10s seek, with a transient on-screen cue. */
@@ -685,15 +680,15 @@ export function VixPlayer({
     seekVideo,
   ]);
 
-  // Iframe path: no seek API for the embed, so drop any resume prompt and
-  // still allow progress saves for the next native session.
+  // Iframe path: no seek API for the embed, so drop any resume prompt.
+  // Lookup effect enables saves when it finishes; if we already have a
+  // supplied position, enable immediately.
   useEffect(() => {
     if (mode !== "iframe") return;
     holdForResumeRef.current = false;
-    // With no supplied position, the lookup effect owns this gate until it
-    // has either found a bookmark or confirmed there is none.
-    saveEnabledRef.current =
-      initialResumePosition != null || resumePosition != null;
+    if (initialResumePosition != null || resumePosition != null) {
+      saveEnabledRef.current = true;
+    }
   }, [initialResumePosition, mode, resumePosition]);
 
   // ---------- source switching ----------
@@ -708,7 +703,18 @@ export function VixPlayer({
           : remotePositionRef.current > RESUME_MIN_SECONDS
             ? remotePositionRef.current
             : null;
-    if (pos != null) switchRestorePosRef.current = pos;
+    if (pos != null) {
+      switchRestorePosRef.current = pos;
+      // Keep throttle baseline at the real position so tiny pre-seek reports
+      // don't pass the min-delta check as "progress".
+      lastSavedPosRef.current = pos;
+      lastSavedAtRef.current = Date.now();
+      // Persist to server before tearing down the video element.
+      savePosition(pos, v && Number.isFinite(v.duration) ? v.duration : 0, true);
+    } else {
+      lastSavedPosRef.current = 0;
+      lastSavedAtRef.current = 0;
+    }
     saveVixSettings({ preferredSource: next });
     setActiveSource(next);
     // Reset playback state so the resolution effect re-runs fresh.
@@ -720,9 +726,7 @@ export function VixPlayer({
     setQualityLevels([]);
     // Keep ended/nearEnd so binge overlays don't double-fire after a switch.
     bookmarkClearedRef.current = false;
-    lastSavedPosRef.current = 0;
-    lastSavedAtRef.current = 0;
-  }, [activeSource]);
+  }, [activeSource, savePosition]);
 
   /** Subtitle source picker: persist choice + re-run the subtitle loader. */
   const handleSubSource = useCallback(
@@ -1196,11 +1200,7 @@ export function VixPlayer({
       } else if (key === "p") {
         e.preventDefault();
         e.stopPropagation();
-        if (document.pictureInPictureElement) {
-          void document.exitPictureInPicture();
-        } else if (document.pictureInPictureEnabled) {
-          void v.requestPictureInPicture?.();
-        }
+        void togglePictureInPicture(v);
       }
     };
     window.addEventListener("keydown", onKey, true);
@@ -1379,10 +1379,19 @@ export function VixPlayer({
           onPictureInPicture={() => {
             const v = videoRef.current;
             if (!v) return;
-            if (document.pictureInPictureElement) {
-              void document.exitPictureInPicture();
+            // iOS prefers the video to be playing before PiP enters.
+            const go = () =>
+              void togglePictureInPicture(v).then((result) => {
+                if (result === "unsupported" || result === "failed") {
+                  console.warn(
+                    "[player] PiP unavailable — on iPhone open the site in Safari (not Home Screen app), ensure video is playing"
+                  );
+                }
+              });
+            if (v.paused) {
+              void v.play().then(go).catch(go);
             } else {
-              void v.requestPictureInPicture?.();
+              go();
             }
           }}
           onLock={() => setLocked(true)}

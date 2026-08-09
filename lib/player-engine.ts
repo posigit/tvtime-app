@@ -13,6 +13,7 @@ import {
   matchLang,
 } from "@/lib/vix-settings";
 import { RESUME_MIN_SECONDS } from "@/lib/player-constants";
+import { seekVideoElement } from "@/lib/player-seek";
 import {
   demoteShowingTracks,
   fetchExternalVtt,
@@ -247,22 +248,31 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
         syncQualityMenu();
       };
 
+      let switchRestoreArmed = false;
       const restoreSwitchPos = () => {
         const pos = switchRestorePosRef.current;
         if (pos == null || !Number.isFinite(pos) || pos <= RESUME_MIN_SECONDS) {
           return;
         }
-        switchRestorePosRef.current = null;
-        const seek = () => {
-          try {
-            video.currentTime = pos;
-            void video.play().catch(() => {});
-          } catch {
-            /* ignore */
-          }
-        };
-        if (video.readyState >= 1) seek();
-        else video.addEventListener("loadedmetadata", seek, { once: true });
+        // Already near target — release the save gate.
+        if (
+          Number.isFinite(video.currentTime) &&
+          Math.abs(video.currentTime - pos) <= 2
+        ) {
+          switchRestorePosRef.current = null;
+          return;
+        }
+        // Keep the ref until seek sticks so savePosition can reject pre-seek 0s.
+        seekVideoElement(video, pos, { play: true });
+        if (!switchRestoreArmed) {
+          switchRestoreArmed = true;
+          // Fail-safe: never block saves forever if seek never lands.
+          window.setTimeout(() => {
+            if (switchRestorePosRef.current === pos) {
+              switchRestorePosRef.current = null;
+            }
+          }, 8000);
+        }
       };
 
       // First attempt at manifest parse (usually empty — harmless), then
@@ -273,6 +283,10 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
         // Always schedule Auto cascade — Vix with zero CC never fires
         // SUBTITLE_TRACKS_UPDATED (same gap Goated had).
         window.setTimeout(() => void maybeLoadFallbackSubtitles(), 1200);
+      });
+      // Second chance after first fragment — Vix often needs this for seek.
+      hls.on(Hls.Events.FRAG_LOADED, () => {
+        if (switchRestorePosRef.current != null) restoreSwitchPos();
       });
       hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, () => {
         if (!userTouched) applySettings();
@@ -700,17 +714,23 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
       // Restore position after a source switch on Safari path too.
       const pos = switchRestorePosRef.current;
       if (pos != null && Number.isFinite(pos) && pos > RESUME_MIN_SECONDS) {
-        switchRestorePosRef.current = null;
-        const seek = () => {
-          try {
-            video.currentTime = pos;
-            void video.play().catch(() => {});
-          } catch {
-            /* ignore */
-          }
+        const run = () => {
+          seekVideoElement(video, pos, { play: true });
+          window.setTimeout(() => {
+            if (
+              switchRestorePosRef.current != null &&
+              Number.isFinite(video.currentTime) &&
+              Math.abs(video.currentTime - pos) <= 2
+            ) {
+              switchRestorePosRef.current = null;
+            }
+          }, 800);
         };
-        if (video.readyState >= 1) seek();
-        else video.addEventListener("loadedmetadata", seek, { once: true });
+        if (video.readyState >= 1) run();
+        else video.addEventListener("loadedmetadata", run, { once: true });
+        // Extra pass after a settle — native HLS can ignore the first seek.
+        window.setTimeout(run, 600);
+        window.setTimeout(run, 1500);
       }
     } else {
       setStreamFailed(true);

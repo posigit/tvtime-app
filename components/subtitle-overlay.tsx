@@ -80,11 +80,12 @@ export function SubtitleOverlay({
 
   const fontPx = Math.round(18 * fontScale);
 
-  // Sit just above native control chrome (~48–56px), not mid-frame.
+  // Above custom transport scrubber (~72–96px with safe area), not mid-frame
+  // and not under the bottom chrome (mobile portrait was sitting on the bar).
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-14 z-[15] flex justify-center px-4 pb-[env(safe-area-inset-bottom)]">
+    <div className="pointer-events-none absolute inset-x-0 bottom-[5.5rem] z-[25] flex justify-center px-4 sm:bottom-20 pb-[env(safe-area-inset-bottom)]">
       <p
-        className="max-w-[90%] whitespace-pre-wrap text-center font-medium leading-snug"
+        className="max-w-[92%] whitespace-pre-wrap text-center font-medium leading-snug sm:max-w-[90%]"
         style={{
           fontSize: fontPx,
           color,
