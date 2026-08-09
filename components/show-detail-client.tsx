@@ -445,13 +445,13 @@ export function ShowDetailClient({
           isEpisodeAired(ep.airDate)
       );
 
-    // Only queue an auto-play when a real next episode exists AND the user
-    // hasn't disabled autoplay. A season finale that has a next season (S+1 E1)
-    // is eligible — `next` is found across all seasons.
-    if (next && loadVixSettings().autoplayNext) {
+    // Always surface Up Next when a later aired unwatched ep exists (season
+    // finales → S+1E1 count). autoplayNext only controls the 10…0 auto-advance;
+    // when off, the card still shows and the user taps to play (or X → FAB).
+    if (next) {
       setManualNext(null);
       setUpNext(next);
-      setUpNextCount(10);
+      setUpNextCount(loadVixSettings().autoplayNext ? 10 : 0);
       return;
     }
 
@@ -461,22 +461,10 @@ export function ShowDetailClient({
     // Handles both first-run and rewatched episodes (an episode auto-completed
     // at 92% on a prior attempt is already watched — it must still show the
     // card instead of closing silently).
-    if (!next) {
-      setUpNext(null);
-      setUpNextCount(0);
-      setManualNext(null);
-      setSeriesEnded(true);
-      return;
-    }
-
-    // A next episode exists but autoplay is disabled — close the player;
-    // the user can tap it when ready.
-    playerSessionRef.current += 1;
-    setPlayerEp(null);
     setUpNext(null);
+    setUpNextCount(0);
     setManualNext(null);
-    setNearEnd(false);
-    setSeriesEnded(false);
+    setSeriesEnded(true);
   };
 
   /** Play the queued "up next" (or post-cancel manual) episode immediately. */
@@ -503,11 +491,12 @@ export function ShowDetailClient({
   }, [upNext]);
 
   // Count down the "up next" overlay; when it hits 0, auto-play the next ep.
+  // upNextCount === 0 means autoplay is off — card stays, no timer.
   // Auto-fire happens in the timeout callback (event context), never in the
   // render phase. Bail if the player was closed mid-countdown (playerEp gone) —
   // never reopen an episode the user dismissed.
   useEffect(() => {
-    if (!upNext || !playerEp) return;
+    if (!upNext || !playerEp || upNextCount <= 0) return;
     const t = window.setTimeout(() => {
       if (upNextCount <= 1) {
         playUpNext();

@@ -180,6 +180,9 @@ export function VixPlayer({
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(
     () => loadVixSettings().speed
   );
+  const [autoplayNext, setAutoplayNext] = useState(
+    () => loadVixSettings().autoplayNext
+  );
   const [subDelay, setSubDelay] = useState(
     () => loadVixSettings().subDelaySeconds
   );
@@ -1609,6 +1612,15 @@ export function VixPlayer({
           onSwitchSource={() =>
             switchSource(activeSource === "vix" ? "goated" : "vix")
           }
+          showAutoplayToggle={type === "tv"}
+          autoplayNext={autoplayNext}
+          onToggleAutoplayNext={() => {
+            setAutoplayNext((prev) => {
+              const next = !prev;
+              saveVixSettings({ autoplayNext: next });
+              return next;
+            });
+          }}
           onLock={() => setLocked(true)}
           onClose={() => {
             void flushPosition().then(() => {

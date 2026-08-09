@@ -128,6 +128,7 @@ function clampSettings(merged: VixSettings): VixSettings {
   } else {
     next.volume = Math.max(0, Math.min(1, next.volume));
   }
+  next.autoplayNext = next.autoplayNext !== false;
   return next;
 }
 

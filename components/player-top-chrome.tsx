@@ -6,6 +6,7 @@ import {
   Check,
   Gauge,
   Lock,
+  SkipForward,
   Volume2,
   X,
 } from "lucide-react";
@@ -57,6 +58,10 @@ type PlayerTopChromeProps = {
   ) => void;
   subError: string | null;
   onSwitchSource: () => void;
+  /** TV only — toggle 10…0 auto-advance after Up Next appears. */
+  showAutoplayToggle?: boolean;
+  autoplayNext?: boolean;
+  onToggleAutoplayNext?: () => void;
   onLock: () => void;
   onClose: () => void;
   onKeepChrome: () => void;
@@ -104,6 +109,9 @@ export function PlayerTopChrome({
   onPatchSubStyle,
   subError,
   onSwitchSource,
+  showAutoplayToggle = false,
+  autoplayNext = true,
+  onToggleAutoplayNext,
   onLock,
   onClose,
   onKeepChrome,
@@ -512,6 +520,37 @@ export function PlayerTopChrome({
               <span className="hidden sm:inline">Source</span>
               <span className="text-white/60">
                 {activeSource === "vix" ? "Vix" : "Goated"}
+              </span>
+            </button>
+          )}
+          {showAutoplayToggle && onToggleAutoplayNext && (
+            <button
+              type="button"
+              onClick={() => {
+                onKeepChrome();
+                onToggleAutoplayNext();
+              }}
+              aria-label={
+                autoplayNext
+                  ? "Autoplay next episode on"
+                  : "Autoplay next episode off"
+              }
+              aria-pressed={autoplayNext}
+              title={
+                autoplayNext
+                  ? "Autoplay next: on"
+                  : "Autoplay next: off (Up Next still shows)"
+              }
+              className={cn(
+                "flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-bold ring-1 backdrop-blur transition",
+                autoplayNext
+                  ? "bg-primary/20 text-primary ring-primary/40 hover:bg-primary/30"
+                  : "bg-black/60 text-white/50 ring-white/20 hover:bg-black/80 hover:text-white/80"
+              )}
+            >
+              <SkipForward className="h-4 w-4" />
+              <span className="hidden sm:inline">
+                {autoplayNext ? "Auto" : "Manual"}
               </span>
             </button>
           )}

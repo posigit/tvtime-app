@@ -28,7 +28,8 @@ export function UpNextCard({
   onCancel: () => void;
 }) {
   const still = stillUrl(episode.stillPath, "w185");
-  // Ring progress: countdown 10 → 0. Clamp so it never renders negative.
+  // countdown > 0 → autoplay ring (10…1). 0 → manual play (autoplay off).
+  const autoplay = countdown > 0;
   const progress = Math.max(0, Math.min(1, countdown / 10));
   const R = 14;
   const CIRC = 2 * Math.PI * R;
@@ -73,38 +74,46 @@ export function UpNextCard({
           </p>
         </div>
 
-        {/* Circular countdown ring */}
+        {/* Circular countdown ring, or play glyph when autoplay is off */}
         <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2">
-          <svg
-            width="34"
-            height="34"
-            viewBox="0 0 34 34"
-            className="-rotate-90"
-            aria-hidden="true"
-          >
-            <circle
-              cx="17"
-              cy="17"
-              r={R}
-              fill="none"
-              stroke="rgba(255,255,255,0.15)"
-              strokeWidth="3"
-            />
-            <circle
-              cx="17"
-              cy="17"
-              r={R}
-              fill="none"
-              stroke="#f5c518"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeDasharray={CIRC}
-              strokeDashoffset={CIRC * (1 - progress)}
-            />
-          </svg>
-          <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-white">
-            {Math.max(1, Math.ceil(countdown))}
-          </span>
+          {autoplay ? (
+            <>
+              <svg
+                width="34"
+                height="34"
+                viewBox="0 0 34 34"
+                className="-rotate-90"
+                aria-hidden="true"
+              >
+                <circle
+                  cx="17"
+                  cy="17"
+                  r={R}
+                  fill="none"
+                  stroke="rgba(255,255,255,0.15)"
+                  strokeWidth="3"
+                />
+                <circle
+                  cx="17"
+                  cy="17"
+                  r={R}
+                  fill="none"
+                  stroke="#f5c518"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeDasharray={CIRC}
+                  strokeDashoffset={CIRC * (1 - progress)}
+                />
+              </svg>
+              <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-white">
+                {Math.max(1, Math.ceil(countdown))}
+              </span>
+            </>
+          ) : (
+            <span className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-primary text-[11px] font-black text-black">
+              ▶
+            </span>
+          )}
         </div>
       </button>
 
