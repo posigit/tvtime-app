@@ -1,7 +1,8 @@
 /**
  * Native HLS engine (hls.js + Safari native HLS).
  * Attaches to a <video>, applies settings, loads external subs, restores
- * source-switch position. Returns a cleanup function for the React effect.
+ * pending seek position (source switch OR cold resume) after the stream is
+ * ready — critical for Vix resolver multi-hop playlists.
  */
 "use client";
 
@@ -34,7 +35,11 @@ export type AttachNativePlaybackArgs = {
   season?: number;
   episode?: number;
   imdbIdRef: MutableRefObject<string | null>;
-  switchRestorePosRef: MutableRefObject<number | null>;
+  /**
+   * Pending seek for source-switch OR cold resume. Engine seeks after
+   * MANIFEST_PARSED / FRAG_LOADED (and prefers hls.js startPosition).
+   */
+  pendingSeekPosRef: MutableRefObject<number | null>;
   subSourceRef: MutableRefObject<SubSource>;
   injectedTracksRef: MutableRefObject<TextTrack[]>;
   externalVttRef: MutableRefObject<{ vtt: string; label: string } | null>;
@@ -51,7 +56,19 @@ export type AttachNativePlaybackArgs = {
   setStreamFailed: Dispatch<SetStateAction<boolean>>;
   savePosition: (pos: number, duration: number, force?: boolean) => void;
   revertExternalSub: (failed: "vdrk" | "opensub") => void;
+  /** Fired once when pending seek lands (or is abandoned). */
+  onPendingSeekSettled?: (result: { pos: number; ok: boolean }) => void;
 };
+
+function readPendingSeek(
+  ref: MutableRefObject<number | null>
+): number | null {
+  const pos = ref.current;
+  if (pos == null || !Number.isFinite(pos) || pos <= RESUME_MIN_SECONDS) {
+    return null;
+  }
+  return pos;
+}
 
 export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void {
   const {
@@ -62,7 +79,7 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
     season,
     episode,
     imdbIdRef,
-    switchRestorePosRef,
+    pendingSeekPosRef,
     subSourceRef,
     injectedTracksRef,
     externalVttRef,
@@ -79,14 +96,34 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
     setStreamFailed,
     savePosition,
     revertExternalSub,
+    onPendingSeekSettled,
   } = args;
 
     let hls: Hls | null = null;
     const cleanup: Array<() => void> = [];
     let bootstrapTimer: number | null = null;
+    let pendingSeekTimer: number | null = null;
+    let pendingSeekSettled = false;
+
+    const notifySeekSettled = (pos: number, ok: boolean) => {
+      if (pendingSeekSettled) return;
+      pendingSeekSettled = true;
+      if (pendingSeekPosRef.current === pos) {
+        pendingSeekPosRef.current = null;
+      }
+      onPendingSeekSettled?.({ pos, ok });
+    };
+
+    // Snapshot at attach — used for hls.js startPosition (Vix resolver cold resume).
+    const startPos = readPendingSeek(pendingSeekPosRef);
 
     if (Hls.isSupported()) {
-      hls = new Hls();
+      // startPosition: load near bookmark instead of 0-then-seek (Vix multi-hop).
+      hls = new Hls(
+        startPos != null
+          ? { startPosition: startPos }
+          : undefined
+      );
       hls.loadSource(playlistUrl);
       hls.attachMedia(video);
 
@@ -248,30 +285,32 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
         syncQualityMenu();
       };
 
-      let switchRestoreArmed = false;
-      const restoreSwitchPos = () => {
-        const pos = switchRestorePosRef.current;
-        if (pos == null || !Number.isFinite(pos) || pos <= RESUME_MIN_SECONDS) {
-          return;
-        }
-        // Already near target — release the save gate.
+      let restoreArmed = false;
+      const restorePendingPos = () => {
+        const pos = readPendingSeek(pendingSeekPosRef);
+        if (pos == null || pendingSeekSettled) return;
+        // Already near target (startPosition or prior seek stuck).
         if (
           Number.isFinite(video.currentTime) &&
-          Math.abs(video.currentTime - pos) <= 2
+          Math.abs(video.currentTime - pos) <= 2.5
         ) {
-          switchRestorePosRef.current = null;
+          notifySeekSettled(pos, true);
           return;
         }
-        // Keep the ref until seek sticks so savePosition can reject pre-seek 0s.
-        seekVideoElement(video, pos, { play: true });
-        if (!switchRestoreArmed) {
-          switchRestoreArmed = true;
-          // Fail-safe: never block saves forever if seek never lands.
-          window.setTimeout(() => {
-            if (switchRestorePosRef.current === pos) {
-              switchRestorePosRef.current = null;
-            }
-          }, 8000);
+        void seekVideoElement(video, pos, { play: true }).then((ok) => {
+          if (ok) notifySeekSettled(pos, true);
+        });
+        if (!restoreArmed) {
+          restoreArmed = true;
+          // Fail-safe: settle after 15s even if Vix resolver is slow.
+          pendingSeekTimer = window.setTimeout(() => {
+            const still = readPendingSeek(pendingSeekPosRef);
+            if (still == null || pendingSeekSettled) return;
+            const near =
+              Number.isFinite(video.currentTime) &&
+              Math.abs(video.currentTime - still) <= 2.5;
+            notifySeekSettled(still, near);
+          }, 15_000);
         }
       };
 
@@ -279,14 +318,14 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
       // re-apply whenever the track lists actually populate.
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         applySettings();
-        restoreSwitchPos();
+        restorePendingPos();
         // Always schedule Auto cascade — Vix with zero CC never fires
         // SUBTITLE_TRACKS_UPDATED (same gap Goated had).
         window.setTimeout(() => void maybeLoadFallbackSubtitles(), 1200);
       });
-      // Second chance after first fragment — Vix often needs this for seek.
+      // Second chance after first fragment — Vix resolver often needs this.
       hls.on(Hls.Events.FRAG_LOADED, () => {
-        if (switchRestorePosRef.current != null) restoreSwitchPos();
+        if (readPendingSeek(pendingSeekPosRef) != null) restorePendingPos();
       });
       hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, () => {
         if (!userTouched) applySettings();
@@ -711,26 +750,27 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
           1200
         );
       }
-      // Restore position after a source switch on Safari path too.
-      const pos = switchRestorePosRef.current;
-      if (pos != null && Number.isFinite(pos) && pos > RESUME_MIN_SECONDS) {
+      // Safari native HLS: no startPosition — retry seek after metadata/fragments.
+      const pos = readPendingSeek(pendingSeekPosRef);
+      if (pos != null) {
         const run = () => {
-          seekVideoElement(video, pos, { play: true });
-          window.setTimeout(() => {
-            if (
-              switchRestorePosRef.current != null &&
-              Number.isFinite(video.currentTime) &&
-              Math.abs(video.currentTime - pos) <= 2
-            ) {
-              switchRestorePosRef.current = null;
-            }
-          }, 800);
+          if (pendingSeekSettled) return;
+          void seekVideoElement(video, pos, { play: true }).then((ok) => {
+            if (ok) notifySeekSettled(pos, true);
+          });
         };
         if (video.readyState >= 1) run();
         else video.addEventListener("loadedmetadata", run, { once: true });
-        // Extra pass after a settle — native HLS can ignore the first seek.
         window.setTimeout(run, 600);
         window.setTimeout(run, 1500);
+        window.setTimeout(run, 3000);
+        pendingSeekTimer = window.setTimeout(() => {
+          if (pendingSeekSettled) return;
+          const near =
+            Number.isFinite(video.currentTime) &&
+            Math.abs(video.currentTime - pos) <= 2.5;
+          notifySeekSettled(pos, near);
+        }, 15_000);
       }
     } else {
       setStreamFailed(true);
@@ -752,6 +792,7 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
     return () => {
       hls?.destroy();
       if (bootstrapTimer != null) window.clearTimeout(bootstrapTimer);
+      if (pendingSeekTimer != null) window.clearTimeout(pendingSeekTimer);
       setHlsAudioTrackRef.current = null;
       setHlsQualityRef.current = null;
       setAudioTracks([]);

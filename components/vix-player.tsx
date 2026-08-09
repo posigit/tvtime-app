@@ -123,8 +123,18 @@ export function VixPlayer({
    */
   const resumeLookupDoneRef = useRef<string | null>(null);
   const resumePosRef = useRef(initialResumePosition ?? 0);
-  /** Seek here after a Vix↔Goated switch once the new playlist is ready. */
-  const switchRestorePosRef = useRef<number | null>(null);
+  /**
+   * Pending seek for source-switch OR cold resume. Engine applies after HLS
+   * is ready (startPosition + MANIFEST/FRAG) — required for Vix resolver.
+   */
+  const pendingSeekPosRef = useRef<number | null>(
+    initialResumePosition != null && initialResumePosition > RESUME_MIN_SECONDS
+      ? initialResumePosition
+      : null
+  );
+  const pendingSeekWaitersRef = useRef<
+    Array<(ok: boolean) => void>
+  >([]);
 
   const streamable = type === "movie" || type === "tv";
   // Source backend — prefer last user choice, then prop default.
@@ -321,23 +331,23 @@ export function VixPlayer({
 
   const savePosition = useCallback(
     (pos: number, duration: number, force = false) => {
-      // Source switch: HLS often reports 0–few seconds before the restore
-      // seek lands. Never let those wipe a good mid-episode bookmark (this is
-      // why Goated→Vix looked like it "lost" resume).
-      const pendingSwitch = switchRestorePosRef.current;
+      // Pending engine seek (switch or cold resume): never wipe bookmark with
+      // pre-seek 0s reports (especially slow Vix resolver playlists).
+      const pendingSeek = pendingSeekPosRef.current;
       if (
-        pendingSwitch != null &&
-        Number.isFinite(pendingSwitch) &&
-        pos < pendingSwitch - 2
+        pendingSeek != null &&
+        Number.isFinite(pendingSeek) &&
+        pos < pendingSeek - 2
       ) {
         return;
       }
-      // Same gate while the resume overlay / lookup is holding.
+      // Protect bookmark: block near-zero reports while a resume target exists
+      // (hold, in-flight seek, or post-failed-seek floor).
       const pendingResume = resumePosRef.current;
       if (
-        holdForResumeRef.current &&
-        pendingResume > 0 &&
-        pos < pendingResume - 2
+        pendingResume > RESUME_MIN_SECONDS &&
+        pos < pendingResume - 2 &&
+        pos <= RESUME_MIN_SECONDS + 1
       ) {
         return;
       }
@@ -373,16 +383,17 @@ export function VixPlayer({
   }, []);
 
   /**
-   * Seek to a resume bookmark and only then allow progress saves.
-   * Confirmed bug: enabling saves before HLS lands the seek let timeupdate@0
-   * wipe the server bookmark so the next open always started at 0.
+   * Queue a resume/switch seek for the engine (post-manifest / startPosition).
+   * Do NOT currentTime-spam before Vix resolver HLS is ready — that is why
+   * cold-start Vix always opened at 0 while Goated and mid-session switch worked.
    */
   const seekAndArmSaves = useCallback(
     async (pos: number) => {
-      if (!(pos > 0)) {
+      if (!(pos > RESUME_MIN_SECONDS)) {
         holdForResumeRef.current = false;
         saveEnabledRef.current = true;
         setResumeSeeking(false);
+        pendingSeekPosRef.current = null;
         return;
       }
       setResumeSeeking(true);
@@ -392,7 +403,40 @@ export function VixPlayer({
       bookmarkClearedRef.current = false;
       lastSavedPosRef.current = pos;
       lastSavedAtRef.current = Date.now();
-      const ok = await seekVideo(pos);
+      pendingSeekPosRef.current = pos;
+
+      const ok = await new Promise<boolean>((resolve) => {
+        let settled = false;
+        let poll = 0;
+        const finish = (result: boolean) => {
+          if (settled) return;
+          settled = true;
+          window.clearInterval(poll);
+          resolve(result);
+        };
+        pendingSeekWaitersRef.current.push(finish);
+        const started = Date.now();
+        poll = window.setInterval(() => {
+          const v = videoRef.current;
+          if (
+            v &&
+            Number.isFinite(v.currentTime) &&
+            Math.abs(v.currentTime - pos) <= 2.5
+          ) {
+            if (pendingSeekPosRef.current === pos) {
+              pendingSeekPosRef.current = null;
+            }
+            finish(true);
+            return;
+          }
+          if (Date.now() - started > 16_000) {
+            finish(false);
+          }
+        }, 250);
+      });
+
+      // Drain any leftover waiters.
+      pendingSeekWaitersRef.current = [];
       holdForResumeRef.current = false;
       saveEnabledRef.current = true;
       setResumeSeeking(false);
@@ -400,13 +444,38 @@ export function VixPlayer({
         const v = videoRef.current;
         const t = v && Number.isFinite(v.currentTime) ? v.currentTime : pos;
         savePosition(t, v?.duration ?? 0, true);
+        window.setTimeout(() => {
+          if (resumePosRef.current === pos) resumePosRef.current = 0;
+        }, 4000);
+      } else {
+        // Seek never landed — keep floor so 0s timeupdates cannot wipe bookmark.
+        console.warn(
+          "[player] resume seek did not land near",
+          pos,
+          "— protecting bookmark from 0s saves"
+        );
+        window.setTimeout(() => {
+          if (resumePosRef.current === pos) resumePosRef.current = 0;
+        }, 30_000);
       }
-      // Clear floor after a beat so intentional rewinds can save again.
-      window.setTimeout(() => {
-        if (resumePosRef.current === pos) resumePosRef.current = 0;
-      }, 4000);
     },
-    [seekVideo, savePosition]
+    [savePosition]
+  );
+
+  const onPendingSeekSettled = useCallback(
+    (result: { pos: number; ok: boolean }) => {
+      const waiters = pendingSeekWaitersRef.current;
+      pendingSeekWaitersRef.current = [];
+      for (const w of waiters) w(result.ok);
+      if (result.ok) {
+        const v = videoRef.current;
+        if (v && Number.isFinite(v.currentTime) && v.currentTime > 0) {
+          // Ensure play after engine seek (hold may have paused).
+          void v.play().catch(() => {});
+        }
+      }
+    },
+    []
   );
 
   /** Native-mode ±10s seek, with a transient on-screen cue. */
@@ -742,7 +811,7 @@ export function VixPlayer({
             ? remotePositionRef.current
             : null;
     if (pos != null) {
-      switchRestorePosRef.current = pos;
+      pendingSeekPosRef.current = pos;
       // Keep throttle baseline at the real position so tiny pre-seek reports
       // don't pass the min-delta check as "progress".
       lastSavedPosRef.current = pos;
@@ -750,6 +819,7 @@ export function VixPlayer({
       // Persist to server before tearing down the video element.
       savePosition(pos, v && Number.isFinite(v.duration) ? v.duration : 0, true);
     } else {
+      pendingSeekPosRef.current = null;
       lastSavedPosRef.current = 0;
       lastSavedAtRef.current = 0;
     }
@@ -846,7 +916,7 @@ export function VixPlayer({
       season,
       episode,
       imdbIdRef,
-      switchRestorePosRef,
+      pendingSeekPosRef,
       subSourceRef,
       injectedTracksRef,
       externalVttRef,
@@ -863,8 +933,20 @@ export function VixPlayer({
       setStreamFailed,
       savePosition,
       revertExternalSub,
+      onPendingSeekSettled,
     });
-  }, [mode, playlistUrl, savePosition, season, episode, activeSource, tmdbId, type, revertExternalSub]);
+  }, [
+    mode,
+    playlistUrl,
+    savePosition,
+    season,
+    episode,
+    activeSource,
+    tmdbId,
+    type,
+    revertExternalSub,
+    onPendingSeekSettled,
+  ]);
 
 
   const flushPosition = useCallback(() => {
