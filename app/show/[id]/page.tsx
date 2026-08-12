@@ -1,5 +1,5 @@
 import { requireAuth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { db, withDbRetry } from "@/lib/db";
 import { userShows, watchedEpisodes, seasonRewatches } from "@/lib/schema";
 import { eq, and } from "drizzle-orm";
 import { ensureShow, ensureEpisodes } from "@/lib/ensure";
@@ -35,9 +35,11 @@ export default async function ShowDetailPage({
 
   const [userShow, allEpisodes, watched, rewatches, ownedShows, playbackPositions] =
     await Promise.all([
-      db.query.userShows.findFirst({
-        where: and(eq(userShows.userId, userId), eq(userShows.tmdbId, tmdbId)),
-      }),
+      withDbRetry(() =>
+        db.query.userShows.findFirst({
+          where: and(eq(userShows.userId, userId), eq(userShows.tmdbId, tmdbId)),
+        })
+      ),
       ensureEpisodes(tmdbId, show.numberOfSeasons),
       db
         .select({

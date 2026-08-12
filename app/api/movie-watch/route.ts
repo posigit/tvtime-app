@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { db, withDbRetry } from "@/lib/db";
 import { userMovies, watchHistory, playbackPositions } from "@/lib/schema";
 import { ensureMovie } from "@/lib/ensure";
 import { eq, and } from "drizzle-orm";
@@ -65,13 +65,15 @@ export async function POST(request: Request) {
 
     if (status === "watched") {
       // Watch history entry + finished → drop any stale resume bookmark
-      await db.insert(watchHistory).values({
-        userId: session.user.id,
-        mediaType: "movie",
-        tmdbId,
-        watchedAt: now,
-        source: "manual",
-      });
+      await withDbRetry(() =>
+        db.insert(watchHistory).values({
+          userId: session.user.id,
+          mediaType: "movie",
+          tmdbId,
+          watchedAt: now,
+          source: "manual",
+        })
+      );
       await db
         .delete(playbackPositions)
         .where(

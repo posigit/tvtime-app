@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { db, withDbRetry } from "@/lib/db";
 import {
   watchedEpisodes,
   userShows,
@@ -96,15 +96,17 @@ export async function POST(request: Request) {
         });
 
       // Watch history entry (append-only — rewatches show up again)
-      await db.insert(watchHistory).values({
-        userId: session.user.id,
-        mediaType: "tv",
-        tmdbId: sid,
-        seasonNumber,
-        episodeNumber,
-        watchedAt: new Date(),
-        source: "manual",
-      });
+      await withDbRetry(() =>
+        db.insert(watchHistory).values({
+          userId: session.user.id,
+          mediaType: "tv",
+          tmdbId: sid,
+          seasonNumber,
+          episodeNumber,
+          watchedAt: new Date(),
+          source: "manual",
+        })
+      );
 
       // Episode finished — drop any stale resume bookmark
       await db

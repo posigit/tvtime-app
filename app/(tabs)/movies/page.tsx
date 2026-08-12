@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { requireAuth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { db, withDbRetry } from "@/lib/db";
 import { movies, userMovies } from "@/lib/schema";
 import { eq } from "drizzle-orm";
 import { ShowTabs } from "@/components/show-tabs";
@@ -280,22 +280,24 @@ export default async function MoviesPage({
 
   const userId = await requireAuth();
 
-  const userMoviesList = await db
-    .select({
-      tmdbId: movies.tmdbId,
-      title: movies.title,
-      posterPath: movies.posterPath,
-      releaseDate: movies.releaseDate,
-      runtime: movies.runtime,
-      rtScore: movies.rtScore,
-      status: userMovies.status,
-      watchedAt: userMovies.watchedAt,
-      rating: userMovies.rating,
-      updatedAt: userMovies.updatedAt,
-    })
-    .from(userMovies)
-    .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
-    .where(eq(userMovies.userId, userId));
+  const userMoviesList = await withDbRetry(() =>
+    db
+      .select({
+        tmdbId: movies.tmdbId,
+        title: movies.title,
+        posterPath: movies.posterPath,
+        releaseDate: movies.releaseDate,
+        runtime: movies.runtime,
+        rtScore: movies.rtScore,
+        status: userMovies.status,
+        watchedAt: userMovies.watchedAt,
+        rating: userMovies.rating,
+        updatedAt: userMovies.updatedAt,
+      })
+      .from(userMovies)
+      .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
+      .where(eq(userMovies.userId, userId))
+  );
 
   // Exclude anything already in the library (watched or listed) from Surprise
   const libraryIds = new Set(userMoviesList.map((m) => m.tmdbId));

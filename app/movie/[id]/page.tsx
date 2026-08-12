@@ -1,5 +1,5 @@
 import { requireAuth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { db, withDbRetry } from "@/lib/db";
 import { userMovies, watchHistory, movieReactions } from "@/lib/schema";
 import { eq, and, sql } from "drizzle-orm";
 import {
@@ -73,9 +73,11 @@ export default async function MovieDetailPage({
 
   const [userMovie, ownedMovies, playback, movieRewatchCount, movieReactionRows] =
     await Promise.all([
-      db.query.userMovies.findFirst({
-        where: and(eq(userMovies.userId, userId), eq(userMovies.tmdbId, tmdbId)),
-      }),
+      withDbRetry(() =>
+        db.query.userMovies.findFirst({
+          where: and(eq(userMovies.userId, userId), eq(userMovies.tmdbId, tmdbId)),
+        })
+      ),
       db
         .select({ tmdbId: userMovies.tmdbId })
         .from(userMovies)

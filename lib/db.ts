@@ -76,8 +76,8 @@ export function isTransientDbError(err: unknown): boolean {
  */
 export async function withDbRetry<T>(
   fn: () => Promise<T>,
-  maxAttempts = 5,
-  baseDelayMs = 1000
+  maxAttempts = 8,
+  baseDelayMs = 1500
 ): Promise<T> {
   let lastError: unknown;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
