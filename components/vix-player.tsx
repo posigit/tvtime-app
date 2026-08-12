@@ -1350,7 +1350,7 @@ export function VixPlayer({
       if (pos < dur) savePosition(pos, dur);
     }, 5000);
     return () => clearInterval(timer);
-  }, [mode, runtimeSeconds, type, savePosition]);
+  }, [mode, runtimeSeconds, type, savePosition, clearPosition, emit]);
 
   // ---------- iframe fallback: postMessage bridge ----------
   useEffect(() => {
