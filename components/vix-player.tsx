@@ -98,6 +98,7 @@ export function VixPlayer({
   initialPosition,
   autoResume = false,
   source = "vix",
+  runtimeSeconds,
 }: {
   src: string;
   title: string;
@@ -115,6 +116,8 @@ export function VixPlayer({
   autoResume?: boolean;
   /** Stream backend: "vix" (default) or "goated". */
   source?: "vix" | "goated";
+  /** Known content runtime (seconds) for the wall-clock progress fallback. */
+  runtimeSeconds?: number;
 }) {
   const initialPlaybackKey = makePlaybackKey(type, tmdbId, season, episode);
   const initialResumePosition =
@@ -139,6 +142,10 @@ export function VixPlayer({
   const lastTimeRef = useRef(0);
   const remotePositionRef = useRef(0);
   const remoteDurationRef = useRef(0);
+  // Wall-clock fallback: estimate progress when an embed won't relay PLAYER_EVENT.
+  const wallClockStartRef = useRef<number | null>(null);
+  const wallClockBaseRef = useRef(0);
+  const lastRelayAtRef = useRef(0);
   const bookmarkClearedRef = useRef(false);
   /** Blocks progress writes until resume check (and optional prompt) finishes. */
   const saveEnabledRef = useRef(false);
@@ -349,6 +356,9 @@ export function VixPlayer({
     lastSavedAtRef.current = 0;
     remotePositionRef.current = 0;
     remoteDurationRef.current = 0;
+    wallClockStartRef.current = null;
+    wallClockBaseRef.current = 0;
+    lastRelayAtRef.current = 0;
     bookmarkClearedRef.current = false;
     lastTapRef.current = null;
     if (tapCueTimerRef.current) {
@@ -1293,6 +1303,36 @@ export function VixPlayer({
     bumpChrome();
   }, [bumpChrome]);
 
+  // ---------- wall-clock progress fallback ----------
+  // Some iframes (e.g. the raw vixsrc fallback) never post PLAYER_EVENT, so
+  // remotePositionRef stays 0 and 92%/96% never fire. When an iframe is
+  // playing but silent for >10s, estimate position from elapsed wall-clock
+  // time (plus the resume base) against the known runtime, and feed the same
+  // near-end/ended detection + save path the real bridge uses.
+  useEffect(() => {
+    if (mode !== "iframe") return;
+    if (!runtimeSeconds || runtimeSeconds <= 0) return;
+    const timer = setInterval(() => {
+      const start = wallClockStartRef.current;
+      if (start == null) return;
+      if (Date.now() - start < 10_000) return;
+      const pos = wallClockBaseRef.current + (Date.now() - start) / 1000;
+      const dur = runtimeSeconds;
+      if (!nearEndFiredRef.current && isNearEndPosition(pos, dur, NEXT_FAB_RATIO)) {
+        nearEndFiredRef.current = true;
+        onNearEndRef.current?.();
+      }
+      if (!endedRef.current && isFinishedPosition(pos, dur)) {
+        emit("ended");
+        clearPosition();
+        wallClockStartRef.current = null;
+        return;
+      }
+      if (pos < dur) savePosition(pos, dur);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [mode, runtimeSeconds, savePosition]);
+
   // ---------- iframe fallback: postMessage bridge ----------
   useEffect(() => {
     const handler = (e: MessageEvent) => {
@@ -1319,6 +1359,8 @@ export function VixPlayer({
 
       if (typeof d.currentTime === "number") {
         remotePositionRef.current = d.currentTime;
+        lastRelayAtRef.current = Date.now();
+        wallClockStartRef.current = null;
       }
       if (typeof d.duration === "number" && d.duration > 0) {
         remoteDurationRef.current = d.duration;
@@ -1579,7 +1621,13 @@ export function VixPlayer({
           referrerPolicy="no-referrer"
           allow="autoplay; fullscreen; encrypted-media; picture-in-picture; clipboard-write"
           allowFullScreen
-          onLoad={() => setIframeError(false)}
+          onLoad={() => {
+            setIframeError(false);
+            if (lastRelayAtRef.current === 0 && wallClockStartRef.current == null) {
+              wallClockStartRef.current = Date.now();
+              wallClockBaseRef.current = initialResumePosition ?? 0;
+            }
+          }}
           onError={() => setIframeError(true)}
           className="h-full w-full border-0 bg-black"
         />
