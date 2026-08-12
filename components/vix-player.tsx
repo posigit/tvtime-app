@@ -1031,9 +1031,16 @@ export function VixPlayer({
       }
       if (result.failed) {
         console.warn(
-          `[player] ${activeSource} stream resolution failed — falling back to iframe:`,
+          `[player] ${activeSource} stream resolution failed — auto-cascading to VidFast:`,
           result.errorMessage ?? "no playlist"
         );
+        // Auto-cascade to a known-working embed instead of parking on the dead
+        // native source — keeps playback + progress relay alive while the Vix
+        // resolver is down.
+        if (activeSource === "vix") {
+          switchSource("vidfast");
+          return;
+        }
         setStreamFailed(true);
       }
     });
@@ -1311,13 +1318,25 @@ export function VixPlayer({
   // near-end/ended detection + save path the real bridge uses.
   useEffect(() => {
     if (mode !== "iframe") return;
-    if (!runtimeSeconds || runtimeSeconds <= 0) return;
+    // Fall back to a nominal runtime when the caller doesn't know it (TMDB
+    // often returns null episode_run_time) so the ratio math still works.
+    const dur =
+      runtimeSeconds && runtimeSeconds > 0
+        ? runtimeSeconds
+        : type === "tv"
+          ? 1800
+          : 5400;
     const timer = setInterval(() => {
+      // Lazy-start the clock on the first tick if the iframe onLoad never fired.
+      if (wallClockStartRef.current == null && lastRelayAtRef.current === 0) {
+        wallClockStartRef.current = Date.now();
+        wallClockBaseRef.current = initialResumePosition ?? 0;
+        return;
+      }
       const start = wallClockStartRef.current;
       if (start == null) return;
       if (Date.now() - start < 10_000) return;
       const pos = wallClockBaseRef.current + (Date.now() - start) / 1000;
-      const dur = runtimeSeconds;
       if (!nearEndFiredRef.current && isNearEndPosition(pos, dur, NEXT_FAB_RATIO)) {
         nearEndFiredRef.current = true;
         onNearEndRef.current?.();
@@ -1331,7 +1350,7 @@ export function VixPlayer({
       if (pos < dur) savePosition(pos, dur);
     }, 5000);
     return () => clearInterval(timer);
-  }, [mode, runtimeSeconds, savePosition]);
+  }, [mode, runtimeSeconds, type, savePosition]);
 
   // ---------- iframe fallback: postMessage bridge ----------
   useEffect(() => {
