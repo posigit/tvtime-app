@@ -1048,7 +1048,7 @@ export function VixPlayer({
       cancelled = true;
       controller.abort();
     };
-  }, [streamable, type, tmdbId, season, episode, activeSource, isEmbedActive]);
+  }, [streamable, type, tmdbId, season, episode, activeSource, isEmbedActive, switchSource]);
 
   // ---------- native playback (hls.js / Safari native) ----------
   useEffect(() => {
@@ -1350,7 +1350,7 @@ export function VixPlayer({
       if (pos < dur) savePosition(pos, dur);
     }, 5000);
     return () => clearInterval(timer);
-  }, [mode, runtimeSeconds, type, savePosition, clearPosition, emit]);
+  }, [mode, runtimeSeconds, type, savePosition, clearPosition, emit, initialResumePosition]);
 
   // ---------- iframe fallback: postMessage bridge ----------
   useEffect(() => {
