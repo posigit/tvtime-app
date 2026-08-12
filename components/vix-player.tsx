@@ -1031,16 +1031,9 @@ export function VixPlayer({
       }
       if (result.failed) {
         console.warn(
-          `[player] ${activeSource} stream resolution failed — auto-cascading to VidFast:`,
+          `[player] ${activeSource} stream resolution failed — falling back to iframe:`,
           result.errorMessage ?? "no playlist"
         );
-        // Auto-cascade to a known-working embed instead of parking on the dead
-        // native source — keeps playback + progress relay alive while the Vix
-        // resolver is down.
-        if (activeSource === "vix") {
-          switchSource("vidfast");
-          return;
-        }
         setStreamFailed(true);
       }
     });
@@ -1048,7 +1041,7 @@ export function VixPlayer({
       cancelled = true;
       controller.abort();
     };
-  }, [streamable, type, tmdbId, season, episode, activeSource, isEmbedActive, switchSource]);
+  }, [streamable, type, tmdbId, season, episode, activeSource, isEmbedActive]);
 
   // ---------- native playback (hls.js / Safari native) ----------
   useEffect(() => {
