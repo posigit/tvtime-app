@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { posterUrl } from "@/lib/tmdb";
@@ -23,6 +23,36 @@ export type LaterMovie = {
 };
 
 type SortKey = "title" | "rt" | "runtime" | "year";
+
+const PICK_KEY = "surprise-pick";
+const RECENT_KEY = "surprise-recent";
+
+function readJson<T>(key: string): T | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(key);
+    if (!raw) return null;
+    return JSON.parse(raw) as T;
+  } catch {
+    return null;
+  }
+}
+
+function writeJson(key: string, value: unknown) {
+  try {
+    sessionStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* quota / private mode */
+  }
+}
+
+function clearStoredPick() {
+  try {
+    sessionStorage.removeItem(PICK_KEY);
+  } catch {
+    /* ignore */
+  }
+}
 
 function formatRuntime(minutes: number): string {
   const h = Math.floor(minutes / 60);
@@ -115,6 +145,19 @@ export function WatchLaterTools({
   const [sort, setSort] = useState<SortKey>("rt");
   const [pick, setPick] = useState<LaterMovie | null>(null);
   const recentRef = useRef<number[]>([]);
+  const hydratedRef = useRef(false);
+
+  useEffect(() => {
+    const storedRecent = readJson<number[]>(RECENT_KEY);
+    if (Array.isArray(storedRecent)) {
+      recentRef.current = storedRecent.filter((id) => Number.isFinite(id));
+    }
+    const stored = readJson<LaterMovie>(PICK_KEY);
+    if (stored && typeof stored.tmdbId === "number" && stored.title) {
+      setPick(stored);
+    }
+    hydratedRef.current = true;
+  }, []);
 
   const poolAll = useMemo(() => {
     const raw = surprisePool && surprisePool.length > 0 ? surprisePool : items;
@@ -127,6 +170,15 @@ export function WatchLaterTools({
     }
     return out;
   }, [surprisePool, items]);
+
+  useEffect(() => {
+    if (!hydratedRef.current || !pick) return;
+    if (poolAll.length === 0) return;
+    if (!poolAll.some((m) => m.tmdbId === pick.tmdbId)) {
+      setPick(null);
+      clearStoredPick();
+    }
+  }, [pick, poolAll]);
 
   const sorted = useMemo(() => {
     const list = [...items];
@@ -160,6 +212,8 @@ export function WatchLaterTools({
     if (!next) return;
     const maxRemember = Math.max(1, Math.min(poolAll.length - 1, 30));
     recentRef.current = [...recentRef.current, next.tmdbId].slice(-maxRemember);
+    writeJson(RECENT_KEY, recentRef.current);
+    writeJson(PICK_KEY, next);
     setPick(next);
   }
 
@@ -236,7 +290,10 @@ export function WatchLaterTools({
           <button
             type="button"
             aria-label="Dismiss pick"
-            onClick={() => setPick(null)}
+            onClick={() => {
+              clearStoredPick();
+              setPick(null);
+            }}
             className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white/80"
           >
             <X className="h-4 w-4" />
