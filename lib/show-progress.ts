@@ -133,43 +133,6 @@ export function computeNextEpisode(
   return { nextEpisode, remaining };
 }
 
-export type SeasonProgress = {
-  seasonNumber: number;
-  watched: number;
-  aired: number;
-  percent: number;
-};
-
-/**
- * Watched / aired share of one season. Unaired episodes are ignored so a
- * mid-season show is not stuck at 40% of a 10-ep order that has only aired 4.
- */
-export function computeSeasonProgress(
-  episodes: EpisodeInfo[],
-  watchedKeys: Set<WatchedKey>,
-  seasonNumber: number,
-  now: Date = new Date()
-): SeasonProgress | null {
-  if (!Number.isFinite(seasonNumber) || seasonNumber < 1) return null;
-  let aired = 0;
-  let watched = 0;
-  for (const ep of episodes) {
-    if (ep.seasonNumber !== seasonNumber) continue;
-    if (!isEpisodeAired(ep.airDate, now)) continue;
-    aired++;
-    if (watchedKeys.has(makeWatchedKey(ep.seasonNumber, ep.episodeNumber))) {
-      watched++;
-    }
-  }
-  if (aired === 0) return null;
-  return {
-    seasonNumber,
-    watched,
-    aired,
-    percent: Math.round((watched / aired) * 100),
-  };
-}
-
 export function computeUpcomingEpisodes(
   episodes: EpisodeInfo[],
   watchedKeys: Set<WatchedKey>,
