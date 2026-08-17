@@ -21,6 +21,7 @@ import {
 } from "@/lib/layout-pref";
 import {
   computeNextEpisode,
+  computeSeasonProgress,
   computeUpcomingEpisodes,
   effectiveLastWatchedAt,
   isEpisodeAired,
@@ -201,6 +202,13 @@ export default async function ShowsPage({
         { seasonNumber: show.lastSeason, episodeNumber: show.lastEpisode },
         showWatched
       );
+      const seasonForProgress =
+        nextEpisode?.seasonNumber ?? show.lastSeason ?? 0;
+      const seasonProgress = computeSeasonProgress(
+        showEpisodes,
+        showWatched,
+        seasonForProgress
+      );
 
       // Caught up: every aired episode is watched → leave Watch List
       // (still followed; new eps show under Upcoming when they air)
@@ -221,6 +229,12 @@ export default async function ShowsPage({
             }
           : null,
         remaining,
+        seasonProgress: seasonProgress
+          ? {
+              seasonNumber: seasonProgress.seasonNumber,
+              percent: seasonProgress.percent,
+            }
+          : null,
       };
 
       // Prefer episode timestamps (detect bulk import/"mark previous" stamps).

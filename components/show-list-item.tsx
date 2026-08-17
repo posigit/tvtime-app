@@ -18,6 +18,10 @@ export type ShowListItemData = {
     stillPath?: string | null;
   } | null;
   remaining: number;
+  seasonProgress?: {
+    seasonNumber: number;
+    percent: number;
+  } | null;
 };
 
 /** Row from snapshot 1: episode still | title pill + Sxx | Exx + episode name | white check */
@@ -76,6 +80,12 @@ export function ShowListItem({ show }: { show: ShowListItemData }) {
             <>
               S{String(show.nextEpisode!.seasonNumber).padStart(2, "0")} | E
               {String(show.nextEpisode!.episodeNumber).padStart(2, "0")}
+              {show.seasonProgress != null && (
+                <span className="text-sm font-semibold text-muted-foreground">
+                  {" "}
+                  · {show.seasonProgress.percent}%
+                </span>
+              )}
               {show.remaining > 0 && (
                 <span className="text-sm font-semibold text-muted-foreground">
                   {" "}
@@ -92,6 +102,14 @@ export function ShowListItem({ show }: { show: ShowListItemData }) {
           <p className="truncate text-[13px] leading-tight text-muted-foreground">
             {show.nextEpisode!.title}
           </p>
+        )}
+        {show.seasonProgress != null && (
+          <div className="mt-1.5 h-0.5 max-w-[8rem] overflow-hidden rounded-full bg-white/15">
+            <div
+              className="h-full bg-primary"
+              style={{ width: `${show.seasonProgress.percent}%` }}
+            />
+          </div>
         )}
       </Link>
 
