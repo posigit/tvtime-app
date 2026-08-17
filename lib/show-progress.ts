@@ -1,8 +1,12 @@
 import {
   appTodayYmd,
+  daysUntilYmd,
   toYmd,
   ymdAddDays,
 } from "./app-time";
+
+/** Days a new drop / just-followed / last-watch stays in Watch Next. */
+export const WATCH_NEXT_DAYS = 14;
 
 export type EpisodeInfo = {
   showTmdbId: number;
@@ -131,6 +135,40 @@ export function computeNextEpisode(
   }
 
   return { nextEpisode, remaining };
+}
+
+/** True when the next unwatched ep aired within the last `days` (today counts). */
+export function isFreshEpisodeDrop(
+  airDate: string | null | undefined,
+  now: Date = new Date(),
+  days = WATCH_NEXT_DAYS
+): boolean {
+  const delta = daysUntilYmd(airDate, now);
+  if (delta == null) return false;
+  return delta <= 0 && delta >= -days;
+}
+
+/** Watch Next vs Haven't-watched. Fresh premieres count even if last watch/follow was months ago. */
+export function belongsInWatchNext(opts: {
+  status: string;
+  followedAt: Date | null | undefined;
+  lastActivityAt: Date | null | undefined;
+  hasWatches: boolean;
+  nextAirDate: string | null | undefined;
+  now?: Date;
+}): boolean {
+  if (opts.status === "for_later") return false;
+  const now = opts.now ?? new Date();
+  const cutoff = now.getTime() - WATCH_NEXT_DAYS * 24 * 60 * 60 * 1000;
+  const isRecent =
+    opts.lastActivityAt != null && opts.lastActivityAt.getTime() > cutoff;
+  const isNewlyFollowed =
+    opts.followedAt != null &&
+    opts.followedAt.getTime() > cutoff &&
+    !opts.hasWatches;
+  return (
+    isRecent || isNewlyFollowed || isFreshEpisodeDrop(opts.nextAirDate, now)
+  );
 }
 
 export function computeUpcomingEpisodes(

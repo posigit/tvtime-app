@@ -16,6 +16,7 @@ export type ShowListItemData = {
     episodeNumber: number;
     title: string;
     stillPath?: string | null;
+    airDate?: string | null;
   } | null;
   remaining: number;
 };

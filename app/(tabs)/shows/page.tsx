@@ -20,6 +20,7 @@ import {
   resolveLayoutPref,
 } from "@/lib/layout-pref";
 import {
+  belongsInWatchNext,
   computeNextEpisode,
   computeUpcomingEpisodes,
   effectiveLastWatchedAt,
@@ -187,8 +188,6 @@ export default async function ShowsPage({
   const haventWatched: ShowListItemData[] = [];
 
   if (currentView === "watchlist") {
-    const now = new Date();
-    const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
     /** Effective last activity (bulk-mark demoted) for sort + section split. */
     const activityByShow = new Map<number, Date | null>();
 
@@ -218,6 +217,7 @@ export default async function ShowsPage({
               episodeNumber: nextEpisode.episodeNumber,
               title: nextEpisode.title,
               stillPath: nextEpisode.stillPath,
+              airDate: nextEpisode.airDate,
             }
           : null,
         remaining,
@@ -235,17 +235,15 @@ export default async function ShowsPage({
           : show.lastWatchedAt);
       activityByShow.set(show.tmdbId, effective);
 
-      // Only explicit followedAt (set by + / follow API) counts as "just added".
-      // Do NOT fall back to updatedAt — catalog/import bumps would flood Watch Next.
-      const isNewlyFollowed =
-        show.followedAt != null &&
-        show.followedAt > twoWeeksAgo &&
-        !watchedAtsByShow.has(show.tmdbId);
-
-      // "For later" is intentional parking — never Watch Next.
-      // Recent *real* activity OR just added → Watch Next; else dormant.
-      const isRecent = effective != null && effective > twoWeeksAgo;
-      if (show.status !== "for_later" && (isRecent || isNewlyFollowed)) {
+      if (
+        belongsInWatchNext({
+          status: show.status,
+          followedAt: show.followedAt,
+          lastActivityAt: effective,
+          hasWatches: watchedAtsByShow.has(show.tmdbId),
+          nextAirDate: nextEpisode?.airDate,
+        })
+      ) {
         watchNext.push(item);
       } else {
         haventWatched.push(item);
@@ -263,10 +261,24 @@ export default async function ShowsPage({
         0
       );
     };
+    const nextAirTime = (airDate?: string | null) => {
+      const ymd = airDate ? toYmd(airDate) : null;
+      if (!ymd) return 0;
+      const t = Date.parse(`${ymd}T12:00:00Z`);
+      return Number.isFinite(t) ? t : 0;
+    };
 
-    watchNext.sort(
-      (a, b) => activityTime(b.tmdbId) - activityTime(a.tmdbId)
-    );
+    watchNext.sort((a, b) => {
+      const aScore = Math.max(
+        activityTime(a.tmdbId),
+        nextAirTime(a.nextEpisode?.airDate)
+      );
+      const bScore = Math.max(
+        activityTime(b.tmdbId),
+        nextAirTime(b.nextEpisode?.airDate)
+      );
+      return bScore - aScore;
+    });
     // Dormant: oldest activity first (longest neglected at top), nulls last
     haventWatched.sort((a, b) => {
       const ta = activityByShow.get(a.tmdbId)?.getTime();
