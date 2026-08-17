@@ -3,11 +3,7 @@
  */
 
 import { getMovieReviews, getTvReviews, type TmdbReview } from "./tmdb";
-import {
-  redditSearchUrl,
-  searchRedditDiscussions,
-  type RedditSubmission,
-} from "./reddit";
+import { redditSearchUrl } from "./reddit";
 import { getRtReviewBundle } from "./rt-reviews";
 import { db } from "./db";
 import { shows, movies } from "./schema";
@@ -101,28 +97,6 @@ function mapTmdb(r: TmdbReview): CommunityReview | null {
   };
 }
 
-function mapReddit(d: RedditSubmission): CommunityReview {
-  const body = cleanText(d.selftext, 900);
-  return {
-    id: `reddit-${d.id}`,
-    source: "reddit",
-    author: d.author,
-    rating: null,
-    sentiment: null,
-    title: d.title,
-    content: body || "Open the thread for the full discussion.",
-    url: d.permalink || null,
-    createdAt:
-      d.created_utc != null
-        ? new Date(d.created_utc * 1000).toISOString()
-        : null,
-    meta: d.subreddit ? `r/${d.subreddit}` : "Reddit",
-    score: d.score,
-    commentCount: d.num_comments,
-    avatarUrl: null,
-  };
-}
-
 async function fetchTmdbReviews(
   kind: "movie" | "tv",
   tmdbId: number
@@ -147,28 +121,6 @@ async function fetchTmdbReviews(
   } catch (err) {
     console.error(
       "TMDB reviews failed:",
-      err instanceof Error ? err.message : err
-    );
-    return [];
-  }
-}
-
-async function fetchRedditReviews(
-  kind: "movie" | "tv",
-  title: string,
-  year?: string | null
-): Promise<CommunityReview[]> {
-  try {
-    const posts = await searchRedditDiscussions({
-      title,
-      kind,
-      year,
-      limit: 15,
-    });
-    return posts.map(mapReddit);
-  } catch (err) {
-    console.error(
-      "Reddit reviews failed:",
       err instanceof Error ? err.message : err
     );
     return [];
@@ -246,9 +198,10 @@ export async function getCommunityReviews(opts: {
   knownRtAudienceScore?: number | null;
   knownMcScore?: number | null;
 }): Promise<ReviewsPayload> {
-  const [tmdb, reddit, rt] = await Promise.all([
+  // Reddit search is off the page path: PullPush 429s and Arctic Shift
+  // added ~8s to every movie/show detail. The Reddit tab still links out.
+  const [tmdb, rt] = await Promise.all([
     fetchTmdbReviews(opts.kind, opts.tmdbId),
-    fetchRedditReviews(opts.kind, opts.title, opts.year),
     getRtReviewBundle({
       kind: opts.kind,
       title: opts.title,
@@ -316,8 +269,7 @@ export async function getCommunityReviews(opts: {
     });
   }
 
-  const redditList =
-    reddit.length > 0 ? reddit : [redditBrowseCard(opts.title, opts.kind)];
+  const redditList = [redditBrowseCard(opts.title, opts.kind)];
 
   // Order: RT consensus + critics, then TMDB, then Reddit
   const reviews = [...rtReviews, ...tmdb, ...redditList];
