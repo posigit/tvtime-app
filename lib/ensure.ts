@@ -5,6 +5,7 @@ import {
   getMovieDetails,
   getTvSeason,
 } from "./tmdb";
+import { getTvmazeAirdateMap, isAppleTv } from "./tvmaze";
 import { resolveRtScores } from "./rt-resolve";
 import { eq, sql } from "drizzle-orm";
 
@@ -412,9 +413,20 @@ function saveEpisodesWithRetry(
 
 async function fetchEpisodesFromTmdb(
   tmdbId: number,
-  numberOfSeasons: number
+  numberOfSeasons: number,
+  title?: string | null,
+  networks?: string[] | null,
+  firstAirDate?: string | null
 ): Promise<EpisodeInfo[]> {
   const fetchedEpisodes: EpisodeInfo[] = [];
+
+  // Apple TV+ episodes: TMDB records the Pacific date (1 day early); TVMaze
+  // carries the official Eastern date. Overlay TVMaze so air dates match
+  // Apple/Google/RT for the whole show.
+  const tvmazeAirdates =
+    title && isAppleTv(networks)
+      ? await getTvmazeAirdateMap(title, firstAirDate)
+      : null;
 
   for (let seasonNumber = 1; seasonNumber <= numberOfSeasons; seasonNumber++) {
     try {
@@ -426,7 +438,10 @@ async function fetchEpisodesFromTmdb(
           episodeNumber: ep.episode_number,
           title: ep.name || `Episode ${ep.episode_number}`,
           overview: ep.overview ?? null,
-          airDate: ep.air_date ?? null,
+          airDate:
+            tvmazeAirdates?.get(`${ep.season_number}:${ep.episode_number}`) ??
+            ep.air_date ??
+            null,
           stillPath: ep.still_path ?? null,
           runtime: ep.runtime ?? null,
         });
@@ -472,6 +487,11 @@ async function refreshShowCatalog(tmdbId: number) {
   const fromSeason = Math.max(1, maxCached);
 
   const fetchedEpisodes: EpisodeInfo[] = [];
+  // Apple TV+ overlay: TMDB's Pacific date is 1 day early; TVMaze has the
+  // official Eastern date (matches Apple/Google/RT).
+  const tvmazeAirdates = isAppleTv(show.networks)
+    ? await getTvmazeAirdateMap(show.title, show.firstAirDate)
+    : null;
   for (
     let seasonNumber = fromSeason;
     seasonNumber <= numberOfSeasons;
@@ -486,7 +506,10 @@ async function refreshShowCatalog(tmdbId: number) {
           episodeNumber: ep.episode_number,
           title: ep.name || `Episode ${ep.episode_number}`,
           overview: ep.overview ?? null,
-          airDate: ep.air_date ?? null,
+          airDate:
+            tvmazeAirdates?.get(`${ep.season_number}:${ep.episode_number}`) ??
+            ep.air_date ??
+            null,
           stillPath: ep.still_path ?? null,
           runtime: ep.runtime ?? null,
         });
@@ -587,7 +610,30 @@ export async function ensureEpisodes(
     return [];
   }
 
-  const fetchedEpisodes = await fetchEpisodesFromTmdb(tmdbId, numberOfSeasons);
+  // Show metadata for the Apple TV+ airdate overlay (title, networks, year).
+  let showMeta: { title?: string | null; networks?: string[] | null; firstAirDate?: string | null } = {};
+  try {
+    const row = await withDbRetry(() =>
+      db.query.shows.findFirst({ where: eq(shows.tmdbId, tmdbId) })
+    );
+    if (row) {
+      showMeta = {
+        title: row.title,
+        networks: row.networks,
+        firstAirDate: row.firstAirDate,
+      };
+    }
+  } catch {
+    /* overlay is best-effort; fall back to TMDB dates */
+  }
+
+  const fetchedEpisodes = await fetchEpisodesFromTmdb(
+    tmdbId,
+    numberOfSeasons,
+    showMeta.title,
+    showMeta.networks,
+    showMeta.firstAirDate
+  );
 
   // Ensure parent exists first in background chain, then episodes with retry
   void (async () => {

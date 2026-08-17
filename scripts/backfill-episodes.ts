@@ -2,15 +2,26 @@ import "dotenv/config";
 import { db } from "../lib/db";
 import { shows, episodes } from "../lib/schema";
 import { getTvSeason } from "../lib/tmdb";
+import { getTvmazeAirdateMap, isAppleTv } from "../lib/tvmaze";
 import { sql } from "drizzle-orm";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function backfillShow(
   tmdbId: number,
-  numberOfSeasons: number | null
+  numberOfSeasons: number | null,
+  networks: string[] | null,
+  title: string | null,
+  firstAirDate: string | null
 ): Promise<number> {
   if (!numberOfSeasons || numberOfSeasons <= 0) return 0;
+
+  // Apple TV+ episodes: TMDB records the Pacific date (1 day early); TVMaze
+  // carries the official Eastern date. Overlay TVMaze so air dates match
+  // Apple/Google/RT for the whole show.
+  const tvmazeAirdates = isAppleTv(networks)
+    ? await getTvmazeAirdateMap(title ?? "", firstAirDate)
+    : null;
 
   let inserted = 0;
 
@@ -26,7 +37,10 @@ async function backfillShow(
         episodeNumber: ep.episode_number,
         title: ep.name || `Episode ${ep.episode_number}`,
         overview: ep.overview ?? null,
-        airDate: ep.air_date ?? null,
+        airDate:
+          tvmazeAirdates?.get(`${ep.season_number}:${ep.episode_number}`) ??
+          ep.air_date ??
+          null,
         stillPath: ep.still_path ?? null,
         runtime: ep.runtime ?? null,
       }));
@@ -72,6 +86,8 @@ async function main() {
       tmdbId: shows.tmdbId,
       title: shows.title,
       numberOfSeasons: shows.numberOfSeasons,
+      networks: shows.networks,
+      firstAirDate: shows.firstAirDate,
     })
     .from(shows);
 
@@ -91,7 +107,10 @@ async function main() {
       const promise = (async () => {
         const count = await backfillShow(
           show.tmdbId,
-          show.numberOfSeasons
+          show.numberOfSeasons,
+          show.networks,
+          show.title,
+          show.firstAirDate
         ).catch((err) => {
           console.error(`Show ${show.title} (${show.tmdbId}) failed:`, err);
           failed.push({ tmdbId: show.tmdbId, title: show.title });
