@@ -148,13 +148,32 @@ export function isFreshEpisodeDrop(
   return delta <= 0 && delta >= -days;
 }
 
-/** Watch Next vs Haven't-watched. Fresh premieres count even if last watch/follow was months ago. */
+/**
+ * True when every aired unwatched episode is a fresh drop (no older backlog).
+ * Caught-up Foundation + new S4E1 → true. Stopped mid-S2 + S3 premiere → false.
+ */
+export function isCaughtUpFreshDrop(
+  episodes: EpisodeInfo[],
+  watchedKeys: Set<WatchedKey>,
+  now: Date = new Date(),
+  days = WATCH_NEXT_DAYS
+): boolean {
+  const leftovers = episodes.filter(
+    (ep) =>
+      isEpisodeAired(ep.airDate, now) &&
+      !watchedKeys.has(makeWatchedKey(ep.seasonNumber, ep.episodeNumber))
+  );
+  if (leftovers.length === 0) return false;
+  return leftovers.every((ep) => isFreshEpisodeDrop(ep.airDate, now, days));
+}
+
+/** Watch Next vs Haven't-watched. Fresh premieres count only if you were current. */
 export function belongsInWatchNext(opts: {
   status: string;
   followedAt: Date | null | undefined;
   lastActivityAt: Date | null | undefined;
   hasWatches: boolean;
-  nextAirDate: string | null | undefined;
+  caughtUpFreshDrop?: boolean;
   now?: Date;
 }): boolean {
   if (opts.status === "for_later") return false;
@@ -166,9 +185,7 @@ export function belongsInWatchNext(opts: {
     opts.followedAt != null &&
     opts.followedAt.getTime() > cutoff &&
     !opts.hasWatches;
-  return (
-    isRecent || isNewlyFollowed || isFreshEpisodeDrop(opts.nextAirDate, now)
-  );
+  return isRecent || isNewlyFollowed || opts.caughtUpFreshDrop === true;
 }
 
 export function computeUpcomingEpisodes(

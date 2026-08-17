@@ -24,6 +24,7 @@ import {
   computeNextEpisode,
   computeUpcomingEpisodes,
   effectiveLastWatchedAt,
+  isCaughtUpFreshDrop,
   isEpisodeAired,
   makeWatchedKey,
   EpisodeInfo,
@@ -81,7 +82,10 @@ export default async function ShowsPage({
   );
 
   const watching = userShowsList.filter(
-    (s) => s.status === "watching" || s.status === "for_later"
+    (s) =>
+      s.status === "watching" ||
+      s.status === "for_later" ||
+      s.status === "completed"
   );
 
   const watchingIds = watching.map((s) => s.tmdbId);
@@ -241,7 +245,7 @@ export default async function ShowsPage({
           followedAt: show.followedAt,
           lastActivityAt: effective,
           hasWatches: watchedAtsByShow.has(show.tmdbId),
-          nextAirDate: nextEpisode?.airDate,
+          caughtUpFreshDrop: isCaughtUpFreshDrop(showEpisodes, showWatched),
         })
       ) {
         watchNext.push(item);
