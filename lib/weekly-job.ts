@@ -1,12 +1,11 @@
 /**
- * Thursday-night weekly job, triggered by GitHub Actions → /api/cron/weekly
+ * Refresh job, triggered by GitHub Actions → /api/cron/weekly every 2 days
  * (or locally via scripts/weekly-refresh.ts):
  *
  *   1) RT sweep — resolve Tomatometer/Popcornmeter/Metacritic for rows that
  *      still have none (rt_score NULL or -1), plus re-check recent releases
  *      whose meters still move. Heals titles the lazy per-page fill missed.
- *   2) Surprise pool rebuild — fresh week-seeded TMDB slices into
- *      surprise_pool so the pick list never runs dry.
+ *   2) Surprise pool rebuild — 2-day-seeded TMDB slices into surprise_pool.
  */
 
 import { db, withDbRetry, pingDb } from "./db";

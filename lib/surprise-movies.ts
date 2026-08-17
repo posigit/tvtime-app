@@ -31,37 +31,27 @@ function toSurprise(card: TmdbMovieCard, badge: string): SurpriseMovie {
   };
 }
 
-/** ISO week key, e.g. "2026-W31" — the pool is rebuilt once per week. */
-export function isoWeekKey(date = new Date()): string {
-  const d = new Date(
-    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
-  );
-  // Thursday of this week decides the ISO year/week
-  d.setUTCDate(d.getUTCDate() + 3 - ((d.getUTCDay() + 6) % 7));
-  const week1 = new Date(Date.UTC(d.getUTCFullYear(), 0, 4));
-  const week =
-    1 +
-    Math.round(
-      ((d.getTime() - week1.getTime()) / 86400000 -
-        3 +
-        ((week1.getUTCDay() + 6) % 7)) /
-        7
-    );
-  return `${d.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
+/** Number of 2-day periods since epoch — this is what actually rotates the pool. */
+export function rotationPeriod(date = new Date()): number {
+  return Math.floor(date.getTime() / 86_400_000 / 2);
 }
 
-function weekNumber(weekKey: string): number {
-  const m = weekKey.match(/-W(\d+)$/);
+/** Cosmetic label stored on the row, e.g. "2026-P183". Trailing digits seed slices. */
+export function periodKey(date = new Date()): string {
+  return `${date.getUTCFullYear()}-P${String(rotationPeriod(date)).padStart(4, "0")}`;
+}
+
+function periodNumber(key: string): number {
+  const m = key.match(/(\d+)$/);
   return m ? Number(m[1]) : 0;
 }
 
 type Slice = { badge: string; fetch: () => Promise<TmdbMovieCard[]> };
 
 /**
- * Deterministic weekly rotation helpers. The KEY insight: rotating only the
- * PAGE number of a fixed sort returns the same ~250 movies every week (they're
- * the only ones clearing the filter). Real rotation rotates the SORT AXIS and
- * samples deeper pages, so each week genuinely pulls a different population.
+ * Deterministic rotation: sort axis + genre offset + deep page all derive
+ * from the 2-day period number. Same period → same pool; next period → new
+ * population. Rotating only the cron without changing the seed is a no-op.
  */
 const SORTS = [
   "popularity.desc",
@@ -88,8 +78,8 @@ const GENRES: Array<{ id: string; label: string }> = [
 ];
 
 function poolSlices(weekKey: string): Slice[] {
-  const w = weekNumber(weekKey);
-  // Pick 3 genre axes per week (rotating offset so all 12 surface over time)
+  const w = periodNumber(weekKey);
+  // Pick 3 genre axes per period (rotating offset so all 12 surface over time)
   const genreStart = (w * 2) % GENRES.length;
   const genres = [
     GENRES[genreStart],
@@ -111,8 +101,8 @@ function poolSlices(weekKey: string): Slice[] {
     // the same ~100 movies; that wall is why the pool never looked different).
     { badge: "Top rated", fetch: () => safe(getTopRatedMoviesPage(1)) },
 
-    // Rotating sort axis — the same discover call but a different population
-    // every week (popularity / revenue / vote count / release date / score).
+    // Rotating sort axis — a different population every period
+    // (popularity / revenue / vote count / release date / score).
     ...[1, 2, 3].map((n) => ({
       badge: "Now trending",
       fetch: () => safe(discoverGreatMovies(deepPage(n), { sortBy: sort(), ...L })),
@@ -223,14 +213,14 @@ function dedupeAndSort(
 }
 
 /**
- * Rebuild the surprise pool table for the current ISO week.
- * Called by the weekly cron (Thursday night) and scripts/weekly-refresh.ts.
+ * Rebuild the surprise pool table for the current 2-day period.
+ * Called by the refresh cron and scripts/weekly-refresh.ts.
  */
 export async function rebuildSurprisePool(): Promise<{
   week: string;
   count: number;
 }> {
-  const week = isoWeekKey();
+  const week = periodKey();
   const tagged = await fetchPoolCards(week);
   const pool = dedupeAndSort(tagged, new Set());
 
@@ -254,7 +244,7 @@ export async function rebuildSurprisePool(): Promise<{
 
 /**
  * Pool of great films the user has not watched (and not already listed).
- * Reads the weekly-built table; falls back to a live TMDB build when empty
+ * Reads the cron-built table; falls back to a live TMDB build when empty
  * (e.g. before the first cron run).
  */
 export async function getUnseenGreatMoviesPool(
@@ -290,6 +280,6 @@ export async function getUnseenGreatMoviesPool(
   }
 
   // Fallback: live build (pre-cron) — the canon slices only
-  const tagged = await fetchPoolCards(isoWeekKey());
+  const tagged = await fetchPoolCards(periodKey());
   return dedupeAndSort(tagged, excludeIds);
 }

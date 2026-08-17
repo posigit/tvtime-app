@@ -1,6 +1,10 @@
 /**
- * Reddit discussion search via PullPush (reliable from cloud hosts).
- * Falls back to official OAuth / public JSON when configured.
+ * Reddit discussion search.
+ *
+ * Order: official OAuth (if REDDIT_CLIENT_ID + REDDIT_CLIENT_SECRET), then
+ * Arctic Shift. PullPush 429s automated clients; reddit.com JSON 403s from
+ * cloud IPs. Huge subs (movies/television) time out on Arctic without a
+ * date bound, so those are searched last with after=2010.
  */
 
 export type RedditSubmission = {
@@ -15,6 +19,21 @@ export type RedditSubmission = {
   num_comments: number;
 };
 
+const ARCTIC_SEARCH = "https://arctic-shift.photon-reddit.com/api/posts/search";
+const REDDIT_TOKEN_URL = "https://www.reddit.com/api/v1/access_token";
+const REDDIT_OAUTH = "https://oauth.reddit.com";
+
+const SEARCH_CACHE_OK_MS = 30 * 60 * 1000;
+const SEARCH_CACHE_FAIL_MS = 2 * 60 * 1000;
+const LARGE_SUBS = new Set(["movies", "television"]);
+
+const searchCache = new Map<
+  string,
+  { hits: RedditSubmission[]; expiresAt: number }
+>();
+
+let oauthToken: { value: string; expiresAt: number } | null = null;
+
 function redditUserAgent() {
   return (
     process.env.REDDIT_USER_AGENT?.trim() ||
@@ -22,8 +41,19 @@ function redditUserAgent() {
   );
 }
 
-function normalizeRow(row: Record<string, unknown>, fallbackSub: string): RedditSubmission | null {
-  const id = String(row.id ?? row.name ?? "");
+function jsonHeaders(extra?: Record<string, string>): Record<string, string> {
+  return {
+    Accept: "application/json",
+    "User-Agent": redditUserAgent(),
+    ...extra,
+  };
+}
+
+export function normalizeRow(
+  row: Record<string, unknown>,
+  fallbackSub: string
+): RedditSubmission | null {
+  const id = String(row.id ?? row.name ?? "").replace(/^t3_/, "");
   if (!id) return null;
   if (row.stickied || row.over_18) return null;
 
@@ -34,7 +64,19 @@ function normalizeRow(row: Record<string, unknown>, fallbackSub: string): Reddit
   if (permalink && !permalink.startsWith("http")) {
     permalink = `https://www.reddit.com${permalink}`;
   }
-  if (!permalink && row.url) permalink = String(row.url);
+  if (!permalink) {
+    const url = typeof row.url === "string" ? row.url : "";
+    permalink = url.includes("reddit.com")
+      ? url
+      : `https://www.reddit.com/r/${row.subreddit ?? fallbackSub}/comments/${id}/`;
+  }
+
+  const created =
+    typeof row.created_utc === "number"
+      ? row.created_utc
+      : typeof row.created_utc === "string" && /^\d+$/.test(row.created_utc)
+        ? Number(row.created_utc)
+        : null;
 
   return {
     id,
@@ -45,78 +87,177 @@ function normalizeRow(row: Record<string, unknown>, fallbackSub: string): Reddit
     title,
     selftext: String(row.selftext ?? "").trim(),
     permalink,
-    created_utc:
-      typeof row.created_utc === "number" ? row.created_utc : null,
+    created_utc: created,
     subreddit: String(row.subreddit ?? fallbackSub),
     score: typeof row.score === "number" ? row.score : 0,
     num_comments: typeof row.num_comments === "number" ? row.num_comments : 0,
   };
 }
 
-/** PullPush title search — most reliable path from Vercel/etc. */
-// PullPush rate-limits automated clients (429). Fail fast (2.5s) and cache
-// failures 15 min so page loads don't stack four long requests.
-const pullPushCache = new Map<
-  string,
-  { hits: RedditSubmission[]; expiresAt: number }
->();
-const PULLPUSH_FAIL_TTL_MS = 15 * 60 * 1000;
-const PULLPUSH_OK_TTL_MS = 30 * 60 * 1000;
+/** Arctic `{data: Row[]}` or official `{data:{children:[{data}]}}`. */
+export function listingRows(json: unknown): Record<string, unknown>[] {
+  if (!json || typeof json !== "object") return [];
+  const root = json as Record<string, unknown>;
+  if (Array.isArray(root.data)) {
+    return root.data.filter(
+      (r): r is Record<string, unknown> => !!r && typeof r === "object"
+    );
+  }
+  const inner = root.data;
+  if (inner && typeof inner === "object") {
+    const children = (inner as { children?: unknown }).children;
+    if (Array.isArray(children)) {
+      return children
+        .map((c) =>
+          c && typeof c === "object"
+            ? ((c as { data?: unknown }).data ?? null)
+            : null
+        )
+        .filter((r): r is Record<string, unknown> => !!r && typeof r === "object");
+    }
+  }
+  return [];
+}
 
-async function searchPullPushByTitle(
+function cacheGet(key: string): RedditSubmission[] | null {
+  const hit = searchCache.get(key);
+  if (!hit || hit.expiresAt <= Date.now()) return null;
+  return hit.hits;
+}
+
+function cacheSet(key: string, hits: RedditSubmission[], ttl: number) {
+  searchCache.set(key, { hits, expiresAt: Date.now() + ttl });
+}
+
+async function getOauthToken(): Promise<string | null> {
+  const id = process.env.REDDIT_CLIENT_ID?.trim();
+  const secret = process.env.REDDIT_CLIENT_SECRET?.trim();
+  if (!id || !secret) return null;
+  if (oauthToken && oauthToken.expiresAt > Date.now() + 30_000) {
+    return oauthToken.value;
+  }
+
+  const basic = Buffer.from(`${id}:${secret}`).toString("base64");
+  try {
+    const res = await fetch(REDDIT_TOKEN_URL, {
+      method: "POST",
+      headers: {
+        ...jsonHeaders({
+          Authorization: `Basic ${basic}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        }),
+      },
+      body: "grant_type=client_credentials",
+      signal: AbortSignal.timeout(5_000),
+    });
+    if (!res.ok) {
+      console.error(`Reddit OAuth token ${res.status}`);
+      return null;
+    }
+    const json = (await res.json()) as {
+      access_token?: string;
+      expires_in?: number;
+    };
+    if (!json.access_token) return null;
+    oauthToken = {
+      value: json.access_token,
+      expiresAt: Date.now() + Math.max(60, json.expires_in ?? 3600) * 1000,
+    };
+    return oauthToken.value;
+  } catch (err) {
+    console.error(
+      "Reddit OAuth token:",
+      err instanceof Error ? err.message : err
+    );
+    return null;
+  }
+}
+
+async function searchOfficial(
   title: string,
-  subreddit: string,
-  size = 50
-): Promise<RedditSubmission[]> {
-  const cacheKey = `${title.toLowerCase()}|${subreddit}|${size}`;
-  const cached = pullPushCache.get(cacheKey);
-  if (cached && cached.expiresAt > Date.now()) return cached.hits;
+  subreddits: string[],
+  limit: number
+): Promise<RedditSubmission[] | null> {
+  const token = await getOauthToken();
+  if (!token) return null;
+
+  const joined = subreddits.join("+");
+  const url = new URL(`${REDDIT_OAUTH}/r/${joined}/search`);
+  url.searchParams.set("q", title);
+  url.searchParams.set("restrict_sr", "1");
+  url.searchParams.set("sort", "top");
+  url.searchParams.set("t", "all");
+  url.searchParams.set("limit", String(Math.min(limit, 25)));
+  url.searchParams.set("type", "link");
+  url.searchParams.set("raw_json", "1");
 
   try {
-    const url = new URL("https://api.pullpush.io/reddit/search/submission/");
-    // `title=` matches post titles; plain `q=` is full-text noise
-    url.searchParams.set("title", title);
-    url.searchParams.set("subreddit", subreddit);
-    url.searchParams.set("size", String(size));
-    url.searchParams.set("sort", "desc");
-    url.searchParams.set("sort_type", "score");
-
     const res = await fetch(url.toString(), {
-      headers: {
-        Accept: "application/json",
-        "User-Agent": redditUserAgent(),
-      },
-      signal: AbortSignal.timeout(2_500),
+      headers: jsonHeaders({ Authorization: `Bearer ${token}` }),
+      signal: AbortSignal.timeout(6_000),
       next: { revalidate: 1800 },
     });
     if (!res.ok) {
-      // 429/5xx: cache the failure so we don't re-hit for 15 min.
-      pullPushCache.set(cacheKey, {
-        hits: [],
-        expiresAt: Date.now() + PULLPUSH_FAIL_TTL_MS,
-      });
-      console.error(`PullPush ${subreddit} ${res.status}`);
+      console.error(`Reddit OAuth search ${res.status}`);
       return [];
     }
+    const rows = listingRows(await res.json());
+    return rows
+      .map((r) => normalizeRow(r, subreddits[0] ?? "movies"))
+      .filter((x): x is RedditSubmission => x != null);
+  } catch (err) {
+    console.error(
+      "Reddit OAuth search:",
+      err instanceof Error ? err.message : err
+    );
+    return [];
+  }
+}
 
-    const json = (await res.json()) as { data?: Record<string, unknown>[] };
-    const rows = json.data ?? [];
+async function searchArctic(
+  title: string,
+  subreddit: string,
+  limit: number
+): Promise<RedditSubmission[]> {
+  const cacheKey = `arctic|${title.toLowerCase()}|${subreddit}|${limit}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) return cached;
+
+  const url = new URL(ARCTIC_SEARCH);
+  url.searchParams.set("subreddit", subreddit);
+  url.searchParams.set("title", title);
+  url.searchParams.set("limit", String(Math.min(limit, 25)));
+  url.searchParams.set("sort", "desc");
+  url.searchParams.set("over_18", "false");
+  url.searchParams.set(
+    "fields",
+    "id,title,selftext,url,created_utc,subreddit,score,num_comments,author,over_18"
+  );
+  if (LARGE_SUBS.has(subreddit.toLowerCase())) {
+    url.searchParams.set("after", "2010-01-01");
+  }
+
+  try {
+    const res = await fetch(url.toString(), {
+      headers: jsonHeaders(),
+      signal: AbortSignal.timeout(10_000),
+      next: { revalidate: 1800 },
+    });
+    if (!res.ok) {
+      cacheSet(cacheKey, [], SEARCH_CACHE_FAIL_MS);
+      console.error(`Arctic Shift ${subreddit} ${res.status}`);
+      return [];
+    }
+    const rows = listingRows(await res.json());
     const hits = rows
       .map((r) => normalizeRow(r, subreddit))
       .filter((x): x is RedditSubmission => x != null);
-    pullPushCache.set(cacheKey, {
-      hits,
-      expiresAt: Date.now() + PULLPUSH_OK_TTL_MS,
-    });
+    cacheSet(cacheKey, hits, SEARCH_CACHE_OK_MS);
     return hits;
   } catch (err) {
-    // Timeout/network: treat like a short-lived failure so the page doesn't stall.
-    pullPushCache.set(cacheKey, {
-      hits: [],
-      expiresAt: Date.now() + PULLPUSH_FAIL_TTL_MS,
-    });
+    cacheSet(cacheKey, [], SEARCH_CACHE_FAIL_MS);
     console.error(
-      `PullPush ${subreddit}:`,
+      `Arctic Shift ${subreddit}:`,
       err instanceof Error ? err.message : err
     );
     return [];
@@ -138,7 +279,6 @@ function isRelevant(post: RedditSubmission, mediaTitle: string): boolean {
   const tokens = titleTokens(mediaTitle);
   if (tokens.length === 0) return true;
   const hits = tokens.filter((t) => hay.includes(t)).length;
-  // Need most distinctive words in the post title
   return hits >= Math.min(tokens.length, Math.max(1, tokens.length - 1));
 }
 
@@ -146,12 +286,38 @@ function dedupe(items: RedditSubmission[]): RedditSubmission[] {
   const seen = new Set<string>();
   const out: RedditSubmission[] = [];
   for (const it of items) {
-    const key = it.id;
-    if (seen.has(key)) continue;
-    seen.add(key);
+    if (seen.has(it.id)) continue;
+    seen.add(it.id);
     out.push(it);
   }
   return out;
+}
+
+function rankHits(
+  batches: RedditSubmission[][],
+  title: string
+): RedditSubmission[] {
+  let hits = dedupe(batches.flat());
+  const relevant = hits.filter((h) => isRelevant(h, title));
+  hits = relevant.length >= 3 ? relevant : relevant;
+
+  if (hits.length === 0) {
+    hits = dedupe(batches.flat()).filter((h) => {
+      const tokens = titleTokens(title);
+      const hay = `${h.title} ${h.selftext}`.toLowerCase();
+      return tokens.some((t) => hay.includes(t));
+    });
+  }
+
+  hits = hits.filter(
+    (h) => h.selftext.length >= 80 || h.num_comments >= 8 || h.score >= 25
+  );
+
+  hits.sort(
+    (a, b) =>
+      b.score + b.num_comments * 3 - (a.score + a.num_comments * 3)
+  );
+  return hits;
 }
 
 /**
@@ -165,43 +331,36 @@ export async function searchRedditDiscussions(opts: {
 }): Promise<RedditSubmission[]> {
   const title = opts.title.trim();
   if (!title) return [];
+  const limit = opts.limit ?? 15;
 
-  const subs =
+  // One small discussion sub — r/movies and r/television time out on Arctic,
+  // and two parallel searches 422 the free archive.
+  const primary = opts.kind === "movie" ? "MovieSuggestions" : "televisionsuggestions";
+  const oauthSubs =
     opts.kind === "movie"
-      ? ["movies", "TrueFilm", "MovieSuggestions", "criterion"]
-      : ["television", "TrueFilm", "televisionsuggestions", "series"];
+      ? ["movies", "MovieSuggestions", "TrueFilm"]
+      : ["television", "televisionsuggestions", "series"];
 
-  const batches = await Promise.all(
-    subs.map((sub) => searchPullPushByTitle(title, sub, 40))
-  );
-  let hits = dedupe(batches.flat());
+  const cacheKey = `all|${opts.kind}|${title.toLowerCase()}|${limit}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) return cached.slice(0, limit);
 
-  // Prefer posts whose *title* is actually about this media
-  const relevant = hits.filter((h) => isRelevant(h, title));
-  hits = relevant.length >= 3 ? relevant : hits.filter((h) => isRelevant(h, title) || (h.score >= 50 && isRelevant(h, title)));
-  // If still empty, keep score-sorted posts that mention at least one token
-  if (hits.length === 0) {
-    hits = dedupe(batches.flat()).filter((h) => {
-      const tokens = titleTokens(title);
-      const hay = `${h.title} ${h.selftext}`.toLowerCase();
-      return tokens.some((t) => hay.includes(t));
-    });
+  const official = await searchOfficial(title, oauthSubs, 25);
+  if (official && official.length > 0) {
+    const ranked = rankHits([official], title).slice(0, limit);
+    cacheSet(cacheKey, ranked, SEARCH_CACHE_OK_MS);
+    return ranked;
   }
 
-  // Prefer engaged threads; allow short selftext if comments/score exist
-  hits = hits.filter(
-    (h) =>
-      h.selftext.length >= 80 ||
-      h.num_comments >= 8 ||
-      h.score >= 25
-  );
+  const batches = [await searchArctic(title, primary, 15)];
 
-  hits.sort(
-    (a, b) =>
-      b.score + b.num_comments * 3 - (a.score + a.num_comments * 3)
+  const ranked = rankHits(batches, title).slice(0, limit);
+  cacheSet(
+    cacheKey,
+    ranked,
+    ranked.length > 0 ? SEARCH_CACHE_OK_MS : SEARCH_CACHE_FAIL_MS
   );
-
-  return hits.slice(0, opts.limit ?? 15);
+  return ranked;
 }
 
 export function redditSearchUrl(title: string, kind: "movie" | "tv") {

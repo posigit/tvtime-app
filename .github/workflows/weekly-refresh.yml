@@ -1,7 +1,7 @@
-# Thursday-night refresh (Fri 00:00 UTC = Thursday evening US):
+# Every-2-days refresh (00:00 UTC on odd calendar days):
 #   - RT sweep: resolve missing Rotten Tomatoes / Popcornmeter / Metacritic
 #     scores for shows & movies that still have none, re-check recent releases
-#   - Surprise Me pool rebuild (fresh week-seeded TMDB slices)
+#   - Surprise Me pool rebuild (2-day-seeded TMDB slices)
 #
 # Requires repo secrets:
 #   APP_URL      e.g. https://your-app.up.railway.app  (no trailing slash)
@@ -11,7 +11,7 @@ name: Weekly refresh
 
 on:
   schedule:
-    - cron: "0 0 * * 5" # Friday 00:00 UTC
+    - cron: "0 0 */2 * *" # 00:00 UTC every 2 calendar days
   workflow_dispatch: # manual run from Actions tab
 
 jobs:

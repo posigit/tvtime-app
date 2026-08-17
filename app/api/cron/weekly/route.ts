@@ -5,9 +5,9 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 /**
- * Thursday-night weekly job (GitHub Actions → here, Fri 00:00 UTC):
+ * Refresh job (GitHub Actions → here, every 2 days at 00:00 UTC):
  *   1) RT sweep — resolve missing Tomatometer/Popcornmeter/Metacritic scores
- *   2) Surprise pool rebuild — fresh week-seeded pool
+ *   2) Surprise pool rebuild — 2-day-seeded pool
  *
  * Requires CRON_SECRET:
  *   Authorization: Bearer <secret>   or   ?secret=<secret>

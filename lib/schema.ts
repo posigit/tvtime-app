@@ -233,7 +233,7 @@ export const userLists = pgTable("user_lists", {
 });
 
 /**
- * Surprise Me pool — rebuilt weekly by /api/cron/weekly (Thursday night).
+ * Surprise Me pool — rebuilt every 2 days by /api/cron/weekly.
  * Pages read this table instead of hammering TMDB discover on every load.
  */
 export const surprisePool = pgTable("surprise_pool", {
@@ -245,7 +245,7 @@ export const surprisePool = pgTable("surprise_pool", {
   voteAverage: real("vote_average"),
   /** "Top rated" | "Critically acclaimed" | "Classic" | "Hidden gem" | decade… */
   badge: text("badge"),
-  /** ISO week the pool was built for, e.g. "2026-W31". */
+  /** Period the pool was built for, e.g. "2026-P183". */
   week: text("week").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
