@@ -26,6 +26,35 @@ type SortKey = "title" | "rt" | "runtime" | "year";
 
 const PICK_KEY = "surprise-pick";
 const RECENT_KEY = "surprise-recent";
+const PICK_TTL_MS = 10 * 60 * 1000;
+
+type StoredPick = { movie: LaterMovie; savedAt: number };
+
+function readStoredPick(): LaterMovie | null {
+  const stored = readJson<StoredPick>(PICK_KEY);
+  if (!stored?.movie || typeof stored.movie.tmdbId !== "number") {
+    clearStoredPick();
+    return null;
+  }
+  if (
+    typeof stored.savedAt !== "number" ||
+    Date.now() - stored.savedAt >= PICK_TTL_MS
+  ) {
+    clearStoredPick();
+    return null;
+  }
+  return stored.movie;
+}
+
+function writeStoredPick(movie: LaterMovie) {
+  writeJson(PICK_KEY, { movie, savedAt: Date.now() } satisfies StoredPick);
+}
+
+function pickRemainingMs(): number {
+  const stored = readJson<StoredPick>(PICK_KEY);
+  if (!stored || typeof stored.savedAt !== "number") return 0;
+  return Math.max(0, PICK_TTL_MS - (Date.now() - stored.savedAt));
+}
 
 function readJson<T>(key: string): T | null {
   if (typeof window === "undefined") return null;
@@ -152,12 +181,25 @@ export function WatchLaterTools({
     if (Array.isArray(storedRecent)) {
       recentRef.current = storedRecent.filter((id) => Number.isFinite(id));
     }
-    const stored = readJson<LaterMovie>(PICK_KEY);
-    if (stored && typeof stored.tmdbId === "number" && stored.title) {
-      setPick(stored);
-    }
+    const stored = readStoredPick();
+    if (stored) setPick(stored);
     hydratedRef.current = true;
   }, []);
+
+  useEffect(() => {
+    if (!pick) return;
+    const left = pickRemainingMs();
+    if (left <= 0) {
+      clearStoredPick();
+      setPick(null);
+      return;
+    }
+    const t = window.setTimeout(() => {
+      clearStoredPick();
+      setPick(null);
+    }, left);
+    return () => window.clearTimeout(t);
+  }, [pick]);
 
   const poolAll = useMemo(() => {
     const raw = surprisePool && surprisePool.length > 0 ? surprisePool : items;
@@ -213,7 +255,7 @@ export function WatchLaterTools({
     const maxRemember = Math.max(1, Math.min(poolAll.length - 1, 30));
     recentRef.current = [...recentRef.current, next.tmdbId].slice(-maxRemember);
     writeJson(RECENT_KEY, recentRef.current);
-    writeJson(PICK_KEY, next);
+    writeStoredPick(next);
     setPick(next);
   }
 
