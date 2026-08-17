@@ -1290,7 +1290,6 @@ export function ShowDetailClient({
           title={`${show.title} — S${playerEp.seasonNumber}E${playerEp.episodeNumber} ${playerEp.title}`}
           initialPosition={playbackFor(playerEp)?.positionSeconds}
           autoResume={Boolean(playbackFor(playerEp))}
-          runtimeSeconds={(show.episodeRuntime ?? 0) * 60}
           onEvent={handlePlayerEvent}
           onNearEnd={() => setNearEnd(true)}
           onClose={() => {

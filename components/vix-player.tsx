@@ -98,7 +98,6 @@ export function VixPlayer({
   initialPosition,
   autoResume = false,
   source = "vix",
-  runtimeSeconds,
 }: {
   src: string;
   title: string;
@@ -116,8 +115,6 @@ export function VixPlayer({
   autoResume?: boolean;
   /** Stream backend: "vix" (default) or "goated". */
   source?: "vix" | "goated";
-  /** Known content runtime (seconds) for the wall-clock progress fallback. */
-  runtimeSeconds?: number;
 }) {
   const initialPlaybackKey = makePlaybackKey(type, tmdbId, season, episode);
   const initialResumePosition =
@@ -142,10 +139,6 @@ export function VixPlayer({
   const lastTimeRef = useRef(0);
   const remotePositionRef = useRef(0);
   const remoteDurationRef = useRef(0);
-  // Wall-clock fallback: estimate progress when an embed won't relay PLAYER_EVENT.
-  const wallClockStartRef = useRef<number | null>(null);
-  const wallClockBaseRef = useRef(0);
-  const lastRelayAtRef = useRef(0);
   const bookmarkClearedRef = useRef(false);
   /** Blocks progress writes until resume check (and optional prompt) finishes. */
   const saveEnabledRef = useRef(false);
@@ -173,9 +166,20 @@ export function VixPlayer({
 
   const streamable = type === "movie" || type === "tv";
   // Source backend — prefer last user choice, then prop default.
-  const [activeSource, setActiveSource] = useState<StreamSource>(
-    () => loadVixSettings().preferredSource || source
-  );
+  // Movie-only embeds (empty tvUrl) fall back to vix so the picker label
+  // matches what the iframe actually loads.
+  const [activeSource, setActiveSource] = useState<StreamSource>(() => {
+    const preferred = loadVixSettings().preferredSource || source;
+    if (
+      type &&
+      tmdbId &&
+      EMBED_SOURCES.some((s) => s.key === preferred) &&
+      !embedUrlFor(preferred, type, tmdbId, season, episode)
+    ) {
+      return source;
+    }
+    return preferred;
+  });
   const [playlistUrl, setPlaylistUrl] = useState<string | null>(null);
   // Non-streamable mounts (no type/tmdbId) go straight to iframe fallback.
   const [streamFailed, setStreamFailed] = useState(() => !streamable);
@@ -356,9 +360,6 @@ export function VixPlayer({
     lastSavedAtRef.current = 0;
     remotePositionRef.current = 0;
     remoteDurationRef.current = 0;
-    wallClockStartRef.current = null;
-    wallClockBaseRef.current = 0;
-    lastRelayAtRef.current = 0;
     bookmarkClearedRef.current = false;
     lastTapRef.current = null;
     if (tapCueTimerRef.current) {
@@ -854,12 +855,30 @@ export function VixPlayer({
   }, [initialResumePosition, mode, resumePosition]);
 
   // ---------- source switching ----------
-  // Order: vix (default native), embed sources, goated LAST (degraded backend).
+  // Picker order: vidnest, mapple, cinesrc, 2embed, vidfast, vidlink, then vix.
+  // goated stays last and disabled (degraded backend).
   const ALL_SOURCES: StreamSource[] = [
-    "vix",
     ...EMBED_SOURCES.map((s) => s.key as StreamSource),
+    "vix",
     "goated",
   ];
+  const disabledSources: StreamSource[] = [
+    "goated",
+    ...(type === "tv"
+      ? EMBED_SOURCES.filter((s) => !s.tvUrl(0, 1, 1)).map(
+          (s) => s.key as StreamSource
+        )
+      : []),
+  ];
+  const nextPlayableSource = (current: StreamSource): StreamSource => {
+    const blocked = new Set(disabledSources);
+    const start = ALL_SOURCES.indexOf(current);
+    for (let i = 1; i <= ALL_SOURCES.length; i++) {
+      const next = ALL_SOURCES[(start + i) % ALL_SOURCES.length];
+      if (next && !blocked.has(next)) return next;
+    }
+    return current;
+  };
   const switchSource = useCallback((next: StreamSource) => {
     if (next === activeSource) return;
     const v = videoRef.current;
@@ -1303,55 +1322,50 @@ export function VixPlayer({
     bumpChrome();
   }, [bumpChrome]);
 
-  // ---------- wall-clock progress fallback ----------
-  // Some iframes (e.g. the raw vixsrc fallback) never post PLAYER_EVENT, so
-  // remotePositionRef stays 0 and 92%/96% never fire. When an iframe is
-  // playing but silent for >10s, estimate position from elapsed wall-clock
-  // time (plus the resume base) against the known runtime, and feed the same
-  // near-end/ended detection + save path the real bridge uses.
-  useEffect(() => {
-    if (mode !== "iframe") return;
-    // Fall back to a nominal runtime when the caller doesn't know it (TMDB
-    // often returns null episode_run_time) so the ratio math still works.
-    const dur =
-      runtimeSeconds && runtimeSeconds > 0
-        ? runtimeSeconds
-        : type === "tv"
-          ? 1800
-          : 5400;
-    const timer = setInterval(() => {
-      // Lazy-start the clock on the first tick if the iframe onLoad never fired.
-      if (wallClockStartRef.current == null && lastRelayAtRef.current === 0) {
-        wallClockStartRef.current = Date.now();
-        wallClockBaseRef.current = initialResumePosition ?? 0;
-        return;
-      }
-      const start = wallClockStartRef.current;
-      if (start == null) return;
-      if (Date.now() - start < 10_000) return;
-      const pos = wallClockBaseRef.current + (Date.now() - start) / 1000;
-      if (!nearEndFiredRef.current && isNearEndPosition(pos, dur, NEXT_FAB_RATIO)) {
-        nearEndFiredRef.current = true;
-        onNearEndRef.current?.();
-      }
-      if (!endedRef.current && isFinishedPosition(pos, dur)) {
-        emit("ended");
-        clearPosition();
-        wallClockStartRef.current = null;
-        return;
-      }
-      if (pos < dur) savePosition(pos, dur);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [mode, runtimeSeconds, type, savePosition, clearPosition, emit, initialResumePosition]);
-
   // ---------- iframe fallback: postMessage bridge ----------
   useEffect(() => {
     const handler = (e: MessageEvent) => {
-      const isPlayerEvent =
+      // CineSrc posts cinesrc:* instead of PLAYER_EVENT — normalize the 5
+      // events the bridge already consumes.
+      let data: unknown = e.data;
+      if (
+        e.origin === "https://cinesrc.st" &&
         typeof e.data === "object" &&
-        e.data !== null &&
-        (e.data as { type?: unknown }).type === "PLAYER_EVENT";
+        e.data !== null
+      ) {
+        const rawType = (e.data as { type?: unknown }).type;
+        if (typeof rawType === "string" && rawType.startsWith("cinesrc:")) {
+          const ev = rawType.slice("cinesrc:".length);
+          if (
+            (["play", "pause", "seeked", "ended", "timeupdate"] as const).includes(
+              ev as "play"
+            )
+          ) {
+            const payload = e.data as {
+              currentTime?: unknown;
+              duration?: unknown;
+            };
+            data = {
+              type: "PLAYER_EVENT",
+              data: {
+                event: ev,
+                currentTime:
+                  typeof payload.currentTime === "number"
+                    ? payload.currentTime
+                    : undefined,
+                duration:
+                  typeof payload.duration === "number"
+                    ? payload.duration
+                    : undefined,
+              },
+            };
+          }
+        }
+      }
+      const isPlayerEvent =
+        typeof data === "object" &&
+        data !== null &&
+        (data as { type?: unknown }).type === "PLAYER_EVENT";
       // Nested player frames post from inner windows, so trust any registered
       // embed player origin instead of requiring the exact embed frame/source.
       if (!isEmbedPlayerOrigin(e.origin)) {
@@ -1365,14 +1379,12 @@ export function VixPlayer({
         }
         return;
       }
-      const d = parseVixPlayerEventData(e.data);
+      const d = parseVixPlayerEventData(data);
       if (!d) return;
       emit(d.event);
 
       if (typeof d.currentTime === "number") {
         remotePositionRef.current = d.currentTime;
-        lastRelayAtRef.current = Date.now();
-        wallClockStartRef.current = null;
       }
       if (typeof d.duration === "number" && d.duration > 0) {
         remoteDurationRef.current = d.duration;
@@ -1633,13 +1645,7 @@ export function VixPlayer({
           referrerPolicy="no-referrer"
           allow="autoplay; fullscreen; encrypted-media; picture-in-picture; clipboard-write"
           allowFullScreen
-          onLoad={() => {
-            setIframeError(false);
-            if (lastRelayAtRef.current === 0 && wallClockStartRef.current == null) {
-              wallClockStartRef.current = Date.now();
-              wallClockBaseRef.current = initialResumePosition ?? 0;
-            }
-          }}
+          onLoad={() => setIframeError(false)}
           onError={() => setIframeError(true)}
           className="h-full w-full border-0 bg-black"
         />
@@ -1714,14 +1720,11 @@ export function VixPlayer({
           onPatchSubStyle={patchSubStyle}
           subError={subError}
           onSwitchSource={() => {
-            const idx = ALL_SOURCES.indexOf(activeSource);
-            switchSource(
-              ALL_SOURCES[(idx + 1) % ALL_SOURCES.length] ?? "vix"
-            );
+            switchSource(nextPlayableSource(activeSource));
           }}
           onPickSource={(source) => switchSource(source)}
           sourceOptions={ALL_SOURCES}
-          disabledSources={["goated"]}
+          disabledSources={disabledSources}
           showAutoplayToggle={type === "tv"}
           autoplayNext={autoplayNext}
           onToggleAutoplayNext={() => {
@@ -1799,14 +1802,11 @@ export function VixPlayer({
               <button
                 type="button"
                 onClick={() => {
-                  const idx = ALL_SOURCES.indexOf(activeSource);
-                  switchSource(
-                    ALL_SOURCES[(idx + 1) % ALL_SOURCES.length] ?? "vix"
-                  );
+                  switchSource(nextPlayableSource(activeSource));
                 }}
                 className="mt-4 inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-bold text-black"
               >
-                Try {sourceLabel(ALL_SOURCES[(ALL_SOURCES.indexOf(activeSource) + 1) % ALL_SOURCES.length] ?? "vix")}
+                Try {sourceLabel(nextPlayableSource(activeSource))}
               </button>
             )}
           </div>

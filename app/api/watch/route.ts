@@ -47,14 +47,16 @@ export async function POST(request: Request) {
   const airDateByKey = new Map<string, string | null>();
 
   if (toMark.length > 0) {
-    const showEps = await db
-      .select({
-        seasonNumber: episodes.seasonNumber,
-        episodeNumber: episodes.episodeNumber,
-        airDate: episodes.airDate,
-      })
-      .from(episodes)
-      .where(eq(episodes.showTmdbId, showTmdbId));
+    const showEps = await withDbRetry(() =>
+      db
+        .select({
+          seasonNumber: episodes.seasonNumber,
+          episodeNumber: episodes.episodeNumber,
+          airDate: episodes.airDate,
+        })
+        .from(episodes)
+        .where(eq(episodes.showTmdbId, showTmdbId))
+    );
 
     for (const ep of showEps) {
       airDateByKey.set(
@@ -76,24 +78,26 @@ export async function POST(request: Request) {
         continue;
       }
 
-      await db
-        .insert(watchedEpisodes)
-        .values({
-          userId: session.user.id,
-          showTmdbId: sid,
-          seasonNumber,
-          episodeNumber,
-          watchedAt: new Date(),
-        })
-        .onConflictDoUpdate({
-          target: [
-            watchedEpisodes.userId,
-            watchedEpisodes.showTmdbId,
-            watchedEpisodes.seasonNumber,
-            watchedEpisodes.episodeNumber,
-          ],
-          set: { watchedAt: new Date() },
-        });
+      await withDbRetry(() =>
+        db
+          .insert(watchedEpisodes)
+          .values({
+            userId: session.user.id,
+            showTmdbId: sid,
+            seasonNumber,
+            episodeNumber,
+            watchedAt: new Date(),
+          })
+          .onConflictDoUpdate({
+            target: [
+              watchedEpisodes.userId,
+              watchedEpisodes.showTmdbId,
+              watchedEpisodes.seasonNumber,
+              watchedEpisodes.episodeNumber,
+            ],
+            set: { watchedAt: new Date() },
+          })
+      );
 
       // Watch history entry (append-only — rewatches show up again)
       await withDbRetry(() =>
@@ -109,68 +113,78 @@ export async function POST(request: Request) {
       );
 
       // Episode finished — drop any stale resume bookmark
-      await db
-        .delete(playbackPositions)
-        .where(
-          and(
-            eq(playbackPositions.userId, session.user.id),
-            eq(playbackPositions.mediaType, "tv"),
-            eq(playbackPositions.tmdbId, sid),
-            eq(playbackPositions.seasonNumber, seasonNumber),
-            eq(playbackPositions.episodeNumber, episodeNumber)
+      await withDbRetry(() =>
+        db
+          .delete(playbackPositions)
+          .where(
+            and(
+              eq(playbackPositions.userId, session.user.id),
+              eq(playbackPositions.mediaType, "tv"),
+              eq(playbackPositions.tmdbId, sid),
+              eq(playbackPositions.seasonNumber, seasonNumber),
+              eq(playbackPositions.episodeNumber, episodeNumber)
+            )
           )
-        );
+      );
     } else {
-      await db
-        .delete(watchedEpisodes)
-        .where(
-          and(
-            eq(watchedEpisodes.userId, session.user.id),
-            eq(watchedEpisodes.showTmdbId, sid),
-            eq(watchedEpisodes.seasonNumber, seasonNumber),
-            eq(watchedEpisodes.episodeNumber, episodeNumber)
+      await withDbRetry(() =>
+        db
+          .delete(watchedEpisodes)
+          .where(
+            and(
+              eq(watchedEpisodes.userId, session.user.id),
+              eq(watchedEpisodes.showTmdbId, sid),
+              eq(watchedEpisodes.seasonNumber, seasonNumber),
+              eq(watchedEpisodes.episodeNumber, episodeNumber)
+            )
           )
-        );
+      );
 
       // Unmarking removes the matching history entries + resume bookmark
-      await db
-        .delete(watchHistory)
-        .where(
-          and(
-            eq(watchHistory.userId, session.user.id),
-            eq(watchHistory.mediaType, "tv"),
-            eq(watchHistory.tmdbId, sid),
-            eq(watchHistory.seasonNumber, seasonNumber),
-            eq(watchHistory.episodeNumber, episodeNumber)
+      await withDbRetry(() =>
+        db
+          .delete(watchHistory)
+          .where(
+            and(
+              eq(watchHistory.userId, session.user.id),
+              eq(watchHistory.mediaType, "tv"),
+              eq(watchHistory.tmdbId, sid),
+              eq(watchHistory.seasonNumber, seasonNumber),
+              eq(watchHistory.episodeNumber, episodeNumber)
+            )
           )
-        );
-      await db
-        .delete(playbackPositions)
-        .where(
-          and(
-            eq(playbackPositions.userId, session.user.id),
-            eq(playbackPositions.mediaType, "tv"),
-            eq(playbackPositions.tmdbId, sid),
-            eq(playbackPositions.seasonNumber, seasonNumber),
-            eq(playbackPositions.episodeNumber, episodeNumber)
+      );
+      await withDbRetry(() =>
+        db
+          .delete(playbackPositions)
+          .where(
+            and(
+              eq(playbackPositions.userId, session.user.id),
+              eq(playbackPositions.mediaType, "tv"),
+              eq(playbackPositions.tmdbId, sid),
+              eq(playbackPositions.seasonNumber, seasonNumber),
+              eq(playbackPositions.episodeNumber, episodeNumber)
+            )
           )
-        );
+      );
     }
   }
 
   // Recalculate aggregate state once after the batch
-  const watchedRows = await db
-    .select({
-      seasonNumber: watchedEpisodes.seasonNumber,
-      episodeNumber: watchedEpisodes.episodeNumber,
-    })
-    .from(watchedEpisodes)
-    .where(
-      and(
-        eq(watchedEpisodes.userId, session.user.id),
-        eq(watchedEpisodes.showTmdbId, showTmdbId)
+  const watchedRows = await withDbRetry(() =>
+    db
+      .select({
+        seasonNumber: watchedEpisodes.seasonNumber,
+        episodeNumber: watchedEpisodes.episodeNumber,
+      })
+      .from(watchedEpisodes)
+      .where(
+        and(
+          eq(watchedEpisodes.userId, session.user.id),
+          eq(watchedEpisodes.showTmdbId, showTmdbId)
+        )
       )
-    );
+  );
 
   const count = watchedRows.length;
   const lastWatched = watchedRows
@@ -182,21 +196,23 @@ export async function POST(request: Request) {
     )
     .at(-1);
 
-  await db
-    .update(userShows)
-    .set({
-      lastSeason: lastWatched?.seasonNumber ?? null,
-      lastEpisode: lastWatched?.episodeNumber ?? null,
-      lastWatchedAt: count > 0 ? new Date() : null,
-      episodesWatched: count,
-      updatedAt: new Date(),
-    })
-    .where(
-      and(
-        eq(userShows.userId, session.user.id),
-        eq(userShows.tmdbId, showTmdbId)
+  await withDbRetry(() =>
+    db
+      .update(userShows)
+      .set({
+        lastSeason: lastWatched?.seasonNumber ?? null,
+        lastEpisode: lastWatched?.episodeNumber ?? null,
+        lastWatchedAt: count > 0 ? new Date() : null,
+        episodesWatched: count,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(userShows.userId, session.user.id),
+          eq(userShows.tmdbId, showTmdbId)
+        )
       )
-    );
+  );
 
   return NextResponse.json({
     success: true,

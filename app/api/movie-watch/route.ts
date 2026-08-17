@@ -22,14 +22,16 @@ export async function POST(request: Request) {
   try {
     // status === null → remove from library entirely
     if (status === null) {
-      await db
-        .delete(userMovies)
-        .where(
-          and(
-            eq(userMovies.userId, session.user.id),
-            eq(userMovies.tmdbId, tmdbId)
+      await withDbRetry(() =>
+        db
+          .delete(userMovies)
+          .where(
+            and(
+              eq(userMovies.userId, session.user.id),
+              eq(userMovies.tmdbId, tmdbId)
+            )
           )
-        );
+      );
       return NextResponse.json({ success: true });
     }
 
@@ -45,23 +47,25 @@ export async function POST(request: Request) {
     await ensureMovie(tmdbId);
 
     const now = new Date();
-    await db
-      .insert(userMovies)
-      .values({
-        userId: session.user.id,
-        tmdbId,
-        status,
-        watchedAt: status === "watched" ? now : null,
-        updatedAt: now,
-      })
-      .onConflictDoUpdate({
-        target: [userMovies.userId, userMovies.tmdbId],
-        set: {
+    await withDbRetry(() =>
+      db
+        .insert(userMovies)
+        .values({
+          userId: session.user.id,
+          tmdbId,
           status,
           watchedAt: status === "watched" ? now : null,
           updatedAt: now,
-        },
-      });
+        })
+        .onConflictDoUpdate({
+          target: [userMovies.userId, userMovies.tmdbId],
+          set: {
+            status,
+            watchedAt: status === "watched" ? now : null,
+            updatedAt: now,
+          },
+        })
+    );
 
     if (status === "watched") {
       // Watch history entry + finished → drop any stale resume bookmark
@@ -74,15 +78,17 @@ export async function POST(request: Request) {
           source: "manual",
         })
       );
-      await db
-        .delete(playbackPositions)
-        .where(
-          and(
-            eq(playbackPositions.userId, session.user.id),
-            eq(playbackPositions.mediaType, "movie"),
-            eq(playbackPositions.tmdbId, tmdbId)
+      await withDbRetry(() =>
+        db
+          .delete(playbackPositions)
+          .where(
+            and(
+              eq(playbackPositions.userId, session.user.id),
+              eq(playbackPositions.mediaType, "movie"),
+              eq(playbackPositions.tmdbId, tmdbId)
+            )
           )
-        );
+      );
     }
 
     return NextResponse.json({ success: true });

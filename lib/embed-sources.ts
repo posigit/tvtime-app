@@ -1,20 +1,10 @@
 /**
- * Generic embed-source registry for the native player's iframe fallback.
+ * Embed-source registry for the player's iframe fallback.
  *
- * Every entry is an iframe player that:
- *   - loads a stream from a movie/tv URL
- *   - posts PLAYER_EVENT messages (play/pause/seeked/ended/timeupdate) with
- *     currentTime/duration — the protocol our player bridge already consumes
- *
- * Adding a server = one entry here. No per-server player code.
- *
- * Integration status (2026-08-09):
- *   - vixsrc  : legacy, always-on fallback (existing code path, `src` prop)
- *   - vidfast : added, real domain is vidfast.vc (vidfast.pro is a 301 shell)
- *   - vidlink : added, movie-web resolver API
- *   - others  : same shape (superembed/vidzee/cinesrc/vidnest) — probe each
- *     before adding; fmovies.gd + primewire.mov are scraper sites, NOT clean
- *     embeds, likely need special handling.
+ * Picker order: vidnest, mapple, cinesrc, 2embed, vidfast, vidlink.
+ * Native vix + goated are appended in vix-player (goated last, disabled).
+ * Mapple is movie-only (empty tvUrl). CineSrc posts cinesrc:* events, not
+ * PLAYER_EVENT — vix-player adapts those.
  */
 export type EmbedSourceDef = {
   /** Stable key — persisted as preferredSource. */
@@ -33,6 +23,44 @@ export type EmbedSourceDef = {
 
 export const EMBED_SOURCES: EmbedSourceDef[] = [
   {
+    key: "vidnest",
+    name: "VidNest",
+    base: "https://vidnest.fun",
+    host: "vidnest.fun",
+    movieUrl: (tmdbId) => `https://vidnest.fun/movie/${tmdbId}`,
+    tvUrl: (tmdbId, season, episode) =>
+      `https://vidnest.fun/tv/${tmdbId}/${season}/${episode}`,
+  },
+  {
+    key: "mapple",
+    name: "Mapple",
+    base: "https://mapple.tv",
+    host: "mapple.tv",
+    movieUrl: (tmdbId) => `https://mapple.tv/movie/${tmdbId}`,
+    // Movie-only — empty tvUrl disables this key on TV in the picker.
+    tvUrl: () => "",
+  },
+  {
+    key: "cinesrc",
+    name: "CineSrc",
+    base: "https://cinesrc.st",
+    host: "cinesrc.st",
+    movieUrl: (tmdbId) => `https://cinesrc.st/embed/movie/${tmdbId}`,
+    // TV is query-string; posts cinesrc:* events (adapted in vix-player).
+    tvUrl: (tmdbId, season, episode) =>
+      `https://cinesrc.st/embed/tv/${tmdbId}?s=${season}&e=${episode}`,
+  },
+  {
+    key: "2embed",
+    name: "2Embed",
+    base: "https://www.2embed.cc",
+    host: "2embed.cc",
+    // /embed/ is the player; /movie/{id} is a wrapper landing page.
+    movieUrl: (tmdbId) => `https://www.2embed.cc/embed/${tmdbId}`,
+    tvUrl: (tmdbId, season, episode) =>
+      `https://www.2embed.cc/embedtv/${tmdbId}&s=${season}&e=${episode}`,
+  },
+  {
     key: "vidfast",
     name: "VidFast",
     base: "https://vidfast.vc",
@@ -50,41 +78,33 @@ export const EMBED_SOURCES: EmbedSourceDef[] = [
     tvUrl: (tmdbId, season, episode) =>
       `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?autoplay=true&title=true&poster=true&nextbutton=true`,
   },
-  {
-    key: "vidzee",
-    name: "VidZee",
-    base: "https://vidzee.wtf",
-    host: "vidzee.wtf",
-    movieUrl: (tmdbId) => `https://vidzee.wtf/movie/${tmdbId}`,
-    tvUrl: (tmdbId, season, episode) =>
-      `https://vidzee.wtf/tv/${tmdbId}/${season}/${episode}`,
-  },
-  {
-    key: "vidnest",
-    name: "VidNest",
-    base: "https://vidnest.fun",
-    host: "vidnest.fun",
-    movieUrl: (tmdbId) => `https://vidnest.fun/movie/${tmdbId}`,
-    tvUrl: (tmdbId, season, episode) =>
-      `https://vidnest.fun/tv/${tmdbId}/${season}/${episode}`,
-  },
-  {
-    key: "cinesrc",
-    name: "CineSrc",
-    base: "https://cinesrc.st",
-    host: "cinesrc.st",
-    movieUrl: (tmdbId) => `https://cinesrc.st/embed/movie/${tmdbId}`,
-    // TV path shape not confirmed (all probed patterns 404) — leave movie-only
-    // until a working tv shape is found; the player falls back to the next source.
-    tvUrl: () => "",
-  },
 ];
 
-/** True for any registered embed host (and its subdomains). */
+/** Origins that must keep accepting PLAYER_EVENT: the vixsrc iframe fallback
+ *  plus vidfast's documented mirror hosts (dropping any kills progress). */
+const LEGACY_PLAYER_ORIGINS = [
+  "vixsrc.to",
+  "vidfast.pro",
+  "vidfast.in",
+  "vidfast.io",
+  "vidfast.me",
+  "vidfast.net",
+  "vidfast.pm",
+  "vidfast.vc",
+  "vidfast.xyz",
+  "vidfast.bz",
+];
 export function isEmbedPlayerOrigin(origin: string): boolean {
   try {
     const url = new URL(origin);
     if (url.protocol !== "https:") return false;
+    if (
+      LEGACY_PLAYER_ORIGINS.some(
+        (h) => url.hostname === h || url.hostname.endsWith(`.${h}`)
+      )
+    ) {
+      return true;
+    }
     return EMBED_SOURCES.some(
       (s) =>
         url.hostname === s.host || url.hostname.endsWith(`.${s.host}`)

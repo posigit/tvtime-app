@@ -571,7 +571,7 @@ export function PlayerTopChrome({
                 <div
                   role="menu"
                   aria-label="Stream sources"
-                  className="absolute right-0 top-full z-30 mt-2 w-48 overflow-hidden rounded-xl border border-white/15 bg-white/[0.06] shadow-2xl backdrop-blur-2xl"
+                  className="absolute right-0 top-full z-30 mt-2 max-h-[min(70vh,28rem)] w-48 max-w-[calc(100vw-1.5rem)] overflow-y-auto overscroll-contain rounded-xl border border-white/15 bg-white/[0.06] shadow-2xl backdrop-blur-2xl"
                 >
                   {sourceOptions.map((key) => {
                     const disabled = disabledSources.includes(key);

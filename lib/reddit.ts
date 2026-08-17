@@ -54,11 +54,24 @@ function normalizeRow(row: Record<string, unknown>, fallbackSub: string): Reddit
 }
 
 /** PullPush title search — most reliable path from Vercel/etc. */
+// PullPush rate-limits automated clients (429). Fail fast (2.5s) and cache
+// failures 15 min so page loads don't stack four long requests.
+const pullPushCache = new Map<
+  string,
+  { hits: RedditSubmission[]; expiresAt: number }
+>();
+const PULLPUSH_FAIL_TTL_MS = 15 * 60 * 1000;
+const PULLPUSH_OK_TTL_MS = 30 * 60 * 1000;
+
 async function searchPullPushByTitle(
   title: string,
   subreddit: string,
   size = 50
 ): Promise<RedditSubmission[]> {
+  const cacheKey = `${title.toLowerCase()}|${subreddit}|${size}`;
+  const cached = pullPushCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) return cached.hits;
+
   try {
     const url = new URL("https://api.pullpush.io/reddit/search/submission/");
     // `title=` matches post titles; plain `q=` is full-text noise
@@ -73,19 +86,35 @@ async function searchPullPushByTitle(
         Accept: "application/json",
         "User-Agent": redditUserAgent(),
       },
+      signal: AbortSignal.timeout(2_500),
       next: { revalidate: 1800 },
     });
     if (!res.ok) {
+      // 429/5xx: cache the failure so we don't re-hit for 15 min.
+      pullPushCache.set(cacheKey, {
+        hits: [],
+        expiresAt: Date.now() + PULLPUSH_FAIL_TTL_MS,
+      });
       console.error(`PullPush ${subreddit} ${res.status}`);
       return [];
     }
 
     const json = (await res.json()) as { data?: Record<string, unknown>[] };
     const rows = json.data ?? [];
-    return rows
+    const hits = rows
       .map((r) => normalizeRow(r, subreddit))
       .filter((x): x is RedditSubmission => x != null);
+    pullPushCache.set(cacheKey, {
+      hits,
+      expiresAt: Date.now() + PULLPUSH_OK_TTL_MS,
+    });
+    return hits;
   } catch (err) {
+    // Timeout/network: treat like a short-lived failure so the page doesn't stall.
+    pullPushCache.set(cacheKey, {
+      hits: [],
+      expiresAt: Date.now() + PULLPUSH_FAIL_TTL_MS,
+    });
     console.error(
       `PullPush ${subreddit}:`,
       err instanceof Error ? err.message : err

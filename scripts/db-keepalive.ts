@@ -8,8 +8,12 @@
  *   cd C:\Users\USER\Desktop\tvtime-data\tvtime-app && npx tsx scripts\db-keepalive.ts
  *
  * Prefer hitting /api/health on a deployed app if the PC is not always on.
+ *
+ * Loads .env.local over .env so local keepalive hits the active DATABASE_URL.
  */
 import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.local", override: true });
 import { pingDb, pool } from "../lib/db";
 
 async function main() {

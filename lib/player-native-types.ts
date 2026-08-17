@@ -14,9 +14,10 @@ export type StreamSource =
   | "goated"
   | "vidfast"
   | "vidlink"
-  | "vidzee"
   | "vidnest"
-  | "cinesrc";
+  | "cinesrc"
+  | "2embed"
+  | "mapple";
 
 export type AudioTrackInfo = { id: number; lang: string; name: string };
 export type QualityLevelInfo = { height: number; index: number };

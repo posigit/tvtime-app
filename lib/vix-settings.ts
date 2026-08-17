@@ -96,9 +96,10 @@ function clampSettings(merged: VixSettings): VixSettings {
     "goated",
     "vidfast",
     "vidlink",
-    "vidzee",
     "vidnest",
     "cinesrc",
+    "2embed",
+    "mapple",
   ] as const;
   if (!(SOURCE_VALUES as readonly string[]).includes(next.preferredSource)) {
     next.preferredSource = "vix";
