@@ -7,6 +7,7 @@ import {
   formatPlayerClock,
   isFinishedPosition,
   isNearEndPosition,
+  isPreSeekNoise,
   isResumablePosition,
   shouldSaveProgress,
 } from "../lib/player-progress";
@@ -54,6 +55,15 @@ assert.equal(
 
 assert.equal(formatPlayerClock(65), "1:05");
 assert.equal(formatPlayerClock(3661), "1:01:01");
+
+// Resume-seek gate: only near-zero reports are noise. 43:00 → 3:00 must save.
+assert.equal(isPreSeekNoise(3, 43 * 60), true);
+assert.equal(isPreSeekNoise(0, 43 * 60), true);
+assert.equal(isPreSeekNoise(6, 43 * 60), true);
+assert.equal(isPreSeekNoise(180, 43 * 60), false);
+assert.equal(isPreSeekNoise(43 * 60, 43 * 60), false);
+assert.equal(isPreSeekNoise(180, null), false);
+assert.equal(isPreSeekNoise(180, 0), false);
 
 assert.equal(RESUME_END_RATIO, 0.92);
 assert.equal(NEXT_FAB_RATIO, 0.96);

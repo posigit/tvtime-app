@@ -16,7 +16,7 @@ export function WatchProviders({
 
   if (stream.length === 0 && others.length === 0) return null;
 
-  const reg = (process.env.WATCH_REGION || "US").toUpperCase();
+  const reg = (process.env.WATCH_REGION || "NG").toUpperCase();
 
   return (
     <div className="mt-4 rounded-xl bg-card p-4">

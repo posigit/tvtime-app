@@ -559,12 +559,12 @@ function mapProviders(
   }));
 }
 
-/** Where to watch. Region from WATCH_REGION env (default US). */
+/** Where to watch. Region from WATCH_REGION env (default NG). */
 export async function getWatchProviders(
   tmdbId: number,
   type: "tv" | "movie"
 ): Promise<WatchProvidersResult> {
-  const region = (process.env.WATCH_REGION || "US").toUpperCase();
+  const region = (process.env.WATCH_REGION || "NG").toUpperCase();
   const data = await tmdbFetch<{
     results?: Record<
       string,

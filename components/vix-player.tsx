@@ -29,6 +29,7 @@ import {
   addStartAt,
   isFinishedPosition,
   isNearEndPosition,
+  isPreSeekNoise,
   isResumablePosition,
   makePlaybackKey,
 } from "@/lib/player-progress";
@@ -95,7 +96,6 @@ export function VixPlayer({
   tmdbId,
   season,
   episode,
-  initialPosition,
   autoResume = false,
   source = "vix",
 }: {
@@ -116,14 +116,6 @@ export function VixPlayer({
   /** Stream backend: "vix" (default) or "goated". */
   source?: "vix" | "goated";
 }) {
-  const initialPlaybackKey = makePlaybackKey(type, tmdbId, season, episode);
-  const initialResumePosition =
-    autoResume &&
-    initialPosition != null &&
-    Number.isFinite(initialPosition) &&
-    initialPosition > 5
-      ? Math.min(MAX_PLAYBACK_SECONDS, initialPosition)
-      : null;
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   /** Fullscreen this shell (not <video>) so SubtitleOverlay + chrome stay visible. */
@@ -150,16 +142,12 @@ export function VixPlayer({
    * native→loading→native) re-arms the hold and re-pops the overlay mid-play.
    */
   const resumeLookupDoneRef = useRef<string | null>(null);
-  const resumePosRef = useRef(initialResumePosition ?? 0);
+  const resumePosRef = useRef(0);
   /**
    * Pending seek for source-switch OR cold resume. Engine applies after HLS
    * is ready (startPosition + MANIFEST/FRAG) — required for Vix resolver.
    */
-  const pendingSeekPosRef = useRef<number | null>(
-    initialResumePosition != null && initialResumePosition > RESUME_MIN_SECONDS
-      ? initialResumePosition
-      : null
-  );
+  const pendingSeekPosRef = useRef<number | null>(null);
   const pendingSeekWaitersRef = useRef<
     Array<(ok: boolean) => void>
   >([]);
@@ -184,12 +172,10 @@ export function VixPlayer({
   // Non-streamable mounts (no type/tmdbId) go straight to iframe fallback.
   const [streamFailed, setStreamFailed] = useState(() => !streamable);
   const [iframeError, setIframeError] = useState(false);
-  const [resumePosition, setResumePosition] = useState<number | null>(
-    initialResumePosition
-  );
-  const [resumeKey, setResumeKey] = useState<string | null>(
-    initialResumePosition != null ? initialPlaybackKey : null
-  );
+  // Do not seed from RSC props — a dismissed Continue Watching delete must
+  // win over a stale show-page bookmark. Lookup always re-reads /api/playback.
+  const [resumePosition, setResumePosition] = useState<number | null>(null);
+  const [resumeKey, setResumeKey] = useState<string | null>(null);
   const [locked, setLocked] = useState(false);
   /** Custom chrome only — native <video controls> are off (dual-layer fix). */
   const [chromeVisible, setChromeVisible] = useState(true);
@@ -387,26 +373,10 @@ export function VixPlayer({
 
   const savePosition = useCallback(
     (pos: number, duration: number, force = false) => {
-      // Pending engine seek (switch or cold resume): never wipe bookmark with
-      // pre-seek 0s reports (especially slow Vix resolver playlists).
-      const pendingSeek = pendingSeekPosRef.current;
-      if (
-        pendingSeek != null &&
-        Number.isFinite(pendingSeek) &&
-        pos < pendingSeek - 2
-      ) {
-        return;
-      }
-      // Protect bookmark: block near-zero reports while a resume target exists
-      // (hold, in-flight seek, or post-failed-seek floor).
-      const pendingResume = resumePosRef.current;
-      if (
-        pendingResume > RESUME_MIN_SECONDS &&
-        pos < pendingResume - 2 &&
-        pos <= RESUME_MIN_SECONDS + 1
-      ) {
-        return;
-      }
+      // Pending engine seek / resume floor: drop 0–5s warmup reports only.
+      // A backward scrub (43:00 → 3:00) must save — that is the new bookmark.
+      if (isPreSeekNoise(pos, pendingSeekPosRef.current)) return;
+      if (isPreSeekNoise(pos, resumePosRef.current)) return;
       // Delegate to shared save rules (throttle, 92% clear, ordered queue).
       const run = createSavePosition(playbackParams, {
         saveEnabledRef,
@@ -504,7 +474,10 @@ export function VixPlayer({
           if (resumePosRef.current === pos) resumePosRef.current = 0;
         }, 4000);
       } else {
-        // Seek never landed — keep floor so 0s timeupdates cannot wipe bookmark.
+        // Seek never landed. Drop the pending target so a later manual
+        // scrub / close flush can still save. Keep resumePos briefly as a
+        // 0s-noise floor only.
+        if (pendingSeekPosRef.current === pos) pendingSeekPosRef.current = null;
         console.warn(
           "[player] resume seek did not land near",
           pos,
@@ -623,6 +596,10 @@ export function VixPlayer({
     endedRef.current = false;
     lastSavedPosRef.current = 0;
     resumePosRef.current = 0;
+    pendingSeekPosRef.current = null;
+    const waiters = pendingSeekWaitersRef.current;
+    pendingSeekWaitersRef.current = [];
+    for (const w of waiters) w(false);
     holdForResumeRef.current = false;
     saveEnabledRef.current = true;
     setResumeKey(null);
@@ -638,58 +615,55 @@ export function VixPlayer({
     if (!params) return;
     if (mode === "iframe") {
       // No cross-origin seek API for the embed — resume via its startAt
-      // param instead. Keep saves disabled until the lookup completes so an
-      // iframe's initial 0–5s reports cannot overwrite a real bookmark.
+      // param instead. Always re-read the server bookmark so a dismissed
+      // Continue Watching delete wins over stale detail-page props.
       holdForResumeRef.current = false;
-      if (initialResumePosition == null) {
-        saveEnabledRef.current = false;
-        let cancelled = false;
-        const controller = new AbortController();
-        const timeout = window.setTimeout(() => controller.abort(), 8_000);
-        waitForPlaybackRequests()
-          .then(() =>
-            cancelled
-              ? null
-              : fetch(`/api/playback?${params}`, { signal: controller.signal })
-          )
-          .then((r) => (r?.ok ? r.json() : null))
-          .then(
-            (
-              data: { positionSeconds?: number; durationSeconds?: number } | null
-            ) => {
-              if (cancelled) return;
-              const pos =
-                typeof data?.positionSeconds === "number" &&
-                Number.isFinite(data.positionSeconds)
-                  ? Math.max(0, data.positionSeconds)
-                  : 0;
-              const dur =
-                typeof data?.durationSeconds === "number" &&
-                Number.isFinite(data.durationSeconds)
-                  ? Math.max(0, data.durationSeconds)
-                  : 0;
-              if (isResumablePosition(pos, dur)) {
-                resumePosRef.current = pos;
-                setResumePosition(pos);
-                // The state update remounts the iframe with startAt. The
-                // resume gate above protects it until the embed reaches pos.
-                saveEnabledRef.current = true;
-              } else {
-                saveEnabledRef.current = true;
-              }
+      saveEnabledRef.current = false;
+      let cancelled = false;
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 8_000);
+      waitForPlaybackRequests()
+        .then(() =>
+          cancelled
+            ? null
+            : fetch(`/api/playback?${params}`, { signal: controller.signal })
+        )
+        .then((r) => (r?.ok ? r.json() : null))
+        .then(
+          (
+            data: { positionSeconds?: number; durationSeconds?: number } | null
+          ) => {
+            if (cancelled) return;
+            const pos =
+              typeof data?.positionSeconds === "number" &&
+              Number.isFinite(data.positionSeconds)
+                ? Math.max(0, data.positionSeconds)
+                : 0;
+            const dur =
+              typeof data?.durationSeconds === "number" &&
+              Number.isFinite(data.durationSeconds)
+                ? Math.max(0, data.durationSeconds)
+                : 0;
+            if (isResumablePosition(pos, dur)) {
+              resumePosRef.current = pos;
+              setResumePosition(pos);
+              saveEnabledRef.current = true;
+            } else {
+              resumePosRef.current = 0;
+              setResumePosition(null);
+              saveEnabledRef.current = true;
             }
-          )
-          .catch(() => {
-            if (!cancelled) saveEnabledRef.current = true;
-          })
-          .finally(() => window.clearTimeout(timeout));
-        return () => {
-          cancelled = true;
-          controller.abort();
-          window.clearTimeout(timeout);
-        };
-      }
-      return;
+          }
+        )
+        .catch(() => {
+          if (!cancelled) saveEnabledRef.current = true;
+        })
+        .finally(() => window.clearTimeout(timeout));
+      return () => {
+        cancelled = true;
+        controller.abort();
+        window.clearTimeout(timeout);
+      };
     }
     if (mode !== "native") return;
 
@@ -705,19 +679,8 @@ export function VixPlayer({
 
     saveEnabledRef.current = false;
     holdForResumeRef.current = true;
-    const suppliedPosition =
-      autoResume &&
-      initialResumePosition != null &&
-      initialPlaybackKey === params
-        ? initialResumePosition
-        : null;
-    resumePosRef.current = suppliedPosition ?? 0;
+    resumePosRef.current = 0;
     videoRef.current?.pause();
-
-    if (suppliedPosition != null) {
-      resumeLookupDoneRef.current = params;
-      return;
-    }
 
     let cancelled = false;
     const controller = new AbortController();
@@ -787,10 +750,7 @@ export function VixPlayer({
       }
     };
   }, [
-    autoResume,
     clearPosition,
-    initialPlaybackKey,
-    initialResumePosition,
     mode,
     playbackParams,
   ]);
@@ -844,15 +804,10 @@ export function VixPlayer({
   ]);
 
   // Iframe path: no seek API for the embed, so drop any resume prompt.
-  // Lookup effect enables saves when it finishes; if we already have a
-  // supplied position, enable immediately.
   useEffect(() => {
     if (mode !== "iframe") return;
     holdForResumeRef.current = false;
-    if (initialResumePosition != null || resumePosition != null) {
-      saveEnabledRef.current = true;
-    }
-  }, [initialResumePosition, mode, resumePosition]);
+  }, [mode]);
 
   // ---------- source switching ----------
   // Picker order: vidnest, mapple, cinesrc, 2embed, vidfast, vidlink, then vix.
@@ -1124,12 +1079,9 @@ export function VixPlayer({
     }
 
     if (mode === "iframe" && remotePositionRef.current > 0) {
-      // Same gate as the message handler: closing during a startAt restart
-      // must not overwrite the saved position with a tiny pre-seek report.
-      if (
-        resumePosRef.current > 0 &&
-        remotePositionRef.current < resumePosRef.current - 1
-      ) {
+      // Closing during startAt warmup must not overwrite with a 0–5s report.
+      // A real backward scrub is a new bookmark and must flush.
+      if (isPreSeekNoise(remotePositionRef.current, resumePosRef.current)) {
         return Promise.resolve();
       }
       savePosition(
@@ -1185,7 +1137,20 @@ export function VixPlayer({
         setResumePosition(null);
         setResumeKey(null);
       }
-      savePosition(video.currentTime, video.duration, true);
+      const t = video.currentTime;
+      const pending = pendingSeekPosRef.current;
+      if (
+        pending != null &&
+        Number.isFinite(t) &&
+        Math.abs(t - pending) > 2.5
+      ) {
+        pendingSeekPosRef.current = null;
+        resumePosRef.current = 0;
+        const waiters = pendingSeekWaitersRef.current;
+        pendingSeekWaitersRef.current = [];
+        for (const w of waiters) w(true);
+      }
+      savePosition(t, video.duration, true);
       syncTransport();
     };
     const onEnded = () => {
@@ -1430,13 +1395,15 @@ export function VixPlayer({
 
       if (remotePositionRef.current <= 0) return;
 
-      // Resume gate: a startAt restart can report tiny positions before the
-      // embed seeks to the bookmark — never let those overwrite a real one.
+      // Resume gate: startAt can report 0–5s before the embed seeks. A
+      // backward scrub (43:00 → 3:00) is the new bookmark — keep it.
       if (resumePosRef.current > 0) {
         if (remotePositionRef.current >= resumePosRef.current - 1) {
           resumePosRef.current = 0;
-        } else if (d.event === "timeupdate" || d.event === "pause") {
+        } else if (isPreSeekNoise(remotePositionRef.current, resumePosRef.current)) {
           return;
+        } else {
+          resumePosRef.current = 0;
         }
       }
 
@@ -1588,10 +1555,7 @@ export function VixPlayer({
     type && tmdbId
       ? embedUrlFor(activeSource, type, tmdbId, season, episode) ?? src
       : src;
-  const iframeSrc = addStartAt(
-    iframeBaseSrc,
-    resumePosition ?? initialResumePosition
-  );
+  const iframeSrc = addStartAt(iframeBaseSrc, resumePosition);
   // Transport only after media can play — otherwise black screen + fake pause/±10.
   const showTransport =
     !locked &&

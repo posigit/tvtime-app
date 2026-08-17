@@ -6,6 +6,22 @@ import {
   SAVE_THROTTLE_MS,
 } from "@/lib/player-constants";
 
+/**
+ * True when `pos` is warmup noise before a resume seek lands (0–~5s reports
+ * while HLS/startAt is still seeking to `pendingTarget`).
+ * A real backward scrub (43:00 → 3:00) is NOT noise and must save.
+ */
+export function isPreSeekNoise(
+  pos: number,
+  pendingTarget: number | null | undefined,
+  minSeconds = RESUME_MIN_SECONDS
+): boolean {
+  if (pendingTarget == null || !Number.isFinite(pendingTarget)) return false;
+  if (!(pendingTarget > minSeconds)) return false;
+  if (!Number.isFinite(pos)) return true;
+  return pos < pendingTarget - 2 && pos <= minSeconds + 1;
+}
+
 /** True if a saved position is worth offering as Resume. */
 export function isResumablePosition(
   pos: number,
