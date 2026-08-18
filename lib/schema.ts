@@ -90,6 +90,8 @@ export const users = pgTable(
     id: text("id").primaryKey(),
     username: text("username").notNull(),
     passwordHash: text("password_hash").notNull(),
+    publicHandle: text("public_handle").unique(),
+    publicProfile: boolean("public_profile").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
