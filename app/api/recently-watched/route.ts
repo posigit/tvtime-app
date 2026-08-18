@@ -2,7 +2,7 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { db, withDbRetry } from "@/lib/db";
-import { movies, shows, users, watchHistory } from "@/lib/schema";
+import { episodes, movies, shows, users, watchHistory } from "@/lib/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -28,8 +28,11 @@ interface WatchedItem {
   mediaType: "movie" | "tv";
   title: string;
   posterUrl: string | null;
+  backdropUrl: string | null;
   year: string | null;
   detail: string | null;
+  episodeTitle: string | null;
+  rating: number | null;
   watchedAt: string;
   source: string;
 }
@@ -111,6 +114,28 @@ export async function GET(request: Request) {
       for (const r of rows) showsMeta.set(r.tmdbId, r);
     }
 
+    // Episode titles for tv events (last-watched episode per show)
+    const episodeKeys = events
+      .filter((e) => e.mediaType === "tv" && e.seasonNumber > 0)
+      .map((e) => ({ showTmdbId: e.tmdbId, seasonNumber: e.seasonNumber, episodeNumber: e.episodeNumber }));
+    const episodeMeta = new Map<string, string>();
+    if (episodeKeys.length > 0) {
+      const rows = await withDbRetry(() =>
+        db
+          .select()
+          .from(episodes)
+          .where(
+            inArray(
+              episodes.showTmdbId,
+              [...new Set(episodeKeys.map((k) => k.showTmdbId))]
+            )
+          )
+      );
+      for (const r of rows) {
+        episodeMeta.set(`${r.showTmdbId}|${r.seasonNumber}|${r.episodeNumber}`, r.title);
+      }
+    }
+
     // Dedupe by tmdbId — keep most recent event; for tv, remember last episode detail
     const seen = new Set<number>();
     const items: WatchedItem[] = [];
@@ -127,11 +152,16 @@ export async function GET(request: Request) {
         mediaType: isMovie ? "movie" : "tv",
         title: meta?.title ?? `Title ${event.tmdbId}`,
         posterUrl: meta?.posterPath ? `${POSTER_BASE}${meta.posterPath}` : null,
+        backdropUrl: meta?.backdropPath ? `${POSTER_BASE}${meta.backdropPath}` : null,
         year: dateStr ? String(dateStr).slice(0, 4) : null,
         detail:
           isMovie || !event.seasonNumber
             ? null
             : `S${event.seasonNumber} E${event.episodeNumber}`,
+        episodeTitle: isMovie
+          ? null
+          : episodeMeta.get(`${event.tmdbId}|${event.seasonNumber}|${event.episodeNumber}`) || null,
+        rating: meta?.voteAverage ?? null,
         watchedAt: event.watchedAt.toISOString(),
         source: event.source,
       });
