@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 120;
 
 /**
- * Daily (13:00 UTC) new-episode push alerts.
+ * Daily (04:00 UTC / 05:00 WAT) new-episode push alerts.
  * One digest notification per user: "N episodes air today".
  * Requires CRON_SECRET (Bearer or ?secret=).
  */
