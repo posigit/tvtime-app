@@ -12,7 +12,7 @@ Architecture done. Pages being wired.
 - [ ] Shows page (poster grid from user_shows)
 - [ ] Show detail page (seasons → episodes → mark watched)
 - [ ] Movies page (movie grid)
-- [ ] Explore page (search + trending + airing today)
+- [x] Explore page (search + recs + Top 10 + Discover)
 - [ ] Profile page (stats + lists)
 - [ ] Episode watch/unwatch API routes
 
@@ -33,9 +33,9 @@ Architecture done. Pages being wired.
 
 | Feature | Why |
 |---------|-----|
-| **Search on Explore** | Debounced search across shows + movies. Already have `searchTv()` + `searchMovie()` in TMDB client. Just needs UI. |
-| **Trending carousel** | Homepage hero with TMDB trending week. Poster carousel + "Follow" button on each. |
-| **Popular / Top Rated** | Browse tabs on Explore. TMDB `/tv/popular`, `/tv/top_rated`, `/movie/popular`. |
+| **Search on Explore** ✅ | Debounced search across shows + movies. |
+| **Trending carousel / Top 10** ✅ | Ranked Top 10 shows + movies on Feed; Daily Pick hero. |
+| **Popular / Top Rated** ✅ | Discover rails + genre browser. |
 | **Watch providers filter** | "Where can I watch this in Nigeria?" TMDB `/tv/{id}/watch/providers` with `watch_region=NG`. Show Netflix/Prime/Apple logos. |
 
 ---

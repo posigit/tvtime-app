@@ -1,65 +1,36 @@
+import { cookies } from "next/headers";
 import { requireAuth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { userShows, userMovies } from "@/lib/schema";
-import { eq } from "drizzle-orm";
 import {
-  getTrendingTv,
-  getPopularMovies,
-  getAiringToday,
-  getOnTheAir,
-  getTopRatedTv,
-  getTopRatedMovies,
-  getNowPlayingMovies,
-  getUpcomingMovies,
-  getPopularTv,
-  getTrendingMovies,
-  discoverTvByGenre,
-  discoverMoviesByGenre,
-  posterUrl,
-  TV_GENRES,
-  MOVIE_GENRES,
-  type TmdbMediaCard,
-} from "@/lib/tmdb";
-import {
-  getBecauseYouWatched,
-  getForYouMix,
-  filterNewMedia,
-  pickRotated,
-  rotationOffset,
-} from "@/lib/recommend";
+  EXPLORE_TAB_COOKIE,
+  resolveExploreTab,
+  type ExploreTab,
+} from "@/lib/explore-tab";
+import { loadExploreDiscover, loadExploreFeed } from "@/lib/explore-data";
 import { SearchBar } from "@/components/search-bar";
 import { StickyChrome } from "@/components/sticky-chrome";
-import { SectionLabel } from "@/components/section-label";
 import { ExplorePills } from "@/components/explore-pills";
-import {
-  ExploreHeroCarousel,
-  type ExploreHeroItem,
-} from "@/components/explore-hero";
 import { ShowFollowButton } from "@/components/show-follow-button";
-import { MovieWatchButton } from "@/components/movie-watch-button";
 import { DiscoverRail } from "@/components/discover-rail";
-import {
-  DiscoverGenreBrowser,
-  type GenreChip,
-} from "@/components/discover-genre-browser";
+import { DiscoverGenreBrowser } from "@/components/discover-genre-browser";
+import { DailyPickCard } from "@/components/daily-pick";
+import { TopTenRail } from "@/components/top-ten";
+import { TonightStrip } from "@/components/tonight-strip";
+import { ContinueWatchingRail } from "@/components/continue-watching";
+import { SectionLabel } from "@/components/section-label";
+import { posterUrl } from "@/lib/tmdb";
 import Link from "next/link";
 import Image from "next/image";
-
-/** Hourly slot — shifts which posters land in grids so re-visits feel different. */
-const HOUR_MS = 60 * 60 * 1000;
 
 function PosterTile({
   title,
   posterPath,
   href,
   action,
-  owned,
 }: {
   title: string;
   posterPath?: string | null;
   href: string;
   action: React.ReactNode;
-  owned?: boolean;
 }) {
   return (
     <div className="relative overflow-hidden rounded-lg bg-card">
@@ -72,17 +43,11 @@ function PosterTile({
               fill
               sizes="(max-width: 768px) 33vw, 200px"
               className="object-cover"
-              unoptimized
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-muted-foreground">
               {title}
             </div>
-          )}
-          {owned && (
-            <span className="absolute bottom-1 left-1 rounded bg-black/70 px-1.5 py-0.5 text-[9px] font-bold uppercase text-primary">
-              In library
-            </span>
           )}
         </div>
       </Link>
@@ -108,370 +73,111 @@ function GridSection({
   );
 }
 
-export default async function ExplorePage() {
-  const userId = await requireAuth();
+async function FeedBody({ userId }: { userId: string }) {
+  const data = await loadExploreFeed(userId);
+  const { digest, library, continueWatching, tonight, topShows, topMovies } =
+    data;
+  const pick = digest.dailyPick;
 
-  const [
-    trendingDay,
-    trendingWeek,
-    trendingMoviesDay,
-    trendingMoviesWeek,
-    popularMovies,
-    popularTv,
-    airingToday,
-    onTheAir,
-    topTv,
-    topMovies,
-    nowPlaying,
-    upcomingMovies,
-    becauseRails,
-    forYouMix,
-    followedShows,
-    followedMovies,
-  ] = await Promise.all([
-    getTrendingTv("day").catch(() => ({ results: [] as Array<{
-      id: number;
-      name: string;
-      poster_path?: string;
-      backdrop_path?: string;
-      overview?: string;
-      vote_average?: number;
-    }> })),
-    getTrendingTv("week").catch(() => ({ results: [] as Array<{
-      id: number;
-      name: string;
-      poster_path?: string;
-      backdrop_path?: string;
-      overview?: string;
-      vote_average?: number;
-    }> })),
-    getTrendingMovies("day").catch(() => ({ results: [] as Array<{
-      id: number;
-      title: string;
-      poster_path?: string;
-      backdrop_path?: string;
-      overview?: string;
-      vote_average?: number;
-    }> })),
-    getTrendingMovies("week").catch(() => ({ results: [] as Array<{
-      id: number;
-      title: string;
-      poster_path?: string;
-      backdrop_path?: string;
-      overview?: string;
-      vote_average?: number;
-    }> })),
-    getPopularMovies(),
-    getPopularTv().catch(() => [] as TmdbMediaCard[]),
-    getAiringToday(),
-    getOnTheAir(),
-    getTopRatedTv().catch(() => [] as TmdbMediaCard[]),
-    getTopRatedMovies().catch(() => [] as TmdbMediaCard[]),
-    getNowPlayingMovies().catch(() => [] as TmdbMediaCard[]),
-    getUpcomingMovies().catch(() => [] as TmdbMediaCard[]),
-    getBecauseYouWatched(userId, 14).catch(() => []),
-    getForYouMix(userId, 16).catch(() => [] as TmdbMediaCard[]),
-    db
-      .select({ tmdbId: userShows.tmdbId })
-      .from(userShows)
-      .where(eq(userShows.userId, userId)),
-    db
-      .select({ tmdbId: userMovies.tmdbId, status: userMovies.status })
-      .from(userMovies)
-      .where(eq(userMovies.userId, userId)),
-  ]);
-
-  const followedShowIds = new Set(followedShows.map((s) => s.tmdbId));
-  const movieStatusById = new Map(
-    followedMovies.map((m) => [m.tmdbId, m.status])
-  );
-  const ownedMovieIds = new Set(followedMovies.map((m) => m.tmdbId));
-
-  // Prefetch genre chips for Discover
-  const [tvGenreLists, movieGenreLists] = await Promise.all([
-    Promise.all(
-      TV_GENRES.map(async (g) => {
-        const raw = await discoverTvByGenre(g.id).catch(
-          () => [] as TmdbMediaCard[]
-        );
-        return {
-          key: `tv-${g.id}`,
-          label: `TV · ${g.name}`,
-          kind: "tv" as const,
-          items: filterNewMedia(raw, followedShowIds, 18),
-        } satisfies GenreChip;
-      })
-    ),
-    Promise.all(
-      MOVIE_GENRES.map(async (g) => {
-        const raw = await discoverMoviesByGenre(g.id).catch(
-          () => [] as TmdbMediaCard[]
-        );
-        return {
-          key: `movie-${g.id}`,
-          label: `Film · ${g.name}`,
-          kind: "movie" as const,
-          items: filterNewMedia(raw, ownedMovieIds, 18),
-        } satisfies GenreChip;
-      })
-    ),
-  ]);
-  const genreChips: GenreChip[] = [...tvGenreLists, ...movieGenreLists];
-
-  // ── Trending today hero: several titles, rotated hourly ────────────────
-  const heroPool: ExploreHeroItem[] = [];
-  for (const s of trendingDay.results) {
-    if (followedShowIds.has(s.id)) continue;
-    heroPool.push({
-      id: s.id,
-      title: s.name,
-      mediaType: "tv",
-      posterPath: s.poster_path,
-      backdropPath: s.backdrop_path,
-      overview: s.overview,
-      badge: "Trending today",
-      following: false,
-    });
-  }
-  // Fill with day-trending movies if TV pool is thin
-  if (heroPool.length < 5) {
-    for (const m of trendingMoviesDay.results) {
-      if (ownedMovieIds.has(m.id)) continue;
-      if (heroPool.some((h) => h.mediaType === "movie" && h.id === m.id))
-        continue;
-      heroPool.push({
-        id: m.id,
-        title: m.title,
-        mediaType: "movie",
-        posterPath: m.poster_path,
-        backdropPath: m.backdrop_path,
-        overview: m.overview,
-        badge: "Trending today",
-        movieStatus: movieStatusById.get(m.id) || null,
-      });
-      if (heroPool.length >= 8) break;
-    }
-  }
-  // Last resort: week trending TV
-  if (heroPool.length < 3) {
-    for (const s of trendingWeek.results) {
-      if (followedShowIds.has(s.id)) continue;
-      if (heroPool.some((h) => h.mediaType === "tv" && h.id === s.id)) continue;
-      heroPool.push({
-        id: s.id,
-        title: s.name,
-        mediaType: "tv",
-        posterPath: s.poster_path,
-        backdropPath: s.backdrop_path,
-        overview: s.overview,
-        badge: "Trending this week",
-        following: false,
-      });
-      if (heroPool.length >= 5) break;
-    }
-  }
-
-  const heroItems = pickRotated(
-    heroPool,
-    Math.min(5, Math.max(3, heroPool.length)),
-    rotationOffset(userId + ":hero", heroPool.length, HOUR_MS)
-  ).map((h) =>
-    h.mediaType === "movie"
-      ? { ...h, movieStatus: movieStatusById.get(h.id) || null }
-      : h
-  );
-
-  // ── Rest of feed: previous layout, with hourly window on grids ─────────
-  const weekShows = trendingWeek.results;
-  const trendingGrid = pickRotated(
-    weekShows,
-    9,
-    rotationOffset(userId + ":trend-grid", weekShows.length, HOUR_MS)
-  );
-
-  const popularResults = popularMovies.results ?? [];
-  const popularGrid = pickRotated(
-    popularResults,
-    9,
-    rotationOffset(userId + ":pop-grid", popularResults.length, HOUR_MS)
-  );
-
-  const topTvPool = filterNewMedia(topTv, followedShowIds, 24);
-  const topTvFresh = pickRotated(
-    topTvPool,
-    12,
-    rotationOffset(userId + ":top-tv", topTvPool.length, HOUR_MS)
-  );
-  const nowPlayingPool = filterNewMedia(nowPlaying, ownedMovieIds, 24);
-  const nowPlayingFresh = pickRotated(
-    nowPlayingPool,
-    12,
-    rotationOffset(userId + ":now", nowPlayingPool.length, HOUR_MS)
-  );
-  const topMoviesPool = filterNewMedia(topMovies, ownedMovieIds, 24);
-  const topMoviesFresh = pickRotated(
-    topMoviesPool,
-    12,
-    rotationOffset(userId + ":top-m", topMoviesPool.length, HOUR_MS)
-  );
-
-  const feed = (
+  return (
     <>
-      <ExploreHeroCarousel items={heroItems} />
+      <TonightStrip items={tonight} />
+      <ContinueWatchingRail items={continueWatching} />
+      {pick && (
+        <DailyPickCard
+          pick={pick}
+          following={
+            pick.item.mediaType === "tv"
+              ? library.followedShowIds.has(pick.item.id)
+              : false
+          }
+          movieStatus={
+            pick.item.mediaType === "movie"
+              ? library.movieStatusById.get(pick.item.id) || null
+              : null
+          }
+        />
+      )}
 
-      {/* At most 2 personal seed rails — rest of recs live in "For you" */}
-      {becauseRails.slice(0, 2).map((rail) => (
+      {digest.forYou.length > 0 && (
+        <DiscoverRail
+          label="For you"
+          items={digest.forYou}
+          followedShowIds={library.followedShowIds}
+          movieStatusById={library.movieStatusById}
+        />
+      )}
+
+      {digest.because.slice(0, 2).map((rail) => (
         <DiscoverRail
           key={rail.seedTitle}
           label={`Because you watched ${rail.seedTitle}`}
           items={rail.items}
-          followedShowIds={followedShowIds}
-          movieStatusById={movieStatusById}
+          followedShowIds={library.followedShowIds}
+          movieStatusById={library.movieStatusById}
         />
       ))}
 
-      {forYouMix.length > 0 && (
-        <DiscoverRail
-          label="For you"
-          items={forYouMix}
-          followedShowIds={followedShowIds}
-          movieStatusById={movieStatusById}
-        />
-      )}
-
-      <GridSection label="Trending This Week">
-        {trendingGrid.map((show) => (
-          <PosterTile
-            key={show.id}
-            title={show.name}
-            posterPath={show.poster_path}
-            href={`/show/${show.id}`}
-            owned={followedShowIds.has(show.id)}
-            action={
-              <ShowFollowButton
-                tmdbId={show.id}
-                initialFollowing={followedShowIds.has(show.id)}
-                variant="overlay"
-              />
-            }
-          />
-        ))}
-      </GridSection>
-
-      <DiscoverRail
-        label="Top Rated TV"
-        items={topTvFresh}
-        followedShowIds={followedShowIds}
-        movieStatusById={movieStatusById}
+      <TopTenRail
+        label="Top 10 Shows"
+        items={topShows}
+        ownedIds={library.followedShowIds}
+        priority
       />
-      <DiscoverRail
-        label="Now Playing"
-        items={nowPlayingFresh}
-        followedShowIds={followedShowIds}
-        movieStatusById={movieStatusById}
-      />
-
-      <GridSection label="Popular Movies">
-        {popularGrid.map((movie) => (
-          <PosterTile
-            key={movie.id}
-            title={movie.title}
-            posterPath={movie.poster_path}
-            href={`/movie/${movie.id}`}
-            owned={ownedMovieIds.has(movie.id)}
-            action={
-              <MovieWatchButton
-                tmdbId={movie.id}
-                initialStatus={movieStatusById.get(movie.id) || null}
-                variant="overlay"
-              />
-            }
-          />
-        ))}
-      </GridSection>
-
-      <DiscoverRail
-        label="Top Rated Movies"
-        items={topMoviesFresh}
-        followedShowIds={followedShowIds}
-        movieStatusById={movieStatusById}
+      <TopTenRail
+        label="Top 10 Movies"
+        items={topMovies}
+        ownedIds={library.ownedMovieIds}
       />
     </>
   );
+}
 
-  // Discover: browse-first — not the same as Feed
-  const discTrendingMovies = filterNewMedia(
-    (trendingMoviesWeek.results ?? []).map((m) => ({
-      id: m.id,
-      title: m.title,
-      poster_path: m.poster_path,
-      mediaType: "movie" as const,
-      vote_average: m.vote_average,
-    })),
-    ownedMovieIds,
-    14
-  );
-  const discPopularTv = filterNewMedia(popularTv, followedShowIds, 14);
-  const discUpcoming = filterNewMedia(upcomingMovies, ownedMovieIds, 14);
-  const discAiring = filterNewMedia(
-    (airingToday.results ?? []).map((s) => ({
-      id: s.id,
-      title: s.name,
-      poster_path: s.poster_path,
-      mediaType: "tv" as const,
-    })),
-    followedShowIds,
-    12
-  );
-  const discOnAir = filterNewMedia(
-    (onTheAir.results ?? []).map((s) => ({
-      id: s.id,
-      title: s.name,
-      poster_path: s.poster_path,
-      mediaType: "tv" as const,
-    })),
-    followedShowIds,
-    12
-  );
-  const discNowPlaying = filterNewMedia(nowPlaying, ownedMovieIds, 12);
-  const discTopMovies = filterNewMedia(topMovies, ownedMovieIds, 12);
+async function DiscoverBody({ userId }: { userId: string }) {
+  const data = await loadExploreDiscover(userId);
+  const { library } = data;
+  const movieStatusRecord = Object.fromEntries(library.movieStatusById);
 
-  const discover = (
+  return (
     <>
       <p className="mb-4 text-center text-xs text-muted-foreground">
         Find something new — not already in your library
       </p>
 
       <DiscoverRail
-        label="Hot movies this week"
-        items={discTrendingMovies}
-        followedShowIds={followedShowIds}
-        movieStatusById={movieStatusById}
+        label="Hidden gems"
+        items={data.hiddenGems}
+        followedShowIds={library.followedShowIds}
+        movieStatusById={library.movieStatusById}
       />
-
+      <DiscoverRail
+        label="Hot movies this week"
+        items={data.hotMovies}
+        followedShowIds={library.followedShowIds}
+        movieStatusById={library.movieStatusById}
+      />
       <DiscoverRail
         label="Popular series"
-        items={discPopularTv}
-        followedShowIds={followedShowIds}
-        movieStatusById={movieStatusById}
+        items={data.popularTv}
+        followedShowIds={library.followedShowIds}
+        movieStatusById={library.movieStatusById}
       />
-
       <DiscoverRail
         label="Coming to theaters"
-        items={discUpcoming}
-        followedShowIds={followedShowIds}
-        movieStatusById={movieStatusById}
+        items={data.upcoming}
+        followedShowIds={library.followedShowIds}
+        movieStatusById={library.movieStatusById}
       />
 
       <DiscoverGenreBrowser
-        genres={genreChips}
-        followedShowIds={followedShowIds}
-        movieStatusById={movieStatusById}
+        genres={data.genreChips}
+        followedShowIds={[...library.followedShowIds]}
+        movieStatusById={movieStatusRecord}
       />
 
-      {discAiring.length > 0 && (
+      {data.airingToday.length > 0 && (
         <GridSection label="Airing Today">
-          {discAiring.map((show) => (
+          {data.airingToday.map((show) => (
             <PosterTile
               key={show.id}
               title={show.title}
@@ -491,14 +197,14 @@ export default async function ExplorePage() {
 
       <DiscoverRail
         label="In theaters now"
-        items={discNowPlaying}
-        followedShowIds={followedShowIds}
-        movieStatusById={movieStatusById}
+        items={data.nowPlaying}
+        followedShowIds={library.followedShowIds}
+        movieStatusById={library.movieStatusById}
       />
 
-      {discOnAir.length > 0 && (
+      {data.onTheAir.length > 0 && (
         <GridSection label="On The Air">
-          {discOnAir.map((show) => (
+          {data.onTheAir.map((show) => (
             <PosterTile
               key={show.id}
               title={show.title}
@@ -518,11 +224,25 @@ export default async function ExplorePage() {
 
       <DiscoverRail
         label="Critically loved films"
-        items={discTopMovies}
-        followedShowIds={followedShowIds}
-        movieStatusById={movieStatusById}
+        items={data.topMovies}
+        followedShowIds={library.followedShowIds}
+        movieStatusById={library.movieStatusById}
       />
     </>
+  );
+}
+
+export default async function ExplorePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
+  const userId = await requireAuth();
+  const { tab: tabParam } = await searchParams;
+  const cookieStore = await cookies();
+  const tab: ExploreTab = resolveExploreTab(
+    tabParam,
+    cookieStore.get(EXPLORE_TAB_COOKIE)?.value
   );
 
   return (
@@ -531,7 +251,14 @@ export default async function ExplorePage() {
         <SearchBar />
       </StickyChrome>
       <div className="px-4 pt-1">
-        <ExplorePills feed={feed} discover={discover} />
+        <ExplorePills active={tab} />
+        <div className="pt-3">
+          {tab === "discover" ? (
+            <DiscoverBody userId={userId} />
+          ) : (
+            <FeedBody userId={userId} />
+          )}
+        </div>
       </div>
     </div>
   );

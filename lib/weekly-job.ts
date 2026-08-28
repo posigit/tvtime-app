@@ -6,12 +6,14 @@
  *      still have none (rt_score NULL or -1), plus re-check recent releases
  *      whose meters still move. Heals titles the lazy per-page fill missed.
  *   2) Surprise pool rebuild — 2-day-seeded TMDB slices into surprise_pool.
+ *   3) Warm tmdb_list_cache (trending / top 10 / catalog rails).
  */
 
 import { db, withDbRetry, pingDb } from "./db";
 import { shows, movies } from "./schema";
 import { resolveRtScores } from "./rt-resolve";
 import { rebuildSurprisePool } from "./surprise-movies";
+import { warmTmdbListCache } from "./tmdb-list-cache";
 import { appTodayYmd, ymdAddDays } from "./app-time";
 import { asc, isNull, or, lt, and, gte, sql, type SQL } from "drizzle-orm";
 
@@ -34,6 +36,7 @@ export type WeeklyJobResult = {
   durationMs: number;
   rtSweep: SweepTableResult[];
   surprise: { week: string; count: number } | null;
+  lists?: { warmed: number; failed: number };
   error?: string;
 };
 
@@ -164,11 +167,23 @@ export async function runWeeklyRefresh(opts?: {
     }
   }
 
+  let lists: { warmed: number; failed: number } | undefined;
+  try {
+    lists = await warmTmdbListCache();
+  } catch (err) {
+    console.error(
+      "TMDB list cache warm failed:",
+      err instanceof Error ? err.message : err
+    );
+    lists = { warmed: 0, failed: 1 };
+  }
+
   return {
     ok: true,
     startedAt: new Date(started).toISOString(),
     durationMs: Date.now() - started,
     rtSweep,
     surprise,
+    lists,
   };
 }

@@ -330,3 +330,31 @@ export const userSettings = pgTable(
   },
   (t) => [index("user_settings_updated_idx").on(t.updatedAt)]
 );
+
+/**
+ * Shared TMDB catalog lists (trending, popular, top 10, genres).
+ * Explore reads this instead of hitting TMDB on every page load.
+ */
+export const tmdbListCache = pgTable("tmdb_list_cache", {
+  key: text("key").primaryKey(),
+  payload: jsonb("payload").notNull(),
+  fetchedAt: timestamp("fetched_at").defaultNow().notNull(),
+});
+
+/**
+ * Personal Explore digest — rebuilt at most once per app-local day.
+ */
+export const userExploreDigest = pgTable(
+  "user_explore_digest",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    day: text("day").notNull(),
+    dailyPick: jsonb("daily_pick"),
+    forYou: jsonb("for_you").notNull().default([]),
+    because: jsonb("because").notNull().default([]),
+    builtAt: timestamp("built_at").defaultNow().notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.day] })]
+);

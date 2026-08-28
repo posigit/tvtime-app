@@ -6,5 +6,5 @@ export default async function HomePage() {
   if (!session) {
     redirect("/login");
   }
-  redirect("/shows");
+  redirect("/explore");
 }

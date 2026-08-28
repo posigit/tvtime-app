@@ -190,24 +190,22 @@ export function ExplorePageSkeleton() {
           <Skeleton className="h-10 w-20 flex-shrink-0 rounded-full bg-white/15" />
           <Skeleton className="h-10 w-24 flex-shrink-0 rounded-full" />
         </div>
-      <section className="mb-6">
-        <div className="mb-3">
-          <Skeleton className="h-7 w-40 rounded-full bg-[#3a3a3c]" />
-        </div>
-        <PosterGridSkeleton count={6} />
-      </section>
-      <section className="mb-6">
-        <div className="mb-3">
-          <Skeleton className="h-7 w-32 rounded-full bg-[#3a3a3c]" />
-        </div>
-        <PosterRailSkeleton count={5} />
-      </section>
-      <section className="mb-6">
-        <div className="mb-3">
-          <Skeleton className="h-7 w-36 rounded-full bg-[#3a3a3c]" />
-        </div>
-        <PosterGridSkeleton count={6} />
-      </section>
+        <section className="mb-7">
+          <Skeleton className="mb-2.5 h-3 w-24" />
+          <Skeleton className="h-52 w-full rounded-2xl" />
+        </section>
+        <section className="mb-6">
+          <div className="mb-3">
+            <Skeleton className="h-7 w-28 rounded-full bg-[#3a3a3c]" />
+          </div>
+          <PosterRailSkeleton count={5} />
+        </section>
+        <section className="mb-6">
+          <div className="mb-3">
+            <Skeleton className="h-7 w-36 rounded-full bg-[#3a3a3c]" />
+          </div>
+          <PosterRailSkeleton count={6} />
+        </section>
       </div>
       <span className="sr-only">Loading explore…</span>
     </div>

@@ -1,36 +1,80 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SectionLabel } from "@/components/section-label";
 import { DiscoverRail } from "@/components/discover-rail";
+import { PosterRailSkeleton } from "@/components/skeletons";
 import type { TmdbMediaCard } from "@/lib/tmdb";
+import type { GenreChipMeta } from "@/lib/explore-types";
 import { cn } from "@/lib/utils";
-
-export type GenreChip = {
-  key: string; // e.g. "tv-80" or "movie-28"
-  label: string; // e.g. "TV · Crime"
-  kind: "tv" | "movie";
-  items: TmdbMediaCard[];
-};
 
 export function DiscoverGenreBrowser({
   genres,
   followedShowIds,
   movieStatusById,
 }: {
-  genres: GenreChip[];
-  followedShowIds?: Set<number>;
-  movieStatusById?: Map<number, string | null | undefined>;
+  genres: GenreChipMeta[];
+  followedShowIds: number[];
+  movieStatusById: Record<number, string | null | undefined>;
 }) {
   const defaultKey = genres[0]?.key ?? "";
   const [active, setActive] = useState(defaultKey);
+  const [itemsByKey, setItemsByKey] = useState<Record<string, TmdbMediaCard[]>>(
+    {}
+  );
 
   const selected = useMemo(
     () => genres.find((g) => g.key === active) ?? genres[0],
     [genres, active]
   );
 
+  const showSet = useMemo(() => new Set(followedShowIds), [followedShowIds]);
+  const movieMap = useMemo(
+    () =>
+      new Map(
+        Object.entries(movieStatusById).map(([k, v]) => [Number(k), v])
+      ),
+    [movieStatusById]
+  );
+
+  const selectedKey = selected?.key ?? "";
+  const cached = selectedKey ? itemsByKey[selectedKey] : undefined;
+  const loading = Boolean(selected) && cached === undefined;
+
+  useEffect(() => {
+    if (!selected) return;
+    const key = selected.key;
+    if (Object.prototype.hasOwnProperty.call(itemsByKey, key)) return;
+
+    const ctrl = new AbortController();
+    const kind = selected.kind;
+    const genreId = selected.genreId;
+    fetch(`/api/discover/genre?kind=${kind}&id=${genreId}`, {
+      signal: ctrl.signal,
+    })
+      .then((res) => (res.ok ? res.json() : { items: [] }))
+      .then((data: { items?: TmdbMediaCard[] }) => {
+        const items = Array.isArray(data.items) ? data.items : [];
+        setItemsByKey((prev) =>
+          Object.prototype.hasOwnProperty.call(prev, key)
+            ? prev
+            : { ...prev, [key]: items }
+        );
+      })
+      .catch((err) => {
+        if (err instanceof DOMException && err.name === "AbortError") return;
+        setItemsByKey((prev) =>
+          Object.prototype.hasOwnProperty.call(prev, key)
+            ? prev
+            : { ...prev, [key]: [] }
+        );
+      });
+    return () => ctrl.abort();
+  }, [selected, itemsByKey]);
+
   if (genres.length === 0) return null;
+
+  const items = cached ?? [];
 
   return (
     <section className="mb-6">
@@ -57,17 +101,20 @@ export function DiscoverGenreBrowser({
 
       {selected && (
         <div className="mt-4">
-          <DiscoverRail
-            label={
-              selected.kind === "tv"
-                ? `${selected.label.replace(/^TV · /, "")} shows`
-                : `${selected.label.replace(/^Film · /, "")} movies`
-            }
-            items={selected.items}
-            followedShowIds={followedShowIds}
-            movieStatusById={movieStatusById}
-          />
-          {selected.items.length === 0 && (
+          {loading ? (
+            <PosterRailSkeleton count={5} />
+          ) : items.length > 0 ? (
+            <DiscoverRail
+              label={
+                selected.kind === "tv"
+                  ? `${selected.label.replace(/^TV · /, "")} shows`
+                  : `${selected.label.replace(/^Film · /, "")} movies`
+              }
+              items={items}
+              followedShowIds={showSet}
+              movieStatusById={movieMap}
+            />
+          ) : (
             <p className="text-sm text-muted-foreground">
               Nothing new in this genre (or everything is already in your
               library).

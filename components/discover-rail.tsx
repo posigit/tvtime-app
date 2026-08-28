@@ -55,12 +55,16 @@ export function DiscoverRail({
                       fill
                       sizes="116px"
                       className="object-cover"
-                      unoptimized
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center p-2 text-center text-[10px] text-muted-foreground">
                       {item.title}
                     </div>
+                  )}
+                  {item.badge && (
+                    <span className="absolute bottom-1 left-1 max-w-[90%] truncate rounded bg-black/75 px-1.5 py-0.5 text-[8px] font-bold uppercase text-primary">
+                      {item.badge}
+                    </span>
                   )}
                 </div>
                 <p className="truncate px-1.5 py-1.5 text-[11px] font-medium text-white/90">

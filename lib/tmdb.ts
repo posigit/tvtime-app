@@ -318,8 +318,11 @@ export type TmdbMediaCard = {
   id: number;
   title: string;
   poster_path?: string | null;
+  backdrop_path?: string | null;
+  overview?: string | null;
   mediaType: "tv" | "movie";
   vote_average?: number;
+  badge?: string;
 };
 
 type TmdbListItem = {
@@ -327,6 +330,8 @@ type TmdbListItem = {
   name?: string;
   title?: string;
   poster_path?: string | null;
+  backdrop_path?: string | null;
+  overview?: string | null;
   vote_average?: number;
 };
 
@@ -338,9 +343,70 @@ function mapList(
     id: r.id,
     title: (mediaType === "tv" ? r.name : r.title) || "Untitled",
     poster_path: r.poster_path,
+    backdrop_path: r.backdrop_path,
+    overview: r.overview,
     mediaType,
     vote_average: r.vote_average,
   }));
+}
+
+export async function getTrendingTvCards(
+  timeWindow: "day" | "week" = "week"
+): Promise<TmdbMediaCard[]> {
+  const data = await getTrendingTv(timeWindow);
+  return mapList(
+    (data.results ?? []).map((s) => ({
+      id: s.id,
+      name: s.name,
+      poster_path: s.poster_path,
+      backdrop_path: s.backdrop_path,
+      overview: s.overview,
+      vote_average: s.vote_average,
+    })),
+    "tv"
+  );
+}
+
+export async function getTrendingMovieCards(
+  timeWindow: "day" | "week" = "week"
+): Promise<TmdbMediaCard[]> {
+  const data = await getTrendingMovies(timeWindow);
+  return mapList(
+    (data.results ?? []).map((m) => ({
+      id: m.id,
+      title: m.title,
+      poster_path: m.poster_path,
+      backdrop_path: m.backdrop_path,
+      overview: m.overview,
+      vote_average: m.vote_average,
+    })),
+    "movie"
+  );
+}
+
+export async function getAiringTodayCards(): Promise<TmdbMediaCard[]> {
+  const data = await getAiringToday();
+  return mapList(
+    (data.results ?? []).map((s) => ({
+      id: s.id,
+      name: s.name,
+      poster_path: s.poster_path,
+      backdrop_path: s.backdrop_path,
+    })),
+    "tv"
+  );
+}
+
+export async function getOnTheAirCards(): Promise<TmdbMediaCard[]> {
+  const data = await getOnTheAir();
+  return mapList(
+    (data.results ?? []).map((s) => ({
+      id: s.id,
+      name: s.name,
+      poster_path: s.poster_path,
+    })),
+    "tv"
+  );
 }
 
 export async function getTvRecommendations(tmdbId: number) {
