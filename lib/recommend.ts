@@ -14,12 +14,12 @@ import {
 import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
 
 /**
- * How often personal "Because you watched" seeds advance.
- * 1h → ~24 rotations/day so Explore keeps changing when you re-open it.
+ * How often personal "Because you watched" *posters* advance inside a rail.
+ * Seeds themselves skip whatever was shown last visit (see excludeSeedIds).
  */
-const ROTATION_MS = 60 * 60 * 1000;
+const ROTATION_MS = 15 * 60 * 1000;
 /** Pull this many candidates for rotation. */
-const SEED_POOL = 8;
+const SEED_POOL = 16;
 /**
  * Max "Because you watched X" rails on Explore.
  * Keep this low — a mixed "For you" rail covers the rest.
@@ -27,6 +27,46 @@ const SEED_POOL = 8;
 const BECAUSE_RAILS_MAX = 2;
 
 type Seed = { tmdbId: number; title: string };
+
+export type BecauseRail = {
+  seedTitle: string;
+  seedTmdbId: number;
+  items: TmdbMediaCard[];
+};
+
+/** Merge seed lists, first-seen wins, cap at `limit`. */
+export function mergeSeeds<T extends { tmdbId: number }>(
+  primary: T[],
+  extra: T[],
+  limit: number
+): T[] {
+  const seen = new Set<number>();
+  const out: T[] = [];
+  for (const s of [...primary, ...extra]) {
+    if (!s || !Number.isFinite(s.tmdbId) || seen.has(s.tmdbId)) continue;
+    seen.add(s.tmdbId);
+    out.push(s);
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
+/**
+ * Prefer titles that were not just shown. If that empties the pool
+ * (tiny library), fall back to the full pool so we still have rails.
+ */
+export function pickSeedsSkippingRecent<T extends { tmdbId: number }>(
+  pool: T[],
+  count: number,
+  recentIds: number[],
+  offset: number
+): T[] {
+  if (pool.length === 0 || count <= 0) return [];
+  const recent = new Set(recentIds);
+  const fresh = pool.filter((s) => !recent.has(s.tmdbId));
+  const source = fresh.length > 0 ? fresh : pool;
+  return pickRotated(source, Math.min(count, source.length), offset);
+}
 
 /**
  * Stable-ish rotation: advances every ROTATION_MS, offset by userId so
@@ -52,11 +92,12 @@ export function pickRotated<T>(
   count: number,
   offset: number
 ): T[] {
-  if (pool.length === 0) return [];
-  if (pool.length <= count) return pool;
+  if (pool.length === 0 || count <= 0) return [];
+  const n = Math.min(count, pool.length);
+  const start = ((offset % pool.length) + pool.length) % pool.length;
   const out: T[] = [];
-  for (let i = 0; i < count; i++) {
-    out.push(pool[(offset + i) % pool.length]);
+  for (let i = 0; i < n; i++) {
+    out.push(pool[(start + i) % pool.length]);
   }
   return out;
 }
@@ -65,13 +106,14 @@ export function pickRotated<T>(
  * "Because you watched…" rails from highest-rated / recent titles,
  * via TMDB recommendations, excluding library.
  *
- * Seeds rotate lightly through the day (~every 4h) across a top pool of 6,
- * so Explore doesn't lock on a single title forever.
+ * Seeds skip whatever was shown last visit, then rotate through a larger pool.
+ * Posters inside a rail also rotate so the same rec is not always first.
  */
 export async function getBecauseYouWatched(
   userId: string,
-  limit = 18
-): Promise<{ seedTitle: string; items: TmdbMediaCard[] }[]> {
+  limit = 18,
+  opts?: { excludeSeedIds?: number[]; excludeSeedTitles?: string[] }
+): Promise<BecauseRail[]> {
   const ownedShowIds = new Set(
     (
       await db
@@ -103,7 +145,6 @@ export async function getBecauseYouWatched(
       )
     )
     .groupBy(watchedEpisodes.showTmdbId, shows.title)
-    .having(sql`count(*) >= 3`)
     .orderBy(desc(sql`avg(${watchedEpisodes.rating})`))
     .limit(SEED_POOL);
 
@@ -124,116 +165,112 @@ export async function getBecauseYouWatched(
     .orderBy(desc(userMovies.rating), desc(userMovies.watchedAt))
     .limit(SEED_POOL);
 
-  if (movieSeeds.length === 0) {
-    movieSeeds = await db
-      .select({
-        tmdbId: userMovies.tmdbId,
-        title: movies.title,
-      })
-      .from(userMovies)
-      .innerJoin(movies, eq(movies.tmdbId, userMovies.tmdbId))
-      .where(
-        and(eq(userMovies.userId, userId), eq(userMovies.status, "watched"))
-      )
-      .orderBy(desc(userMovies.watchedAt))
-      .limit(SEED_POOL);
-  }
+  const recentMovieSeeds = await db
+    .select({
+      tmdbId: userMovies.tmdbId,
+      title: movies.title,
+    })
+    .from(userMovies)
+    .innerJoin(movies, eq(movies.tmdbId, userMovies.tmdbId))
+    .where(and(eq(userMovies.userId, userId), eq(userMovies.status, "watched")))
+    .orderBy(desc(userMovies.watchedAt))
+    .limit(SEED_POOL);
+  movieSeeds = mergeSeeds(movieSeeds, recentMovieSeeds, SEED_POOL);
 
-  // Fallback show seeds: most watched episodes if no ratings
-  let showSeeds: Seed[] = topShows;
-  if (showSeeds.length === 0) {
-    showSeeds = await db
-      .select({
-        tmdbId: watchedEpisodes.showTmdbId,
-        title: shows.title,
-      })
-      .from(watchedEpisodes)
-      .innerJoin(shows, eq(shows.tmdbId, watchedEpisodes.showTmdbId))
-      .where(eq(watchedEpisodes.userId, userId))
-      .groupBy(watchedEpisodes.showTmdbId, shows.title)
-      .orderBy(desc(sql`count(*)`))
-      .limit(SEED_POOL);
-  }
+  const mostWatchedShows = await db
+    .select({
+      tmdbId: watchedEpisodes.showTmdbId,
+      title: shows.title,
+    })
+    .from(watchedEpisodes)
+    .innerJoin(shows, eq(shows.tmdbId, watchedEpisodes.showTmdbId))
+    .where(eq(watchedEpisodes.userId, userId))
+    .groupBy(watchedEpisodes.showTmdbId, shows.title)
+    .orderBy(desc(sql`count(*)`))
+    .limit(SEED_POOL);
+  const showSeeds = mergeSeeds(topShows, mostWatchedShows, SEED_POOL);
+
+  const excludeTitles = new Set(
+    (opts?.excludeSeedTitles ?? []).map((t) => t.trim().toLowerCase()).filter(Boolean)
+  );
+  const exclude = [
+    ...(opts?.excludeSeedIds ?? []),
+    ...showSeeds
+      .concat(movieSeeds)
+      .filter((s) => excludeTitles.has(s.title.trim().toLowerCase()))
+      .map((s) => s.tmdbId),
+  ];
 
   // Prefer one TV seed + one movie seed (max 2 "Because you watched" rails)
-  const showPick = pickRotated(
+  const showPick = pickSeedsSkippingRecent(
     showSeeds,
     1,
-    rotationOffset(userId, showSeeds.length)
+    exclude,
+    rotationOffset(userId + ":tv", Math.max(showSeeds.length, 1))
   )[0];
-  const moviePick = pickRotated(
+  const moviePick = pickSeedsSkippingRecent(
     movieSeeds,
     1,
-    rotationOffset(userId + ":m", movieSeeds.length)
+    exclude,
+    rotationOffset(userId + ":m", Math.max(movieSeeds.length, 1))
   )[0];
 
-  const rails: { seedTitle: string; items: TmdbMediaCard[] }[] = [];
+  const rails: BecauseRail[] = [];
   const seen = new Set<string>();
 
-  if (showPick) {
+  const pushRail = async (
+    seed: Seed,
+    kind: "tv" | "movie"
+  ) => {
+    if (rails.length >= BECAUSE_RAILS_MAX) return;
     try {
-      const recs = await getTvRecommendations(showPick.tmdbId);
-      const items = recs
-        .filter((r) => !ownedShowIds.has(r.id))
-        .filter((r) => {
-          const k = `tv:${r.id}`;
-          if (seen.has(k)) return false;
-          seen.add(k);
-          return true;
-        })
-        .slice(0, limit);
+      const recs =
+        kind === "tv"
+          ? await getTvRecommendations(seed.tmdbId)
+          : await getMovieRecommendations(seed.tmdbId);
+      const owned = kind === "tv" ? ownedShowIds : ownedMovieIds;
+      const filtered = recs.filter((r) => {
+        if (owned.has(r.id)) return false;
+        const k = `${kind}:${r.id}`;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+      const items = pickRotated(
+        filtered,
+        limit,
+        rotationOffset(`${userId}:${kind}:${seed.tmdbId}`, filtered.length)
+      );
       if (items.length > 0) {
-        rails.push({ seedTitle: showPick.title, items });
+        rails.push({
+          seedTitle: seed.title,
+          seedTmdbId: seed.tmdbId,
+          items,
+        });
       }
     } catch {
       /* skip */
     }
-  }
+  };
 
-  if (moviePick && rails.length < BECAUSE_RAILS_MAX) {
-    try {
-      const recs = await getMovieRecommendations(moviePick.tmdbId);
-      const items = recs
-        .filter((r) => !ownedMovieIds.has(r.id))
-        .filter((r) => {
-          const k = `movie:${r.id}`;
-          if (seen.has(k)) return false;
-          seen.add(k);
-          return true;
-        })
-        .slice(0, limit);
-      if (items.length > 0) {
-        rails.push({ seedTitle: moviePick.title, items });
-      }
-    } catch {
-      /* skip */
-    }
-  }
+  if (showPick) await pushRail(showPick, "tv");
+  if (moviePick) await pushRail(moviePick, "movie");
 
-  // If we only got movies or only shows, fill second slot from the other pool
+  // Second TV seed if movies were thin
   if (rails.length < BECAUSE_RAILS_MAX && showSeeds.length > 1) {
-    const alt = pickRotated(
-      showSeeds.filter((s) => s.tmdbId !== showPick?.tmdbId),
+    const used = new Set([
+      ...exclude,
+      ...rails.map((r) => r.seedTmdbId),
+      showPick?.tmdbId,
+      moviePick?.tmdbId,
+    ].filter((id): id is number => typeof id === "number"));
+    const alt = pickSeedsSkippingRecent(
+      showSeeds,
       1,
-      rotationOffset(userId + ":alt", Math.max(1, showSeeds.length - 1))
+      [...used],
+      rotationOffset(userId + ":alt", Math.max(showSeeds.length, 1))
     )[0];
-    if (alt) {
-      try {
-        const recs = await getTvRecommendations(alt.tmdbId);
-        const items = recs
-          .filter((r) => !ownedShowIds.has(r.id))
-          .filter((r) => {
-            const k = `tv:${r.id}`;
-            if (seen.has(k)) return false;
-            seen.add(k);
-            return true;
-          })
-          .slice(0, limit);
-        if (items.length > 0) rails.push({ seedTitle: alt.title, items });
-      } catch {
-        /* skip */
-      }
-    }
+    if (alt) await pushRail(alt, "tv");
   }
 
   return rails.slice(0, BECAUSE_RAILS_MAX);

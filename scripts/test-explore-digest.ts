@@ -13,6 +13,11 @@ import {
 } from "../lib/explore-digest";
 import { parseExploreTab, resolveExploreTab } from "../lib/explore-tab";
 import { rankTopTen } from "../lib/tmdb-list-cache";
+import {
+  mergeSeeds,
+  pickRotated,
+  pickSeedsSkippingRecent,
+} from "../lib/recommend";
 import type { TmdbMediaCard } from "../lib/tmdb";
 
 function card(
@@ -88,5 +93,36 @@ assert.deepEqual(
   ranked.map((r) => r.id),
   [1, 2]
 );
+
+assert.deepEqual(
+  mergeSeeds(
+    [
+      { tmdbId: 1, title: "A" },
+      { tmdbId: 2, title: "B" },
+    ],
+    [
+      { tmdbId: 2, title: "B" },
+      { tmdbId: 3, title: "C" },
+    ],
+    3
+  ).map((s) => s.tmdbId),
+  [1, 2, 3]
+);
+
+const pool = [1, 2, 3, 4, 5, 6, 7, 8].map((tmdbId) => ({ tmdbId }));
+assert.deepEqual(
+  pickSeedsSkippingRecent(pool, 2, [1, 8], 0).map((s) => s.tmdbId),
+  [2, 3]
+);
+assert.deepEqual(
+  pickSeedsSkippingRecent(pool, 1, [1, 2, 3, 4, 5, 6, 7, 8], 0).map(
+    (s) => s.tmdbId
+  ),
+  [1]
+);
+
+const posters = [10, 20, 30, 40];
+assert.deepEqual(pickRotated(posters, 4, 1), [20, 30, 40, 10]);
+assert.notDeepEqual(pickRotated(posters, 4, 0), pickRotated(posters, 4, 1));
 
 console.log("explore digest: all assertions passed");

@@ -13,7 +13,13 @@ import {
   aggregateGenres,
   genresFromTmdbData,
 } from "./profile-insights";
-import { filterNewMedia, getBecauseYouWatched } from "./recommend";
+import {
+  filterNewMedia,
+  getBecauseYouWatched,
+  pickRotated,
+  rotationOffset,
+  type BecauseRail,
+} from "./recommend";
 import { cachedGenreList } from "./tmdb-list-cache";
 import {
   getMovieRecommendations,
@@ -28,7 +34,7 @@ import {
   type TmdbMediaCard,
 } from "./tmdb";
 
-export type BecauseRail = { seedTitle: string; items: TmdbMediaCard[] };
+export type { BecauseRail };
 
 export type DailyPick = {
   item: TmdbMediaCard;
@@ -154,15 +160,26 @@ function parseDailyPick(raw: unknown): DailyPick | null {
 
 function parseBecause(raw: unknown): BecauseRail[] {
   if (!Array.isArray(raw)) return [];
-  return raw
-    .filter(
-      (r): r is BecauseRail =>
-        !!r &&
-        typeof r === "object" &&
-        typeof (r as BecauseRail).seedTitle === "string" &&
-        Array.isArray((r as BecauseRail).items)
-    )
-    .slice(0, 2);
+  const out: BecauseRail[] = [];
+  for (const r of raw) {
+    if (!r || typeof r !== "object") continue;
+    const row = r as {
+      seedTitle?: unknown;
+      seedTmdbId?: unknown;
+      items?: unknown;
+    };
+    if (typeof row.seedTitle !== "string" || !Array.isArray(row.items)) continue;
+    out.push({
+      seedTitle: row.seedTitle,
+      seedTmdbId:
+        typeof row.seedTmdbId === "number" && Number.isFinite(row.seedTmdbId)
+          ? row.seedTmdbId
+          : 0,
+      items: row.items as BecauseRail["items"],
+    });
+    if (out.length >= 2) break;
+  }
+  return out;
 }
 
 function parseCards(raw: unknown): TmdbMediaCard[] {
@@ -372,18 +389,24 @@ async function extraRecBuckets(
   return buckets;
 }
 
-async function buildDigest(userId: string, day: string): Promise<ExploreDigest> {
+async function buildDigest(
+  userId: string,
+  day: string,
+  opts?: { excludeSeedIds?: number[]; excludeSeedTitles?: string[] }
+): Promise<ExploreDigest> {
   const { showIds, movieIds } = await loadLibrary(userId);
   const [because, tasteNames] = await Promise.all([
-    getBecauseYouWatched(userId, BECAUSE_ITEM_LIMIT).catch(
-      () => [] as BecauseRail[]
-    ),
+    getBecauseYouWatched(userId, BECAUSE_ITEM_LIMIT, {
+      excludeSeedIds: opts?.excludeSeedIds,
+      excludeSeedTitles: opts?.excludeSeedTitles,
+    }).catch(() => [] as BecauseRail[]),
     loadTasteGenres(userId).catch(() => [] as string[]),
   ]);
 
   const becauseSeen = new Set<string>();
   const becauseRails = because.slice(0, 2).map((rail) => ({
     seedTitle: rail.seedTitle,
+    seedTmdbId: rail.seedTmdbId,
     items: rail.items.filter((item) => {
       const k = mediaKey(item);
       if (becauseSeen.has(k)) return false;
@@ -434,40 +457,7 @@ async function buildDigest(userId: string, day: string): Promise<ExploreDigest> 
   return { day, dailyPick, forYou, because: becauseRails };
 }
 
-export async function getOrBuildExploreDigest(
-  userId: string
-): Promise<ExploreDigest> {
-  const day = appTodayYmd();
-  try {
-    const rows = await withDbRetry(() =>
-      db
-        .select()
-        .from(userExploreDigest)
-        .where(
-          and(
-            eq(userExploreDigest.userId, userId),
-            eq(userExploreDigest.day, day)
-          )
-        )
-        .limit(1)
-    );
-    const row = rows[0];
-    if (row) {
-      return {
-        day,
-        dailyPick: parseDailyPick(row.dailyPick),
-        forYou: parseCards(row.forYou),
-        because: parseBecause(row.because),
-      };
-    }
-  } catch (err) {
-    console.error(
-      "explore digest read failed:",
-      err instanceof Error ? err.message : err
-    );
-  }
-
-  const digest = await buildDigest(userId, day);
+async function saveDigest(userId: string, day: string, digest: ExploreDigest) {
   try {
     await withDbRetry(() =>
       db
@@ -480,7 +470,15 @@ export async function getOrBuildExploreDigest(
           because: digest.because,
           builtAt: new Date(),
         })
-        .onConflictDoNothing()
+        .onConflictDoUpdate({
+          target: [userExploreDigest.userId, userExploreDigest.day],
+          set: {
+            dailyPick: digest.dailyPick,
+            forYou: digest.forYou,
+            because: digest.because,
+            builtAt: new Date(),
+          },
+        })
     );
   } catch (err) {
     console.error(
@@ -488,6 +486,73 @@ export async function getOrBuildExploreDigest(
       err instanceof Error ? err.message : err
     );
   }
+}
+
+export async function getOrBuildExploreDigest(
+  userId: string
+): Promise<ExploreDigest> {
+  const day = appTodayYmd();
+  let last: ExploreDigest | null = null;
+  try {
+    const rows = await withDbRetry(() =>
+      db
+        .select()
+        .from(userExploreDigest)
+        .where(eq(userExploreDigest.userId, userId))
+        .orderBy(desc(userExploreDigest.day))
+        .limit(1)
+    );
+    const row = rows[0];
+    if (row) {
+      last = {
+        day: row.day,
+        dailyPick: parseDailyPick(row.dailyPick),
+        forYou: parseCards(row.forYou),
+        because: parseBecause(row.because),
+      };
+    }
+  } catch (err) {
+    console.error(
+      "explore digest read failed:",
+      err instanceof Error ? err.message : err
+    );
+  }
+
+  const excludeSeedIds = last?.because
+    .map((r) => r.seedTmdbId)
+    .filter((id) => id > 0);
+  const excludeSeedTitles = last?.because.map((r) => r.seedTitle);
+  const sameDay = last?.day === day;
+
+  if (sameDay && last) {
+    // Keep Daily Pick; refresh Because rails so the same two titles cannot stick.
+    const because = await getBecauseYouWatched(userId, BECAUSE_ITEM_LIMIT, {
+      excludeSeedIds,
+      excludeSeedTitles,
+    }).catch(() => [] as BecauseRail[]);
+    const forYou =
+      last.forYou.length > 0
+        ? pickRotated(
+            last.forYou,
+            last.forYou.length,
+            rotationOffset(userId + ":foryou", last.forYou.length)
+          )
+        : last.forYou;
+    const digest: ExploreDigest = {
+      day,
+      dailyPick: last.dailyPick,
+      forYou,
+      because: because.length > 0 ? because : last.because,
+    };
+    await saveDigest(userId, day, digest);
+    return digest;
+  }
+
+  const digest = await buildDigest(userId, day, {
+    excludeSeedIds,
+    excludeSeedTitles,
+  });
+  await saveDigest(userId, day, digest);
   return digest;
 }
 
