@@ -142,6 +142,29 @@ export async function loadExploreFeed(userId: string): Promise<ExploreFeedData> 
   };
 }
 
+export type TopTenKind = "shows" | "movies";
+
+export async function loadTopTenChart(
+  userId: string,
+  kind: TopTenKind
+): Promise<{
+  kind: TopTenKind;
+  items: TmdbMediaCard[];
+  library: ExploreLibrary;
+}> {
+  const [library, raw] = await Promise.all([
+    getLibraryState(userId),
+    kind === "shows"
+      ? cachedTrendingTv("week").catch(() => [] as TmdbMediaCard[])
+      : cachedTrendingMovies("week").catch(() => [] as TmdbMediaCard[]),
+  ]);
+  return {
+    kind,
+    items: rankTopTen(raw, 10),
+    library,
+  };
+}
+
 export async function loadExploreDiscover(
   userId: string
 ): Promise<ExploreDiscoverData> {

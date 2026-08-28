@@ -143,6 +143,20 @@
 /* ── Safe areas (Phase 2: native shell) ───────────────────────────────────
    Requires viewport-fit=cover. env() falls back to 0px in browsers without insets. */
 @layer utilities {
+  .top-ten-rank {
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: -0.1em;
+    line-height: 0.75;
+    color: rgba(255, 255, 255, 0.06);
+    -webkit-text-stroke: 2.5px rgba(255, 255, 255, 0.88);
+    paint-order: stroke fill;
+  }
+  .top-ten-rank-gold {
+    color: rgba(245, 197, 24, 0.12);
+    -webkit-text-stroke: 2.5px #f5c518;
+  }
+
   .pt-safe {
     padding-top: env(safe-area-inset-top, 0px);
   }

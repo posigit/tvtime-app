@@ -192,6 +192,11 @@ export function ExplorePageSkeleton() {
         </div>
         <section className="mb-7">
           <Skeleton className="mb-2.5 h-3 w-24" />
+          <Skeleton className="mb-3 h-8 w-48" />
+          <PosterRailSkeleton count={5} />
+        </section>
+        <section className="mb-7">
+          <Skeleton className="mb-2.5 h-3 w-24" />
           <Skeleton className="h-52 w-full rounded-2xl" />
         </section>
         <section className="mb-6">

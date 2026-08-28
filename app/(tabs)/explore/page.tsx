@@ -83,6 +83,17 @@ async function FeedBody({ userId }: { userId: string }) {
     <>
       <TonightStrip items={tonight} />
       <ContinueWatchingRail items={continueWatching} />
+
+      <TopTenRail
+        label="Top 10 Series"
+        kicker="Hottest this week"
+        href="/explore/top-10/shows"
+        items={topShows}
+        ownedIds={library.followedShowIds}
+        priority
+        featured
+      />
+
       {pick && (
         <DailyPickCard
           pick={pick}
@@ -119,13 +130,8 @@ async function FeedBody({ userId }: { userId: string }) {
       ))}
 
       <TopTenRail
-        label="Top 10 Shows"
-        items={topShows}
-        ownedIds={library.followedShowIds}
-        priority
-      />
-      <TopTenRail
         label="Top 10 Movies"
+        href="/explore/top-10/movies"
         items={topMovies}
         ownedIds={library.ownedMovieIds}
       />
