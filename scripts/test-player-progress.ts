@@ -14,6 +14,7 @@ import {
 } from "../lib/player-progress";
 import { cueTextAt, parseVttCues } from "../lib/player-subs";
 import { embedUrlFor } from "../lib/embed-sources";
+import { DEFAULT_VIX_SETTINGS } from "../lib/vix-settings";
 import { NEXT_FAB_RATIO, RESUME_END_RATIO } from "../lib/player-constants";
 
 assert.equal(isResumablePosition(3, 100), false);
@@ -117,6 +118,8 @@ assert.equal(cueTextAt(cues, 61), "Line one\nLine two");
 const delayed = parseVttCues(sampleVtt, 1);
 assert.equal(cueTextAt(delayed, 1.5), "");
 assert.equal(cueTextAt(delayed, 2.5), "Hello world");
+
+assert.equal(DEFAULT_VIX_SETTINGS.subBgBlur, "md");
 
 assert.equal(RESUME_END_RATIO, 0.92);
 assert.equal(NEXT_FAB_RATIO, 0.96);

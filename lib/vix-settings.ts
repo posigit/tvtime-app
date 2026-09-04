@@ -50,6 +50,8 @@ export type VixSettings = {
   subColor: "white" | "yellow" | "cyan";
   /** Cue background opacity 0..1. */
   subBgOpacity: number;
+  /** Cue background blur (liquid-glass pill). Off when background is off. */
+  subBgBlur: "none" | "sm" | "md" | "lg";
 };
 
 export const VIX_SETTINGS_KEY = "vix-settings";
@@ -72,6 +74,7 @@ export const DEFAULT_VIX_SETTINGS: VixSettings = {
   subFontSize: "md",
   subColor: "white",
   subBgOpacity: 0.35,
+  subBgBlur: "md",
 };
 
 /** Language codes that should NEVER apply as a default (hard user rule).
@@ -133,6 +136,14 @@ function clampSettings(merged: VixSettings): VixSettings {
     next.subBgOpacity = 0.35;
   } else {
     next.subBgOpacity = Math.max(0, Math.min(1, next.subBgOpacity));
+  }
+  if (
+    next.subBgBlur !== "none" &&
+    next.subBgBlur !== "sm" &&
+    next.subBgBlur !== "md" &&
+    next.subBgBlur !== "lg"
+  ) {
+    next.subBgBlur = "md";
   }
   if (typeof next.volume !== "number" || !Number.isFinite(next.volume)) {
     next.volume = 1;

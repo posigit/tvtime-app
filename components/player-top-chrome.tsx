@@ -53,9 +53,13 @@ type PlayerTopChromeProps = {
   subFontSize: VixSettings["subFontSize"];
   subColor: VixSettings["subColor"];
   subBgOpacity: number;
+  subBgBlur: VixSettings["subBgBlur"];
   onPatchSubStyle: (
     patch: Partial<
-      Pick<VixSettings, "subFontSize" | "subColor" | "subBgOpacity">
+      Pick<
+        VixSettings,
+        "subFontSize" | "subColor" | "subBgOpacity" | "subBgBlur"
+      >
     >
   ) => void;
   subError: string | null;
@@ -114,6 +118,7 @@ export function PlayerTopChrome({
   subFontSize,
   subColor,
   subBgOpacity,
+  subBgBlur,
   onPatchSubStyle,
   subError,
   onSwitchSource,
@@ -546,6 +551,37 @@ export function PlayerTopChrome({
                                 : "bg-secondary text-white"
                             )}
                             aria-label={`Background ${label}`}
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-8 shrink-0 text-[10px] font-semibold uppercase tracking-wide text-white/45">
+                          Blur
+                        </span>
+                        {(
+                          [
+                            ["none", "0"],
+                            ["sm", "S"],
+                            ["md", "M"],
+                            ["lg", "L"],
+                          ] as [VixSettings["subBgBlur"], string][]
+                        ).map(([value, label]) => (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onPatchSubStyle({ subBgBlur: value });
+                            }}
+                            className={cn(
+                              "h-8 min-w-8 flex-1 rounded-lg px-1.5 text-[10px] font-bold",
+                              subBgBlur === value
+                                ? "bg-primary text-black"
+                                : "bg-secondary text-white"
+                            )}
+                            aria-label={`Background blur ${label}`}
                           >
                             {label}
                           </button>

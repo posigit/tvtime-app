@@ -224,6 +224,9 @@ export function VixPlayer({
   const [subBgOpacity, setSubBgOpacity] = useState(
     () => loadVixSettings().subBgOpacity
   );
+  const [subBgBlur, setSubBgBlur] = useState<VixSettings["subBgBlur"]>(
+    () => loadVixSettings().subBgBlur
+  );
   /** True once an external VTT is loaded — Sync can re-time it. */
   const [hasExternalSubs, setHasExternalSubs] = useState(false);
   const [audioTracks, setAudioTracks] = useState<AudioTrackInfo[]>([]);
@@ -1950,10 +1953,11 @@ export function VixPlayer({
   }, [subDelay]);
 
   const patchSubStyle = useCallback(
-    (patch: Partial<Pick<VixSettings, "subFontSize" | "subColor" | "subBgOpacity">>) => {
+    (patch: Partial<Pick<VixSettings, "subFontSize" | "subColor" | "subBgOpacity" | "subBgBlur">>) => {
       if (patch.subFontSize) setSubFontSize(patch.subFontSize);
       if (patch.subColor) setSubColor(patch.subColor);
       if (typeof patch.subBgOpacity === "number") setSubBgOpacity(patch.subBgOpacity);
+      if (patch.subBgBlur) setSubBgBlur(patch.subBgBlur);
       saveVixSettings(patch);
     },
     []
@@ -2034,6 +2038,7 @@ export function VixPlayer({
           fontScale={SUB_FONT_SCALE[subFontSize]}
           color={SUB_COLORS[subColor]}
           bgOpacity={subBgOpacity}
+          bgBlur={subBgBlur}
           chromeRaised={!locked && chromeVisible}
         />
       )}
@@ -2044,6 +2049,7 @@ export function VixPlayer({
           fontScale={SUB_FONT_SCALE[subFontSize]}
           color={SUB_COLORS[subColor]}
           bgOpacity={subBgOpacity}
+          bgBlur={subBgBlur}
           chromeRaised={!locked && chromeVisible}
         />
       )}
@@ -2165,6 +2171,7 @@ export function VixPlayer({
           subFontSize={subFontSize}
           subColor={subColor}
           subBgOpacity={subBgOpacity}
+          subBgBlur={subBgBlur}
           onPatchSubStyle={patchSubStyle}
           subError={subError}
           onSwitchSource={() => {

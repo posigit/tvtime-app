@@ -7,12 +7,24 @@ import { useEffect, useState, type RefObject } from "react";
  * Native ::cue styling is unreliable with <video controls> / hls.js —
  * this is the only dependable way to do color / size / background.
  */
+/** backdrop-blur utilities per blur step (full literals for Tailwind). */
+export const SUB_BLUR_CLASS: Record<
+  "none" | "sm" | "md" | "lg",
+  string
+> = {
+  none: "",
+  sm: "backdrop-blur-sm",
+  md: "backdrop-blur-md",
+  lg: "backdrop-blur-xl",
+};
+
 export function SubtitleOverlay({
   videoRef,
   enabled,
   fontScale,
   color,
   bgOpacity,
+  bgBlur,
   /** When true, sit above the transport scrubber; otherwise low on the frame. */
   chromeRaised = false,
 }: {
@@ -22,6 +34,7 @@ export function SubtitleOverlay({
   fontScale: number;
   color: string;
   bgOpacity: number;
+  bgBlur: "none" | "sm" | "md" | "lg";
   chromeRaised?: boolean;
 }) {
   const [text, setText] = useState("");
@@ -96,6 +109,7 @@ export function SubtitleOverlay({
       fontPx={fontPx}
       color={color}
       bgOpacity={bgOpacity}
+      bgBlur={bgBlur}
       positionClass={positionClass}
     />
   );
@@ -103,19 +117,21 @@ export function SubtitleOverlay({
 
 /**
  * Liquid-glass cue shell shared by native + iframe overlays.
- * bgOpacity 0 = bare text with shadow; otherwise frosted pill.
+ * bgOpacity 0 = bare text with shadow; otherwise frosted pill with blur step.
  */
 export function CueShell({
   text,
   fontPx,
   color,
   bgOpacity,
+  bgBlur,
   positionClass,
 }: {
   text: string;
   fontPx: number;
   color: string;
   bgOpacity: number;
+  bgBlur: "none" | "sm" | "md" | "lg";
   positionClass: string;
 }) {
   const glass = bgOpacity > 0;
@@ -130,7 +146,7 @@ export function CueShell({
       <p
         className={
           glass
-            ? "max-w-[92%] whitespace-pre-wrap text-center font-medium leading-snug backdrop-blur-md ring-1 ring-white/15 sm:max-w-[90%]"
+            ? `max-w-[92%] whitespace-pre-wrap text-center font-medium leading-snug ring-1 ring-white/15 sm:max-w-[90%] ${SUB_BLUR_CLASS[bgBlur]}`
             : "max-w-[92%] whitespace-pre-wrap text-center font-medium leading-snug sm:max-w-[90%]"
         }
         style={{
@@ -161,6 +177,7 @@ export function IframeSubtitleOverlay({
   fontScale,
   color,
   bgOpacity,
+  bgBlur,
   chromeRaised = false,
 }: {
   text: string;
@@ -168,6 +185,7 @@ export function IframeSubtitleOverlay({
   fontScale: number;
   color: string;
   bgOpacity: number;
+  bgBlur: "none" | "sm" | "md" | "lg";
   /** When true, sit above the transport scrubber; otherwise low on the frame. */
   chromeRaised?: boolean;
 }) {
@@ -182,6 +200,7 @@ export function IframeSubtitleOverlay({
       fontPx={fontPx}
       color={color}
       bgOpacity={bgOpacity}
+      bgBlur={bgBlur}
       positionClass={positionClass}
     />
   );

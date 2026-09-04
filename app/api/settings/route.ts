@@ -61,6 +61,14 @@ export async function POST(request: Request) {
   };
   if (typeof merged.subs !== "string") merged.subs = DEFAULT_VIX_SETTINGS.subs;
   if (typeof merged.audio !== "string") merged.audio = DEFAULT_VIX_SETTINGS.audio;
+  if (
+    merged.subBgBlur !== "none" &&
+    merged.subBgBlur !== "sm" &&
+    merged.subBgBlur !== "md" &&
+    merged.subBgBlur !== "lg"
+  ) {
+    merged.subBgBlur = DEFAULT_VIX_SETTINGS.subBgBlur;
+  }
   if (isBannedSubLang(merged.subs)) merged.subs = "en";
   if (isBannedSubLang(merged.audio)) merged.audio = "en";
 
