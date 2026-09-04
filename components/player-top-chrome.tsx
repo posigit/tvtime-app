@@ -8,6 +8,7 @@ import {
   Gauge,
   Lock,
   SkipForward,
+  Smartphone,
   Volume2,
   X,
 } from "lucide-react";
@@ -80,6 +81,8 @@ type PlayerTopChromeProps = {
   showAutoplayToggle?: boolean;
   autoplayNext?: boolean;
   onToggleAutoplayNext?: () => void;
+  autoRotate?: boolean;
+  onToggleAutoRotate?: () => void;
   onLock: () => void;
   onClose: () => void;
   onKeepChrome: () => void;
@@ -138,6 +141,8 @@ export function PlayerTopChrome({
   showAutoplayToggle = false,
   autoplayNext = true,
   onToggleAutoplayNext,
+  autoRotate = true,
+  onToggleAutoRotate,
   onLock,
   onClose,
   onKeepChrome,
@@ -720,6 +725,35 @@ export function PlayerTopChrome({
               <SkipForward className="h-4 w-4" />
               <span className="hidden sm:inline">
                 {autoplayNext ? "Auto" : "Manual"}
+              </span>
+            </button>
+          )}
+          {onToggleAutoRotate && (
+            <button
+              type="button"
+              onClick={() => {
+                onKeepChrome();
+                onToggleAutoRotate();
+              }}
+              aria-label={
+                autoRotate ? "Auto-rotate on" : "Auto-rotate off"
+              }
+              aria-pressed={autoRotate}
+              title={
+                autoRotate
+                  ? "Auto-rotate: fullscreen goes landscape"
+                  : "Auto-rotate: off"
+              }
+              className={cn(
+                "flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-bold ring-1 backdrop-blur transition",
+                autoRotate
+                  ? "bg-primary/20 text-primary ring-primary/40 hover:bg-primary/30"
+                  : "bg-black/60 text-white/50 ring-white/20 hover:bg-black/80 hover:text-white/80"
+              )}
+            >
+              <Smartphone className="h-4 w-4" />
+              <span className="hidden sm:inline">
+                {autoRotate ? "Auto" : "Fixed"}
               </span>
             </button>
           )}

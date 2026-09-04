@@ -30,6 +30,8 @@ export type VixSettings = {
   muted: boolean;
   /** Auto-play the next episode when the current one ends (TV only). */
   autoplayNext: boolean;
+  /** Force landscape while the player is fullscreen (Netflix-style). */
+  autoRotate: boolean;
   /**
    * Subtitle source preference (picker in the player):
    * "auto" (default) = stream CC when present, else VDRK → OpenSubtitles;
@@ -72,6 +74,7 @@ export const DEFAULT_VIX_SETTINGS: VixSettings = {
   volume: 1,
   muted: false,
   autoplayNext: true,
+  autoRotate: true,
   preferredSource: "vix",
   subSource: "auto",
   subDelaySeconds: 0,
@@ -172,6 +175,7 @@ function clampSettings(merged: VixSettings): VixSettings {
     next.volume = Math.max(0, Math.min(1, next.volume));
   }
   next.autoplayNext = next.autoplayNext !== false;
+  next.autoRotate = next.autoRotate !== false;
   return next;
 }
 

@@ -127,6 +127,7 @@ assert.equal(cueTextAt(delayed, 2.5), "Hello world");
 assert.equal(DEFAULT_VIX_SETTINGS.subBgBlur, "md");
 assert.equal(DEFAULT_VIX_SETTINGS.videoFit, "fit");
 assert.equal(DEFAULT_VIX_SETTINGS.embedZoom, 1);
+assert.equal(DEFAULT_VIX_SETTINGS.autoRotate, true);
 assert.equal(SUB_FONT_SCALE.xs, 0.75);
 
 // CineSrc preferred-quality param (Auto clears it).

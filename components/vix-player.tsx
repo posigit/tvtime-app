@@ -221,6 +221,9 @@ export function VixPlayer({
   const [autoplayNext, setAutoplayNext] = useState(
     () => loadVixSettings().autoplayNext
   );
+  const [autoRotate, setAutoRotate] = useState(
+    () => loadVixSettings().autoRotate
+  );
   const [subDelay, setSubDelay] = useState(
     () => loadVixSettings().subDelaySeconds
   );
@@ -572,6 +575,7 @@ export function VixPlayer({
   const seekBy = useCallback(
     (side: "left" | "right") => {
       const delta = side === "right" ? 10 : -10;
+      navigator.vibrate?.(10);
       if (isDrivenEmbed) {
         sendEmbedSeek(
           clampEmbedTime(remotePositionRef.current + delta)
@@ -1451,6 +1455,44 @@ export function VixPlayer({
     return () => document.removeEventListener("fullscreenchange", onFs);
   }, []);
 
+  // Netflix-style auto-landscape while fullscreen. Android-only in practice
+  // (iOS has no Orientation Lock API); every failure path is silent so
+  // unsupported browsers just keep manual rotate. Released on exit/unmount.
+  useEffect(() => {
+    const orient = screen.orientation as
+      | (ScreenOrientation & {
+          lock?: (o: OrientationLockType) => Promise<void>;
+        })
+      | undefined;
+    if (isFullscreen && autoRotate) {
+      try {
+        void orient?.lock?.("landscape")?.catch(() => {});
+      } catch {
+        /* unsupported — manual rotate */
+      }
+    } else {
+      try {
+        orient?.unlock?.();
+      } catch {
+        /* noop */
+      }
+    }
+  }, [isFullscreen, autoRotate]);
+
+  useEffect(() => {
+    return () => {
+      try {
+        (
+          screen.orientation as
+            | (ScreenOrientation & { unlock?: () => void })
+            | undefined
+        )?.unlock?.();
+      } catch {
+        /* noop */
+      }
+    };
+  }, []);
+
   const togglePlay = useCallback(() => {
     if (isDrivenEmbed) {
       sendCineSrcCommand(
@@ -1469,6 +1511,7 @@ export function VixPlayer({
 
   const seekBySeconds = useCallback(
     (delta: number) => {
+      navigator.vibrate?.(10);
       if (isDrivenEmbed) {
         sendEmbedSeek(
           clampEmbedTime(remotePositionRef.current + delta)
@@ -2265,7 +2308,19 @@ export function VixPlayer({
               return next;
             });
           }}
-          onLock={() => setLocked(true)}
+          autoRotate={autoRotate}
+          onToggleAutoRotate={() => {
+            navigator.vibrate?.(10);
+            setAutoRotate((prev) => {
+              const next = !prev;
+              saveVixSettings({ autoRotate: next });
+              return next;
+            });
+          }}
+          onLock={() => {
+            navigator.vibrate?.(10);
+            setLocked(true);
+          }}
           onClose={() => {
             void flushPosition().then(() => {
               onClose();
@@ -2289,6 +2344,7 @@ export function VixPlayer({
         <button
           type="button"
           onClick={() => {
+            navigator.vibrate?.(10);
             setLocked(false);
             setChromeVisible(true);
           }}
