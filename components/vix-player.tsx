@@ -212,6 +212,12 @@ export function VixPlayer({
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(
     () => loadVixSettings().speed
   );
+  const [videoFit, setVideoFit] = useState<VixSettings["videoFit"]>(
+    () => loadVixSettings().videoFit
+  );
+  const [embedZoom, setEmbedZoom] = useState<VixSettings["embedZoom"]>(
+    () => loadVixSettings().embedZoom
+  );
   const [autoplayNext, setAutoplayNext] = useState(
     () => loadVixSettings().autoplayNext
   );
@@ -1536,6 +1542,22 @@ export function VixPlayer({
     [isDrivenEmbed, bumpChrome]
   );
 
+  /** Cycle screen fill: object-fit on native, CSS zoom on embeds. */
+  const cycleScreenFill = useCallback(() => {
+    if (mode === "native") {
+      const order: VixSettings["videoFit"][] = ["fit", "cover", "stretch"];
+      const next = order[(order.indexOf(videoFit) + 1) % order.length] ?? "fit";
+      setVideoFit(next);
+      saveVixSettings({ videoFit: next });
+    } else if (mode === "iframe") {
+      const order: VixSettings["embedZoom"][] = [1, 1.25, 1.5];
+      const next = order[(order.indexOf(embedZoom) + 1) % order.length] ?? 1;
+      setEmbedZoom(next);
+      saveVixSettings({ embedZoom: next });
+    }
+    bumpChrome();
+  }, [mode, videoFit, embedZoom, bumpChrome]);
+
   const toggleFullscreen = useCallback(() => {
     const root = shellRef.current;
     if (!root) return;
@@ -1922,6 +1944,10 @@ export function VixPlayer({
         e.preventDefault();
         e.stopPropagation();
         toggleMute();
+      } else if (key === "z") {
+        e.preventDefault();
+        e.stopPropagation();
+        cycleScreenFill();
       } else if (key === "f") {
         e.preventDefault();
         e.stopPropagation();
@@ -1945,6 +1971,7 @@ export function VixPlayer({
     togglePlay,
     seekBySeconds,
     toggleMute,
+    cycleScreenFill,
   ]);
 
   const adjustSubDelay = useCallback((delta: number) => {
@@ -2051,7 +2078,13 @@ export function VixPlayer({
           disablePictureInPicture={false}
           onTouchEnd={handleTap}
           onClick={handleVideoClick}
-          className="h-full w-full touch-manipulation bg-black"
+          className={`h-full w-full touch-manipulation bg-black ${
+            videoFit === "cover"
+              ? "object-cover"
+              : videoFit === "stretch"
+                ? "object-fill"
+                : "object-contain"
+          }`}
         />
       )}
 
@@ -2079,33 +2112,40 @@ export function VixPlayer({
       )}
 
       {mode === "iframe" && (
-        <iframe
-          key={iframeSrc}
-          ref={iframeRef}
-          src={iframeSrc}
-          title={title}
-          // vixsrc.to WAF blocks referers from *.vercel.app — strip it so the
-          // fallback embed can load on Vercel-hosted prod.
-          referrerPolicy="no-referrer"
-          allow="autoplay; fullscreen; encrypted-media; picture-in-picture; clipboard-write"
-          allowFullScreen
-          // NOTE: no sandbox attribute on purpose — every source gates
-          // playback on window.open/navigation working and shows a "disable
-          // sandbox" wall otherwise. Popup defense lives in the tap-catcher
-          // overlays on driven embeds (CineSrc/VidFast) instead.
-          onLoad={() => {
-            setIframeError(false);
-            // VidFast starts muted under autoplay policy with no
-            // unsolicited state event — pull the real state on every load.
-            if (vidfastEmbed) {
-              sendVidfastCommand(iframeRef.current, "getStatus");
+        <div className="h-full w-full overflow-hidden bg-black">
+          <iframe
+            key={iframeSrc}
+            ref={iframeRef}
+            src={iframeSrc}
+            title={title}
+            // vixsrc.to WAF blocks referers from *.vercel.app — strip it so the
+            // fallback embed can load on Vercel-hosted prod.
+            referrerPolicy="no-referrer"
+            allow="autoplay; fullscreen; encrypted-media; picture-in-picture; clipboard-write"
+            allowFullScreen
+            // NOTE: no sandbox attribute on purpose — every source gates
+            // playback on window.open/navigation working and shows a "disable
+            // sandbox" wall otherwise. Popup defense lives in the tap-catcher
+            // overlays on driven embeds (CineSrc/VidFast) instead.
+            onLoad={() => {
+              setIframeError(false);
+              // VidFast starts muted under autoplay policy with no
+              // unsolicited state event — pull the real state on every load.
+              if (vidfastEmbed) {
+                sendVidfastCommand(iframeRef.current, "getStatus");
+              }
+            }}
+            onError={() => setIframeError(true)}
+            style={
+              embedZoom !== 1
+                ? { transform: `scale(${embedZoom})` }
+                : undefined
             }
-          }}
-          onError={() => setIframeError(true)}
-          className={`h-full w-full border-0 bg-black ${
-            locked || isDrivenEmbed ? "pointer-events-none" : ""
-          }`}
-        />
+            className={`h-full w-full border-0 bg-black ${
+              locked || isDrivenEmbed ? "pointer-events-none" : ""
+            }`}
+          />
+        </div>
       )}
 
       {isDrivenEmbed && !locked && (
@@ -2153,6 +2193,9 @@ export function VixPlayer({
           streamable={streamable}
           isLoading={isLoading || (mode === "native" && !mediaReady)}
           playbackSpeed={playbackSpeed}
+          videoFit={videoFit}
+          embedZoom={embedZoom}
+          onCycleScreenFill={cycleScreenFill}
           onCycleSpeed={() => {
             // CineSrc is the only embed with a rate API; VidFast has none,
             // so the speed button stays CineSrc/native-only (see top chrome).

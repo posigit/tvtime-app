@@ -52,6 +52,10 @@ export type VixSettings = {
   subBgOpacity: number;
   /** Cue background blur (liquid-glass pill). Off when background is off. */
   subBgBlur: "none" | "sm" | "md" | "lg";
+  /** Native aspect mode (object-fit). */
+  videoFit: "fit" | "cover" | "stretch";
+  /** Iframe zoom (CSS scale crop) — cross-origin frames lack aspect APIs. */
+  embedZoom: 1 | 1.25 | 1.5;
 };
 
 export const VIX_SETTINGS_KEY = "vix-settings";
@@ -75,6 +79,8 @@ export const DEFAULT_VIX_SETTINGS: VixSettings = {
   subColor: "white",
   subBgOpacity: 0.35,
   subBgBlur: "md",
+  videoFit: "fit",
+  embedZoom: 1,
 };
 
 /** Language codes that should NEVER apply as a default (hard user rule).
@@ -145,6 +151,20 @@ function clampSettings(merged: VixSettings): VixSettings {
     next.subBgBlur !== "lg"
   ) {
     next.subBgBlur = "md";
+  }
+  if (
+    next.videoFit !== "fit" &&
+    next.videoFit !== "cover" &&
+    next.videoFit !== "stretch"
+  ) {
+    next.videoFit = "fit";
+  }
+  if (
+    next.embedZoom !== 1 &&
+    next.embedZoom !== 1.25 &&
+    next.embedZoom !== 1.5
+  ) {
+    next.embedZoom = 1;
   }
   if (typeof next.volume !== "number" || !Number.isFinite(next.volume)) {
     next.volume = 1;

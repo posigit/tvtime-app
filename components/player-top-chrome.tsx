@@ -4,6 +4,7 @@ import type { MutableRefObject, RefObject } from "react";
 import {
   Captions,
   Check,
+  Crop,
   Gauge,
   Lock,
   SkipForward,
@@ -30,6 +31,9 @@ type PlayerTopChromeProps = {
   isLoading: boolean;
   playbackSpeed: number;
   onCycleSpeed: () => void;
+  videoFit: VixSettings["videoFit"];
+  embedZoom: VixSettings["embedZoom"];
+  onCycleScreenFill: () => void;
   audioTracks: AudioTrackInfo[];
   audioTrackId: number;
   audioMenuOpen: boolean;
@@ -98,6 +102,9 @@ export function PlayerTopChrome({
   isLoading,
   playbackSpeed,
   onCycleSpeed,
+  videoFit,
+  embedZoom,
+  onCycleScreenFill,
   audioTracks,
   audioTrackId,
   audioMenuOpen,
@@ -193,6 +200,25 @@ export function PlayerTopChrome({
               className="flex h-9 items-center rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
             >
               {playbackSpeed}×
+            </button>
+          )}
+          {(mode === "native" || mode === "iframe") && (
+            <button
+              type="button"
+              onClick={onCycleScreenFill}
+              aria-label="Screen fill mode"
+              className="flex h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+            >
+              <Crop className="h-4 w-4" />
+              <span className="hidden sm:inline">
+                {mode === "native"
+                  ? videoFit === "fit"
+                    ? "Fit"
+                    : videoFit === "cover"
+                      ? "Cover"
+                      : "Stretch"
+                  : `${Math.round(embedZoom * 100)}%`}
+              </span>
             </button>
           )}
           {mode === "native" && audioTracks.length > 1 && (

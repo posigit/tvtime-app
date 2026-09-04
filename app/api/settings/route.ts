@@ -69,6 +69,20 @@ export async function POST(request: Request) {
   ) {
     merged.subBgBlur = DEFAULT_VIX_SETTINGS.subBgBlur;
   }
+  if (
+    merged.videoFit !== "fit" &&
+    merged.videoFit !== "cover" &&
+    merged.videoFit !== "stretch"
+  ) {
+    merged.videoFit = DEFAULT_VIX_SETTINGS.videoFit;
+  }
+  if (
+    merged.embedZoom !== 1 &&
+    merged.embedZoom !== 1.25 &&
+    merged.embedZoom !== 1.5
+  ) {
+    merged.embedZoom = DEFAULT_VIX_SETTINGS.embedZoom;
+  }
   if (isBannedSubLang(merged.subs)) merged.subs = "en";
   if (isBannedSubLang(merged.audio)) merged.audio = "en";
 
