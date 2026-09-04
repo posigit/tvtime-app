@@ -140,20 +140,9 @@ export async function POST(request: Request) {
           )
       );
 
-      // Unmarking removes the matching history entries + resume bookmark
-      await withDbRetry(() =>
-        db
-          .delete(watchHistory)
-          .where(
-            and(
-              eq(watchHistory.userId, session.user.id),
-              eq(watchHistory.mediaType, "tv"),
-              eq(watchHistory.tmdbId, sid),
-              eq(watchHistory.seasonNumber, seasonNumber),
-              eq(watchHistory.episodeNumber, episodeNumber)
-            )
-          )
-      );
+      // Unmarking clears episode state + resume bookmark but PRESERVES the
+      // append-only history (same rule as movie-unwatch): the heatmap counts
+      // the historical fact of the watch, and relogging appends a new date.
       await withDbRetry(() =>
         db
           .delete(playbackPositions)

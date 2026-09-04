@@ -7,6 +7,7 @@ import {
   userShows,
   userMovies,
   watchedEpisodes,
+  watchHistory,
   userLists,
 } from "@/lib/schema";
 import {
@@ -321,25 +322,31 @@ export default async function ProfilePage() {
       )
     );
 
-  // Activity by day (episodes + movies) for streak + heatmap
-  const [epDays, movieDays] = await Promise.all([
+  // Activity by day for streak + heatmap. Sourced from the append-only
+  // watch_history (every completion keeps its date, rewatches included) UNION
+  // current library state (covers pre-history imports). Merged on title-day
+  // keys so a completion stamped in both tables counts once, while unwatching
+  // (which clears state) can never erase the historical fact of the watch.
+  const [histRows, stateMovieRows, stateEpRows] = await Promise.all([
     db
       .select({
-        day: sql<string>`TO_CHAR(${watchedEpisodes.watchedAt}, 'YYYY-MM-DD')`,
-        cnt: sql<number>`count(*)::int`,
+        day: sql<string>`TO_CHAR(${watchHistory.watchedAt}, 'YYYY-MM-DD')`,
+        mediaType: watchHistory.mediaType,
+        tmdbId: watchHistory.tmdbId,
+        seasonNumber: watchHistory.seasonNumber,
+        episodeNumber: watchHistory.episodeNumber,
       })
-      .from(watchedEpisodes)
+      .from(watchHistory)
       .where(
         and(
-          eq(watchedEpisodes.userId, userId),
-          isNotNull(watchedEpisodes.watchedAt)
+          eq(watchHistory.userId, userId),
+          isNotNull(watchHistory.watchedAt)
         )
-      )
-      .groupBy(sql`TO_CHAR(${watchedEpisodes.watchedAt}, 'YYYY-MM-DD')`),
+      ),
     db
       .select({
         day: sql<string>`TO_CHAR(${userMovies.watchedAt}, 'YYYY-MM-DD')`,
-        cnt: sql<number>`count(*)::int`,
+        tmdbId: userMovies.tmdbId,
       })
       .from(userMovies)
       .where(
@@ -348,18 +355,57 @@ export default async function ProfilePage() {
           eq(userMovies.status, "watched"),
           isNotNull(userMovies.watchedAt)
         )
-      )
-      .groupBy(sql`TO_CHAR(${userMovies.watchedAt}, 'YYYY-MM-DD')`),
+      ),
+    db
+      .select({
+        day: sql<string>`TO_CHAR(${watchedEpisodes.watchedAt}, 'YYYY-MM-DD')`,
+        tmdbId: watchedEpisodes.showTmdbId,
+        seasonNumber: watchedEpisodes.seasonNumber,
+        episodeNumber: watchedEpisodes.episodeNumber,
+      })
+      .from(watchedEpisodes)
+      .where(
+        and(
+          eq(watchedEpisodes.userId, userId),
+          isNotNull(watchedEpisodes.watchedAt)
+        )
+      ),
   ]);
 
-  const dayCountMap = new Map<string, number>();
-  for (const r of epDays) {
-    if (!r.day) continue;
-    dayCountMap.set(r.day, (dayCountMap.get(r.day) ?? 0) + Number(r.cnt));
+  const dayTitleSets = new Map<string, Set<string>>();
+  const addDayTitle = (
+    day: string | null,
+    key: string | null
+  ) => {
+    if (!day || !key) return;
+    let set = dayTitleSets.get(day);
+    if (!set) {
+      set = new Set<string>();
+      dayTitleSets.set(day, set);
+    }
+    set.add(key);
+  };
+  for (const r of histRows) {
+    addDayTitle(
+      r.day,
+      r.mediaType === "movie"
+        ? `movie:${r.tmdbId}`
+        : `tv:${r.tmdbId}:${r.seasonNumber ?? 0}:${r.episodeNumber ?? 0}`
+    );
   }
-  for (const r of movieDays) {
-    if (!r.day) continue;
-    dayCountMap.set(r.day, (dayCountMap.get(r.day) ?? 0) + Number(r.cnt));
+  for (const r of stateMovieRows) {
+    addDayTitle(r.day, `movie:${r.tmdbId}`);
+  }
+  for (const r of stateEpRows) {
+    addDayTitle(
+      r.day,
+      `tv:${r.tmdbId}:${r.seasonNumber}:${r.episodeNumber}`
+    );
+  }
+
+  const dayCountMap = new Map<string, number>();
+  for (const [day, titles] of dayTitleSets) {
+    dayCountMap.set(day, titles.size);
   }
   const dayCounts: DayCount[] = [...dayCountMap.entries()].map(
     ([day, count]) => ({ day, count })
