@@ -544,10 +544,11 @@ export function VixPlayer({
     [activeSource]
   );
 
-  /** True for iframe embeds we can drive (transport + lock parity). */
-  const isDrivenEmbed =
-    mode === "iframe" &&
-    (activeSource === "cinesrc" || activeSource === "vidfast");
+  // CineSrc is the only embed we remote-control (controls=false hides its
+  // chrome, so ours must replace it). VidFast/Mapple stay fully interactive —
+  // layering our transport over their working chrome gave two dead players.
+  /** True for iframe embeds we drive (transport + tap-catcher + lock). */
+  const isDrivenEmbed = mode === "iframe" && activeSource === "cinesrc";
   const vidfastEmbed = mode === "iframe" && activeSource === "vidfast";
   const mappleEmbed = mode === "iframe" && activeSource === "mapple";
   /** Embeds with a usable playback clock: driven (transport) + Mapple (subs). */
@@ -1429,17 +1430,10 @@ export function VixPlayer({
 
   const togglePlay = useCallback(() => {
     if (isDrivenEmbed) {
-      if (activeSource === "cinesrc") {
-        sendCineSrcCommand(
-          iframeRef.current,
-          iframePausedRef.current ? "play" : "pause"
-        );
-      } else {
-        sendVidfastCommand(
-          iframeRef.current,
-          iframePausedRef.current ? "play" : "pause"
-        );
-      }
+      sendCineSrcCommand(
+        iframeRef.current,
+        iframePausedRef.current ? "play" : "pause"
+      );
       bumpChrome();
       return;
     }
@@ -1448,7 +1442,7 @@ export function VixPlayer({
     if (v.paused) void v.play().catch(() => {});
     else v.pause();
     bumpChrome();
-  }, [isDrivenEmbed, activeSource, bumpChrome]);
+  }, [isDrivenEmbed, bumpChrome]);
 
   const seekBySeconds = useCallback(
     (delta: number) => {
@@ -1491,13 +1485,7 @@ export function VixPlayer({
     if (isDrivenEmbed) {
       const next = !iframeMutedRef.current;
       iframeMutedRef.current = next;
-      if (activeSource === "cinesrc") {
-        sendCineSrcCommand(iframeRef.current, "setMuted", [next]);
-      } else {
-        // VidFast has no mute command — drive it through volume.
-        const level = next ? 0 : loadVixSettings().volume || 1;
-        sendVidfastCommand(iframeRef.current, "volume", { level });
-      }
+      sendCineSrcCommand(iframeRef.current, "setMuted", [next]);
       setTransport((t) => ({ ...t, muted: next }));
       bumpChrome();
       return;
@@ -1507,19 +1495,15 @@ export function VixPlayer({
     // Session-only mute — never persisted (see vix-settings).
     v.muted = !v.muted;
     bumpChrome();
-  }, [isDrivenEmbed, activeSource, bumpChrome]);
+  }, [isDrivenEmbed, bumpChrome]);
 
   const setVolume = useCallback(
     (vol: number) => {
       const next = Math.max(0, Math.min(1, vol));
       if (isDrivenEmbed) {
         iframeMutedRef.current = next === 0;
-        if (activeSource === "cinesrc") {
-          sendCineSrcCommand(iframeRef.current, "setVolume", [next]);
-          sendCineSrcCommand(iframeRef.current, "setMuted", [next === 0]);
-        } else {
-          sendVidfastCommand(iframeRef.current, "volume", { level: next });
-        }
+        sendCineSrcCommand(iframeRef.current, "setVolume", [next]);
+        sendCineSrcCommand(iframeRef.current, "setMuted", [next === 0]);
         setTransport((t) => ({ ...t, volume: next, muted: next === 0 }));
         saveVixSettings({ volume: next });
         bumpChrome();
@@ -1532,7 +1516,7 @@ export function VixPlayer({
       saveVixSettings({ volume: next });
       bumpChrome();
     },
-    [isDrivenEmbed, activeSource, bumpChrome]
+    [isDrivenEmbed, bumpChrome]
   );
 
   const toggleFullscreen = useCallback(() => {
