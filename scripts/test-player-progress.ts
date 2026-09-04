@@ -12,7 +12,7 @@ import {
   isResumablePosition,
   shouldSaveProgress,
 } from "../lib/player-progress";
-import { cueTextAt, parseVttCues } from "../lib/player-subs";
+import { cueTextAt, isPromoCue, parseVttCues } from "../lib/player-subs";
 import { embedUrlFor } from "../lib/embed-sources";
 import { DEFAULT_VIX_SETTINGS } from "../lib/vix-settings";
 import { NEXT_FAB_RATIO, RESUME_END_RATIO } from "../lib/player-constants";
@@ -120,6 +120,23 @@ assert.equal(cueTextAt(delayed, 1.5), "");
 assert.equal(cueTextAt(delayed, 2.5), "Hello world");
 
 assert.equal(DEFAULT_VIX_SETTINGS.subBgBlur, "md");
+
+// Promo cues (VDRK ad spam) are dropped; dialogue is never touched.
+assert.equal(isPromoCue("Visit hoofoot.ru to watch all sports"), true);
+assert.equal(isPromoCue("Subtitles by https://example.com"), true);
+assert.equal(isPromoCue("Hello world"), false);
+assert.equal(isPromoCue("I see dead people"), false);
+const spammy = `WEBVTT
+
+00:00:01.000 --> 00:00:03.000
+Visit hoofoot.ru to watch free
+
+00:00:04.000 --> 00:00:06.000
+I see dead people
+`;
+const clean = parseVttCues(spammy);
+assert.equal(clean.length, 1);
+assert.equal(clean[0].text, "I see dead people");
 
 assert.equal(RESUME_END_RATIO, 0.92);
 assert.equal(NEXT_FAB_RATIO, 0.96);

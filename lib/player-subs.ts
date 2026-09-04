@@ -62,6 +62,8 @@ export function injectVttTrack(
         text.push(lines[i]);
         i++;
       }
+      const plain = text.join("\n").trim();
+      if (plain && isPromoCue(plain)) continue;
       try {
         track.addCue(new VTTCue(start, end, text.join("\n")));
       } catch {
@@ -75,6 +77,17 @@ export function injectVttTrack(
 }
 
 export type VttCue = { start: number; end: number; text: string };
+
+/**
+ * VDRK/OpenSubs files often open with a promo cue ("Visit xyz.ru …").
+ * Drop cues that are pure advertising so the overlay never flashes spam.
+ * Conservative: only matches URLs and known spam TLDs, never plain words.
+ */
+export function isPromoCue(text: string): boolean {
+  return /(https?:\/\/|www\.|[\w-]+\.(ru|xyz|top|click|live|stream|sbs|mom|lol)\b)/i.test(
+    text.trim()
+  );
+}
 
 /**
  * Parse a WebVTT document into plain-text cues (no <video> element needed).
@@ -104,7 +117,7 @@ export function parseVttCues(vtt: string, delaySeconds = 0): VttCue[] {
         .replace(/<br\s*\/?>/gi, "\n")
         .replace(/<[^>]+>/g, "")
         .trim();
-      if (plain) cues.push({ start, end, text: plain });
+      if (plain && !isPromoCue(plain)) cues.push({ start, end, text: plain });
     } else {
       i++;
     }

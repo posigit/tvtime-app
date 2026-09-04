@@ -367,6 +367,8 @@ export function VixPlayer({
     setMediaReady(false);
     setIframeCues([]);
     setOpenSubFileId(null);
+    setOpenSubItems([]);
+    openSubListKeyRef.current = null;
     if (tapCueTimerRef.current) {
       clearTimeout(tapCueTimerRef.current);
       tapCueTimerRef.current = null;
@@ -933,13 +935,36 @@ export function VixPlayer({
     setMediaReady(false);
     setIframeCues([]);
     setOpenSubFileId(null);
+    setOpenSubItems([]);
+    openSubListKeyRef.current = null;
     // Keep ended/nearEnd so binge overlays don't double-fire after a switch.
     bookmarkClearedRef.current = false;
   }, [activeSource, savePosition]);
 
+  // Resolve an IMDb id for embed mode (native gets it from resolvers).
+  // Declared before ensureOpenSubList / handleOpenSubPick (deps below).
+  const ensureIframeImdb = useCallback(async (): Promise<string | null> => {
+    if (imdbIdRef.current) return imdbIdRef.current;
+    if (!type || !tmdbId) return null;
+    try {
+      const res = await fetch(
+        `/api/imdb?type=${type}&id=${tmdbId}`
+      );
+      if (!res.ok) return null;
+      const data = (await res.json()) as { imdbId?: string | null };
+      if (data.imdbId) imdbIdRef.current = data.imdbId;
+      return data.imdbId ?? null;
+    } catch {
+      return null;
+    }
+  }, [type, tmdbId]);
+
   /** Load top-3 OpenSubtitles list once per episode (no download quota). */
   const ensureOpenSubList = useCallback(async () => {
-    const imdb = imdbIdRef.current;
+    let imdb = imdbIdRef.current;
+    // Embed mode never resolves IMDb via streams — fetch it so the CC menu
+    // doesn't strand on "No English files found" for want of an id.
+    if (!imdb) imdb = await ensureIframeImdb();
     if (!imdb) {
       setOpenSubItems([]);
       return;
@@ -958,7 +983,7 @@ export function VixPlayer({
     } finally {
       setOpenSubListLoading(false);
     }
-  }, [season, episode, openSubItems.length]);
+  }, [season, episode, openSubItems.length, ensureIframeImdb]);
 
   /** Subtitle source picker: persist choice + re-run the subtitle loader. */
   const handleSubSource = useCallback(
@@ -986,23 +1011,6 @@ export function VixPlayer({
     },
     [ensureOpenSubList]
   );
-
-  // Declared before handleOpenSubPick (used in its deps below).
-  const ensureIframeImdb = useCallback(async (): Promise<string | null> => {
-    if (imdbIdRef.current) return imdbIdRef.current;
-    if (!type || !tmdbId) return null;
-    try {
-      const res = await fetch(
-        `/api/imdb?type=${type}&id=${tmdbId}`
-      );
-      if (!res.ok) return null;
-      const data = (await res.json()) as { imdbId?: string | null };
-      if (data.imdbId) imdbIdRef.current = data.imdbId;
-      return data.imdbId ?? null;
-    } catch {
-      return null;
-    }
-  }, [type, tmdbId]);
 
   /** User picked one of the top-3 OpenSubtitles files. */
   const handleOpenSubPick = useCallback(
@@ -1132,12 +1140,14 @@ export function VixPlayer({
     let cancelled = false;
     void (async () => {
       // Forced OpenSubs (or a picked file): download it directly.
+      // NOTE: this path never touches the embed player — VidFast/CineSrc
+      // only supply the clock. Failures here are our lookup chain, not them.
       if (subSource === "opensub") {
         const imdb = await ensureIframeImdb();
         if (cancelled) return;
         if (!imdb) {
           setIframeCues([]);
-          setSubError("OpenSubtitles unavailable for this title");
+          setSubError("Couldn’t match this title to IMDb — OpenSubs needs it");
           return;
         }
         // Keep the top-3 list fresh for the picker.
@@ -1152,7 +1162,7 @@ export function VixPlayer({
         if (cancelled) return;
         if (!ext?.vtt) {
           setIframeCues([]);
-          setSubError("Couldn’t download that subtitle");
+          setSubError("No English OpenSubtitles files found for this title");
           return;
         }
         // Guard: setting state re-runs this effect — only touch the picker
