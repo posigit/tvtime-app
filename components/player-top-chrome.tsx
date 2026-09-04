@@ -176,7 +176,8 @@ export function PlayerTopChrome({
           </p>
         </div>
         <div className="pointer-events-auto flex max-w-full shrink-0 items-center gap-1.5 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] sm:flex-wrap sm:justify-end sm:gap-2 sm:overflow-visible sm:pb-0 [&::-webkit-scrollbar]:hidden">
-          {mode === "native" && (
+          {(mode === "native" ||
+            (mode === "iframe" && activeSource === "cinesrc")) && (
             <button
               type="button"
               onClick={onCycleSpeed}
@@ -303,7 +304,8 @@ export function PlayerTopChrome({
               )}
             </div>
           )}
-          {mode === "native" && (
+          {(mode === "native" ||
+            (mode === "iframe" && activeSource === "cinesrc")) && (
             <div ref={subMenuRef} className="relative">
               <button
                 type="button"
@@ -332,13 +334,22 @@ export function PlayerTopChrome({
                   onTouchStart={(e) => e.stopPropagation()}
                 >
                   {(
-                    [
-                      ["auto", "Auto"],
-                      ["stream", "Stream"],
-                      ["vdrk", "VDRK"],
-                      ["opensub", "OpenSubs"],
-                      ["off", "Off"],
-                    ] as const
+                    (
+                      mode === "iframe"
+                        ? [
+                            ["auto", "Auto"],
+                            ["vdrk", "VDRK"],
+                            ["opensub", "OpenSubs"],
+                            ["off", "Off"],
+                          ]
+                        : [
+                            ["auto", "Auto"],
+                            ["stream", "Stream"],
+                            ["vdrk", "VDRK"],
+                            ["opensub", "OpenSubs"],
+                            ["off", "Off"],
+                          ]
+                    ) as const
                   ).map(([key, label]) => (
                     <button
                       key={key}

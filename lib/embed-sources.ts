@@ -3,9 +3,11 @@
  *
  * Picker order: vidnest, mapple, cinesrc, 2embed, vidfast, vidlink.
  * Native vix + goated are appended in vix-player (goated last, disabled).
- * Mapple is movie-only (empty tvUrl). CineSrc posts cinesrc:* events, not
+ * Mapple + VidFast + VidLink post PLAYER_EVENT (progress saves); VidFast also
+ * accepts {command} control messages. CineSrc posts cinesrc:* events, not
  * PLAYER_EVENT — vix-player adapts those. CineSrc embeds use controls=false
- * so lock mode cannot leak its Vidstack chrome (host chrome + postMessage).
+ * and VidNest embeds hide their transport chrome by query param, so lock mode
+ * cannot leak embed chrome (host chrome + postMessage instead).
  */
 export type EmbedSourceDef = {
   /** Stable key — persisted as preferredSource. */
@@ -28,18 +30,25 @@ export const EMBED_SOURCES: EmbedSourceDef[] = [
     name: "VidNest",
     base: "https://vidnest.fun",
     host: "vidnest.fun",
-    movieUrl: (tmdbId) => `https://vidnest.fun/movie/${tmdbId}`,
+    // Hide the embed's transport chrome (slider/center play/±seek) so lock
+    // mode cannot leak it. Captions/settings/fullscreen stay usable.
+    // TV resumes via `progress`, movies via `startAt` (see addStartAt).
+    movieUrl: (tmdbId) =>
+      `https://vidnest.fun/movie/${tmdbId}?timeslider=hide&centerplay=hide&centerseekbackward=hide&centerseekforward=hide`,
     tvUrl: (tmdbId, season, episode) =>
-      `https://vidnest.fun/tv/${tmdbId}/${season}/${episode}`,
+      `https://vidnest.fun/tv/${tmdbId}/${season}/${episode}?timeslider=hide&centerplay=hide&centerseekbackward=hide&centerseekforward=hide`,
   },
   {
     key: "mapple",
     name: "Mapple",
-    base: "https://mapple.tv",
-    host: "mapple.tv",
-    movieUrl: (tmdbId) => `https://mapple.tv/movie/${tmdbId}`,
-    // Movie-only — empty tvUrl disables this key on TV in the picker.
-    tvUrl: () => "",
+    base: "https://mapple.rip",
+    host: "mapple.rip",
+    // Official endpoints are mapple.rip/watch/... (mapple.tv is the landing
+    // site). Events post from the mapple.rip origin — see LEGACY list below.
+    movieUrl: (tmdbId) =>
+      `https://mapple.rip/watch/movie/${tmdbId}?autoPlay=true`,
+    tvUrl: (tmdbId, season, episode) =>
+      `https://mapple.rip/watch/tv/${tmdbId}-${season}-${episode}?autoPlay=true`,
   },
   {
     key: "cinesrc",
@@ -82,10 +91,12 @@ export const EMBED_SOURCES: EmbedSourceDef[] = [
   },
 ];
 
-/** Origins that must keep accepting PLAYER_EVENT: the vixsrc iframe fallback
- *  plus vidfast's documented mirror hosts (dropping any kills progress). */
+/** Origins that must keep accepting PLAYER_EVENT: the vixsrc iframe fallback,
+ *  vidfast's documented mirror hosts, plus the legacy mapple.tv host
+ *  (dropping any kills progress). */
 const LEGACY_PLAYER_ORIGINS = [
   "vixsrc.to",
+  "mapple.tv",
   "vidfast.pro",
   "vidfast.in",
   "vidfast.io",
@@ -144,6 +155,26 @@ export function sendCineSrcCommand(
     { type: "cinesrc:command", command, args },
     CINESRC_ORIGIN
   );
+}
+
+/**
+ * VidFast control channel: { command: "play" | "pause" | "seek" | "volume",
+ * extra fields per command (seek -> { time }, volume -> { level }) }.
+ * Targets the iframe's own origin (covers vidfast.* mirrors).
+ */
+export function sendVidfastCommand(
+  iframe: HTMLIFrameElement | null,
+  command: "play" | "pause" | "seek" | "volume" | "getStatus",
+  data: Record<string, unknown> = {}
+): void {
+  if (!iframe?.contentWindow || !iframe.src) return;
+  let target = "*";
+  try {
+    target = new URL(iframe.src).origin;
+  } catch {
+    /* fall back to wildcard per VidFast's own examples */
+  }
+  iframe.contentWindow.postMessage({ command, ...data }, target);
 }
 
 /** Label for a source key ("Vix" | "Goated" | registry names). */

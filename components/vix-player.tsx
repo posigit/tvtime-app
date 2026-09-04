@@ -10,10 +10,14 @@ import {
   embedUrlFor,
   isEmbedPlayerOrigin,
   sendCineSrcCommand,
+  sendVidfastCommand,
   sourceLabel,
 } from "@/lib/embed-sources";
 import { ResumeOverlay } from "@/components/resume-overlay";
-import { SubtitleOverlay } from "@/components/subtitle-overlay";
+import {
+  IframeSubtitleOverlay,
+  SubtitleOverlay,
+} from "@/components/subtitle-overlay";
 import { PlayerTransport } from "@/components/player-transport";
 import { PlayerTopChrome } from "@/components/player-top-chrome";
 import {
@@ -42,11 +46,14 @@ import {
 import {
   SUB_COLORS,
   SUB_FONT_SCALE,
+  cueTextAt,
   fetchExternalVtt,
   injectVttTrack,
   listOpenSubtitles,
+  parseVttCues,
   type OpenSubListItem,
   type SubSource,
+  type VttCue,
 } from "@/lib/player-subs";
 import { attachNativePlayback } from "@/lib/player-engine";
 import { resolveStreamPlaylist } from "@/lib/player-stream";
@@ -134,6 +141,8 @@ export function VixPlayer({
   const remoteDurationRef = useRef(0);
   const iframePausedRef = useRef(true);
   const iframeMutedRef = useRef(false);
+  /** Parsed VDRK cues rendered over the CineSrc iframe (no <video> track). */
+  const [iframeCues, setIframeCues] = useState<VttCue[]>([]);
   const bookmarkClearedRef = useRef(false);
   /** Blocks progress writes until resume check (and optional prompt) finishes. */
   const saveEnabledRef = useRef(false);
@@ -353,6 +362,8 @@ export function VixPlayer({
     bookmarkClearedRef.current = false;
     lastTapRef.current = null;
     setMediaReady(false);
+    setIframeCues([]);
+    setOpenSubFileId(null);
     if (tapCueTimerRef.current) {
       clearTimeout(tapCueTimerRef.current);
       tapCueTimerRef.current = null;
@@ -512,16 +523,37 @@ export function VixPlayer({
     []
   );
 
-  /** Native / CineSrc ±10s seek, with a transient on-screen cue. */
+  /** Clamp a target time to the driven embed's known duration. */
+  const clampEmbedTime = (target: number): number => {
+    const dur = remoteDurationRef.current;
+    return dur > 0 ? Math.max(0, Math.min(target, dur)) : Math.max(0, target);
+  };
+
+  /** Seek the active driven embed (CineSrc and VidFast command channels). */
+  const sendEmbedSeek = useCallback(
+    (target: number) => {
+      if (activeSource === "cinesrc") {
+        sendCineSrcCommand(iframeRef.current, "seek", [target]);
+      } else if (activeSource === "vidfast") {
+        sendVidfastCommand(iframeRef.current, "seek", { time: target });
+      }
+    },
+    [activeSource]
+  );
+
+  /** True for iframe embeds we can drive (transport + lock parity). */
+  const isDrivenEmbed =
+    mode === "iframe" &&
+    (activeSource === "cinesrc" || activeSource === "vidfast");
+
+  /** Native / driven-embed ±10s seek, with a transient on-screen cue. */
   const seekBy = useCallback(
     (side: "left" | "right") => {
       const delta = side === "right" ? 10 : -10;
-      if (mode === "iframe" && activeSource === "cinesrc") {
-        const dur = remoteDurationRef.current;
-        const target = Math.max(0, remotePositionRef.current + delta);
-        sendCineSrcCommand(iframeRef.current, "seek", [
-          dur > 0 ? Math.min(target, dur) : target,
-        ]);
+      if (isDrivenEmbed) {
+        sendEmbedSeek(
+          clampEmbedTime(remotePositionRef.current + delta)
+        );
         setTapCue({ side });
         if (tapCueTimerRef.current) clearTimeout(tapCueTimerRef.current);
         tapCueTimerRef.current = setTimeout(() => setTapCue(null), 650);
@@ -537,7 +569,7 @@ export function VixPlayer({
       if (tapCueTimerRef.current) clearTimeout(tapCueTimerRef.current);
       tapCueTimerRef.current = setTimeout(() => setTapCue(null), 650);
     },
-    [mode, activeSource]
+    [isDrivenEmbed, sendEmbedSeek]
   );
 
   const bumpChrome = useCallback(() => {
@@ -560,7 +592,7 @@ export function VixPlayer({
   const handleTap = useCallback(
     (e: React.TouchEvent) => {
       if (locked) return;
-      if (mode !== "native" && !(mode === "iframe" && activeSource === "cinesrc")) {
+      if (mode !== "native" && !isDrivenEmbed) {
         return;
       }
       const t = e.changedTouches[0];
@@ -586,13 +618,13 @@ export function VixPlayer({
         }, 360);
       }
     },
-    [mode, activeSource, locked, seekBy, bumpChrome]
+    [mode, isDrivenEmbed, locked, seekBy, bumpChrome]
   );
 
   const handleVideoClick = useCallback(
     (e: React.MouseEvent) => {
       if (locked) return;
-      if (mode !== "native" && !(mode === "iframe" && activeSource === "cinesrc")) {
+      if (mode !== "native" && !isDrivenEmbed) {
         return;
       }
       // Ignore the synthetic click that follows touchend on mobile.
@@ -604,7 +636,7 @@ export function VixPlayer({
       setChromeVisible((v) => !v);
       bumpChrome();
     },
-    [mode, activeSource, locked, bumpChrome]
+    [mode, isDrivenEmbed, locked, bumpChrome]
   );
 
   const handleResume = useCallback(() => {
@@ -891,6 +923,8 @@ export function VixPlayer({
     setAudioTrackId(-1);
     setQualityLevels([]);
     setMediaReady(false);
+    setIframeCues([]);
+    setOpenSubFileId(null);
     // Keep ended/nearEnd so binge overlays don't double-fire after a switch.
     bookmarkClearedRef.current = false;
   }, [activeSource, savePosition]);
@@ -948,6 +982,22 @@ export function VixPlayer({
   /** User picked one of the top-3 OpenSubtitles files. */
   const handleOpenSubPick = useCallback(
     async (item: OpenSubListItem) => {
+      // Driven iframe: no <video> track — the iframe-sub effect downloads
+      // the picked file once openSubFileId is set.
+      if (isDrivenEmbed) {
+        const imdb = imdbIdRef.current ?? (await ensureIframeImdb());
+        if (!imdb) {
+          setSubError("Subtitles unavailable");
+          return;
+        }
+        setOpenSubFileId(item.fileId);
+        setSubSource("opensub");
+        subSourceRef.current = "opensub";
+        setSubError(null);
+        saveVixSettings({ subSource: "opensub", subs: "en" });
+        setSubMenuOpen(false);
+        return;
+      }
       const video = videoRef.current;
       const imdb = imdbIdRef.current;
       if (!video || !imdb) {
@@ -980,7 +1030,7 @@ export function VixPlayer({
       if (tr) injectedTracksRef.current.push(tr);
       setSubMenuOpen(false);
     },
-    [season, episode]
+    [season, episode, isDrivenEmbed, ensureIframeImdb]
   );
 
   // Prefetch OS list when CC menu opens on OpenSubs.
@@ -1040,6 +1090,124 @@ export function VixPlayer({
       controller.abort();
     };
   }, [streamable, type, tmdbId, season, episode, activeSource, isEmbedActive]);
+
+  // ---------- Driven-embed subtitles (VDRK / OpenSubs overlay) ----------
+  // CineSrc hides its CC menu (controls=false) with no subtitle postMessage
+  // API; VidFast has no subtitle commands either — so render our own cues
+  // over the iframe, synced to its timeupdate position. VDRK needs only TMDB
+  // ids; OpenSubs needs an IMDb id (resolved lazily via /api/imdb since
+  // embeds never resolve).
+  const ensureIframeImdb = useCallback(async (): Promise<string | null> => {
+    if (imdbIdRef.current) return imdbIdRef.current;
+    if (!type || !tmdbId) return null;
+    try {
+      const res = await fetch(
+        `/api/imdb?type=${type}&id=${tmdbId}`
+      );
+      if (!res.ok) return null;
+      const data = (await res.json()) as { imdbId?: string | null };
+      if (data.imdbId) imdbIdRef.current = data.imdbId;
+      return data.imdbId ?? null;
+    } catch {
+      return null;
+    }
+  }, [type, tmdbId]);
+
+  useEffect(() => {
+    if (!isDrivenEmbed) return;
+    if (subSource === "off" || subSource === "stream") {
+      setIframeCues([]);
+      return;
+    }
+    if (!type || !tmdbId) return;
+    let cancelled = false;
+    void (async () => {
+      // Forced OpenSubs (or a picked file): download it directly.
+      if (subSource === "opensub") {
+        const imdb = await ensureIframeImdb();
+        if (cancelled) return;
+        if (!imdb) {
+          setIframeCues([]);
+          setSubError("OpenSubtitles unavailable for this title");
+          return;
+        }
+        // Keep the top-3 list fresh for the picker.
+        void ensureOpenSubList();
+        const ext = await fetchExternalVtt({
+          source: "opensub",
+          imdbId: imdb,
+          season,
+          episode,
+          ...(openSubFileId != null ? { fileId: openSubFileId } : {}),
+        });
+        if (cancelled) return;
+        if (!ext?.vtt) {
+          setIframeCues([]);
+          setSubError("Couldn’t download that subtitle");
+          return;
+        }
+        // Guard: setting state re-runs this effect — only touch the picker
+        // id when it actually changed, or best-download loops forever.
+        if (ext.fileId != null && ext.fileId !== openSubFileId) {
+          setOpenSubFileId(ext.fileId);
+        }
+        setIframeCues(parseVttCues(ext.vtt));
+        setHasExternalSubs(true);
+        setSubError(null);
+        return;
+      }
+      // Auto / VDRK: VDRK first (TMDB ids only), then OpenSubs best on Auto.
+      const vdrk = await fetchExternalVtt({
+        source: "vdrk",
+        type,
+        tmdbId,
+        season,
+        episode,
+      });
+      if (cancelled) return;
+      if (vdrk?.vtt) {
+        setIframeCues(parseVttCues(vdrk.vtt));
+        setHasExternalSubs(true);
+        setSubError(null);
+        return;
+      }
+      if (subSource !== "auto") {
+        setIframeCues([]);
+        setSubError("VDRK subtitles unavailable for this episode");
+        return;
+      }
+      const imdb = await ensureIframeImdb();
+      if (cancelled) return;
+      if (!imdb) {
+        setIframeCues([]);
+        setSubError("Subtitles unavailable for this episode");
+        return;
+      }
+      const os = await fetchExternalVtt({ source: "opensub", imdbId: imdb, season, episode });
+      if (cancelled) return;
+      if (!os?.vtt) {
+        setIframeCues([]);
+        setSubError("Subtitles unavailable for this episode");
+        return;
+      }
+      setIframeCues(parseVttCues(os.vtt));
+      setHasExternalSubs(true);
+      setSubError(null);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    isDrivenEmbed,
+    subSource,
+    openSubFileId,
+    type,
+    tmdbId,
+    season,
+    episode,
+    ensureIframeImdb,
+    ensureOpenSubList,
+  ]);
 
   // ---------- native playback (hls.js / Safari native) ----------
   useEffect(() => {
@@ -1252,11 +1420,18 @@ export function VixPlayer({
   }, []);
 
   const togglePlay = useCallback(() => {
-    if (mode === "iframe" && activeSource === "cinesrc") {
-      sendCineSrcCommand(
-        iframeRef.current,
-        iframePausedRef.current ? "play" : "pause"
-      );
+    if (isDrivenEmbed) {
+      if (activeSource === "cinesrc") {
+        sendCineSrcCommand(
+          iframeRef.current,
+          iframePausedRef.current ? "play" : "pause"
+        );
+      } else {
+        sendVidfastCommand(
+          iframeRef.current,
+          iframePausedRef.current ? "play" : "pause"
+        );
+      }
       bumpChrome();
       return;
     }
@@ -1265,16 +1440,14 @@ export function VixPlayer({
     if (v.paused) void v.play().catch(() => {});
     else v.pause();
     bumpChrome();
-  }, [mode, activeSource, bumpChrome]);
+  }, [isDrivenEmbed, activeSource, bumpChrome]);
 
   const seekBySeconds = useCallback(
     (delta: number) => {
-      if (mode === "iframe" && activeSource === "cinesrc") {
-        const dur = remoteDurationRef.current;
-        const target = Math.max(0, remotePositionRef.current + delta);
-        sendCineSrcCommand(iframeRef.current, "seek", [
-          dur > 0 ? Math.min(target, dur) : target,
-        ]);
+      if (isDrivenEmbed) {
+        sendEmbedSeek(
+          clampEmbedTime(remotePositionRef.current + delta)
+        );
         bumpChrome();
         return;
       }
@@ -1286,17 +1459,15 @@ export function VixPlayer({
       v.currentTime = dur == null ? target : Math.min(target, dur);
       bumpChrome();
     },
-    [mode, activeSource, bumpChrome]
+    [isDrivenEmbed, sendEmbedSeek, bumpChrome]
   );
 
   const seekRatio = useCallback(
     (ratio: number) => {
-      if (mode === "iframe" && activeSource === "cinesrc") {
+      if (isDrivenEmbed) {
         const dur = remoteDurationRef.current;
         if (!(dur > 0)) return;
-        sendCineSrcCommand(iframeRef.current, "seek", [
-          Math.max(0, Math.min(dur, ratio * dur)),
-        ]);
+        sendEmbedSeek(Math.max(0, Math.min(dur, ratio * dur)));
         bumpChrome();
         return;
       }
@@ -1305,14 +1476,20 @@ export function VixPlayer({
       v.currentTime = Math.max(0, Math.min(v.duration, ratio * v.duration));
       bumpChrome();
     },
-    [mode, activeSource, bumpChrome]
+    [isDrivenEmbed, sendEmbedSeek, bumpChrome]
   );
 
   const toggleMute = useCallback(() => {
-    if (mode === "iframe" && activeSource === "cinesrc") {
+    if (isDrivenEmbed) {
       const next = !iframeMutedRef.current;
       iframeMutedRef.current = next;
-      sendCineSrcCommand(iframeRef.current, "setMuted", [next]);
+      if (activeSource === "cinesrc") {
+        sendCineSrcCommand(iframeRef.current, "setMuted", [next]);
+      } else {
+        // VidFast has no mute command — drive it through volume.
+        const level = next ? 0 : loadVixSettings().volume || 1;
+        sendVidfastCommand(iframeRef.current, "volume", { level });
+      }
       setTransport((t) => ({ ...t, muted: next }));
       bumpChrome();
       return;
@@ -1322,15 +1499,19 @@ export function VixPlayer({
     // Session-only mute — never persisted (see vix-settings).
     v.muted = !v.muted;
     bumpChrome();
-  }, [mode, activeSource, bumpChrome]);
+  }, [isDrivenEmbed, activeSource, bumpChrome]);
 
   const setVolume = useCallback(
     (vol: number) => {
       const next = Math.max(0, Math.min(1, vol));
-      if (mode === "iframe" && activeSource === "cinesrc") {
+      if (isDrivenEmbed) {
         iframeMutedRef.current = next === 0;
-        sendCineSrcCommand(iframeRef.current, "setVolume", [next]);
-        sendCineSrcCommand(iframeRef.current, "setMuted", [next === 0]);
+        if (activeSource === "cinesrc") {
+          sendCineSrcCommand(iframeRef.current, "setVolume", [next]);
+          sendCineSrcCommand(iframeRef.current, "setMuted", [next === 0]);
+        } else {
+          sendVidfastCommand(iframeRef.current, "volume", { level: next });
+        }
         setTransport((t) => ({ ...t, volume: next, muted: next === 0 }));
         saveVixSettings({ volume: next });
         bumpChrome();
@@ -1343,7 +1524,7 @@ export function VixPlayer({
       saveVixSettings({ volume: next });
       bumpChrome();
     },
-    [mode, activeSource, bumpChrome]
+    [isDrivenEmbed, activeSource, bumpChrome]
   );
 
   const toggleFullscreen = useCallback(() => {
@@ -1373,9 +1554,17 @@ export function VixPlayer({
             duration?: unknown;
             volume?: unknown;
             muted?: unknown;
+            playbackRate?: unknown;
           };
           if (ev === "ready" || ev === "loadedmetadata") {
             setMediaReady(true);
+          }
+          if (ev === "ratechange" && typeof payload.playbackRate === "number") {
+            const rate = payload.playbackRate;
+            if (Number.isFinite(rate) && rate > 0) {
+              setPlaybackSpeed(rate);
+              saveVixSettings({ speed: rate });
+            }
           }
           if (ev === "volumechange") {
             if (typeof payload.muted === "boolean") {
@@ -1466,6 +1655,46 @@ export function VixPlayer({
         remoteDurationRef.current = d.duration;
       }
 
+      // VidFast drives our transport like CineSrc (play/pause/seek/volume).
+      // Other PLAYER_EVENT embeds (Mapple/VidLink/2Embed/vixsrc fallback) only
+      // feed progress below — their chrome stays in charge until locked.
+      if (
+        activeSource === "vidfast" &&
+        (d.event === "play" ||
+          d.event === "pause" ||
+          d.event === "seeked" ||
+          d.event === "ended" ||
+          d.event === "timeupdate")
+      ) {
+        if (d.event === "play") iframePausedRef.current = false;
+        if (d.event === "pause" || d.event === "ended") {
+          iframePausedRef.current = true;
+        }
+        if (d.event === "play" || d.event === "timeupdate") setMediaReady(true);
+        setTransport((t) => ({
+          ...t,
+          currentTime:
+            typeof d.currentTime === "number" ? d.currentTime : t.currentTime,
+          duration:
+            typeof d.duration === "number" && d.duration > 0
+              ? d.duration
+              : t.duration,
+          paused:
+            d.event === "play"
+              ? false
+              : d.event === "pause" || d.event === "ended"
+                ? true
+                : t.paused,
+        }));
+        if (d.event === "play") bumpChrome();
+        if (d.event === "pause") {
+          setChromeVisible(true);
+          if (chromeHideTimerRef.current) {
+            clearTimeout(chromeHideTimerRef.current);
+          }
+        }
+      }
+
       if (d.event === "ended") {
         if (!nearEndFiredRef.current) {
           nearEndFiredRef.current = true;
@@ -1540,7 +1769,7 @@ export function VixPlayer({
     };
     window.addEventListener("message", handler);
     return () => window.removeEventListener("message", handler);
-  }, [bumpChrome, clearPosition, emit, savePosition]);
+  }, [activeSource, bumpChrome, clearPosition, emit, savePosition]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -1672,7 +1901,7 @@ export function VixPlayer({
   const showTransport =
     !locked &&
     chromeVisible &&
-    (mode === "native" || cineSrcEmbed) &&
+    (mode === "native" || isDrivenEmbed) &&
     mediaReady &&
     !showResume &&
     !resumeSeeking;
@@ -1710,6 +1939,16 @@ export function VixPlayer({
         />
       )}
 
+      {isDrivenEmbed && subSource !== "off" && subSource !== "stream" && (
+        <IframeSubtitleOverlay
+          text={cueTextAt(iframeCues, transport.currentTime - subDelay)}
+          fontScale={SUB_FONT_SCALE[subFontSize]}
+          color={SUB_COLORS[subColor]}
+          bgOpacity={subBgOpacity}
+          chromeRaised={!locked && chromeVisible}
+        />
+      )}
+
       {mode === "iframe" && (
         <iframe
           key={iframeSrc}
@@ -1724,12 +1963,12 @@ export function VixPlayer({
           onLoad={() => setIframeError(false)}
           onError={() => setIframeError(true)}
           className={`h-full w-full border-0 bg-black ${
-            locked || cineSrcEmbed ? "pointer-events-none" : ""
+            locked || isDrivenEmbed ? "pointer-events-none" : ""
           }`}
         />
       )}
 
-      {cineSrcEmbed && !locked && (
+      {isDrivenEmbed && !locked && (
         <div
           className="absolute inset-0 z-[15]"
           onTouchEnd={handleTap}
@@ -1775,12 +2014,21 @@ export function VixPlayer({
           isLoading={isLoading || (mode === "native" && !mediaReady)}
           playbackSpeed={playbackSpeed}
           onCycleSpeed={() => {
-            const v = videoRef.current;
+            // CineSrc is the only embed with a rate API; VidFast has none,
+            // so the speed button stays CineSrc/native-only (see top chrome).
             const speeds = [0.75, 1, 1.25, 1.5, 2];
+            const idx = speeds.indexOf(playbackSpeed);
             const next =
-              speeds[(speeds.indexOf(playbackSpeed) + 1) % speeds.length] ?? 1;
+              idx >= 0
+                ? (speeds[(idx + 1) % speeds.length] ?? 1)
+                : (speeds.find((s) => s > playbackSpeed) ?? 1);
             setPlaybackSpeed(next);
             saveVixSettings({ speed: next });
+            if (cineSrcEmbed) {
+              sendCineSrcCommand(iframeRef.current, "setPlaybackRate", [next]);
+              return;
+            }
+            const v = videoRef.current;
             if (v) v.playbackRate = next;
           }}
           audioTracks={audioTracks}
@@ -1858,9 +2106,9 @@ export function VixPlayer({
         </button>
       )}
 
-      {mode === "iframe" && !locked && !cineSrcEmbed && <EmbedHint />}
+      {mode === "iframe" && !locked && !isDrivenEmbed && <EmbedHint />}
 
-      {(mode === "native" || cineSrcEmbed) && tapCue && (
+      {(mode === "native" || isDrivenEmbed) && tapCue && (
         <div
           className={`pointer-events-none absolute inset-y-0 z-40 flex items-center ${
             tapCue.side === "right" ? "justify-end pr-6" : "justify-start pl-6"

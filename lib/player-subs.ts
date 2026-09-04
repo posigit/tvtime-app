@@ -74,6 +74,54 @@ export function injectVttTrack(
   return track;
 }
 
+export type VttCue = { start: number; end: number; text: string };
+
+/**
+ * Parse a WebVTT document into plain-text cues (no <video> element needed).
+ * Used to render our own subtitles over iframe embeds (e.g. CineSrc) where
+ * the embed's internal CC menu is hidden behind controls=false.
+ */
+export function parseVttCues(vtt: string, delaySeconds = 0): VttCue[] {
+  const delay = Number.isFinite(delaySeconds) ? delaySeconds : 0;
+  const cues: VttCue[] = [];
+  const lines = vtt.split(/\r?\n/);
+  let i = 0;
+  while (i < lines.length) {
+    const m = lines[i].match(
+      /(\d{2}:\d{2}:\d{2}\.\d{3}|\d{2}:\d{2}\.\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}\.\d{3}|\d{2}:\d{2}\.\d{3})/
+    );
+    if (m) {
+      const start = Math.max(0, parseVttTime(m[1]) + delay);
+      const end = Math.max(start + 0.05, parseVttTime(m[2]) + delay);
+      i++;
+      const text: string[] = [];
+      while (i < lines.length && lines[i].trim() !== "") {
+        text.push(lines[i]);
+        i++;
+      }
+      const plain = text
+        .join("\n")
+        .replace(/<br\s*\/?>/gi, "\n")
+        .replace(/<[^>]+>/g, "")
+        .trim();
+      if (plain) cues.push({ start, end, text: plain });
+    } else {
+      i++;
+    }
+  }
+  return cues;
+}
+
+/** Active cue text at time t (seconds). */
+export function cueTextAt(cues: VttCue[], t: number): string {
+  if (!Number.isFinite(t)) return "";
+  const lines: string[] = [];
+  for (const c of cues) {
+    if (t >= c.start && t < c.end) lines.push(c.text);
+  }
+  return lines.join("\n");
+}
+
 export type ExternalVttResult = { vtt: string; label: string; fileId?: number };
 
 export type OpenSubListItem = {

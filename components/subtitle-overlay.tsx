@@ -91,6 +91,35 @@ export function SubtitleOverlay({
     : "bottom-3 sm:bottom-6";
 
   return (
+    <CueShell
+      text={text}
+      fontPx={fontPx}
+      color={color}
+      bgOpacity={bgOpacity}
+      positionClass={positionClass}
+    />
+  );
+}
+
+/**
+ * Liquid-glass cue shell shared by native + iframe overlays.
+ * bgOpacity 0 = bare text with shadow; otherwise frosted pill.
+ */
+export function CueShell({
+  text,
+  fontPx,
+  color,
+  bgOpacity,
+  positionClass,
+}: {
+  text: string;
+  fontPx: number;
+  color: string;
+  bgOpacity: number;
+  positionClass: string;
+}) {
+  const glass = bgOpacity > 0;
+  return (
     <div
       className={`pointer-events-none absolute inset-x-0 z-[25] flex justify-center px-3 sm:px-4 ${positionClass}`}
       style={{
@@ -99,22 +128,61 @@ export function SubtitleOverlay({
       }}
     >
       <p
-        className="max-w-[92%] whitespace-pre-wrap text-center font-medium leading-snug sm:max-w-[90%]"
+        className={
+          glass
+            ? "max-w-[92%] whitespace-pre-wrap text-center font-medium leading-snug backdrop-blur-md ring-1 ring-white/15 sm:max-w-[90%]"
+            : "max-w-[92%] whitespace-pre-wrap text-center font-medium leading-snug sm:max-w-[90%]"
+        }
         style={{
           fontSize: fontPx,
           color,
-          backgroundColor:
-            bgOpacity > 0 ? `rgba(0, 0, 0, ${bgOpacity})` : "transparent",
-          padding: bgOpacity > 0 ? "0.15em 0.5em" : 0,
-          borderRadius: 4,
-          textShadow:
-            bgOpacity > 0
-              ? "none"
-              : "0 1px 2px #000, 0 0 6px #000, 0 0 2px #000",
+          backgroundColor: glass
+            ? `rgba(10, 10, 14, ${Math.max(0.35, bgOpacity)})`
+            : "transparent",
+          padding: glass ? "0.3em 0.8em" : 0,
+          borderRadius: glass ? 12 : 4,
+          textShadow: glass
+            ? "0 1px 2px rgba(0,0,0,0.8)"
+            : "0 1px 2px #000, 0 0 6px #000, 0 0 2px #000",
         }}
       >
         {text}
       </p>
     </div>
+  );
+}
+
+/**
+ * Time-driven subtitle overlay for iframe embeds (no <video> element).
+ * Cue timing comes from the embed's postMessage timeupdate position.
+ */
+export function IframeSubtitleOverlay({
+  text,
+  fontScale,
+  color,
+  bgOpacity,
+  chromeRaised = false,
+}: {
+  text: string;
+  /** 1 = 100%, up to 1.25 = +25%. */
+  fontScale: number;
+  color: string;
+  bgOpacity: number;
+  /** When true, sit above the transport scrubber; otherwise low on the frame. */
+  chromeRaised?: boolean;
+}) {
+  if (!text) return null;
+  const fontPx = Math.round(18 * fontScale);
+  const positionClass = chromeRaised
+    ? "bottom-14 sm:bottom-16"
+    : "bottom-3 sm:bottom-6";
+  return (
+    <CueShell
+      text={text}
+      fontPx={fontPx}
+      color={color}
+      bgOpacity={bgOpacity}
+      positionClass={positionClass}
+    />
   );
 }

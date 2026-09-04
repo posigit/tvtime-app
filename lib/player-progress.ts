@@ -127,6 +127,14 @@ export function addStartAt(src: string, position: number | null): string {
       url.searchParams.set("continueprompt", "false");
       return url.toString();
     }
+    if (url.hostname === "vidnest.fun" || url.hostname.endsWith(".vidnest.fun")) {
+      // VidNest resumes movies via startAt but TV episodes via progress.
+      url.searchParams.set(
+        url.pathname.includes("/tv/") ? "progress" : "startAt",
+        t
+      );
+      return url.toString();
+    }
     url.searchParams.set("startAt", t);
     return url.toString();
   } catch {
