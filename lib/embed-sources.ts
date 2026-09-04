@@ -164,21 +164,17 @@ export function sendCineSrcCommand(
 /**
  * VidFast control channel: { command: "play" | "pause" | "seek" | "volume",
  * extra fields per command (seek -> { time }, volume -> { level }) }.
- * Targets the iframe's own origin (covers vidfast.* mirrors).
+ * Always targets "*" per VidFast's own docs: the player redirects across
+ * vidfast.* mirrors internally, so the src origin is unreliable and an
+ * explicit origin silently drops every command (dead remote). Inbound
+ * events are still origin-validated (see isEmbedPlayerOrigin).
  */
 export function sendVidfastCommand(
   iframe: HTMLIFrameElement | null,
   command: "play" | "pause" | "seek" | "volume" | "getStatus",
   data: Record<string, unknown> = {}
 ): void {
-  if (!iframe?.contentWindow || !iframe.src) return;
-  let target = "*";
-  try {
-    target = new URL(iframe.src).origin;
-  } catch {
-    /* fall back to wildcard per VidFast's own examples */
-  }
-  iframe.contentWindow.postMessage({ command, ...data }, target);
+  iframe?.contentWindow?.postMessage({ command, ...data }, "*");
 }
 
 /** Label for a source key ("Vix" | "Goated" | registry names). */
