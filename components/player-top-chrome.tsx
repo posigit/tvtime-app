@@ -349,7 +349,7 @@ export function PlayerTopChrome({
                             ["opensub", "OpenSubs"],
                             ["off", "Off"],
                           ]
-                    ) as const
+                    ) as [SubSource, string][]
                   ).map(([key, label]) => (
                     <button
                       key={key}
