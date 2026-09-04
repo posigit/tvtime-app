@@ -2008,8 +2008,10 @@ export function VixPlayer({
       : src;
   // CineSrc quality switches reload the frame: keep position via t= and
   // apply the preferred-quality param (brief rebuffer, no bookmark loss).
+  // Inline (not the render const below): this runs before it is declared.
+  const cinesrcFrame = mode === "iframe" && activeSource === "cinesrc";
   let iframeSrc = addStartAt(iframeBaseSrc, cineSrcT ?? resumePosition);
-  if (cineSrcEmbed && qualitySelection !== "auto") {
+  if (cinesrcFrame && qualitySelection !== "auto") {
     iframeSrc = withCineSrcQuality(iframeSrc, qualitySelection);
   }
   const handleCineSrcQuality = useCallback(
