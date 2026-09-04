@@ -4,6 +4,7 @@
  */
 import assert from "node:assert/strict";
 import {
+  addStartAt,
   formatPlayerClock,
   isFinishedPosition,
   isNearEndPosition,
@@ -64,6 +65,15 @@ assert.equal(isPreSeekNoise(180, 43 * 60), false);
 assert.equal(isPreSeekNoise(43 * 60, 43 * 60), false);
 assert.equal(isPreSeekNoise(180, null), false);
 assert.equal(isPreSeekNoise(180, 0), false);
+
+assert.equal(
+  addStartAt("https://cinesrc.st/embed/tv/1?s=1&e=1&controls=false", 109),
+  "https://cinesrc.st/embed/tv/1?s=1&e=1&controls=false&t=109&continueprompt=false"
+);
+assert.equal(
+  addStartAt("https://vidfast.vc/movie/1?autoPlay=true", 50),
+  "https://vidfast.vc/movie/1?autoPlay=true&startAt=50"
+);
 
 assert.equal(RESUME_END_RATIO, 0.92);
 assert.equal(NEXT_FAB_RATIO, 0.96);

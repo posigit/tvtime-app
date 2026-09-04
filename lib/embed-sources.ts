@@ -4,7 +4,8 @@
  * Picker order: vidnest, mapple, cinesrc, 2embed, vidfast, vidlink.
  * Native vix + goated are appended in vix-player (goated last, disabled).
  * Mapple is movie-only (empty tvUrl). CineSrc posts cinesrc:* events, not
- * PLAYER_EVENT — vix-player adapts those.
+ * PLAYER_EVENT — vix-player adapts those. CineSrc embeds use controls=false
+ * so lock mode cannot leak its Vidstack chrome (host chrome + postMessage).
  */
 export type EmbedSourceDef = {
   /** Stable key — persisted as preferredSource. */
@@ -45,10 +46,11 @@ export const EMBED_SOURCES: EmbedSourceDef[] = [
     name: "CineSrc",
     base: "https://cinesrc.st",
     host: "cinesrc.st",
-    movieUrl: (tmdbId) => `https://cinesrc.st/embed/movie/${tmdbId}`,
+    movieUrl: (tmdbId) =>
+      `https://cinesrc.st/embed/movie/${tmdbId}?controls=false`,
     // TV is query-string; posts cinesrc:* events (adapted in vix-player).
     tvUrl: (tmdbId, season, episode) =>
-      `https://cinesrc.st/embed/tv/${tmdbId}?s=${season}&e=${episode}`,
+      `https://cinesrc.st/embed/tv/${tmdbId}?s=${season}&e=${episode}&controls=false`,
   },
   {
     key: "2embed",
@@ -129,6 +131,19 @@ export function embedUrlFor(
   if (type === "movie") url = src.movieUrl(tmdbId);
   else if (season != null && episode != null) url = src.tvUrl(tmdbId, season, episode);
   return url ? url : null;
+}
+
+export const CINESRC_ORIGIN = "https://cinesrc.st";
+
+export function sendCineSrcCommand(
+  iframe: HTMLIFrameElement | null,
+  command: string,
+  args: unknown[] = []
+): void {
+  iframe?.contentWindow?.postMessage(
+    { type: "cinesrc:command", command, args },
+    CINESRC_ORIGIN
+  );
 }
 
 /** Label for a source key ("Vix" | "Goated" | registry names). */

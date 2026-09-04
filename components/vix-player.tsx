@@ -9,6 +9,7 @@ import {
   EMBED_SOURCES,
   embedUrlFor,
   isEmbedPlayerOrigin,
+  sendCineSrcCommand,
   sourceLabel,
 } from "@/lib/embed-sources";
 import { ResumeOverlay } from "@/components/resume-overlay";
@@ -131,6 +132,8 @@ export function VixPlayer({
   const lastTimeRef = useRef(0);
   const remotePositionRef = useRef(0);
   const remoteDurationRef = useRef(0);
+  const iframePausedRef = useRef(true);
+  const iframeMutedRef = useRef(false);
   const bookmarkClearedRef = useRef(false);
   /** Blocks progress writes until resume check (and optional prompt) finishes. */
   const saveEnabledRef = useRef(false);
@@ -346,8 +349,10 @@ export function VixPlayer({
     lastSavedAtRef.current = 0;
     remotePositionRef.current = 0;
     remoteDurationRef.current = 0;
+    iframePausedRef.current = true;
     bookmarkClearedRef.current = false;
     lastTapRef.current = null;
+    setMediaReady(false);
     if (tapCueTimerRef.current) {
       clearTimeout(tapCueTimerRef.current);
       tapCueTimerRef.current = null;
@@ -507,11 +512,22 @@ export function VixPlayer({
     []
   );
 
-  /** Native-mode ±10s seek, with a transient on-screen cue. */
+  /** Native / CineSrc ±10s seek, with a transient on-screen cue. */
   const seekBy = useCallback(
     (side: "left" | "right") => {
-      const v = videoRef.current;
       const delta = side === "right" ? 10 : -10;
+      if (mode === "iframe" && activeSource === "cinesrc") {
+        const dur = remoteDurationRef.current;
+        const target = Math.max(0, remotePositionRef.current + delta);
+        sendCineSrcCommand(iframeRef.current, "seek", [
+          dur > 0 ? Math.min(target, dur) : target,
+        ]);
+        setTapCue({ side });
+        if (tapCueTimerRef.current) clearTimeout(tapCueTimerRef.current);
+        tapCueTimerRef.current = setTimeout(() => setTapCue(null), 650);
+        return;
+      }
+      const v = videoRef.current;
       if (!v || mode !== "native" || !Number.isFinite(v.currentTime)) return;
       const target = Math.max(0, v.currentTime + delta);
       const dur =
@@ -521,7 +537,7 @@ export function VixPlayer({
       if (tapCueTimerRef.current) clearTimeout(tapCueTimerRef.current);
       tapCueTimerRef.current = setTimeout(() => setTapCue(null), 650);
     },
-    [mode]
+    [mode, activeSource]
   );
 
   const bumpChrome = useCallback(() => {
@@ -529,8 +545,9 @@ export function VixPlayer({
     setChromeVisible(true);
     if (chromeHideTimerRef.current) clearTimeout(chromeHideTimerRef.current);
     const v = videoRef.current;
+    const playing = v ? !v.paused : !iframePausedRef.current;
     // Auto-hide only while playing and no menus are open.
-    if (v && !v.paused) {
+    if (playing) {
       chromeHideTimerRef.current = setTimeout(() => {
         if (!subMenuOpen && !audioMenuOpen && !qualityMenuOpen) {
           setChromeVisible(false);
@@ -542,7 +559,10 @@ export function VixPlayer({
   /** Double-tap ±10s; single tap toggles custom chrome (no native controls). */
   const handleTap = useCallback(
     (e: React.TouchEvent) => {
-      if (mode !== "native" || locked) return;
+      if (locked) return;
+      if (mode !== "native" && !(mode === "iframe" && activeSource === "cinesrc")) {
+        return;
+      }
       const t = e.changedTouches[0];
       if (!t) return;
       const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -566,12 +586,15 @@ export function VixPlayer({
         }, 360);
       }
     },
-    [mode, locked, seekBy, bumpChrome]
+    [mode, activeSource, locked, seekBy, bumpChrome]
   );
 
   const handleVideoClick = useCallback(
     (e: React.MouseEvent) => {
-      if (mode !== "native" || locked) return;
+      if (locked) return;
+      if (mode !== "native" && !(mode === "iframe" && activeSource === "cinesrc")) {
+        return;
+      }
       // Ignore the synthetic click that follows touchend on mobile.
       if (performance.now() - lastTouchChromeRef.current < 500) return;
       // Ignore clicks that originate from chrome buttons (they stopPropagation).
@@ -581,7 +604,7 @@ export function VixPlayer({
       setChromeVisible((v) => !v);
       bumpChrome();
     },
-    [mode, locked, bumpChrome]
+    [mode, activeSource, locked, bumpChrome]
   );
 
   const handleResume = useCallback(() => {
@@ -867,6 +890,7 @@ export function VixPlayer({
     setAudioTracks([]);
     setAudioTrackId(-1);
     setQualityLevels([]);
+    setMediaReady(false);
     // Keep ended/nearEnd so binge overlays don't double-fire after a switch.
     bookmarkClearedRef.current = false;
   }, [activeSource, savePosition]);
@@ -1228,15 +1252,32 @@ export function VixPlayer({
   }, []);
 
   const togglePlay = useCallback(() => {
+    if (mode === "iframe" && activeSource === "cinesrc") {
+      sendCineSrcCommand(
+        iframeRef.current,
+        iframePausedRef.current ? "play" : "pause"
+      );
+      bumpChrome();
+      return;
+    }
     const v = videoRef.current;
     if (!v) return;
     if (v.paused) void v.play().catch(() => {});
     else v.pause();
     bumpChrome();
-  }, [bumpChrome]);
+  }, [mode, activeSource, bumpChrome]);
 
   const seekBySeconds = useCallback(
     (delta: number) => {
+      if (mode === "iframe" && activeSource === "cinesrc") {
+        const dur = remoteDurationRef.current;
+        const target = Math.max(0, remotePositionRef.current + delta);
+        sendCineSrcCommand(iframeRef.current, "seek", [
+          dur > 0 ? Math.min(target, dur) : target,
+        ]);
+        bumpChrome();
+        return;
+      }
       const v = videoRef.current;
       if (!v || !Number.isFinite(v.currentTime)) return;
       const dur =
@@ -1245,38 +1286,64 @@ export function VixPlayer({
       v.currentTime = dur == null ? target : Math.min(target, dur);
       bumpChrome();
     },
-    [bumpChrome]
+    [mode, activeSource, bumpChrome]
   );
 
   const seekRatio = useCallback(
     (ratio: number) => {
+      if (mode === "iframe" && activeSource === "cinesrc") {
+        const dur = remoteDurationRef.current;
+        if (!(dur > 0)) return;
+        sendCineSrcCommand(iframeRef.current, "seek", [
+          Math.max(0, Math.min(dur, ratio * dur)),
+        ]);
+        bumpChrome();
+        return;
+      }
       const v = videoRef.current;
       if (!v || !Number.isFinite(v.duration) || v.duration <= 0) return;
       v.currentTime = Math.max(0, Math.min(v.duration, ratio * v.duration));
       bumpChrome();
     },
-    [bumpChrome]
+    [mode, activeSource, bumpChrome]
   );
 
   const toggleMute = useCallback(() => {
+    if (mode === "iframe" && activeSource === "cinesrc") {
+      const next = !iframeMutedRef.current;
+      iframeMutedRef.current = next;
+      sendCineSrcCommand(iframeRef.current, "setMuted", [next]);
+      setTransport((t) => ({ ...t, muted: next }));
+      bumpChrome();
+      return;
+    }
     const v = videoRef.current;
     if (!v) return;
     // Session-only mute — never persisted (see vix-settings).
     v.muted = !v.muted;
     bumpChrome();
-  }, [bumpChrome]);
+  }, [mode, activeSource, bumpChrome]);
 
   const setVolume = useCallback(
     (vol: number) => {
+      const next = Math.max(0, Math.min(1, vol));
+      if (mode === "iframe" && activeSource === "cinesrc") {
+        iframeMutedRef.current = next === 0;
+        sendCineSrcCommand(iframeRef.current, "setVolume", [next]);
+        sendCineSrcCommand(iframeRef.current, "setMuted", [next === 0]);
+        setTransport((t) => ({ ...t, volume: next, muted: next === 0 }));
+        saveVixSettings({ volume: next });
+        bumpChrome();
+        return;
+      }
       const v = videoRef.current;
       if (!v) return;
-      const next = Math.max(0, Math.min(1, vol));
       v.volume = next;
       v.muted = next === 0;
       saveVixSettings({ volume: next });
       bumpChrome();
     },
-    [bumpChrome]
+    [mode, activeSource, bumpChrome]
   );
 
   const toggleFullscreen = useCallback(() => {
@@ -1301,15 +1368,59 @@ export function VixPlayer({
         const rawType = (e.data as { type?: unknown }).type;
         if (typeof rawType === "string" && rawType.startsWith("cinesrc:")) {
           const ev = rawType.slice("cinesrc:".length);
+          const payload = e.data as {
+            currentTime?: unknown;
+            duration?: unknown;
+            volume?: unknown;
+            muted?: unknown;
+          };
+          if (ev === "ready" || ev === "loadedmetadata") {
+            setMediaReady(true);
+          }
+          if (ev === "volumechange") {
+            if (typeof payload.muted === "boolean") {
+              iframeMutedRef.current = payload.muted;
+            }
+            setTransport((t) => ({
+              ...t,
+              volume:
+                typeof payload.volume === "number" ? payload.volume : t.volume,
+              muted:
+                typeof payload.muted === "boolean" ? payload.muted : t.muted,
+            }));
+          }
           if (
             (["play", "pause", "seeked", "ended", "timeupdate"] as const).includes(
               ev as "play"
             )
           ) {
-            const payload = e.data as {
-              currentTime?: unknown;
-              duration?: unknown;
-            };
+            if (ev === "play") iframePausedRef.current = false;
+            if (ev === "pause" || ev === "ended") iframePausedRef.current = true;
+            if (ev === "play" || ev === "timeupdate") setMediaReady(true);
+            setTransport((t) => ({
+              ...t,
+              currentTime:
+                typeof payload.currentTime === "number"
+                  ? payload.currentTime
+                  : t.currentTime,
+              duration:
+                typeof payload.duration === "number"
+                  ? payload.duration
+                  : t.duration,
+              paused:
+                ev === "play"
+                  ? false
+                  : ev === "pause" || ev === "ended"
+                    ? true
+                    : t.paused,
+            }));
+            if (ev === "play") bumpChrome();
+            if (ev === "pause") {
+              setChromeVisible(true);
+              if (chromeHideTimerRef.current) {
+                clearTimeout(chromeHideTimerRef.current);
+              }
+            }
             data = {
               type: "PLAYER_EVENT",
               data: {
@@ -1429,7 +1540,7 @@ export function VixPlayer({
     };
     window.addEventListener("message", handler);
     return () => window.removeEventListener("message", handler);
-  }, [clearPosition, emit, savePosition]);
+  }, [bumpChrome, clearPosition, emit, savePosition]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -1557,10 +1668,11 @@ export function VixPlayer({
       : src;
   const iframeSrc = addStartAt(iframeBaseSrc, resumePosition);
   // Transport only after media can play — otherwise black screen + fake pause/±10.
+  const cineSrcEmbed = mode === "iframe" && activeSource === "cinesrc";
   const showTransport =
     !locked &&
     chromeVisible &&
-    mode === "native" &&
+    (mode === "native" || cineSrcEmbed) &&
     mediaReady &&
     !showResume &&
     !resumeSeeking;
@@ -1611,8 +1723,22 @@ export function VixPlayer({
           allowFullScreen
           onLoad={() => setIframeError(false)}
           onError={() => setIframeError(true)}
-          className="h-full w-full border-0 bg-black"
+          className={`h-full w-full border-0 bg-black ${
+            locked || cineSrcEmbed ? "pointer-events-none" : ""
+          }`}
         />
+      )}
+
+      {cineSrcEmbed && !locked && (
+        <div
+          className="absolute inset-0 z-[15]"
+          onTouchEnd={handleTap}
+          onClick={handleVideoClick}
+        />
+      )}
+
+      {mode === "iframe" && locked && (
+        <div className="absolute inset-0 z-30" aria-hidden="true" />
       )}
 
       {showResume && (
@@ -1732,9 +1858,9 @@ export function VixPlayer({
         </button>
       )}
 
-      {mode === "iframe" && !locked && <EmbedHint />}
+      {mode === "iframe" && !locked && !cineSrcEmbed && <EmbedHint />}
 
-      {mode === "native" && tapCue && (
+      {(mode === "native" || cineSrcEmbed) && tapCue && (
         <div
           className={`pointer-events-none absolute inset-y-0 z-40 flex items-center ${
             tapCue.side === "right" ? "justify-end pr-6" : "justify-start pl-6"

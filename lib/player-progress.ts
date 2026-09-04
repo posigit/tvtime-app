@@ -118,7 +118,16 @@ export function addStartAt(src: string, position: number | null): string {
   if (position == null || !Number.isFinite(position) || position <= 0) return src;
   try {
     const url = new URL(src);
-    url.searchParams.set("startAt", String(Math.floor(position)));
+    const t = String(Math.floor(position));
+    if (
+      url.hostname === "cinesrc.st" ||
+      url.hostname.endsWith(".cinesrc.st")
+    ) {
+      url.searchParams.set("t", t);
+      url.searchParams.set("continueprompt", "false");
+      return url.toString();
+    }
+    url.searchParams.set("startAt", t);
     return url.toString();
   } catch {
     return src;
