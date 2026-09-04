@@ -1795,6 +1795,13 @@ export function VixPlayer({
       }
 
       if (d.event === "ended") {
+        if (!nearEndFiredRef.current) {
+          nearEndFiredRef.current = true;
+          onNearEndRef.current?.();
+        }
+        clearPosition();
+        return;
+      }
 
       if (
         !nearEndFiredRef.current &&
