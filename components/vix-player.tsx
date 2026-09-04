@@ -545,6 +545,10 @@ export function VixPlayer({
   const isDrivenEmbed =
     mode === "iframe" &&
     (activeSource === "cinesrc" || activeSource === "vidfast");
+  const vidfastEmbed = mode === "iframe" && activeSource === "vidfast";
+  const mappleEmbed = mode === "iframe" && activeSource === "mapple";
+  /** Embeds with a usable playback clock: driven (transport) + Mapple (subs). */
+  const clockEmbed = isDrivenEmbed || mappleEmbed;
 
   /** Native / driven-embed ±10s seek, with a transient on-screen cue. */
   const seekBy = useCallback(
@@ -999,9 +1003,9 @@ export function VixPlayer({
   /** User picked one of the top-3 OpenSubtitles files. */
   const handleOpenSubPick = useCallback(
     async (item: OpenSubListItem) => {
-      // Driven iframe: no <video> track — the iframe-sub effect downloads
+      // Clocked iframe: no <video> track — the iframe-sub effect downloads
       // the picked file once openSubFileId is set.
-      if (isDrivenEmbed) {
+      if (clockEmbed) {
         const imdb = imdbIdRef.current ?? (await ensureIframeImdb());
         if (!imdb) {
           setSubError("Subtitles unavailable");
@@ -1047,7 +1051,7 @@ export function VixPlayer({
       if (tr) injectedTracksRef.current.push(tr);
       setSubMenuOpen(false);
     },
-    [season, episode, isDrivenEmbed, ensureIframeImdb]
+    [season, episode, clockEmbed, ensureIframeImdb]
   );
 
   // Prefetch OS list when CC menu opens on OpenSubs.
@@ -1115,7 +1119,7 @@ export function VixPlayer({
   // ids; OpenSubs needs an IMDb id (resolved lazily via /api/imdb since
   // embeds never resolve).
   useEffect(() => {
-    if (!isDrivenEmbed) return;
+    if (!clockEmbed) return;
     if (subSource === "off" || subSource === "stream") {
       setIframeCues([]);
       return;
@@ -1199,7 +1203,7 @@ export function VixPlayer({
       cancelled = true;
     };
   }, [
-    isDrivenEmbed,
+    clockEmbed,
     subSource,
     openSubFileId,
     type,
@@ -1645,6 +1649,63 @@ export function VixPlayer({
         }
         return;
       }
+      // VidFast enriches PLAYER_EVENT payloads with live state
+      // ({ playing, muted, volume }) — read extras once for the blocks below.
+      // Its playerstatus reply (getStatus) is outside the 5-event whitelist,
+      // so sync from it here and stop before the progress-save path.
+      const vfState =
+        activeSource === "vidfast" &&
+        typeof data === "object" &&
+        data !== null &&
+        typeof (data as { data?: unknown }).data === "object" &&
+        (data as { data?: unknown }).data !== null
+          ? ((data as { data?: unknown }).data as {
+              event?: unknown;
+              playing?: unknown;
+              muted?: unknown;
+              volume?: unknown;
+            })
+          : null;
+      if (vfState?.event === "playerstatus") {
+        const st = vfState as {
+          currentTime?: unknown;
+          duration?: unknown;
+          playing?: unknown;
+          muted?: unknown;
+          volume?: unknown;
+        };
+        if (typeof st.currentTime === "number") {
+          remotePositionRef.current = st.currentTime;
+        }
+        if (typeof st.duration === "number" && st.duration > 0) {
+          remoteDurationRef.current = st.duration;
+        }
+        if (typeof st.muted === "boolean") iframeMutedRef.current = st.muted;
+        if (typeof st.playing === "boolean") {
+          iframePausedRef.current = !st.playing;
+        }
+        if (
+          typeof st.currentTime === "number" ||
+          typeof st.duration === "number"
+        ) {
+          setMediaReady(true);
+        }
+        setTransport((t) => ({
+          ...t,
+          currentTime:
+            typeof st.currentTime === "number" ? st.currentTime : t.currentTime,
+          duration:
+            typeof st.duration === "number" && st.duration > 0
+              ? st.duration
+              : t.duration,
+          paused:
+            typeof st.playing === "boolean" ? !st.playing : t.paused,
+          muted: typeof st.muted === "boolean" ? st.muted : t.muted,
+          volume: typeof st.volume === "number" ? st.volume : t.volume,
+        }));
+        return;
+      }
+
       const d = parseVixPlayerEventData(data);
       if (!d) return;
       emit(d.event);
@@ -1667,10 +1728,20 @@ export function VixPlayer({
           d.event === "ended" ||
           d.event === "timeupdate")
       ) {
-        if (d.event === "play") iframePausedRef.current = false;
-        if (d.event === "pause" || d.event === "ended") {
+        // Prefer the payload's live state (autoplay-muted starts never fire
+        // a mute event, so event names alone lie about sound).
+        const livePlaying =
+          typeof vfState?.playing === "boolean" ? vfState.playing : null;
+        const liveMuted =
+          typeof vfState?.muted === "boolean" ? vfState.muted : null;
+        const liveVolume =
+          typeof vfState?.volume === "number" ? vfState.volume : null;
+        if (livePlaying != null) iframePausedRef.current = !livePlaying;
+        else if (d.event === "play") iframePausedRef.current = false;
+        else if (d.event === "pause" || d.event === "ended") {
           iframePausedRef.current = true;
         }
+        if (liveMuted != null) iframeMutedRef.current = liveMuted;
         if (d.event === "play" || d.event === "timeupdate") setMediaReady(true);
         setTransport((t) => ({
           ...t,
@@ -1681,11 +1752,15 @@ export function VixPlayer({
               ? d.duration
               : t.duration,
           paused:
-            d.event === "play"
-              ? false
-              : d.event === "pause" || d.event === "ended"
-                ? true
-                : t.paused,
+            livePlaying != null
+              ? !livePlaying
+              : d.event === "play"
+                ? false
+                : d.event === "pause" || d.event === "ended"
+                  ? true
+                  : t.paused,
+          muted: liveMuted ?? t.muted,
+          volume: liveVolume ?? t.volume,
         }));
         if (d.event === "play") bumpChrome();
         if (d.event === "pause") {
@@ -1696,14 +1771,30 @@ export function VixPlayer({
         }
       }
 
-      if (d.event === "ended") {
-        if (!nearEndFiredRef.current) {
-          nearEndFiredRef.current = true;
-          onNearEndRef.current?.();
+      // Mapple has no command channel — sync only the clock so our subtitle
+      // overlay can follow it. Transport stays hidden; its player owns control.
+      if (
+        mappleEmbed &&
+        (d.event === "timeupdate" || d.event === "seeked")
+      ) {
+        if (
+          typeof d.currentTime === "number" ||
+          typeof d.duration === "number"
+        ) {
+          setMediaReady(true);
         }
-        clearPosition();
-        return;
+        setTransport((t) => ({
+          ...t,
+          currentTime:
+            typeof d.currentTime === "number" ? d.currentTime : t.currentTime,
+          duration:
+            typeof d.duration === "number" && d.duration > 0
+              ? d.duration
+              : t.duration,
+        }));
       }
+
+      if (d.event === "ended") {
 
       if (
         !nearEndFiredRef.current &&
@@ -1940,7 +2031,7 @@ export function VixPlayer({
         />
       )}
 
-      {isDrivenEmbed && subSource !== "off" && subSource !== "stream" && (
+      {clockEmbed && subSource !== "off" && subSource !== "stream" && (
         <IframeSubtitleOverlay
           text={cueTextAt(iframeCues, transport.currentTime - subDelay)}
           fontScale={SUB_FONT_SCALE[subFontSize]}
@@ -1961,7 +2052,18 @@ export function VixPlayer({
           referrerPolicy="no-referrer"
           allow="autoplay; fullscreen; encrypted-media; picture-in-picture; clipboard-write"
           allowFullScreen
-          onLoad={() => setIframeError(false)}
+          // No allow-popups / allow-top-navigation: embed ads cannot open
+          // scam popups or redirect the page. Scripts + same-origin storage
+          // keep playback working; postMessage is unaffected by sandboxing.
+          sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+          onLoad={() => {
+            setIframeError(false);
+            // VidFast starts muted under autoplay policy with no
+            // unsolicited state event — pull the real state on every load.
+            if (vidfastEmbed) {
+              sendVidfastCommand(iframeRef.current, "getStatus");
+            }
+          }}
           onError={() => setIframeError(true)}
           className={`h-full w-full border-0 bg-black ${
             locked || isDrivenEmbed ? "pointer-events-none" : ""
