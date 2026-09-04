@@ -148,6 +148,21 @@ export function embedUrlFor(
   return url ? url : null;
 }
 
+/**
+ * Set (or clear with "auto") CineSrc's preferred-quality param. Only CineSrc
+ * documents one — other embeds own quality through their own gear menus.
+ */
+export function withCineSrcQuality(src: string, quality: "auto" | number): string {
+  try {
+    const url = new URL(src);
+    if (quality === "auto") url.searchParams.delete("quality");
+    else url.searchParams.set("quality", String(quality));
+    return url.toString();
+  } catch {
+    return src;
+  }
+}
+
 export const CINESRC_ORIGIN = "https://cinesrc.st";
 
 export function sendCineSrcCommand(

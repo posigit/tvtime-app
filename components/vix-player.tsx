@@ -12,6 +12,7 @@ import {
   sendCineSrcCommand,
   sendVidfastCommand,
   sourceLabel,
+  withCineSrcQuality,
 } from "@/lib/embed-sources";
 import { ResumeOverlay } from "@/components/resume-overlay";
 import {
@@ -143,6 +144,8 @@ export function VixPlayer({
   const iframeMutedRef = useRef(false);
   /** Parsed VDRK cues rendered over the CineSrc iframe (no <video> track). */
   const [iframeCues, setIframeCues] = useState<VttCue[]>([]);
+  /** Resume override for CineSrc quality switches (reload keeps position). */
+  const [cineSrcT, setCineSrcT] = useState<number | null>(null);
   const bookmarkClearedRef = useRef(false);
   /** Blocks progress writes until resume check (and optional prompt) finishes. */
   const saveEnabledRef = useRef(false);
@@ -369,6 +372,7 @@ export function VixPlayer({
     setOpenSubFileId(null);
     setOpenSubItems([]);
     openSubListKeyRef.current = null;
+    setCineSrcT(null);
     if (tapCueTimerRef.current) {
       clearTimeout(tapCueTimerRef.current);
       tapCueTimerRef.current = null;
@@ -939,6 +943,7 @@ export function VixPlayer({
     setOpenSubFileId(null);
     setOpenSubItems([]);
     openSubListKeyRef.current = null;
+    setCineSrcT(null);
     // Keep ended/nearEnd so binge overlays don't double-fire after a switch.
     bookmarkClearedRef.current = false;
   }, [activeSource, savePosition]);
@@ -1888,39 +1893,35 @@ export function VixPlayer({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [flushPosition, subMenuOpen, audioMenuOpen, qualityMenuOpen]);
 
-  // Desktop keyboard shortcuts (native only). Custom chrome owns transport —
-  // no native <video controls> to double-toggle against.
+  // Desktop keyboard shortcuts (native + CineSrc via its command channel).
+  // Custom chrome owns transport — no native <video controls> to
+  // double-toggle against. Other embeds keep their own keys when focused.
   useEffect(() => {
-    if (mode !== "native" || locked) return;
+    // Inline (not the render const below): deps evaluate before it exists.
+    const cinesrcKeys = mode === "iframe" && activeSource === "cinesrc";
+    if ((mode !== "native" && !cinesrcKeys) || locked) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
       if (subMenuOpen || audioMenuOpen || qualityMenuOpen) return;
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
-      const v = videoRef.current;
-      if (!v) return;
       const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
       if (key === " " || key === "k") {
         e.preventDefault();
         e.stopPropagation();
-        if (v.paused) void v.play();
-        else v.pause();
-        bumpChrome();
+        togglePlay();
       } else if (key === "ArrowRight" || key === "l") {
         e.preventDefault();
         e.stopPropagation();
-        v.currentTime = Math.min(v.duration || 1e9, v.currentTime + 10);
-        bumpChrome();
+        seekBySeconds(10);
       } else if (key === "ArrowLeft" || key === "j") {
         e.preventDefault();
         e.stopPropagation();
-        v.currentTime = Math.max(0, v.currentTime - 10);
-        bumpChrome();
+        seekBySeconds(-10);
       } else if (key === "m") {
         e.preventDefault();
         e.stopPropagation();
-        v.muted = !v.muted;
-        bumpChrome();
+        toggleMute();
       } else if (key === "f") {
         e.preventDefault();
         e.stopPropagation();
@@ -1933,7 +1934,18 @@ export function VixPlayer({
     };
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
-  }, [mode, locked, subMenuOpen, audioMenuOpen, qualityMenuOpen, bumpChrome]);
+  }, [
+    mode,
+    activeSource,
+    locked,
+    subMenuOpen,
+    audioMenuOpen,
+    qualityMenuOpen,
+    bumpChrome,
+    togglePlay,
+    seekBySeconds,
+    toggleMute,
+  ]);
 
   const adjustSubDelay = useCallback((delta: number) => {
     const next = Math.max(
@@ -1994,7 +2006,21 @@ export function VixPlayer({
     type && tmdbId
       ? embedUrlFor(activeSource, type, tmdbId, season, episode) ?? src
       : src;
-  const iframeSrc = addStartAt(iframeBaseSrc, resumePosition);
+  // CineSrc quality switches reload the frame: keep position via t= and
+  // apply the preferred-quality param (brief rebuffer, no bookmark loss).
+  let iframeSrc = addStartAt(iframeBaseSrc, cineSrcT ?? resumePosition);
+  if (cineSrcEmbed && qualitySelection !== "auto") {
+    iframeSrc = withCineSrcQuality(iframeSrc, qualitySelection);
+  }
+  const handleCineSrcQuality = useCallback(
+    (next: "auto" | number) => {
+      setQualitySelection(next);
+      saveVixSettings({ quality: next });
+      setCineSrcT(Math.floor(remotePositionRef.current));
+      bumpChrome();
+    },
+    [bumpChrome]
+  );
   // Transport only after media can play — otherwise black screen + fake pause/±10.
   const cineSrcEmbed = mode === "iframe" && activeSource === "cinesrc";
   const showTransport =
@@ -2147,10 +2173,19 @@ export function VixPlayer({
           audioTrackId={audioTrackId}
           audioMenuOpen={audioMenuOpen}
           setAudioMenuOpen={setAudioMenuOpen}
-          qualityLevels={qualityLevels}
+          qualityLevels={
+            cineSrcEmbed
+              ? [
+                  { height: 1080, index: 0 },
+                  { height: 720, index: 1 },
+                  { height: 480, index: 2 },
+                ]
+              : qualityLevels
+          }
           qualitySelection={qualitySelection}
           qualityMenuOpen={qualityMenuOpen}
           setQualityMenuOpen={setQualityMenuOpen}
+          onPickQuality={cineSrcEmbed ? handleCineSrcQuality : undefined}
           subSource={subSource}
           subMenuOpen={subMenuOpen}
           setSubMenuOpen={setSubMenuOpen}

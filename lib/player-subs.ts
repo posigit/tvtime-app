@@ -6,6 +6,7 @@
 import type { VixSettings } from "@/lib/vix-settings";
 
 export const SUB_FONT_SCALE: Record<VixSettings["subFontSize"], number> = {
+  xs: 0.75,
   sm: 1,
   md: 1.12,
   lg: 1.25,

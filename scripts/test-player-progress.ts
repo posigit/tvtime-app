@@ -12,8 +12,13 @@ import {
   isResumablePosition,
   shouldSaveProgress,
 } from "../lib/player-progress";
-import { cueTextAt, isPromoCue, parseVttCues } from "../lib/player-subs";
-import { embedUrlFor } from "../lib/embed-sources";
+import {
+  SUB_FONT_SCALE,
+  cueTextAt,
+  isPromoCue,
+  parseVttCues,
+} from "../lib/player-subs";
+import { embedUrlFor, withCineSrcQuality } from "../lib/embed-sources";
 import { DEFAULT_VIX_SETTINGS } from "../lib/vix-settings";
 import { NEXT_FAB_RATIO, RESUME_END_RATIO } from "../lib/player-constants";
 
@@ -120,6 +125,20 @@ assert.equal(cueTextAt(delayed, 1.5), "");
 assert.equal(cueTextAt(delayed, 2.5), "Hello world");
 
 assert.equal(DEFAULT_VIX_SETTINGS.subBgBlur, "md");
+assert.equal(SUB_FONT_SCALE.xs, 0.75);
+
+// CineSrc preferred-quality param (Auto clears it).
+assert.equal(
+  withCineSrcQuality("https://cinesrc.st/embed/movie/1?controls=false", 720),
+  "https://cinesrc.st/embed/movie/1?controls=false&quality=720"
+);
+assert.equal(
+  withCineSrcQuality(
+    "https://cinesrc.st/embed/movie/1?controls=false&quality=720",
+    "auto"
+  ),
+  "https://cinesrc.st/embed/movie/1?controls=false"
+);
 
 // Promo cues (VDRK ad spam) are dropped; dialogue is never touched.
 assert.equal(isPromoCue("Visit hoofoot.ru to watch all sports"), true);

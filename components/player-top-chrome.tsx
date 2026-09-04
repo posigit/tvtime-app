@@ -38,6 +38,8 @@ type PlayerTopChromeProps = {
   qualitySelection: "auto" | number;
   qualityMenuOpen: boolean;
   setQualityMenuOpen: (open: boolean | ((v: boolean) => boolean)) => void;
+  /** Embed override (CineSrc): reloads the frame with a quality param. */
+  onPickQuality?: (quality: "auto" | number) => void;
   subSource: SubSource;
   subMenuOpen: boolean;
   setSubMenuOpen: (open: boolean | ((v: boolean) => boolean)) => void;
@@ -104,6 +106,7 @@ export function PlayerTopChrome({
   qualitySelection,
   qualityMenuOpen,
   setQualityMenuOpen,
+  onPickQuality,
   subSource,
   subMenuOpen,
   setSubMenuOpen,
@@ -241,7 +244,10 @@ export function PlayerTopChrome({
               )}
             </div>
           )}
-          {mode === "native" && qualityLevels.length > 0 && (
+          {((mode === "native" && qualityLevels.length > 0) ||
+            (mode === "iframe" &&
+              activeSource === "cinesrc" &&
+              onPickQuality)) && (
             <div ref={qualityMenuRef} className="relative">
               <button
                 type="button"
@@ -272,7 +278,8 @@ export function PlayerTopChrome({
                     type="button"
                     role="menuitem"
                     onClick={() => {
-                      setHlsQualityRef.current?.("auto");
+                      if (onPickQuality) onPickQuality("auto");
+                      else setHlsQualityRef.current?.("auto");
                       setQualityMenuOpen(false);
                     }}
                     className={cn(
@@ -291,7 +298,8 @@ export function PlayerTopChrome({
                       type="button"
                       role="menuitem"
                       onClick={() => {
-                        setHlsQualityRef.current?.(lv.height);
+                        if (onPickQuality) onPickQuality(lv.height);
+                        else setHlsQualityRef.current?.(lv.height);
                         setQualityMenuOpen(false);
                       }}
                       className={cn(
@@ -472,6 +480,7 @@ export function PlayerTopChrome({
                       <div className="flex items-center gap-1.5">
                         {(
                           [
+                            ["xs", "75%"],
                             ["sm", "100%"],
                             ["md", "112%"],
                             ["lg", "125%"],

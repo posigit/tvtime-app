@@ -45,7 +45,7 @@ export type VixSettings = {
    */
   subDelaySeconds: number;
   /** Cue text size. */
-  subFontSize: "sm" | "md" | "lg";
+  subFontSize: "xs" | "sm" | "md" | "lg";
   /** Cue text color. */
   subColor: "white" | "yellow" | "cyan";
   /** Cue background opacity 0..1. */
@@ -116,6 +116,7 @@ function clampSettings(merged: VixSettings): VixSettings {
     next.subDelaySeconds = Math.max(-10, Math.min(10, next.subDelaySeconds));
   }
   if (
+    next.subFontSize !== "xs" &&
     next.subFontSize !== "sm" &&
     next.subFontSize !== "md" &&
     next.subFontSize !== "lg"
