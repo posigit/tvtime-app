@@ -1461,7 +1461,7 @@ export function VixPlayer({
   useEffect(() => {
     const orient = screen.orientation as
       | (ScreenOrientation & {
-          lock?: (o: OrientationLockType) => Promise<void>;
+          lock?: (o: string) => Promise<void>;
         })
       | undefined;
     if (isFullscreen && autoRotate) {
