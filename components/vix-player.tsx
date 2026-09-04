@@ -869,7 +869,7 @@ export function VixPlayer({
   }, [mode]);
 
   // ---------- source switching ----------
-  // Picker order: vidnest, mapple, cinesrc, 2embed, vidfast, vidlink, then vix.
+  // Picker order: cinesrc, vidfast, mapple, vidlink, vidnest, 2embed, then vix.
   // goated stays last and disabled (degraded backend).
   const ALL_SOURCES: StreamSource[] = [
     ...EMBED_SOURCES.map((s) => s.key as StreamSource),
@@ -2059,10 +2059,10 @@ export function VixPlayer({
           referrerPolicy="no-referrer"
           allow="autoplay; fullscreen; encrypted-media; picture-in-picture; clipboard-write"
           allowFullScreen
-          // No allow-popups / allow-top-navigation: embed ads cannot open
-          // scam popups or redirect the page. Scripts + same-origin storage
-          // keep playback working; postMessage is unaffected by sandboxing.
-          sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+          // NOTE: no sandbox attribute on purpose — every source gates
+          // playback on window.open/navigation working and shows a "disable
+          // sandbox" wall otherwise. Popup defense lives in the tap-catcher
+          // overlays on driven embeds (CineSrc/VidFast) instead.
           onLoad={() => {
             setIframeError(false);
             // VidFast starts muted under autoplay policy with no

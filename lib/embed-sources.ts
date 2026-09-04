@@ -1,7 +1,7 @@
 /**
  * Embed-source registry for the player's iframe fallback.
  *
- * Picker order: vidnest, mapple, cinesrc, 2embed, vidfast, vidlink.
+ * Picker order: cinesrc, vidfast, mapple, vidlink, vidnest, 2embed.
  * Native vix + goated are appended in vix-player (goated last, disabled).
  * Mapple + VidFast + VidLink post PLAYER_EVENT (progress saves); VidFast also
  * accepts {command} control messages. CineSrc posts cinesrc:* events, not
@@ -25,18 +25,29 @@ export type EmbedSourceDef = {
 };
 
 export const EMBED_SOURCES: EmbedSourceDef[] = [
+  // Driven first: CineSrc + VidFast are popup-proof (tap-catcher owns all
+  // taps, their ads never see a gesture) and get host transport + subs.
+  // Raw embeds after them can still pop scam tabs on tap — no sandbox is
+  // possible (sources wall on it), so ranking is the defense.
   {
-    key: "vidnest",
-    name: "VidNest",
-    base: "https://vidnest.fun",
-    host: "vidnest.fun",
-    // Hide the embed's transport chrome (slider/center play/±seek) so lock
-    // mode cannot leak it. Captions/settings/fullscreen stay usable.
-    // TV resumes via `progress`, movies via `startAt` (see addStartAt).
+    key: "cinesrc",
+    name: "CineSrc",
+    base: "https://cinesrc.st",
+    host: "cinesrc.st",
     movieUrl: (tmdbId) =>
-      `https://vidnest.fun/movie/${tmdbId}?timeslider=hide&centerplay=hide&centerseekbackward=hide&centerseekforward=hide`,
+      `https://cinesrc.st/embed/movie/${tmdbId}?controls=false`,
+    // TV is query-string; posts cinesrc:* events (adapted in vix-player).
     tvUrl: (tmdbId, season, episode) =>
-      `https://vidnest.fun/tv/${tmdbId}/${season}/${episode}?timeslider=hide&centerplay=hide&centerseekbackward=hide&centerseekforward=hide`,
+      `https://cinesrc.st/embed/tv/${tmdbId}?s=${season}&e=${episode}&controls=false`,
+  },
+  {
+    key: "vidfast",
+    name: "VidFast",
+    base: "https://vidfast.vc",
+    host: "vidfast.vc",
+    movieUrl: (tmdbId) => `https://vidfast.vc/movie/${tmdbId}?autoPlay=true&title=true&poster=true`,
+    tvUrl: (tmdbId, season, episode) =>
+      `https://vidfast.vc/tv/${tmdbId}/${season}/${episode}?autoPlay=true&title=true&poster=true&nextButton=true&autoNext=true`,
   },
   {
     key: "mapple",
@@ -51,15 +62,26 @@ export const EMBED_SOURCES: EmbedSourceDef[] = [
       `https://mapple.rip/watch/tv/${tmdbId}-${season}-${episode}?autoPlay=true`,
   },
   {
-    key: "cinesrc",
-    name: "CineSrc",
-    base: "https://cinesrc.st",
-    host: "cinesrc.st",
-    movieUrl: (tmdbId) =>
-      `https://cinesrc.st/embed/movie/${tmdbId}?controls=false`,
-    // TV is query-string; posts cinesrc:* events (adapted in vix-player).
+    key: "vidlink",
+    name: "VidLink",
+    base: "https://vidlink.pro",
+    host: "vidlink.pro",
+    movieUrl: (tmdbId) => `https://vidlink.pro/movie/${tmdbId}?autoplay=true&title=true&poster=true`,
     tvUrl: (tmdbId, season, episode) =>
-      `https://cinesrc.st/embed/tv/${tmdbId}?s=${season}&e=${episode}&controls=false`,
+      `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?autoplay=true&title=true&poster=true&nextbutton=true`,
+  },
+  {
+    key: "vidnest",
+    name: "VidNest",
+    base: "https://vidnest.fun",
+    host: "vidnest.fun",
+    // Hide the embed's transport chrome (slider/center play/±seek) so lock
+    // mode cannot leak it. Captions/settings/fullscreen stay usable.
+    // TV resumes via `progress`, movies via `startAt` (see addStartAt).
+    movieUrl: (tmdbId) =>
+      `https://vidnest.fun/movie/${tmdbId}?timeslider=hide&centerplay=hide&centerseekbackward=hide&centerseekforward=hide`,
+    tvUrl: (tmdbId, season, episode) =>
+      `https://vidnest.fun/tv/${tmdbId}/${season}/${episode}?timeslider=hide&centerplay=hide&centerseekbackward=hide&centerseekforward=hide`,
   },
   {
     key: "2embed",
@@ -70,24 +92,6 @@ export const EMBED_SOURCES: EmbedSourceDef[] = [
     movieUrl: (tmdbId) => `https://www.2embed.cc/embed/${tmdbId}`,
     tvUrl: (tmdbId, season, episode) =>
       `https://www.2embed.cc/embedtv/${tmdbId}&s=${season}&e=${episode}`,
-  },
-  {
-    key: "vidfast",
-    name: "VidFast",
-    base: "https://vidfast.vc",
-    host: "vidfast.vc",
-    movieUrl: (tmdbId) => `https://vidfast.vc/movie/${tmdbId}?autoPlay=true&title=true&poster=true`,
-    tvUrl: (tmdbId, season, episode) =>
-      `https://vidfast.vc/tv/${tmdbId}/${season}/${episode}?autoPlay=true&title=true&poster=true&nextButton=true&autoNext=true`,
-  },
-  {
-    key: "vidlink",
-    name: "VidLink",
-    base: "https://vidlink.pro",
-    host: "vidlink.pro",
-    movieUrl: (tmdbId) => `https://vidlink.pro/movie/${tmdbId}?autoplay=true&title=true&poster=true`,
-    tvUrl: (tmdbId, season, episode) =>
-      `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?autoplay=true&title=true&poster=true&nextbutton=true`,
   },
 ];
 
