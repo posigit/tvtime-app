@@ -979,6 +979,23 @@ export function VixPlayer({
     [ensureOpenSubList]
   );
 
+  // Declared before handleOpenSubPick (used in its deps below).
+  const ensureIframeImdb = useCallback(async (): Promise<string | null> => {
+    if (imdbIdRef.current) return imdbIdRef.current;
+    if (!type || !tmdbId) return null;
+    try {
+      const res = await fetch(
+        `/api/imdb?type=${type}&id=${tmdbId}`
+      );
+      if (!res.ok) return null;
+      const data = (await res.json()) as { imdbId?: string | null };
+      if (data.imdbId) imdbIdRef.current = data.imdbId;
+      return data.imdbId ?? null;
+    } catch {
+      return null;
+    }
+  }, [type, tmdbId]);
+
   /** User picked one of the top-3 OpenSubtitles files. */
   const handleOpenSubPick = useCallback(
     async (item: OpenSubListItem) => {
@@ -1097,22 +1114,6 @@ export function VixPlayer({
   // over the iframe, synced to its timeupdate position. VDRK needs only TMDB
   // ids; OpenSubs needs an IMDb id (resolved lazily via /api/imdb since
   // embeds never resolve).
-  const ensureIframeImdb = useCallback(async (): Promise<string | null> => {
-    if (imdbIdRef.current) return imdbIdRef.current;
-    if (!type || !tmdbId) return null;
-    try {
-      const res = await fetch(
-        `/api/imdb?type=${type}&id=${tmdbId}`
-      );
-      if (!res.ok) return null;
-      const data = (await res.json()) as { imdbId?: string | null };
-      if (data.imdbId) imdbIdRef.current = data.imdbId;
-      return data.imdbId ?? null;
-    } catch {
-      return null;
-    }
-  }, [type, tmdbId]);
-
   useEffect(() => {
     if (!isDrivenEmbed) return;
     if (subSource === "off" || subSource === "stream") {
