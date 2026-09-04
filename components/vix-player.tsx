@@ -553,8 +553,10 @@ export function VixPlayer({
   const isDrivenEmbed = mode === "iframe" && activeSource === "cinesrc";
   const vidfastEmbed = mode === "iframe" && activeSource === "vidfast";
   const mappleEmbed = mode === "iframe" && activeSource === "mapple";
-  /** Embeds with a usable playback clock: driven (transport) + Mapple (subs). */
-  const clockEmbed = isDrivenEmbed || mappleEmbed;
+  // Subs only need a clock: driven embeds (transport) + VidFast/Mapple
+  // (read-only timeupdate clock). VidFast must stay here even though it is
+  // NOT driven — dropping it silently disables its entire CC flow.
+  const clockEmbed = isDrivenEmbed || mappleEmbed || vidfastEmbed;
 
   /** Native / driven-embed ±10s seek, with a transient on-screen cue. */
   const seekBy = useCallback(
