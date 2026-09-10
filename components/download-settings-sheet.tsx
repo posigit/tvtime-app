@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Check, Download, Pause, Play, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/toast";
@@ -66,6 +67,10 @@ export function DownloadSettingsSheet({
   const [items, setItems] = useState<DownloadRecord[]>([]);
   const [quota, setQuota] = useState<number | undefined>();
   const [usage, setUsage] = useState<number | undefined>();
+  // Portal target: rendering under document.body escapes ancestor stacking
+  // contexts (profile page wrappers) so the sheet + backdrop always paint
+  // above the bottom tab bar instead of sliding under it. `open` can only
+  // become true from a client tap, so document is guaranteed here.
 
   const readSettings = useCallback(() => {
     try {
@@ -136,7 +141,7 @@ export function DownloadSettingsSheet({
     };
   }, [open]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
   const toggleMode = () => {
     const next = !mode;
@@ -160,9 +165,10 @@ export function DownloadSettingsSheet({
   const usedByApp = items
     .filter((r) => r.state === "done")
     .reduce((s, r) => s + r.sizeBytes, 0);
+  const doneCount = items.filter((r) => r.state === "done").length;
   const capBytes = capMb * 1024 * 1024;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[80] flex flex-col">
       <button
         type="button"
@@ -291,10 +297,20 @@ export function DownloadSettingsSheet({
 
           {/* Storage meter */}
           <div className="mt-3 rounded-2xl bg-white/[0.04] px-4 py-3.5 ring-1 ring-white/[0.08]">
-            <div className="flex items-baseline justify-between">
-              <p className="text-sm font-bold text-white">On this device</p>
-              <p className="text-xs font-semibold text-white/45">
-                {formatBytes(usedByApp)} of {formatBytes(capBytes)}
+            <div className="flex items-end justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-white">On this device</p>
+                <p className="mt-0.5 truncate text-[11px] text-white/40">
+                  {doneCount} saved · cap {formatBytes(capBytes)}
+                </p>
+              </div>
+              <p className="shrink-0 text-right leading-none">
+                <span className="block text-xl font-black text-white">
+                  {formatBytes(usedByApp)}
+                </span>
+                <span className="mt-1 block text-[10px] font-bold uppercase tracking-wider text-white/35">
+                  used
+                </span>
               </p>
             </div>
             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
@@ -351,7 +367,8 @@ export function DownloadSettingsSheet({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
