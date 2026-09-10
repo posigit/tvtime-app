@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { backdropUrl, stillUrl } from "@/lib/tmdb";
+import { backdropUrl, posterUrl, stillUrl } from "@/lib/tmdb";
 import { cn } from "@/lib/utils";
+import type { CSSProperties } from "react";
+import type { MovieTheme } from "@/lib/movie-theme";
 import { isEpisodeAired } from "@/lib/show-progress";
 import { daysUntilYmd, formatAppDateShort } from "@/lib/app-time";
 import { Confetti } from "@/components/confetti";
@@ -13,6 +15,7 @@ import { DiscoverRail } from "@/components/discover-rail";
 import { WatchProviders } from "@/components/watch-providers";
 import { CommunityReviews } from "@/components/community-reviews";
 import { TrailerButton } from "@/components/trailer-button";
+import { ScoreStrip } from "@/components/score-strip";
 import { VixPlayer } from "@/components/vix-player";
 import { UpNextCard } from "@/components/up-next-card";
 import { EndOfLineCard } from "@/components/end-of-line-card";
@@ -26,7 +29,7 @@ import type { TmdbMediaCard, WatchProvidersResult } from "@/lib/tmdb";
 import type { ReviewsPayload } from "@/lib/reviews";
 import type { PlaybackSummary } from "@/lib/playback";
 import { formatPlaybackTime } from "@/lib/playback-format";
-import { Check, ChevronDown, MoreHorizontal, Play } from "lucide-react";
+import { Check, ChevronDown, ChevronLeft, MoreHorizontal, Play } from "lucide-react";
 
 export type DetailEpisode = {
   seasonNumber: number;
@@ -91,6 +94,7 @@ export function ShowDetailClient({
   reviews,
   trailerKey = null,
   playbackPositions = {},
+  theme,
 }: {
   show: DetailShow;
   episodes: DetailEpisode[];
@@ -105,6 +109,7 @@ export function ShowDetailClient({
   reviews?: ReviewsPayload;
   trailerKey?: string | null;
   playbackPositions?: Record<string, PlaybackSummary>;
+  theme: MovieTheme;
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -118,7 +123,7 @@ export function ShowDetailClient({
   });
   const watchedMapRef = useRef(watchedMap);
   const [rewatchCounts, setRewatchCounts] = useState(initialRewatchCounts);
-  const [activeTab, setActiveTab] = useState<"about" | "episodes">("episodes");
+  const [activeTab, setActiveTab] = useState<"about" | "episodes">("about");
   const [confetti, setConfetti] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [following, setFollowing] = useState(initialFollowing);
@@ -602,26 +607,92 @@ export function ShowDetailClient({
         ? { icon: "tmdb" as const, text: `${show.voteAverage.toFixed(1)}/10` }
         : null;
 
+  /** Artwork sources for the movie-style hero. */
+  const backdropSrc = show.backdropPath
+    ? (backdropUrl(show.backdropPath, "w1280") ?? null)
+    : null;
+  const posterSrc = show.posterPath
+    ? (posterUrl(show.posterPath, "w342") ?? null)
+    : null;
+  const ambientSrc =
+    (show.backdropPath ? backdropUrl(show.backdropPath, "w300") : null) ??
+    posterSrc;
+
   return (
-    <div className="min-h-dvh bg-black pb-safe-page">
+    <div
+      className="min-h-dvh bg-black pb-safe-page"
+      style={
+        {
+          "--theme": theme.v,
+          "--theme-deep": theme.deep,
+        } as CSSProperties
+      }
+    >
       <Confetti fire={confetti} />
 
-      {/* ---------- Backdrop header (e4) ---------- */}
-      <div className="relative h-detail-hero w-full overflow-hidden">
-        {show.backdropPath ? (
-          <Image
-            src={backdropUrl(show.backdropPath, "w1280") ?? ""}
-            alt={show.title}
-            fill
-            sizes="100vw"
-            className="object-cover"
-            unoptimized
-            priority
+      {/* ---------- Adaptive hero (movie-detail style) ----------
+          Sharp backdrop band feathered into blurred ambience; poster +
+          title overlap its fading bottom edge. */}
+      <div className="relative overflow-hidden">
+        {/* Blurred photographic ambience (cheap w300 file, painted once) */}
+        {ambientSrc ? (
+          <div aria-hidden className="pointer-events-none absolute inset-0">
+            <Image
+              src={ambientSrc}
+              alt=""
+              fill
+              sizes="100vw"
+              className="scale-105 object-cover object-top opacity-30 blur-2xl saturate-150"
+              unoptimized
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black" />
+          </div>
+        ) : null}
+
+        {/* Backdrop band — sharp, ~32% of the viewport (tightened from 48dvh
+            so the poster sits much closer to the top — matches the
+            scrolled “better” reference). */}
+        <div
+          className="relative h-[32dvh] max-h-[320px] min-h-[220px] overflow-hidden"
+          style={{
+            maskImage: "linear-gradient(to bottom, black 55%, transparent 98%)",
+            WebkitMaskImage:
+              "linear-gradient(to bottom, black 55%, transparent 98%)",
+          }}
+        >
+          {backdropSrc ? (
+            <Image
+              src={backdropSrc}
+              alt={show.title}
+              fill
+              sizes="100vw"
+              className="object-cover"
+              unoptimized
+              priority
+            />
+          ) : (
+            <div
+              aria-hidden
+              className="h-full w-full"
+              style={{
+                background:
+                  "linear-gradient(to bottom, rgb(var(--theme) / 0.55), #000)",
+              }}
+            />
+          )}
+          {/* legibility scrims + theme seam glow */}
+          <div
+            aria-hidden
+            className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/60 to-transparent"
           />
-        ) : (
-          <div className="h-full w-full bg-card" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/30" />
+          <div
+            aria-hidden
+            className="absolute inset-x-0 bottom-0 h-[65%]"
+            style={{
+              background:
+                "radial-gradient(90% 100% at 50% 100%, rgb(var(--theme) / 0.4), transparent 70%), linear-gradient(to top, #000 22%, rgb(0 0 0 / 0.65) 52%, transparent)",
+            }}
+          />
 
         {/* Centered play button opens the trailer */}
         {trailerKey && (
@@ -632,13 +703,13 @@ export function ShowDetailClient({
           />
         )}
 
-        {/* Top controls — sit below notch / status bar */}
+        {/* Top controls over the art */}
         <button
           onClick={() => router.back()}
           aria-label="Back"
-          className="absolute left-4 top-safe-float flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white"
+          className="absolute left-4 top-safe-float flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.12] text-white ring-1 ring-white/30 shadow-[0_8px_24px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-xl transition hover:bg-white/25 active:scale-95"
         >
-          <ChevronDown className="h-5 w-5" />
+          <ChevronLeft className="h-5 w-5" />
         </button>
         <div className="absolute right-4 top-safe-float">
           <div className="flex items-center gap-2">
@@ -652,7 +723,7 @@ export function ShowDetailClient({
             <button
               onClick={() => setMenuOpen((v) => !v)}
               aria-label="More"
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.12] text-white ring-1 ring-white/30 shadow-[0_8px_24px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-xl transition hover:bg-white/25 active:scale-95"
             >
               <MoreHorizontal className="h-5 w-5" />
             </button>
@@ -696,38 +767,75 @@ export function ShowDetailClient({
             </div>
           )}
         </div>
-
-        {/* Title block */}
-        <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="text-2xl font-black text-white drop-shadow">
-              {show.title}
-            </h1>
-            {rewatchCounts[0] > 0 && (
-              <span className="mt-1 inline-flex items-center rounded-full bg-success/20 px-2.5 py-0.5 text-[11px] font-bold text-success ring-1 ring-success/40">
-                Rewatched ×{rewatchCounts[0] + 1}
-              </span>
-            )}
-            <p className="mt-0.5 truncate text-sm text-white/80">
-              {metaParts.join(" · ")}
-            </p>
-          </div>
-          {rating && (
-            <div className="flex flex-shrink-0 items-center gap-1.5">
-              {rating.icon === "rt" ? (
-                <span className="text-xl leading-none" title="Rotten Tomatoes">
-                  🍅
-                </span>
-              ) : (
-                <TmdbIcon className="h-6 w-6" />
-              )}
-              <span className="text-lg font-bold text-primary">
-                {rating.text}
-              </span>
-            </div>
-          )}
-        </div>
       </div>
+
+      <div className="relative px-4 pb-5">
+        {/* Poster card overlapping the backdrop fade (~50% width) — overlap
+            tuned to -mt-24 so shorter hero (≈272px) leaves ≈176px gap vs
+            old ~300px; closely matches scrolled reference ~150px. */}
+        <div className="mx-auto -mt-24 w-[50%] max-w-[220px]">
+          <div className="relative aspect-[2/3] overflow-hidden rounded-[1.75rem] shadow-[0_24px_80px_-16px_rgb(var(--theme)/0.6),0_10px_30px_rgba(0,0,0,0.6)] ring-1 ring-white/25">
+            {posterSrc ? (
+              <Image
+                src={posterSrc}
+                alt={`${show.title} poster`}
+                fill
+                sizes="(max-width: 480px) 50vw, 220px"
+                className="object-cover"
+                unoptimized
+                priority
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-card p-4 text-center text-sm font-bold text-white/50">
+                {show.title}
+              </div>
+            )}
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-white/10" />
+          </div>
+        </div>
+
+        {/* Title */}
+        <h1 className="mt-4 text-center text-3xl font-black tracking-tight text-white drop-shadow">
+          {show.title}
+        </h1>
+        {rewatchCounts[0] > 0 && (
+          <div className="mt-1.5 flex justify-center">
+            <span className="inline-flex items-center rounded-full bg-success/20 px-2.5 py-0.5 text-[11px] font-bold text-success ring-1 ring-success/40">
+              Rewatched ×{rewatchCounts[0] + 1}
+            </span>
+          </div>
+        )}
+        <p className="mt-1 text-center text-sm text-white/60">
+          {metaParts.join("  ·  ")}
+        </p>
+        {rating && (
+          <div className="mt-2 flex items-center justify-center gap-1.5">
+            {rating.icon === "rt" ? (
+              <span className="text-xl leading-none" title="Rotten Tomatoes">
+                🍅
+              </span>
+            ) : (
+              <TmdbIcon className="h-6 w-6" />
+            )}
+            <span className="text-sm font-bold text-white/85">
+              {rating.text}
+            </span>
+          </div>
+        )}
+        {show.networks && show.networks.length > 0 && (
+          <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+            {show.networks.slice(0, 2).map((n) => (
+              <span
+                key={n}
+                className="rounded-full bg-[rgb(var(--theme)/0.18)] px-3 py-1 text-[11px] font-semibold text-white/80 shadow-[0_0_18px_rgb(var(--theme)/0.25)] ring-1 ring-white/20 backdrop-blur-xl"
+              >
+                {n}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
 
       {/* ---------- Your score (avg of your episode ratings) ---------- */}
       {derivedScore && (
@@ -740,6 +848,20 @@ export function ShowDetailClient({
             your avg · {derivedScore.count} episode
             {derivedScore.count === 1 ? "" : "s"} rated
           </span>
+        </div>
+      )}
+
+      {/* ---------- Scores (movie-detail style) ---------- */}
+      {(reviews?.rtScore != null ||
+        reviews?.rtAudienceScore != null ||
+        show.voteAverage) && (
+        <div className="glass-panel mx-4 mt-4 overflow-hidden rounded-3xl">
+          <ScoreStrip
+            className="border-y-0"
+            rtScore={reviews?.rtScore}
+            rtAudienceScore={reviews?.rtAudienceScore}
+            voteAverage={show.voteAverage}
+          />
         </div>
       )}
 
@@ -780,7 +902,7 @@ export function ShowDetailClient({
             <p className="text-sm text-muted-foreground">No overview yet.</p>
           )}
 
-          <div className="mt-5 space-y-3 rounded-xl bg-card p-4">
+          <div className="glass-panel mt-5 space-y-3 rounded-3xl p-4">
             {show.firstAirDate && (
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">First aired</span>
@@ -838,10 +960,7 @@ export function ShowDetailClient({
           )}
 
           <div className="mt-6">
-            <DiscoverRail
-              label={`More like ${show.title}`}
-              items={moreLikeThis}
-            />
+            <DiscoverRail label="You Might Also Like" items={moreLikeThis} />
             <DiscoverRail label="Recommended for you" items={recommended} />
           </div>
         </div>

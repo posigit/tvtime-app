@@ -22,6 +22,22 @@ export const MOVIE_THEME_FALLBACK: MovieTheme = {
 
 const THEME_REVALIDATE_S = 60 * 60 * 24 * 30;
 
+/**
+ * Tiny in-memory cache so repeat visits skip the fetch + sharp pass
+ * entirely (the fetch itself is also Next-cached for 30d, but sharp still
+ * ran on every page load). Capped to bound memory.
+ */
+const themeCache = new Map<string, MovieTheme>();
+const THEME_CACHE_MAX = 200;
+
+function cacheTheme(key: string, theme: MovieTheme) {
+  if (themeCache.size >= THEME_CACHE_MAX) {
+    const oldest = themeCache.keys().next().value;
+    if (oldest !== undefined) themeCache.delete(oldest);
+  }
+  themeCache.set(key, theme);
+}
+
 function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
   r /= 255;
   g /= 255;
@@ -105,6 +121,10 @@ export async function getMovieTheme(
   posterPath: string | null | undefined,
   backdropPath: string | null | undefined
 ): Promise<MovieTheme> {
+  const key = `${posterPath ?? ""}|${backdropPath ?? ""}`;
+  const hit = themeCache.get(key);
+  if (hit) return hit;
+
   const base = "https://image.tmdb.org/t/p";
   const candidates = [
     posterPath ? `${base}/w185${posterPath}` : null,
@@ -114,10 +134,14 @@ export async function getMovieTheme(
   for (const url of candidates) {
     try {
       const theme = await sampleDominant(url);
-      if (theme) return theme;
+      if (theme) {
+        cacheTheme(key, theme);
+        return theme;
+      }
     } catch {
       // Try the next candidate, fall back to brand gold below.
     }
   }
+  cacheTheme(key, MOVIE_THEME_FALLBACK);
   return MOVIE_THEME_FALLBACK;
 }

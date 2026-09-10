@@ -349,11 +349,11 @@ export default async function MovieDetailPage({
           </div>
         ) : null}
 
-        {/* Backdrop band — sharp, ~50% of the viewport.
-            The mask feathers the WHOLE band (art + scrims) into the blurred
-            ambience below, so no container edge can show as a line. */}
+        {/* Backdrop band — sharp, ~32% of the viewport (tightened from 48dvh
+            so the poster sits much closer to the top — matches the
+            scrolled “better” reference where gap was ~150px not ~300px). */}
         <div
-          className="relative h-[48dvh] max-h-[460px] min-h-[320px] overflow-hidden"
+          className="relative h-[32dvh] max-h-[320px] min-h-[220px] overflow-hidden"
           style={{
             maskImage: "linear-gradient(to bottom, black 55%, transparent 98%)",
             WebkitMaskImage:
@@ -417,8 +417,10 @@ export default async function MovieDetailPage({
         </div>
 
         <div className="relative px-4 pb-5">
-          {/* Poster card overlapping the backdrop fade (~50% width) */}
-          <div className="mx-auto -mt-28 w-[50%] max-w-[220px]">
+          {/* Poster card overlapping the backdrop fade (~50% width) — overlap
+              tuned to -mt-24 so shorter hero (≈272px) leaves ≈176px gap vs
+              old ~300px; closely matches scrolled reference ~150px. */}
+          <div className="mx-auto -mt-24 w-[50%] max-w-[220px]">
             <div className="relative aspect-[2/3] overflow-hidden rounded-[1.75rem] shadow-[0_24px_80px_-16px_rgb(var(--theme)/0.6),0_10px_30px_rgba(0,0,0,0.6)] ring-1 ring-white/25">
               {posterSrc ? (
                 <Image
