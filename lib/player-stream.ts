@@ -15,6 +15,12 @@ export type StreamResolveResult = {
   imdbId: string | null;
   failed: boolean;
   errorMessage?: string;
+  /** Machine-readable failure code from the stream route (if any). */
+  code?: string;
+  /** Human-readable diagnosis from the stream route (if any). */
+  detail?: string;
+  /** False when the deployment has no VIX resolver configured. */
+  resolverConfigured?: boolean;
   /** Which backend actually produced the playlist (diagnostics). */
   usedSource?: "valenox" | "orbit" | "vix";
   /** True when the goated cascade exhausted and vix was tried as the last native fallback. */
@@ -60,18 +66,45 @@ async function resolveOne(
   routeLabel: "vix" | "goated",
   params: URLSearchParams,
   signal?: AbortSignal
-): Promise<{ playlistUrl: string | null; imdbId: string | null; error?: string }> {
+): Promise<{
+  playlistUrl: string | null;
+  imdbId: string | null;
+  error?: string;
+  code?: string;
+  detail?: string;
+  resolverConfigured?: boolean;
+}> {
   try {
     const res = await fetchWithTimeout(
       `/api/${routeLabel === "vix" ? "vixsrc" : "goated"}/stream?${params.toString()}`,
       signal
     );
     if (!res.ok) {
-      const text = await res.text();
+      let code: string | undefined;
+      let detail: string | undefined;
+      let resolverConfigured: boolean | undefined;
+      let text = "";
+      try {
+        const data = (await res.json()) as {
+          error?: string;
+          code?: string;
+          detail?: string;
+          resolverConfigured?: boolean;
+        };
+        text = data?.error ?? "";
+        code = data?.code;
+        detail = data?.detail;
+        resolverConfigured = data?.resolverConfigured;
+      } catch {
+        text = await res.text().catch(() => "");
+      }
       return {
         playlistUrl: null,
         imdbId: null,
         error: `stream route ${res.status}: ${text.slice(0, 200)}`,
+        code,
+        detail,
+        resolverConfigured,
       };
     }
     const data = (await res.json()) as {
@@ -129,10 +162,31 @@ export async function resolveStreamPlaylist(opts: {
       imdbId: r.imdbId,
       failed: !r.playlistUrl,
       errorMessage: r.error,
+      code: r.code,
+      detail: r.detail,
+      resolverConfigured: r.resolverConfigured,
       usedSource: r.playlistUrl ? "vix" : undefined,
       attempts,
     };
   }
+
+  // First structured diagnosis seen across attempts (surfaced on failure).
+  const diag: {
+    code?: string;
+    detail?: string;
+    resolverConfigured?: boolean;
+  } = {};
+  const noteDiag = (r: {
+    code?: string;
+    detail?: string;
+    resolverConfigured?: boolean;
+  }) => {
+    if (diag.code == null && r.code != null) {
+      diag.code = r.code;
+      diag.detail = r.detail;
+      diag.resolverConfigured = r.resolverConfigured;
+    }
+  };
 
   // Goated cascade: Valenox → Orbit → Vix (last native fallback).
   let imdbId: string | null = null;
@@ -144,6 +198,7 @@ export async function resolveStreamPlaylist(opts: {
     p.set("source", backend);
     const r = await resolveOne("goated", p, opts.signal);
     record(`goated:${backend}`, r);
+    noteDiag(r);
     if (r.imdbId) imdbId = r.imdbId;
     if (r.playlistUrl) {
       return {
@@ -162,6 +217,7 @@ export async function resolveStreamPlaylist(opts: {
   }
   const v = await resolveOne("vix", base, opts.signal);
   record("vix", v);
+  noteDiag(v);
   if (v.playlistUrl) {
     return {
       playlistUrl: v.playlistUrl,
@@ -178,6 +234,9 @@ export async function resolveStreamPlaylist(opts: {
     imdbId: v.imdbId ?? imdbId,
     failed: true,
     errorMessage: lastErr ?? "all sources failed",
+    code: diag.code,
+    detail: diag.detail,
+    resolverConfigured: diag.resolverConfigured,
     fellBackToVix: true,
     attempts,
   };

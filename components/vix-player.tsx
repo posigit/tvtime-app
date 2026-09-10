@@ -1152,7 +1152,9 @@ export function VixPlayer({
       if (result.failed) {
         console.warn(
           `[player] ${activeSource} stream resolution failed — falling back to iframe:`,
-          result.errorMessage ?? "no playlist"
+          result.errorMessage ?? "no playlist",
+          result.code ? `(code: ${result.code})` : "",
+          result.detail ?? ""
         );
         setStreamFailed(true);
       }

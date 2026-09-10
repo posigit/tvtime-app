@@ -72,6 +72,34 @@ function abortError(): Error {
   return e;
 }
 
+/**
+ * Turn a failed native resolution into an honest message. The generic
+ * "no downloadable stream" hid the real cause: on Vercel-class hosting the
+ * sources block direct requests, so without the standalone resolver
+ * (VIX_RESOLVER_URL) there is no native path at all — while iframe
+ * playback keeps working, which made the old message look like a lie.
+ */
+function diagnoseResolveFailure(r: {
+  code?: string;
+  detail?: string;
+  attempts?: Array<{ source: string; ok: boolean; error?: string }>;
+}): string {
+  if (r.code === "resolver_unconfigured") {
+    return "Downloads need the stream resolver — VIX_RESOLVER_URL isn't set on this deployment, and the sources block it directly. Streaming still works via embeds, but offline needs native. Set the env var and redeploy.";
+  }
+  if (r.code === "resolution_failed") {
+    return `Stream resolver failed${r.detail ? ` (${r.detail})` : ""} Check the resolver service, then retry.`;
+  }
+  if (r.code === "upstream_unreachable") {
+    return "Sources are unreachable from this deployment right now. Retry in a bit — embed streaming is unaffected.";
+  }
+  const tried = (r.attempts ?? [])
+    .filter((a) => !a.ok)
+    .map((a) => a.source)
+    .join(", ");
+  return `No downloadable stream${tried ? ` (tried: ${tried})` : ""} — the title may only exist on embed sources right now.`;
+}
+
 export async function startDownload(req: DownloadRequest): Promise<void> {
   const settings = loadVixSettings();
   if (!settings.downloadMode) {
@@ -214,9 +242,7 @@ async function runDownload(
   });
   throwIfAborted();
   if (!resolved.playlistUrl) {
-    throw new Error(
-      "No downloadable stream — try again, or switch server and retry."
-    );
+    throw new Error(diagnoseResolveFailure(resolved));
   }
   rec.usedSource = resolved.usedSource ?? source;
   await upsertRecord(rec);

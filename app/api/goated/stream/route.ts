@@ -76,8 +76,14 @@ export async function GET(req: NextRequest) {
       sourceApi: "goated",
     });
   } catch (err) {
+    const message = err instanceof Error ? err.message : "goated stream failed";
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "goated stream failed" },
+      {
+        error: message,
+        code: "upstream_unreachable",
+        detail:
+          "The goated backend is unreachable from this deployment (DNS / connection / TLS failure, not a missing title).",
+      },
       { status: 502 }
     );
   }

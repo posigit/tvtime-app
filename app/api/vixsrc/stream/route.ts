@@ -59,6 +59,7 @@ export async function GET(req: NextRequest) {
   }
 
   const resolver = process.env.VIX_RESOLVER_URL?.replace(/\/+$/, "");
+  const stages: { resolver?: string; direct?: string } = {};
 
   // Deployed path: resolve from a non-blocked service, then enrich with IMDb.
   if (resolver) {
@@ -69,9 +70,10 @@ export async function GET(req: NextRequest) {
       });
       if (season != null) rp.set("season", season);
       if (episode != null) rp.set("episode", episode);
+      // Railway cold starts can exceed 15s — match the client's 30s ceiling.
       const res = await fetch(`${resolver}/stream?${rp.toString()}`, {
         cache: "no-store",
-        signal: AbortSignal.timeout(15_000),
+        signal: AbortSignal.timeout(30_000),
       });
       if (res.ok) {
         const data = await res.json();
@@ -89,8 +91,11 @@ export async function GET(req: NextRequest) {
           imdbId: await fetchImdbId(type, id),
         });
       }
+      stages.resolver = `resolver ${res.status}`;
       // Non-2xx from the resolver: fall through to the direct attempt.
-    } catch {
+    } catch (err) {
+      stages.resolver =
+        err instanceof Error ? `resolver: ${err.message}` : "resolver failed";
       // Resolver unreachable/error: fall through to the direct attempt.
     }
   }
@@ -150,8 +155,23 @@ export async function GET(req: NextRequest) {
       episode: type === "tv" ? episode : null,
     });
   } catch (err) {
+    const directErr = err instanceof Error ? err.message : "vixsrc stream failed";
+    stages.direct = directErr;
+    // Machine-readable codes so clients can tell "no stream exists" apart
+    // from "this deployment can't reach the source". Direct Vercel → vixsrc
+    // requests are Cloudflare-blocked (403); production depends on the
+    // standalone resolver (VIX_RESOLVER_URL).
+    const code = !resolver ? "resolver_unconfigured" : "resolution_failed";
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "vixsrc stream failed" },
+      {
+        error: directErr,
+        code,
+        detail: !resolver
+          ? "VIX_RESOLVER_URL is not set on this deployment and vixsrc blocks direct requests from it. Streaming still works via embeds, but native playback and downloads need the resolver."
+          : `Resolver and direct paths both failed (resolver: ${stages.resolver ?? "n/a"}; direct: ${directErr}). The resolver service may be down or blocked.`,
+        resolverConfigured: !!resolver,
+        stages,
+      },
       { status: 502 }
     );
   }
