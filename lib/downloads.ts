@@ -119,6 +119,10 @@ export function canonicalMediaKey(raw: string): string {
 export type VariantInfo = {
   bandwidth: number;
   height: number;
+  width: number;
+  codecs: string | null;
+  /** EXT-X-MEDIA audio GROUP-ID when the variant uses separate audio. */
+  audioGroup: string | null;
   url: string;
 };
 
@@ -136,13 +140,18 @@ export function parseMasterVariants(
     const line = (lines[i] ?? "").trim();
     if (!line.startsWith("#EXT-X-STREAM-INF")) continue;
     const bw = Number(/BANDWIDTH=(\d+)/.exec(line)?.[1] ?? 0);
-    const res = /RESOLUTION=\d+x(\d+)/.exec(line)?.[1];
+    const res = /RESOLUTION=(\d+)x(\d+)/.exec(line);
+    const codecs = /CODECS="([^"]+)"/.exec(line)?.[1] ?? null;
+    const audioGroup = /AUDIO="([^"]+)"/.exec(line)?.[1] ?? null;
     const uri = (lines[i + 1] ?? "").trim();
     if (!uri || uri.startsWith("#")) continue;
     try {
       out.push({
         bandwidth: bw,
-        height: res ? Number(res) : 0,
+        height: res ? Number(res[2]) : 0,
+        width: res ? Number(res[1]) : 0,
+        codecs,
+        audioGroup,
         url: new URL(uri, baseUrl).toString(),
       });
     } catch {
@@ -276,6 +285,90 @@ export function rewritePlaylistForOffline(
 export function estimateBytes(bandwidth: number, durationSec: number): number {
   if (!bandwidth || !durationSec) return 0;
   return Math.round((bandwidth / 8) * durationSec);
+}
+
+/* ------------------------------------------------------------------ */
+/* Separate-audio renditions (vix-style masters)                       */
+/* ------------------------------------------------------------------ */
+
+export type AudioEntry = {
+  groupId: string;
+  name: string;
+  language: string;
+  isDefault: boolean;
+  url: string;
+};
+
+/** All TYPE=AUDIO EXT-X-MEDIA renditions in a master playlist. */
+export function parseMasterAudio(text: string, baseUrl: string): AudioEntry[] {
+  const out: AudioEntry[] = [];
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line.startsWith("#EXT-X-MEDIA:")) continue;
+    if (!/TYPE=AUDIO/.test(line)) continue;
+    const uri = /URI="([^"]+)"/.exec(line)?.[1];
+    if (!uri) continue;
+    try {
+      out.push({
+        groupId: /GROUP-ID="([^"]+)"/.exec(line)?.[1] ?? "",
+        name: /NAME="([^"]+)"/.exec(line)?.[1] ?? "Audio",
+        language: /LANGUAGE="([^"]+)"/.exec(line)?.[1] ?? "",
+        isDefault: /DEFAULT=YES/.test(line),
+        url: new URL(uri, baseUrl).toString(),
+      });
+    } catch {
+      /* skip unresolvable URI */
+    }
+  }
+  return out;
+}
+
+/** Prefer the user's audio language, else the source default, else first. */
+export function pickAudioEntry(
+  entries: AudioEntry[],
+  wantLang: string,
+  match: (lang: string | undefined, want: string) => boolean
+): AudioEntry | null {
+  if (entries.length === 0) return null;
+  const group = entries;
+  const byLang = group.find(
+    (e) => match(e.language, wantLang) || match(e.name, wantLang)
+  );
+  if (byLang) return byLang;
+  const def = group.find((e) => e.isDefault);
+  if (def) return def;
+  return group[0] ?? null;
+}
+
+/**
+ * Minimal synthetic master pointing hls.js at the stored video + audio
+ * playlists. Stream SUBTITLES groups are deliberately dropped — offline
+ * subs come from the downloaded external VTT instead.
+ */
+export function buildOfflineMaster(opts: {
+  variant: VariantInfo;
+  videoPlaylistUrl: string;
+  audio: AudioEntry | null;
+  audioPlaylistUrl: string | null;
+}): string {
+  const res =
+    opts.variant.width > 0 && opts.variant.height > 0
+      ? `,RESOLUTION=${opts.variant.width}x${opts.variant.height}`
+      : "";
+  const codecs = opts.variant.codecs ? `,CODECS="${opts.variant.codecs}"` : "";
+  const audioAttr =
+    opts.audio && opts.audioPlaylistUrl ? `,AUDIO="offline-audio"` : "";
+  const lines = ["#EXTM3U"];
+  if (opts.audio && opts.audioPlaylistUrl) {
+    lines.push(
+      `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="offline-audio",NAME="${opts.audio.name}",DEFAULT=YES,AUTOSELECT=YES,LANGUAGE="${opts.audio.language || "und"}",URI="${opts.audioPlaylistUrl}"`
+    );
+  }
+  lines.push(
+    `#EXT-X-STREAM-INF:BANDWIDTH=${opts.variant.bandwidth}${res}${codecs}${audioAttr}`,
+    opts.videoPlaylistUrl
+  );
+  return lines.join("\n");
 }
 
 export function formatBytes(n: number | null | undefined): string {

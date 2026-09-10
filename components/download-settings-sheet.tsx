@@ -22,22 +22,33 @@ import {
   verifyRecordFiles,
   type DownloadRecord,
 } from "@/lib/downloads";
-import { cancelDownload, resumeDownload } from "@/lib/downloader";
+import { pauseDownload, resumeDownload } from "@/lib/downloader";
 
-const QUALITY_OPTIONS = [
-  { value: 480, label: "480p", hint: "Smallest · fits several episodes" },
-  { value: 720, label: "720p", hint: "Recommended · ~1 episode per GB" },
-  { value: 1080, label: "1080p", hint: "Big files · desktop territory" },
-  { value: "best", label: "Best", hint: "Top quality the source offers" },
-] as const;
+type Quality = 480 | 720 | 1080 | "best";
+
+const QUALITY_OPTIONS: { value: Quality; label: string; hint: string }[] = [
+  { value: 480, label: "480p", hint: "~350 MB / ep" },
+  { value: 720, label: "720p", hint: "~800 MB / ep" },
+  { value: 1080, label: "1080p", hint: "~1.5 GB+ / ep" },
+  { value: "best", label: "Best", hint: "Biggest file" },
+];
+
+const CAP_OPTIONS = [
+  { value: 500, label: "500 MB" },
+  { value: 950, label: "950 MB" },
+  { value: 2000, label: "2 GB" },
+  { value: 5000, label: "5 GB" },
+];
 
 export function requestOfflinePlay(key: string) {
-  window.dispatchEvent(new CustomEvent("tvtime:play-offline", { detail: { key } }));
+  window.dispatchEvent(
+    new CustomEvent("tvtime:play-offline", { detail: { key } })
+  );
 }
 
 /**
- * Download settings bottom sheet: mode toggle, quality select, storage
- * meter, and the downloads library (play offline / delete).
+ * Download settings bottom sheet: mode toggle, quality + storage-cap
+ * pickers, live storage meter, and the on-device library.
  */
 export function DownloadSettingsSheet({
   open,
@@ -48,16 +59,22 @@ export function DownloadSettingsSheet({
 }) {
   const { toast } = useToast();
   const [mode, setMode] = useState(false);
-  const [quality, setQuality] = useState<480 | 720 | 1080 | "best">(720);
+  const [quality, setQuality] = useState<Quality>(720);
+  const [capMb, setCapMb] = useState<number>(
+    DEFAULT_VIX_SETTINGS.downloadCapMb
+  );
   const [items, setItems] = useState<DownloadRecord[]>([]);
   const [quota, setQuota] = useState<number | undefined>();
   const [usage, setUsage] = useState<number | undefined>();
-  const capMb = DEFAULT_VIX_SETTINGS.downloadCapMb;
 
   const readSettings = useCallback(() => {
     try {
       const s = loadVixSettings();
-      return { mode: s.downloadMode === true, quality: s.downloadQuality };
+      return {
+        mode: s.downloadMode === true,
+        quality: s.downloadQuality,
+        capMb: s.downloadCapMb,
+      };
     } catch {
       return null;
     }
@@ -74,6 +91,7 @@ export function DownloadSettingsSheet({
       if (s) {
         setMode(s.mode);
         setQuality(s.quality);
+        setCapMb(s.capMb);
       }
       setItems(getAllSync());
       const st = await storageStats();
@@ -116,7 +134,7 @@ export function DownloadSettingsSheet({
     return () => {
       document.body.style.overflow = prev;
     };
-  }, [open ]);
+  }, [open]);
 
   if (!open) return null;
 
@@ -125,12 +143,18 @@ export function DownloadSettingsSheet({
     setMode(next);
     saveVixSettings({ downloadMode: next });
     if (next) void ensurePersisted();
-    toast(next ? "Download mode on" : "Download mode off");
+    toast(next ? "Download mode on — look for ↓" : "Download mode off");
   };
 
-  const pickQuality = (q: 480 | 720 | 1080 | "best") => {
+  const pickQuality = (q: Quality) => {
     setQuality(q);
     saveVixSettings({ downloadQuality: q });
+  };
+
+  const pickCap = (mb: number) => {
+    setCapMb(mb);
+    saveVixSettings({ downloadCapMb: mb });
+    toast(`Storage cap ${mb >= 1000 ? `${mb / 1000} GB` : `${mb} MB`}`);
   };
 
   const usedByApp = items
@@ -168,7 +192,7 @@ export function DownloadSettingsSheet({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-white/70 transition hover:bg-white/10 hover:text-white"
+            className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/[0.06] text-white/70 transition hover:bg-white/10 hover:text-white active:scale-95"
           >
             <X className="h-4 w-4" />
           </button>
@@ -180,59 +204,95 @@ export function DownloadSettingsSheet({
             type="button"
             onClick={toggleMode}
             aria-pressed={mode}
-            className="flex w-full items-center justify-between gap-3 rounded-2xl bg-white/[0.04] px-4 py-3.5 ring-1 ring-white/[0.08] transition active:scale-[0.99]"
+            className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-2xl bg-white/[0.04] px-4 py-4 ring-1 ring-white/[0.08] transition active:scale-[0.99]"
           >
             <span className="text-left">
-              <span className="block text-sm font-bold text-white">
-                Download mode
+              <span className="block text-[15px] font-bold text-white">
+                Download mode {mode ? "· On" : "· Off"}
               </span>
-              <span className="mt-0.5 block text-xs text-white/45">
-                {mode ? "Download buttons are visible" : "Off — no download buttons"}
+              <span className="mt-0.5 block text-xs leading-relaxed text-white/45">
+                {mode
+                  ? "↓ buttons show on movies, episodes & in the player"
+                  : "Turn on to reveal ↓ buttons across the app"}
               </span>
             </span>
             <span
               aria-hidden
               className={cn(
-                "relative h-7 w-12 shrink-0 rounded-full transition-colors",
+                "relative h-8 w-[3.25rem] shrink-0 rounded-full transition-colors",
                 mode ? "bg-success" : "bg-white/15"
               )}
             >
               <span
                 className={cn(
-                  "absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all",
-                  mode ? "left-[1.375rem]" : "left-0.5"
+                  "absolute top-1 h-6 w-6 rounded-full bg-white shadow transition-all",
+                  mode ? "left-6" : "left-1"
                 )}
               />
             </span>
           </button>
 
           {/* Quality */}
-          <p className="mb-2 mt-5 text-[10px] font-bold uppercase tracking-[0.12em] text-white/40">
-            Download quality
-          </p>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="mt-5 flex items-baseline justify-between">
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/40">
+              Download quality
+            </p>
+            <p className="text-[11px] text-white/30">applies to new downloads</p>
+          </div>
+          <div className="mt-2 grid grid-cols-4 gap-2">
             {QUALITY_OPTIONS.map((q) => (
               <button
                 key={String(q.value)}
                 type="button"
                 onClick={() => pickQuality(q.value)}
-                title={q.hint}
+                aria-pressed={quality === q.value}
                 className={cn(
-                  "rounded-2xl px-2 py-2.5 text-sm font-black ring-1 transition active:scale-95",
+                  "cursor-pointer rounded-2xl px-1 py-2.5 ring-1 transition active:scale-95",
                   quality === q.value
                     ? "bg-primary text-black ring-primary"
                     : "bg-white/[0.05] text-white/60 ring-white/10 hover:text-white"
                 )}
               >
-                {q.label}
+                <span className="block text-sm font-black">{q.label}</span>
+                <span
+                  className={cn(
+                    "mt-0.5 block text-[9px] font-semibold leading-tight",
+                    quality === q.value ? "text-black/70" : "text-white/35"
+                  )}
+                >
+                  {q.hint}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {/* Storage cap */}
+          <p className="mb-2 mt-5 text-[10px] font-bold uppercase tracking-[0.12em] text-white/40">
+            Storage cap
+          </p>
+          <div className="grid grid-cols-4 gap-2">
+            {CAP_OPTIONS.map((c) => (
+              <button
+                key={c.value}
+                type="button"
+                onClick={() => pickCap(c.value)}
+                aria-pressed={capMb === c.value}
+                className={cn(
+                  "cursor-pointer rounded-2xl px-1 py-2.5 text-sm font-black ring-1 transition active:scale-95",
+                  capMb === c.value
+                    ? "bg-primary text-black ring-primary"
+                    : "bg-white/[0.05] text-white/60 ring-white/10 hover:text-white"
+                )}
+              >
+                {c.label}
               </button>
             ))}
           </div>
 
           {/* Storage meter */}
-          <div className="mt-5 rounded-2xl bg-white/[0.04] px-4 py-3.5 ring-1 ring-white/[0.08]">
+          <div className="mt-3 rounded-2xl bg-white/[0.04] px-4 py-3.5 ring-1 ring-white/[0.08]">
             <div className="flex items-baseline justify-between">
-              <p className="text-sm font-bold text-white">Storage</p>
+              <p className="text-sm font-bold text-white">On this device</p>
               <p className="text-xs font-semibold text-white/45">
                 {formatBytes(usedByApp)} of {formatBytes(capBytes)}
               </p>
@@ -246,8 +306,7 @@ export function DownloadSettingsSheet({
               />
             </div>
             <p className="mt-2 text-[11px] leading-relaxed text-white/35">
-              Cap {capMb} MB · 950&nbsp;MB ≈ one 720p episode. Oldest downloads
-              make room automatically.
+              Oldest downloads make room automatically.
               {usage != null && quota != null && (
                 <> Device free ≈ {formatBytes(quota - usage)}.</>
               )}
@@ -259,18 +318,34 @@ export function DownloadSettingsSheet({
             On this device ({items.length})
           </p>
           {items.length === 0 ? (
-            <p className="rounded-2xl bg-white/[0.03] px-4 py-6 text-center text-sm text-white/35 ring-1 ring-white/[0.06]">
-              Nothing here yet. Turn on download mode and tap ↓ on a movie or
-              episode.
-            </p>
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                toast("Turn on download mode, then tap ↓ on anything");
+              }}
+              className="w-full cursor-pointer rounded-2xl bg-white/[0.03] px-4 py-6 text-center ring-1 ring-white/[0.06] transition active:scale-[0.99]"
+            >
+              <Download className="mx-auto h-5 w-5 text-white/30" />
+              <p className="mt-2 text-sm font-semibold text-white/50">
+                Nothing here yet
+              </p>
+              <p className="mt-0.5 text-xs text-white/30">
+                Turn on download mode and tap ↓ on a movie or episode
+              </p>
+            </button>
           ) : (
             <div className="space-y-2 pb-4">
               {items.map((r) => (
-                <DownloadRow key={r.key} record={r} onPlay={() => {
-                  onClose();
-                  void touchRecord(r.key);
-                  requestOfflinePlay(r.key);
-                }} />
+                <DownloadRow
+                  key={r.key}
+                  record={r}
+                  onPlay={() => {
+                    onClose();
+                    void touchRecord(r.key);
+                    requestOfflinePlay(r.key);
+                  }}
+                />
               ))}
             </div>
           )}
@@ -278,6 +353,11 @@ export function DownloadSettingsSheet({
       </div>
     </div>
   );
+}
+
+function qualityLabel(r: DownloadRecord): string {
+  const q = r.quality === "best" ? "Best" : `${r.quality}p`;
+  return r.usedSource ? `${q} · ${r.usedSource}` : q;
 }
 
 function DownloadRow({
@@ -289,8 +369,7 @@ function DownloadRow({
 }) {
   const { toast } = useToast();
   const busy = r.state === "active" || r.state === "queued";
-  const progress =
-    r.totalSegments > 0 ? r.doneSegments / r.totalSegments : 0;
+  const progress = r.totalSegments > 0 ? r.doneSegments / r.totalSegments : 0;
 
   return (
     <div className="flex items-center gap-3 rounded-2xl bg-white/[0.04] px-3.5 py-3 ring-1 ring-white/[0.08]">
@@ -301,17 +380,16 @@ function DownloadRow({
         )}
         <p className="mt-1 text-[11px] font-semibold text-white/40">
           {r.state === "done" && r.sizeBytes > 0
-            ? formatBytes(r.sizeBytes)
+            ? `${formatBytes(r.sizeBytes)} · ${qualityLabel(r)}`
             : busy
-              ? `${Math.round(progress * 100)}%${r.estimateBytes > 0 ? ` · ~${formatBytes(r.estimateBytes)}` : ""}`
+              ? `${Math.round(progress * 100)}%${r.estimateBytes > 0 ? ` of ~${formatBytes(r.estimateBytes)}` : ""}`
               : r.state === "paused"
                 ? `Paused · ${Math.round(progress * 100)}%`
                 : r.state === "error"
                   ? (r.error ?? "Failed")
                   : r.state === "missing"
-                    ? "Removed from storage"
+                    ? "Removed from storage — download again"
                     : "Waiting…"}
-          {r.usedSource ? ` · ${r.usedSource}` : ""}
         </p>
         {busy && (
           <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-white/10">
@@ -328,18 +406,25 @@ function DownloadRow({
             type="button"
             onClick={onPlay}
             aria-label={`Play ${r.title} offline`}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-black transition active:scale-95"
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-primary text-black transition active:scale-95"
           >
             <Play className="h-4 w-4 fill-current" />
           </button>
         )}
-        {(r.state === "paused" || r.state === "error" || r.state === "missing") && (
+        {(r.state === "paused" ||
+          r.state === "error" ||
+          r.state === "missing") && (
           <button
             type="button"
             onClick={() => {
               const req =
                 r.type === "movie"
-                  ? { type: "movie" as const, tmdbId: r.tmdbId, title: r.title, subtitle: r.subtitle }
+                  ? {
+                      type: "movie" as const,
+                      tmdbId: r.tmdbId,
+                      title: r.title,
+                      subtitle: r.subtitle,
+                    }
                   : {
                       type: "tv" as const,
                       tmdbId: r.tmdbId,
@@ -349,11 +434,14 @@ function DownloadRow({
                       subtitle: r.subtitle,
                     };
               void resumeDownload(req).catch((e: unknown) =>
-                toast(e instanceof Error ? e.message : "Couldn't resume", "error")
+                toast(
+                  e instanceof Error ? e.message : "Couldn't resume",
+                  "error"
+                )
               );
             }}
             aria-label="Resume download"
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.08] text-white ring-1 ring-white/15 transition hover:bg-white/15 active:scale-95"
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-white/[0.08] text-white ring-1 ring-white/15 transition hover:bg-white/15 active:scale-95"
           >
             {r.state === "paused" ? (
               <Play className="h-4 w-4 fill-current" />
@@ -365,14 +453,16 @@ function DownloadRow({
         {busy && (
           <button
             type="button"
-            onClick={() => cancelDownload(r.key)}
-            aria-label="Cancel download"
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.08] text-white ring-1 ring-white/15 transition hover:bg-white/15 active:scale-95"
+            onClick={() => pauseDownload(r.key)}
+            aria-label="Pause download"
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-white/[0.08] text-white ring-1 ring-white/15 transition hover:bg-white/15 active:scale-95"
           >
             <Pause className="h-4 w-4" />
           </button>
         )}
-        {(r.state === "done" || r.state === "error" || r.state === "missing") && (
+        {(r.state === "done" ||
+          r.state === "error" ||
+          r.state === "missing") && (
           <button
             type="button"
             onClick={() => {
@@ -383,7 +473,7 @@ function DownloadRow({
               })();
             }}
             aria-label={`Delete ${r.title}`}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.08] text-white/60 ring-1 ring-white/15 transition hover:bg-white/15 hover:text-white active:scale-95"
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-white/[0.08] text-white/60 ring-1 ring-white/15 transition hover:bg-white/15 hover:text-white active:scale-95"
           >
             <Trash2 className="h-4 w-4" />
           </button>

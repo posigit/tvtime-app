@@ -13,9 +13,10 @@
 
 import { resolveStreamPlaylist } from "@/lib/player-stream";
 import { fetchExternalVtt } from "@/lib/player-subs";
-import { loadVixSettings } from "@/lib/vix-settings";
+import { loadVixSettings, matchLang } from "@/lib/vix-settings";
 import {
   DL_CACHE,
+  buildOfflineMaster,
   canonicalMediaKey,
   commitRecord,
   deleteRecordFiles,
@@ -29,8 +30,10 @@ import {
   getManifest,
   getRecordSync,
   isMasterPlaylist,
+  parseMasterAudio,
   parseMasterVariants,
   parseMediaPlaylist,
+  pickAudioEntry,
   pickVariant,
   removeRecord,
   rewritePlaylistForOffline,
@@ -38,7 +41,10 @@ import {
   updateProgress,
   upsertRecord,
   usedBytes,
+  type AudioEntry,
   type DownloadRecord,
+  type MediaParts,
+  type VariantInfo,
 } from "@/lib/downloads";
 
 export type DownloadRequest = {
@@ -215,24 +221,32 @@ async function runDownload(
   rec.usedSource = resolved.usedSource ?? source;
   await upsertRecord(rec);
 
-  // 2. Master → variant at/below the quality setting.
-  const masterRes = await fetch(resolved.playlistUrl, { signal });
+  // 2. Master → variant at/below the quality setting. The resolver may
+  // hand back a relative same-origin proxy path — absolutize once so every
+  // URL resolution below (variants, segments, keys) actually works.
+  const playlistBase = new URL(
+    resolved.playlistUrl,
+    window.location.origin
+  ).toString();
+  const masterRes = await fetch(playlistBase, { signal });
   if (!masterRes.ok) throw new Error(`Stream lookup failed (${masterRes.status})`);
   const masterText = await masterRes.text();
   throwIfAborted();
 
-  let mediaUrl = resolved.playlistUrl;
+  let mediaUrl = playlistBase;
   let mediaText = masterText;
   let bandwidth = 0;
-  if (isMasterPlaylist(masterText)) {
-    const variants = parseMasterVariants(masterText, resolved.playlistUrl);
-    const picked = pickVariant(variants, rec.quality);
-    if (!picked) throw new Error("No playable quality found for this title.");
-    const vRes = await fetch(picked.url, { signal });
+  let pickedVariant: VariantInfo | null = null;
+  const isMaster = isMasterPlaylist(masterText);
+  if (isMaster) {
+    const variants = parseMasterVariants(masterText, playlistBase);
+    pickedVariant = pickVariant(variants, rec.quality);
+    if (!pickedVariant) throw new Error("No playable quality found for this title.");
+    const vRes = await fetch(pickedVariant.url, { signal });
     if (!vRes.ok) throw new Error(`Quality fetch failed (${vRes.status})`);
     mediaText = await vRes.text();
-    mediaUrl = picked.url;
-    bandwidth = picked.bandwidth;
+    mediaUrl = pickedVariant.url;
+    bandwidth = pickedVariant.bandwidth;
     throwIfAborted();
   }
 
@@ -244,8 +258,57 @@ async function runDownload(
   if (parts.segments.length === 0) {
     throw new Error("No video segments found in this stream.");
   }
+
+  // 3b. Separate audio rendition. Vix-style masters pair each video variant
+  // with an EXT-X-MEDIA audio group — skip this and downloads play silent.
+  let audioParts: MediaParts | null = null;
+  let audioUrl: string | null = null;
+  let audioText: string | null = null;
+  let audioEntry: AudioEntry | null = null;
+  if (isMaster && pickedVariant?.audioGroup) {
+    const entries = parseMasterAudio(masterText, playlistBase).filter(
+      (e) => e.groupId === (pickedVariant as VariantInfo).audioGroup
+    );
+    audioEntry = pickAudioEntry(
+      entries,
+      loadVixSettings().audio || "en",
+      matchLang
+    );
+    if (audioEntry) {
+      const aRes = await fetch(audioEntry.url, { signal });
+      if (!aRes.ok) throw new Error(`Audio track fetch failed (${aRes.status})`);
+      let aText = await aRes.text();
+      audioUrl = audioEntry.url;
+      if (isMasterPlaylist(aText)) {
+        const aVars = parseMasterVariants(aText, audioEntry.url);
+        if (aVars.length === 0) {
+          throw new Error("No audio track found for this title.");
+        }
+        const aPicked = aVars[0]!;
+        const avRes = await fetch(aPicked.url, { signal });
+        if (!avRes.ok) throw new Error(`Audio track fetch failed (${avRes.status})`);
+        aText = await avRes.text();
+        audioUrl = aPicked.url;
+      }
+      const parsed = parseMediaPlaylist(aText, audioUrl);
+      if (parsed.sampleAes) {
+        throw new Error("This source is encrypted and can't be saved offline.");
+      }
+      if (parsed.segments.length === 0) {
+        // Audio declared but empty — video-only rather than a failure.
+        audioEntry = null;
+        audioUrl = null;
+      } else {
+        audioParts = parsed;
+        audioText = aText;
+      }
+      throwIfAborted();
+    }
+  }
+
   rec.durationSec = parts.durationSec;
-  rec.totalSegments = parts.segments.length;
+  rec.totalSegments =
+    parts.segments.length + (audioParts?.segments.length ?? 0);
   rec.estimateBytes = estimateBytes(bandwidth, parts.durationSec);
   await upsertRecord(rec);
 
@@ -254,113 +317,143 @@ async function runDownload(
 
   // 5. Fetch everything into the cache (resume skips what's already there).
   const cache = await caches.open(DL_CACHE);
-  const jobs: { original: string; dlUrl: string; kind: "seg" | "key" }[] = [];
-  if (parts.mapUrl) {
-    jobs.push({
-      original: parts.mapUrl,
-      dlUrl: dlFileUrl(canonicalMediaKey(parts.mapUrl)),
-      kind: "key",
-    });
-  }
-  for (const k of parts.keys) {
-    jobs.push({
-      original: k.url,
-      dlUrl: dlFileUrl(canonicalMediaKey(k.url)),
-      kind: "key",
-    });
-  }
-  for (const s of parts.segments) {
-    jobs.push({
-      original: s,
-      dlUrl: dlFileUrl(canonicalMediaKey(s)),
-      kind: "seg",
-    });
-  }
-
-  let cursor = 0;
+  const fileUrls = new Set<string>();
   let doneSeg = 0;
   let measuredBytes = 0;
-  const fileUrls = new Set<string>();
 
   const readSize = (r: Response | undefined): number => {
     const n = Number(r?.headers.get("Content-Length") ?? 0);
     return Number.isFinite(n) && n > 0 ? n : 0;
   };
 
-  const worker = async () => {
-    for (;;) {
-      throwIfAborted();
-      const i = cursor++;
-      if (i >= jobs.length) return;
-      const job = jobs[i]!;
-      const hit = await cache.match(job.dlUrl);
-      if (hit) {
+  const mpegResponse = (text: string, noStore = false) =>
+    new Response(text, {
+      headers: {
+        "Content-Type": "application/vnd.apple.mpegurl",
+        "Cache-Control": noStore ? "no-store" : "public, max-age=31536000",
+      },
+    });
+
+  const reportProgress = async () => {
+    rec.bytesDone = measuredBytes;
+    rec.doneSegments = doneSeg;
+    await updateProgress(rec.key, {
+      bytesDone: rec.bytesDone,
+      doneSegments: doneSeg,
+    });
+  };
+
+  const storeParts = async (
+    list: MediaParts,
+    label: string
+  ): Promise<void> => {
+    const jobs: { original: string; dlUrl: string; kind: "seg" | "key" }[] = [];
+    if (list.mapUrl) {
+      jobs.push({
+        original: list.mapUrl,
+        dlUrl: dlFileUrl(canonicalMediaKey(list.mapUrl)),
+        kind: "key",
+      });
+    }
+    for (const k of list.keys) {
+      jobs.push({
+        original: k.url,
+        dlUrl: dlFileUrl(canonicalMediaKey(k.url)),
+        kind: "key",
+      });
+    }
+    for (const s of list.segments) {
+      jobs.push({
+        original: s,
+        dlUrl: dlFileUrl(canonicalMediaKey(s)),
+        kind: "seg",
+      });
+    }
+    let cursor = 0;
+    const worker = async () => {
+      for (;;) {
+        throwIfAborted();
+        const i = cursor++;
+        if (i >= jobs.length) return;
+        const job = jobs[i]!;
+        const hit = await cache.match(job.dlUrl);
+        if (hit) {
+          fileUrls.add(job.dlUrl);
+          if (job.kind === "seg") {
+            doneSeg++;
+            measuredBytes += readSize(hit);
+            await reportProgress();
+          }
+          continue;
+        }
+        const res = await fetch(job.original, { signal });
+        if (!res.ok) throw new Error(`${label} piece failed.`);
+        const buf = await res.arrayBuffer();
+        if (buf.byteLength === 0) throw new Error(`${label} piece was empty.`);
+        const stored = new Response(buf, {
+          headers: {
+            "Content-Type":
+              res.headers.get("content-type") ?? "application/octet-stream",
+            "Content-Length": String(buf.byteLength),
+            "Cache-Control": "public, max-age=31536000",
+          },
+        });
+        try {
+          await cache.put(job.dlUrl, stored);
+        } catch (e) {
+          if (
+            e instanceof DOMException &&
+            (e.name === "QuotaExceededError" || e.code === 22)
+          ) {
+            throw new Error("Out of device space — free storage and retry.");
+          }
+          throw e;
+        }
         fileUrls.add(job.dlUrl);
         if (job.kind === "seg") {
           doneSeg++;
-          measuredBytes += readSize(hit);
-          rec.bytesDone = measuredBytes;
-          rec.doneSegments = doneSeg;
-          await updateProgress(rec.key, {
-            bytesDone: rec.bytesDone,
-            doneSegments: doneSeg,
-          });
+          measuredBytes += buf.byteLength;
+          await reportProgress();
         }
-        continue;
+        throwIfAborted();
       }
-      const res = await fetch(job.original, { signal });
-      if (!res.ok) throw new Error(`Piece ${i + 1}/${jobs.length} failed.`);
-      const buf = await res.arrayBuffer();
-      if (buf.byteLength === 0) throw new Error(`Piece ${i + 1} was empty.`);
-      const stored = new Response(buf, {
-        headers: {
-          "Content-Type":
-            res.headers.get("content-type") ?? "application/octet-stream",
-          "Content-Length": String(buf.byteLength),
-          "Cache-Control": "public, max-age=31536000",
-        },
-      });
-      try {
-        await cache.put(job.dlUrl, stored);
-      } catch (e) {
-        if (
-          e instanceof DOMException &&
-          (e.name === "QuotaExceededError" || e.code === 22)
-        ) {
-          throw new Error("Out of device space — free storage and retry.");
-        }
-        throw e;
-      }
-      fileUrls.add(job.dlUrl);
-      if (job.kind === "seg") {
-        doneSeg++;
-        measuredBytes += buf.byteLength;
-        rec.bytesDone = measuredBytes;
-        rec.doneSegments = doneSeg;
-        await updateProgress(rec.key, {
-          bytesDone: rec.bytesDone,
-          doneSegments: doneSeg,
-        });
-      }
-      throwIfAborted();
-    }
+    };
+    await Promise.all(
+      Array.from({ length: Math.min(CONCURRENCY, jobs.length) }, () => worker())
+    );
   };
-  await Promise.all(
-    Array.from({ length: Math.min(CONCURRENCY, jobs.length) }, () => worker())
-  );
 
-  // 6. Store the rewritten playlist last — only complete sets ever play.
-  const offlineText = rewritePlaylistForOffline(mediaText, mediaUrl);
-  const playlistKey = dlPlaylistUrl(rec.key);
+  await storeParts(parts, "Video");
+  throwIfAborted();
+  if (audioParts) await storeParts(audioParts, "Audio");
+  throwIfAborted();
+
+  // 6. Store rewritten playlists last — only complete sets ever play.
+  const videoStoredUrl = dlFileUrl(canonicalMediaKey(mediaUrl));
   await cache.put(
-    playlistKey,
-    new Response(offlineText, {
-      headers: {
-        "Content-Type": "application/vnd.apple.mpegurl",
-        "Cache-Control": "no-store",
-      },
-    })
+    videoStoredUrl,
+    mpegResponse(rewritePlaylistForOffline(mediaText, mediaUrl))
   );
+  fileUrls.add(videoStoredUrl);
+  let topText: string;
+  if (audioParts && audioUrl && audioText && audioEntry && pickedVariant) {
+    const audioStoredUrl = dlFileUrl(canonicalMediaKey(audioUrl));
+    await cache.put(
+      audioStoredUrl,
+      mpegResponse(rewritePlaylistForOffline(audioText, audioUrl))
+    );
+    fileUrls.add(audioStoredUrl);
+    topText = buildOfflineMaster({
+      variant: pickedVariant,
+      videoPlaylistUrl: videoStoredUrl,
+      audio: audioEntry,
+      audioPlaylistUrl: audioStoredUrl,
+    });
+  } else {
+    topText = rewritePlaylistForOffline(mediaText, mediaUrl);
+  }
+  const playlistKey = dlPlaylistUrl(rec.key);
+  await cache.put(playlistKey, mpegResponse(topText, true));
   fileUrls.add(playlistKey);
   rec.fileUrls = [...fileUrls];
 

@@ -535,14 +535,13 @@ export default async function MovieDetailPage({
               initialQueued={isRewatchQueued}
             />
           )}
+          {/* Offline download icon — null (zero space) while mode is off. */}
+          <DownloadButton
+            variant="icon"
+            className="h-11 w-11"
+            item={{ type: "movie", tmdbId, title: movie.title }}
+          />
         </div>
-
-        {/* Offline download — null (zero space) while download mode is off. */}
-        <DownloadButton
-          variant="bar"
-          className="mt-3"
-          item={{ type: "movie", tmdbId, title: movie.title }}
-        />
 
         {isWatched && diaryDates.length > 0 && (
           <MovieDiaryLine dates={diaryDates} />
