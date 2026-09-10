@@ -9,6 +9,19 @@ import { Star } from "lucide-react";
  * (stored value = stars x 2), so half stars are integers: 7 = 3.5 stars.
  */
 
+const RATING_LABELS: Record<number, string> = {
+  1: "Trash",
+  2: "Bad",
+  3: "Weak",
+  4: "Meh",
+  5: "Okay",
+  6: "Decent",
+  7: "Good",
+  8: "Great",
+  9: "Superb",
+  10: "Masterpiece",
+};
+
 function StarGlyph({
   fill,
   size,
@@ -22,8 +35,10 @@ function StarGlyph({
       style={{ width: size, height: size }}
     >
       <Star
-        className="absolute inset-0 text-white/25"
+        className="absolute inset-0 text-white/20"
         style={{ width: size, height: size }}
+        strokeWidth={1.75}
+        fill="rgba(255,255,255,0.06)"
       />
       {fill !== "empty" && (
         <span
@@ -31,9 +46,10 @@ function StarGlyph({
           style={{ width: fill === "half" ? size / 2 : size }}
         >
           <Star
-            className="text-primary"
+            className="text-primary drop-shadow-[0_0_6px_rgba(245,197,24,0.45)]"
             fill="currentColor"
             style={{ width: size, height: size }}
+            strokeWidth={1.5}
           />
         </span>
       )}
@@ -72,7 +88,7 @@ export function StarRatingDisplay({
 export function StarRatingInput({
   value,
   onChange,
-  size = 28,
+  size = 34,
   disabled,
 }: {
   value: number | null;
@@ -81,39 +97,59 @@ export function StarRatingInput({
   disabled?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <span
-          key={i}
-          className="relative inline-block"
-          style={{ width: size, height: size }}
-        >
-          <StarGlyph
-            size={size}
-            fill={
-              (value ?? 0) >= i * 2
-                ? "full"
-                : (value ?? 0) >= i * 2 - 1
-                  ? "half"
-                  : "empty"
-            }
-          />
-          <button
-            type="button"
-            disabled={disabled}
-            aria-label={`${i - 0.5} stars`}
-            onClick={() => onChange(value === i * 2 - 1 ? null : i * 2 - 1)}
-            className="absolute left-0 top-0 h-full w-1/2"
-          />
-          <button
-            type="button"
-            disabled={disabled}
-            aria-label={`${i} stars`}
-            onClick={() => onChange(value === i * 2 ? null : i * 2)}
-            className="absolute right-0 top-0 h-full w-1/2"
-          />
-        </span>
-      ))}
+    <div className="flex items-center gap-1.5" role="radiogroup" aria-label="Your rating">
+      {[1, 2, 3, 4, 5].map((i) => {
+        const filled = (value ?? 0) >= i * 2 - 1;
+        return (
+          <span
+            key={i}
+            className={cn(
+              "relative inline-block transition-transform",
+              filled && "scale-105"
+            )}
+            style={{ width: size, height: size }}
+          >
+            <StarGlyph
+              size={size}
+              fill={
+                (value ?? 0) >= i * 2
+                  ? "full"
+                  : (value ?? 0) >= i * 2 - 1
+                    ? "half"
+                    : "empty"
+              }
+            />
+            <button
+              type="button"
+              disabled={disabled}
+              aria-label={`${i - 0.5} stars`}
+              onClick={() => {
+                try {
+                  navigator.vibrate?.(8);
+                } catch {
+                  /* ignore */
+                }
+                onChange(value === i * 2 - 1 ? null : i * 2 - 1);
+              }}
+              className="absolute left-0 top-0 h-full w-1/2 rounded-l-full transition active:scale-90"
+            />
+            <button
+              type="button"
+              disabled={disabled}
+              aria-label={`${i} stars`}
+              onClick={() => {
+                try {
+                  navigator.vibrate?.(8);
+                } catch {
+                  /* ignore */
+                }
+                onChange(value === i * 2 ? null : i * 2);
+              }}
+              className="absolute right-0 top-0 h-full w-1/2 rounded-r-full transition active:scale-90"
+            />
+          </span>
+        );
+      })}
     </div>
   );
 }
@@ -162,17 +198,36 @@ export function MovieRating({
 
   return (
     <div>
-      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        Your rating
-      </p>
-      <div className="flex items-center gap-3">
-        <StarRatingInput value={rating} onChange={save} disabled={pending} />
+      <div className="mb-2 flex items-baseline justify-between">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Your rating
+        </p>
         {rating != null && (
-          <span className="text-sm font-bold text-primary">
-            {formatStars(rating)}
-          </span>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-primary">
+            {RATING_LABELS[rating] ?? ""}
+          </p>
         )}
       </div>
+      <div className="flex items-center gap-3">
+        <StarRatingInput value={rating} onChange={save} disabled={pending} />
+        {rating != null ? (
+          <span className="min-w-[3rem] text-center text-lg font-black tabular-nums text-primary">
+            {formatStars(rating)}
+          </span>
+        ) : (
+          <span className="text-xs text-white/35">Tap a star · halves count</span>
+        )}
+      </div>
+      {rating != null && (
+        <button
+          type="button"
+          onClick={() => save(null)}
+          disabled={pending}
+          className="mt-1.5 px-1 text-[11px] font-semibold text-white/40 underline-offset-2 hover:text-white/70 hover:underline disabled:opacity-50"
+        >
+          Clear rating
+        </button>
+      )}
     </div>
   );
 }
@@ -240,11 +295,16 @@ export function EpisodeRating({
       {open && (
         <div className="absolute left-0 top-8 z-30 rounded-xl border border-white/10 bg-[#1c1c1e] p-2.5 shadow-xl">
           <StarRatingInput
-            size={26}
+            size={30}
             value={rating}
             onChange={save}
             disabled={pending}
           />
+          {rating != null && (
+            <p className="mt-1 text-center text-[11px] font-bold text-primary">
+              {formatStars(rating)} · {RATING_LABELS[rating] ?? ""}
+            </p>
+          )}
         </div>
       )}
     </div>

@@ -1,9 +1,10 @@
 import { requireAuth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { shows, movies, userShows, userMovies } from "@/lib/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { db, withDbRetry } from "@/lib/db";
+import { shows, movies, userShows, userMovies, watchHistory } from "@/lib/schema";
+import { eq, and, desc, inArray, sql } from "drizzle-orm";
 import { posterUrl } from "@/lib/tmdb";
 import { RatingBadge } from "@/components/star-rating";
+import { PosterBadges } from "@/components/poster-badges";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -35,6 +36,7 @@ export default async function ProfileListPage({
     title: string;
     posterPath: string | null;
     rating?: number | null;
+    favorite?: boolean | null;
   };
 
   const items: GridItem[] = config.movies
@@ -44,6 +46,7 @@ export default async function ProfileListPage({
           title: movies.title,
           posterPath: movies.posterPath,
           rating: userMovies.rating,
+          favorite: userMovies.favorite,
         })
         .from(userMovies)
         .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
@@ -67,6 +70,51 @@ export default async function ProfileListPage({
             : eq(userShows.userId, userId)
         )
         .orderBy(desc(userShows.updatedAt));
+
+  // Movie rewatch badges (counts + queue flags). Tolerant of pre-migration DBs.
+  const rewatchCounts = new Map<number, number>();
+  const queuedIds = new Set<number>();
+  if (config.movies && items.length > 0) {
+    const ids = items.map((i) => i.tmdbId);
+    try {
+      const rows = await withDbRetry(() =>
+        db
+          .select({
+            tmdbId: watchHistory.tmdbId,
+            count: sql<number>`count(*)::int`,
+          })
+          .from(watchHistory)
+          .where(
+            and(
+              eq(watchHistory.userId, userId),
+              eq(watchHistory.mediaType, "movie"),
+              inArray(watchHistory.tmdbId, ids)
+            )
+          )
+          .groupBy(watchHistory.tmdbId)
+      );
+      for (const r of rows) rewatchCounts.set(r.tmdbId, Number(r.count));
+    } catch {
+      /* badges hide */
+    }
+    try {
+      const rows = await withDbRetry(() =>
+        db
+          .select({ tmdbId: userMovies.tmdbId })
+          .from(userMovies)
+          .where(
+            and(
+              eq(userMovies.userId, userId),
+              eq(userMovies.rewatchQueued, true),
+              inArray(userMovies.tmdbId, ids)
+            )
+          )
+      );
+      for (const r of rows) queuedIds.add(r.tmdbId);
+    } catch {
+      /* pre-migration */
+    }
+  }
 
   const hrefPrefix = config.movies ? "/movie" : "/show";
 
@@ -101,37 +149,57 @@ export default async function ProfileListPage({
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-2">
-          {items.map((item) => (
-            <Link
-              key={item.tmdbId}
-              href={`${hrefPrefix}/${item.tmdbId}`}
-              className="overflow-hidden rounded-md bg-card"
-            >
-              <div
-                style={{ aspectRatio: "2 / 3" }}
-                className="relative bg-secondary"
+        <div className="grid grid-cols-3 gap-x-2 gap-y-4">
+          {items.map((item) => {
+            const isFav = config.movies
+              ? !!item.favorite
+              : config.favorite
+                ? true
+                : false;
+            return (
+              <Link
+                key={item.tmdbId}
+                href={`${hrefPrefix}/${item.tmdbId}`}
+                className="overflow-visible rounded-md bg-card"
               >
-                {item.rating != null && <RatingBadge value={item.rating} />}
-                {item.posterPath ? (
-                  <Image
-                    src={posterUrl(item.posterPath, "w342") ?? ""}
-                    alt={item.title}
-                    fill
-                    sizes="(max-width: 768px) 33vw, 200px"
-                    className="object-cover"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-[#3a7bd5] p-2 text-center">
-                    <span className="text-xs font-medium text-white">
-                      {item.title || "No title yet"}
-                    </span>
+                <div
+                  style={{ aspectRatio: "2 / 3" }}
+                  className="relative bg-secondary"
+                >
+                  <div className="absolute inset-0 overflow-hidden rounded-md">
+                    {item.rating != null && <RatingBadge value={item.rating} />}
+                    {item.posterPath ? (
+                      <Image
+                        src={posterUrl(item.posterPath, "w342") ?? ""}
+                        alt={item.title}
+                        fill
+                        sizes="(max-width: 768px) 33vw, 200px"
+                        className="object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-[#3a7bd5] p-2 text-center">
+                        <span className="text-xs font-medium text-white">
+                          {item.title || "No title yet"}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            </Link>
-          ))}
+                  <PosterBadges
+                    favorite={isFav}
+                    rewatchCount={
+                      config.movies
+                        ? (rewatchCounts.get(item.tmdbId) ?? null)
+                        : null
+                    }
+                    rewatchQueued={
+                      config.movies ? queuedIds.has(item.tmdbId) : false
+                    }
+                  />
+                </div>
+              </Link>
+            );
+          })}
         </div>
       )}
       </div>

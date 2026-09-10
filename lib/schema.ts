@@ -133,6 +133,13 @@ export const userMovies = pgTable(
     favorite: boolean("favorite").notNull().default(false),
     watchedAt: timestamp("watched_at"),
     rating: integer("rating"),
+    /**
+     * Letterboxd-style rewatch intent. A watched movie stays `status=watched`
+     * while `rewatchQueued=true` surfaces it back in Watch Next, so a rewatch
+     * can be planned (screenshot-able) without losing watched state/rating.
+     * Cleared when a rewatch is logged or the movie is removed.
+     */
+    rewatchQueued: boolean("rewatch_queued").notNull().default(false),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [primaryKey({ columns: [table.userId, table.tmdbId] })]

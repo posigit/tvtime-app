@@ -52,8 +52,13 @@ export function MovieWatchButton({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ tmdbId, status: next }),
         });
+        const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error("save failed");
-        if (next === "watched") toast("Marked watched");
+        // Re-adding a watched title queues a rewatch (stays watched underneath).
+        if (data?.queuedRewatch) {
+          setStatus("watched");
+          toast("Queued for rewatch — in Watch Next");
+        } else if (next === "watched") toast("Marked watched");
         else if (next === "want_to_watch") toast("Added to watchlist");
         else if (prev === "watched") toast("Marked unwatched", "info");
         else toast("Removed from My List", "info");

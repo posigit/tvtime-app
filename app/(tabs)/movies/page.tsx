@@ -1,13 +1,15 @@
 import { cookies } from "next/headers";
 import { requireAuth } from "@/lib/auth";
 import { db, withDbRetry } from "@/lib/db";
-import { movies, userMovies } from "@/lib/schema";
-import { eq } from "drizzle-orm";
+import { movies, userMovies, watchHistory } from "@/lib/schema";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { ShowTabs } from "@/components/show-tabs";
 import { StickyChrome } from "@/components/sticky-chrome";
 import { SectionLabel } from "@/components/section-label";
 import { LayoutToggle } from "@/components/layout-toggle";
 import { RatingBadge } from "@/components/star-rating";
+import { PosterBadges } from "@/components/poster-badges";
+import { FridayShareButton } from "@/components/friday-share";
 import { posterUrl } from "@/lib/tmdb";
 import {
   isUnreleased,
@@ -93,31 +95,46 @@ function MoviePoster({
   title,
   posterPath,
   rating,
+  favorite,
+  rewatchCount,
+  rewatchQueued,
 }: {
   title: string;
   posterPath: string | null;
   rating?: number | null;
+  favorite?: boolean | null;
+  rewatchCount?: number | null;
+  rewatchQueued?: boolean | null;
 }) {
   return (
-    <div
-      style={{ aspectRatio: "2 / 3" }}
-      className="relative w-full overflow-hidden bg-secondary"
-    >
-      {rating != null && <RatingBadge value={rating} />}
-      {posterPath ? (
-        <Image
-          src={posterUrl(posterPath, "w342") ?? ""}
-          alt={title}
-          fill
-          sizes="(max-width: 768px) 33vw, 200px"
-          className="object-cover"
-          unoptimized
-        />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center bg-[#3a7bd5] p-2 text-center">
-          <span className="text-xs font-medium text-white">{title}</span>
-        </div>
-      )}
+    <div style={{ aspectRatio: "2 / 3" }} className="relative w-full bg-secondary">
+      <div className="absolute inset-0 overflow-hidden">
+        {rating != null && <RatingBadge value={rating} />}
+        {posterPath ? (
+          <Image
+            src={posterUrl(posterPath, "w342") ?? ""}
+            alt={title}
+            fill
+            sizes="(max-width: 768px) 33vw, 200px"
+            className="object-cover"
+            unoptimized
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-[#3a7bd5] p-2 text-center">
+            <span className="text-xs font-medium text-white">{title}</span>
+          </div>
+        )}
+      </div>
+      <PosterBadges
+        favorite={favorite}
+        rewatchCount={rewatchCount}
+        rewatchQueued={rewatchQueued}
+      />
+      {rewatchQueued ? (
+        <span className="pointer-events-none absolute left-1 top-1 z-10 rounded bg-primary px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wide text-black">
+          Rewatch
+        </span>
+      ) : null}
     </div>
   );
 }
@@ -130,6 +147,9 @@ type MovieRow = {
   releaseDate?: string | null;
   runtime?: number | null;
   rtScore?: number | null;
+  favorite?: boolean | null;
+  rewatchCount?: number | null;
+  rewatchQueued?: boolean | null;
 };
 
 function formatRuntime(minutes: number): string {
@@ -142,18 +162,25 @@ function formatRuntime(minutes: number): string {
 
 function MovieGrid({ items }: { items: MovieRow[] }) {
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className="grid grid-cols-3 gap-x-2 gap-y-4">
       {items.map((movie) => (
         <Link
           key={movie.tmdbId}
           href={`/movie/${movie.tmdbId}`}
-          className="overflow-hidden rounded-md bg-card"
+          className="overflow-visible rounded-md bg-card"
         >
-          <MoviePoster
-            title={movie.title}
-            posterPath={movie.posterPath}
-            rating={movie.rating}
-          />
+          <div className="overflow-visible rounded-md">
+            <div className="overflow-hidden rounded-md">
+              <MoviePoster
+                title={movie.title}
+                posterPath={movie.posterPath}
+                rating={movie.rating}
+                favorite={movie.favorite}
+                rewatchCount={movie.rewatchCount}
+                rewatchQueued={movie.rewatchQueued}
+              />
+            </div>
+          </div>
         </Link>
       ))}
     </div>
@@ -173,21 +200,28 @@ function MovieList({ items }: { items: MovieRow[] }) {
             href={`/movie/${movie.tmdbId}`}
             className="flex items-center gap-3 rounded-xl bg-[#101011] p-2.5 active:scale-[0.99]"
           >
-            <div className="relative h-[88px] w-[60px] flex-shrink-0 overflow-hidden rounded-lg bg-[#2c2c2e]">
-              {poster ? (
-                <Image
-                  src={poster}
-                  alt={movie.title}
-                  fill
-                  sizes="60px"
-                  className="object-cover"
-                  unoptimized
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center p-1 text-center text-[9px] text-muted-foreground">
-                  {movie.title}
-                </div>
-              )}
+            <div className="relative h-[88px] w-[60px] flex-shrink-0 rounded-lg bg-[#2c2c2e]">
+              <div className="absolute inset-0 overflow-hidden rounded-lg">
+                {poster ? (
+                  <Image
+                    src={poster}
+                    alt={movie.title}
+                    fill
+                    sizes="60px"
+                    className="object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center p-1 text-center text-[9px] text-muted-foreground">
+                    {movie.title}
+                  </div>
+                )}
+              </div>
+              <PosterBadges
+                favorite={movie.favorite}
+                rewatchCount={movie.rewatchCount}
+                rewatchQueued={movie.rewatchQueued}
+              />
             </div>
             <div className="min-w-0 flex-1 py-0.5">
               <div className="mb-1.5 inline-flex max-w-full items-center gap-0.5 rounded-full border border-white/90 px-2.5 py-[3px]">
@@ -210,6 +244,15 @@ function MovieList({ items }: { items: MovieRow[] }) {
                 {movie.rtScore != null && movie.rtScore >= 0 && (
                   <span className="text-primary">🍅 {movie.rtScore}%</span>
                 )}
+                {movie.rewatchQueued ? (
+                  <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wide text-primary">
+                    Queued rewatch
+                  </span>
+                ) : movie.rewatchCount != null && movie.rewatchCount >= 2 ? (
+                  <span className="text-[11px] font-bold text-success">
+                    ⟳ ×{movie.rewatchCount}
+                  </span>
+                ) : null}
               </div>
             </div>
           </Link>
@@ -231,27 +274,26 @@ function formatReleaseDate(releaseDate: string): string {
 function UpcomingMovieGrid({
   items,
 }: {
-  items: {
-    tmdbId: number;
-    title: string;
-    posterPath: string | null;
-    releaseDate: string | null;
-    rating?: number | null;
-  }[];
+  items: MovieRow[];
 }) {
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className="grid grid-cols-3 gap-x-2 gap-y-4">
       {items.map((movie) => (
         <Link
           key={movie.tmdbId}
           href={`/movie/${movie.tmdbId}`}
-          className="overflow-hidden rounded-md bg-card"
+          className="overflow-visible rounded-md bg-card"
         >
-          <MoviePoster
-            title={movie.title}
-            posterPath={movie.posterPath}
-            rating={movie.rating}
-          />
+          <div className="overflow-hidden rounded-md">
+            <MoviePoster
+              title={movie.title}
+              posterPath={movie.posterPath}
+              rating={movie.rating}
+              favorite={movie.favorite}
+              rewatchCount={movie.rewatchCount}
+              rewatchQueued={movie.rewatchQueued}
+            />
+          </div>
           {movie.releaseDate && (
             <p className="px-1.5 py-1.5 text-center text-[10px] font-bold uppercase tracking-wide text-primary">
               {formatReleaseDate(movie.releaseDate)}
@@ -280,38 +322,124 @@ export default async function MoviesPage({
 
   const userId = await requireAuth();
 
-  const userMoviesList = await withDbRetry(() =>
-    db
-      .select({
-        tmdbId: movies.tmdbId,
-        title: movies.title,
-        posterPath: movies.posterPath,
-        releaseDate: movies.releaseDate,
-        runtime: movies.runtime,
-        rtScore: movies.rtScore,
-        status: userMovies.status,
-        watchedAt: userMovies.watchedAt,
-        rating: userMovies.rating,
-        updatedAt: userMovies.updatedAt,
-      })
-      .from(userMovies)
-      .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
-      .where(eq(userMovies.userId, userId))
-  );
+  // userMovies select is tolerant of pre-migration DBs (no rewatch_queued yet).
+  let userMoviesList: {
+    tmdbId: number;
+    title: string;
+    posterPath: string | null;
+    releaseDate: string | null;
+    runtime: number | null;
+    rtScore: number | null;
+    status: string;
+    watchedAt: Date | null;
+    rating: number | null;
+    favorite: boolean | null;
+    rewatchQueued: boolean | null;
+    updatedAt: Date;
+  }[];
+  try {
+    userMoviesList = await withDbRetry(() =>
+      db
+        .select({
+          tmdbId: movies.tmdbId,
+          title: movies.title,
+          posterPath: movies.posterPath,
+          releaseDate: movies.releaseDate,
+          runtime: movies.runtime,
+          rtScore: movies.rtScore,
+          status: userMovies.status,
+          watchedAt: userMovies.watchedAt,
+          rating: userMovies.rating,
+          favorite: userMovies.favorite,
+          rewatchQueued: userMovies.rewatchQueued,
+          updatedAt: userMovies.updatedAt,
+        })
+        .from(userMovies)
+        .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
+        .where(eq(userMovies.userId, userId))
+    );
+  } catch {
+    const fallback = await withDbRetry(() =>
+      db
+        .select({
+          tmdbId: movies.tmdbId,
+          title: movies.title,
+          posterPath: movies.posterPath,
+          releaseDate: movies.releaseDate,
+          runtime: movies.runtime,
+          rtScore: movies.rtScore,
+          status: userMovies.status,
+          watchedAt: userMovies.watchedAt,
+          rating: userMovies.rating,
+          favorite: userMovies.favorite,
+          updatedAt: userMovies.updatedAt,
+        })
+        .from(userMovies)
+        .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
+        .where(eq(userMovies.userId, userId))
+    );
+    userMoviesList = fallback.map((m) => ({ ...m, rewatchQueued: false }));
+  }
+
+  // Rewatch counts = total watchHistory completions per movie (first + rewatches).
+  const rewatchCounts = new Map<number, number>();
+  try {
+    const watchedIds = userMoviesList
+      .filter((m) => m.status === "watched")
+      .map((m) => m.tmdbId);
+    if (watchedIds.length > 0) {
+      const rows = await withDbRetry(() =>
+        db
+          .select({
+            tmdbId: watchHistory.tmdbId,
+            count: sql<number>`count(*)::int`,
+          })
+          .from(watchHistory)
+          .where(
+            and(
+              eq(watchHistory.userId, userId),
+              eq(watchHistory.mediaType, "movie"),
+              inArray(watchHistory.tmdbId, watchedIds)
+            )
+          )
+          .groupBy(watchHistory.tmdbId)
+      );
+      for (const r of rows) rewatchCounts.set(r.tmdbId, Number(r.count));
+    }
+  } catch {
+    // watchHistory may be empty — badges simply hide.
+  }
+  type MovieLibraryRow = Omit<MovieRow, "releaseDate"> & {
+    releaseDate: string | null;
+    status: string;
+    watchedAt: Date | null;
+    updatedAt: Date;
+  };
+  const withCounts: MovieLibraryRow[] = userMoviesList.map((m) => ({
+    ...m,
+    rewatchCount: rewatchCounts.get(m.tmdbId) ?? (m.status === "watched" ? 1 : null),
+  }));
 
   // Exclude anything already in the library (watched or listed) from Surprise
-  const libraryIds = new Set(userMoviesList.map((m) => m.tmdbId));
+  const libraryIds = new Set(withCounts.map((m) => m.tmdbId));
   const surprisePool = await getUnseenGreatMoviesPool(libraryIds).catch(
     () => []
   );
 
-  const wantToWatchAll = userMoviesList.filter(
+  const wantToWatchAll = withCounts.filter(
     (m) => m.status === "want_to_watch" || m.status === "for_later"
+  );
+
+  // Queued rewatches surface back in Watch Next (stays watched underneath).
+  const queuedRewatches = withCounts.filter(
+    (m) => m.status === "watched" && m.rewatchQueued
   );
 
   // Unreleased → Upcoming tab. Released/undated → Watch Next vs Watch Later.
   const releasedUnwatched = wantToWatchAll.filter((m) => !isUnreleased(m.releaseDate));
-  const { watchNext, watchLater } = splitWatchNextAndLater(releasedUnwatched);
+  const split = splitWatchNextAndLater(releasedUnwatched);
+  const watchNext: MovieRow[] = [...queuedRewatches, ...split.watchNext];
+  const watchLater = split.watchLater;
 
   const upcomingMovies = wantToWatchAll
     .filter((m) => isUnreleased(m.releaseDate))
@@ -331,9 +459,19 @@ export default async function MoviesPage({
     else upcomingGroups.set(key, [m]);
   }
 
-  const watched = userMoviesList
+  const watched = withCounts
     .filter((m) => m.status === "watched")
     .sort((a, b) => (b.watchedAt?.getTime() ?? 0) - (a.watchedAt?.getTime() ?? 0));
+
+  const fridayShareItems = watched.slice(0, 4).map((m) => ({
+    tmdbId: m.tmdbId,
+    title: m.title,
+    posterPath: m.posterPath,
+    rating: m.rating,
+    favorite: m.favorite,
+    rewatchCount: m.rewatchCount,
+    year: m.releaseDate ? m.releaseDate.slice(0, 4) : null,
+  }));
 
   return (
     <div className="min-h-dvh bg-black px-4 pb-nav-page">
@@ -372,9 +510,9 @@ export default async function MoviesPage({
                 title: m.title,
                 posterPath: m.posterPath,
                 releaseDate: m.releaseDate,
-                runtime: m.runtime,
-                rtScore: m.rtScore,
-                rating: m.rating,
+                runtime: m.runtime ?? null,
+                rtScore: m.rtScore ?? null,
+                rating: m.rating ?? null,
               }))}
               surprisePool={surprisePool}
             />
@@ -382,14 +520,17 @@ export default async function MoviesPage({
 
           {watched.length > 0 && (
             <section className="mb-6">
-              <div className="mb-3 flex justify-center">
+              <div className="relative mb-3 mt-2 flex items-center justify-center gap-2">
                 <SectionLabel>Recently Watched</SectionLabel>
+                <div className="absolute right-0 top-1/2 -translate-y-1/2">
+                  <FridayShareButton items={fridayShareItems} />
+                </div>
               </div>
               <MovieGrid items={watched.slice(0, 30)} />
             </section>
           )}
 
-          {userMoviesList.length === 0 && (
+          {withCounts.length === 0 && (
             <EmptyState
               title="Your watch list is empty!"
               description="Add movies you want to watch."

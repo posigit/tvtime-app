@@ -1,8 +1,8 @@
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { db, withDbRetry } from "@/lib/db";
-import { episodes, movies, shows, users, watchHistory } from "@/lib/schema";
+import { episodes, movies, shows, userMovies, users, watchHistory } from "@/lib/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +33,11 @@ interface WatchedItem {
   detail: string | null;
   episodeTitle: string | null;
   rating: number | null;
+  /** The user's own 1–10 star rating (movies only, null when unrated). */
+  userRating: number | null;
+  favorite: boolean | null;
+  /** Total completions incl. rewatches (movies only). */
+  rewatchCount: number | null;
   watchedAt: string;
   source: string;
 }
@@ -136,6 +141,57 @@ export async function GET(request: Request) {
       }
     }
 
+    // User library signals for movie items (stars/fav/rewatch badges).
+    const userMeta = new Map<
+      number,
+      { rating: number | null; favorite: boolean | null }
+    >();
+    const rewatchCounts = new Map<number, number>();
+    if (movieIds.length > 0) {
+      try {
+        const rows = await withDbRetry(() =>
+          db
+            .select({
+              tmdbId: userMovies.tmdbId,
+              rating: userMovies.rating,
+              favorite: userMovies.favorite,
+            })
+            .from(userMovies)
+            .where(
+              and(
+                eq(userMovies.userId, publicUser.id),
+                inArray(userMovies.tmdbId, movieIds)
+              )
+            )
+        );
+        for (const r of rows)
+          userMeta.set(r.tmdbId, { rating: r.rating, favorite: r.favorite });
+      } catch {
+        /* library lookup failed — fields stay null */
+      }
+      try {
+        const rows = await withDbRetry(() =>
+          db
+            .select({
+              tmdbId: watchHistory.tmdbId,
+              count: sql<number>`count(*)::int`,
+            })
+            .from(watchHistory)
+            .where(
+              and(
+                eq(watchHistory.userId, publicUser.id),
+                eq(watchHistory.mediaType, "movie"),
+                inArray(watchHistory.tmdbId, movieIds)
+              )
+            )
+            .groupBy(watchHistory.tmdbId)
+        );
+        for (const r of rows) rewatchCounts.set(r.tmdbId, Number(r.count));
+      } catch {
+        /* counts stay null */
+      }
+    }
+
     // Dedupe by tmdbId — keep most recent event; for tv, remember last episode detail
     const seen = new Set<number>();
     const items: WatchedItem[] = [];
@@ -146,6 +202,7 @@ export async function GET(request: Request) {
       const isMovie = event.mediaType === "movie";
       const meta = isMovie ? moviesMeta.get(event.tmdbId) : showsMeta.get(event.tmdbId);
       const dateStr = meta ? ("releaseDate" in meta ? meta.releaseDate : meta.firstAirDate) : null;
+      const um = isMovie ? userMeta.get(event.tmdbId) : undefined;
 
       items.push({
         tmdbId: event.tmdbId,
@@ -162,6 +219,11 @@ export async function GET(request: Request) {
           ? null
           : episodeMeta.get(`${event.tmdbId}|${event.seasonNumber}|${event.episodeNumber}`) || null,
         rating: meta?.voteAverage ?? null,
+        userRating: um?.rating ?? null,
+        favorite: um?.favorite ?? null,
+        rewatchCount: isMovie
+          ? (rewatchCounts.get(event.tmdbId) ?? null)
+          : null,
         watchedAt: event.watchedAt.toISOString(),
         source: event.source,
       });

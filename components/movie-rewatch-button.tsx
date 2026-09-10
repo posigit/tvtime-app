@@ -2,45 +2,76 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { RotateCcw } from "lucide-react";
+import { BookmarkPlus, Check, History, RotateCcw } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useToast } from "@/components/toast";
 
 /**
- * Movie rewatch toggle. Visible only when the movie is marked watched.
- * Clears the resume bookmark (replay from top) and appends a new entry to the
- * watch-history log so the rewatch date is kept alongside the first watch.
+ * Letterboxd-style movie rewatch control. Visible only when watched.
+ *
+ * Two intents, one button:
+ * - "Plan rewatch" (queue): stays watched, sets rewatch_queued → resurfaces in
+ *   Watch Next so it can be screenshotted/planned. No history row.
+ * - "Log rewatch now": clears resume, appends watchHistory, clears the queue.
  */
 export function MovieRewatchButton({
   tmdbId,
   initialCount,
+  initialQueued,
 }: {
   tmdbId: number;
   initialCount: number;
+  initialQueued?: boolean;
 }) {
   const router = useRouter();
   const { toast } = useToast();
-  const [confirming, setConfirming] = useState(false);
-  const [pending, setPending] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [pendingMode, setPendingMode] = useState<string | null>(null);
   const [count, setCount] = useState(initialCount);
+  const [queued, setQueued] = useState(!!initialQueued);
 
-  const start = async () => {
-    setPending(true);
+  const run = async (mode: "queue" | "log" | "unqueue") => {
+    setPendingMode(mode);
     try {
       const res = await fetch("/api/movie-rewatch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tmdbId }),
+        body: JSON.stringify({ tmdbId, mode }),
       });
-      if (!res.ok) throw new Error("rewatch failed");
-      const data = await res.json();
-      setCount(Number(data.count ?? count + 1));
-      toast("Rewatch started — starting from the top");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error || "rewatch failed");
+      if (mode === "queue") {
+        setQueued(true);
+        if (typeof data.count === "number") setCount(Number(data.count));
+        try {
+          navigator.vibrate?.(15);
+        } catch {
+          /* ignore */
+        }
+        toast(
+          data?.queuedFallback
+            ? "Marked for rewatch (list sync pending)"
+            : "Queued for rewatch — in Watch Next"
+        );
+      } else if (mode === "unqueue") {
+        setQueued(false);
+        toast("Removed from rewatch queue", "info");
+      } else {
+        setQueued(false);
+        setCount(Number(data.count ?? count + 1));
+        try {
+          navigator.vibrate?.(15);
+        } catch {
+          /* ignore */
+        }
+        toast(`Rewatch logged${data.count >= 5 ? " — certified classic!" : ""}`);
+      }
       router.refresh();
     } catch {
-      toast("Couldn't start rewatch — try again", "error");
+      toast("Couldn't update rewatch — try again", "error");
     } finally {
-      setPending(false);
-      setConfirming(false);
+      setPendingMode(null);
+      setOpen(false);
     }
   };
 
@@ -48,44 +79,132 @@ export function MovieRewatchButton({
     <>
       <button
         type="button"
-        onClick={() => setConfirming(true)}
-        disabled={pending}
-        aria-label="Rewatch movie"
-        title="Rewatch movie"
-        className="flex h-9 flex-shrink-0 items-center gap-1.5 rounded-full bg-card px-3 text-white ring-1 ring-white/15 transition-colors hover:bg-secondary disabled:opacity-50"
+        onClick={() => setOpen(true)}
+        disabled={pendingMode !== null}
+        aria-label={queued ? "Queued for rewatch" : "Rewatch movie"}
+        title={queued ? "Queued for rewatch" : "Rewatch movie"}
+        className={cn(
+          "flex h-9 flex-shrink-0 items-center gap-1.5 rounded-full px-3 ring-1 transition-colors disabled:opacity-50",
+          queued
+            ? "bg-primary text-black ring-primary"
+            : "bg-card text-white ring-white/15 hover:bg-secondary"
+        )}
       >
-        <RotateCcw className="h-4 w-4" strokeWidth={2.5} />
-        {count > 0 ? (
-          <span className="text-xs font-bold text-success">×{count}</span>
+        {queued ? (
+          <Check className="h-4 w-4" strokeWidth={3} />
         ) : (
-          <span className="text-xs font-bold text-white/60">Rewatch</span>
+          <RotateCcw className="h-4 w-4" strokeWidth={2.5} />
+        )}
+        {count >= 2 ? (
+          <span
+            className={cn(
+              "text-xs font-black",
+              queued ? "text-black" : "text-success"
+            )}
+          >
+            ×{count}
+          </span>
+        ) : (
+          <span
+            className={cn(
+              "text-xs font-bold",
+              queued ? "text-black" : "text-white/60"
+            )}
+          >
+            {queued ? "Queued" : "Rewatch"}
+          </span>
         )}
       </button>
-      {confirming && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-card p-6">
-            <p className="mb-2 text-lg font-bold text-white">Rewatch?</p>
-            <p className="mb-6 text-sm text-muted-foreground">
-              Your resume point clears so it plays from the top. Rating and
-              watch history stay. Your rewatch badge becomes ×{count + 1}.
+
+      {open && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 p-4 sm:items-center"
+          onClick={() => pendingMode === null && setOpen(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl bg-card p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="mb-1 text-lg font-black text-white">
+              {queued ? "Queued for rewatch" : "Rewatch this?"}
             </p>
-            <div className="flex gap-3">
+            <p className="mb-4 text-[13px] leading-relaxed text-muted-foreground">
+              {queued ? (
+                <>
+                  It&apos;s sitting in <b className="text-white">Watch Next</b>{" "}
+                  with a Rewatch badge — screenshot away. Finish it to log{" "}
+                  <b className="text-white">×{count + 1}</b>, or log it now.
+                </>
+              ) : (
+                <>
+                  <b className="text-white">Plan it</b> to resurface in Watch
+                  Next (rating + history stay), or{" "}
+                  <b className="text-white">log it now</b> if you just finished
+                  it{count >= 1 ? ` — badge becomes ×${count + 1}` : ""}.
+                </>
+              )}
+            </p>
+            <div className="space-y-2">
+              {!queued && (
+                <button
+                  type="button"
+                  onClick={() => run("queue")}
+                  disabled={pendingMode !== null}
+                  className="flex w-full items-center gap-3 rounded-xl bg-primary px-4 py-3 text-left text-sm font-black text-black disabled:opacity-50"
+                >
+                  <BookmarkPlus className="h-5 w-5" strokeWidth={2.5} />
+                  <span>
+                    Plan rewatch
+                    <span className="block text-[11px] font-semibold text-black/60">
+                      Back to Watch Next · no date stamped
+                    </span>
+                  </span>
+                </button>
+              )}
               <button
                 type="button"
-                onClick={() => setConfirming(false)}
-                disabled={pending}
-                className="flex-1 rounded-full border border-white/20 py-3 text-sm font-medium text-white"
+                onClick={() => run("log")}
+                disabled={pendingMode !== null}
+                className={cn(
+                  "flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-bold",
+                  queued
+                    ? "bg-primary text-black"
+                    : "bg-secondary text-white hover:bg-white/10"
+                )}
               >
-                Cancel
+                <History className="h-5 w-5" strokeWidth={2.5} />
+                <span>
+                  {pendingMode === "log" ? "Logging…" : "Log rewatch now"}
+                  <span
+                    className={cn(
+                      "block text-[11px] font-semibold",
+                      queued ? "text-black/60" : "text-white/50"
+                    )}
+                  >
+                    Stamps today · resume resets · ×{count + 1}
+                  </span>
+                </span>
               </button>
-              <button
-                type="button"
-                onClick={start}
-                disabled={pending}
-                className="flex-1 rounded-full bg-success py-3 text-sm font-bold text-white"
-              >
-                Rewatch
-              </button>
+              {queued && (
+                <button
+                  type="button"
+                  onClick={() => run("unqueue")}
+                  disabled={pendingMode !== null}
+                  className="w-full rounded-full border border-white/20 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                >
+                  Remove from queue
+                </button>
+              )}
+              {!queued && (
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  disabled={pendingMode !== null}
+                  className="w-full rounded-full border border-white/20 py-3 text-sm font-medium text-white"
+                >
+                  Cancel
+                </button>
+              )}
             </div>
           </div>
         </div>

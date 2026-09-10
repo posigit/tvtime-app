@@ -11,18 +11,21 @@ import { formatPlaybackTime } from "@/lib/playback-format";
 
 /**
  * Primary "Watch now" button for movies — opens the VixSrc player.
- * Auto-marks the movie watched when playback ends.
+ * Auto-marks the movie watched when playback ends; when the movie is already
+ * watched (e.g. a queued rewatch), finishing logs a rewatch stamp instead.
  * When a saved position exists, becomes a "Resume · time left" CTA.
  */
 export function MovieVixButton({
   tmdbId,
   title,
   isWatched,
+  isRewatchQueued,
   playback,
 }: {
   tmdbId: number;
   title: string;
   isWatched: boolean;
+  isRewatchQueued?: boolean;
   playback?: PlaybackSummary | null;
 }) {
   const [open, setOpen] = useState(false);
@@ -48,7 +51,7 @@ export function MovieVixButton({
         </span>
         <span className="min-w-0">
           <span className="block text-sm font-black">
-            {resume ? "Resume" : "Watch now"}
+            {resume ? "Resume" : isWatched ? "Rewatch now" : "Watch now"}
           </span>
           {resume?.timeLeft && (
             <span className="mt-0.5 block text-xs font-semibold text-black/60">
@@ -69,17 +72,31 @@ export function MovieVixButton({
   }
 
   const handleEvent = async (event: string) => {
-    if (event !== "ended" || isWatched) return;
+    if (event !== "ended") return;
     if (completionRef.current) return;
     completionRef.current = true;
     try {
-      const res = await fetch("/api/movie-watch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tmdbId, status: "watched" }),
-      });
-      if (!res.ok) throw new Error("save failed");
-      toast("Watched — nice one!");
+      if (isWatched) {
+        // Finishing an already-watched title = a rewatch. Stamp history and
+        // clear the queue flag so Watch Next drops it.
+        const res = await fetch("/api/movie-rewatch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tmdbId, mode: "log" }),
+        });
+        if (!res.ok) throw new Error("save failed");
+        toast(
+          isRewatchQueued ? "Rewatch logged — nice one!" : "Rewatch logged!"
+        );
+      } else {
+        const res = await fetch("/api/movie-watch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tmdbId, status: "watched" }),
+        });
+        if (!res.ok) throw new Error("save failed");
+        toast("Watched — nice one!");
+      }
       router.refresh();
     } catch {
       completionRef.current = false;

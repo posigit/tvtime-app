@@ -1,7 +1,7 @@
 import { requireAuth } from "@/lib/auth";
 import { db, withDbRetry } from "@/lib/db";
 import { userMovies, watchHistory, movieReactions } from "@/lib/schema";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import {
   backdropUrl,
   posterUrl,
@@ -23,6 +23,7 @@ import { ChevronLeft } from "lucide-react";
 import { MovieWatchButton } from "@/components/movie-watch-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { MovieRewatchButton } from "@/components/movie-rewatch-button";
+import { MovieDiaryLine } from "@/components/movie-diary-line";
 import { ReactionPicker } from "@/components/reaction-picker";
 import { MovieRating } from "@/components/star-rating";
 import { DiscoverRail } from "@/components/discover-rail";
@@ -71,20 +72,46 @@ export default async function MovieDetailPage({
   const movie = await ensureMovie(tmdbId);
   if (!movie) notFound();
 
-  const [userMovie, ownedMovies, playback, movieRewatchCount, movieReactionRows] =
-    await Promise.all([
-      withDbRetry(() =>
+  const loadUserMovie = async () => {
+    try {
+      return await withDbRetry(() =>
         db.query.userMovies.findFirst({
           where: and(eq(userMovies.userId, userId), eq(userMovies.tmdbId, tmdbId)),
         })
-      ),
+      );
+    } catch {
+      // Pre-migration DB without rewatch_queued — select without the column.
+      const [row] = await withDbRetry(() =>
+        db
+          .select({
+            userId: userMovies.userId,
+            tmdbId: userMovies.tmdbId,
+            status: userMovies.status,
+            favorite: userMovies.favorite,
+            watchedAt: userMovies.watchedAt,
+            rating: userMovies.rating,
+            updatedAt: userMovies.updatedAt,
+          })
+          .from(userMovies)
+          .where(
+            and(eq(userMovies.userId, userId), eq(userMovies.tmdbId, tmdbId))
+          )
+          .limit(1)
+      ).catch(() => [null] as const);
+      return row ?? null;
+    }
+  };
+
+  const [userMovie, ownedMovies, playback, movieHistoryRows, movieReactionRows] =
+    await Promise.all([
+      loadUserMovie(),
       db
         .select({ tmdbId: userMovies.tmdbId })
         .from(userMovies)
         .where(eq(userMovies.userId, userId)),
       getPlaybackPosition(userId, "movie", tmdbId),
       db
-        .select({ count: sql<number>`count(*)` })
+        .select({ watchedAt: watchHistory.watchedAt })
         .from(watchHistory)
         .where(
           and(
@@ -100,6 +127,14 @@ export default async function MovieDetailPage({
           and(eq(movieReactions.userId, userId), eq(movieReactions.tmdbId, tmdbId))
         ),
     ]);
+  const movieRewatchCount = movieHistoryRows.length;
+  const diaryDates = movieHistoryRows
+    .map((r) => r.watchedAt)
+    .filter((d): d is Date => d instanceof Date && !Number.isNaN(d.getTime()));
+  const userMovieRow = (userMovie ?? null) as
+    | (NonNullable<typeof userMovie> & { rewatchQueued?: boolean | null })
+    | null;
+  const isRewatchQueued = userMovieRow?.rewatchQueued === true;
 
   const ownedIds = new Set(ownedMovies.map((m) => m.tmdbId));
   const movieReactionKeys = movieReactionRows.map((r) => r.reactionKey);
@@ -231,8 +266,15 @@ export default async function MovieDetailPage({
           tmdbId={tmdbId}
           title={movie.title}
           isWatched={isWatched}
+          isRewatchQueued={isRewatchQueued}
           playback={playback}
         />
+
+        {isWatched && isRewatchQueued && (
+          <p className="mt-2 rounded-xl bg-primary/10 px-3 py-2 text-center text-[11px] font-bold text-primary ring-1 ring-primary/30">
+            Queued for rewatch · sitting in Watch Next
+          </p>
+        )}
 
         <div className="mt-3 flex items-center gap-3">
           <div className="flex-1">
@@ -251,10 +293,15 @@ export default async function MovieDetailPage({
           {isWatched && (
             <MovieRewatchButton
               tmdbId={tmdbId}
-              initialCount={Number(movieRewatchCount[0]?.count ?? 0)}
+              initialCount={movieRewatchCount}
+              initialQueued={isRewatchQueued}
             />
           )}
         </div>
+
+        {isWatched && diaryDates.length > 0 && (
+          <MovieDiaryLine dates={diaryDates} />
+        )}
 
         <div className="mt-3">
           <ReactionPicker

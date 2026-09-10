@@ -33,6 +33,8 @@ import { ProfileHeatmap } from "@/components/profile-heatmap";
 import { ProfileTaste } from "@/components/profile-taste";
 import { ProfileYearRecap } from "@/components/profile-year-recap";
 import { StarRatingDisplay } from "@/components/star-rating";
+import { PosterBadges } from "@/components/poster-badges";
+import { FridayShareButton } from "@/components/friday-share";
 import { ProfilePlaybackShelf } from "@/components/recent-streams";
 import { getContinueWatching, getWatchHistory } from "@/lib/playback";
 import {
@@ -56,10 +58,12 @@ function SectionHeader({
   title,
   href,
   heart,
+  action,
 }: {
   title: string;
   href?: string;
   heart?: boolean;
+  action?: React.ReactNode;
 }) {
   const inner = (
     <div className="flex items-center gap-2.5">
@@ -72,14 +76,25 @@ function SectionHeader({
     </div>
   );
 
-  if (!href) {
+  if (!href && !action) {
     return <div className="mb-3">{inner}</div>;
   }
+  if (!href) {
+    return (
+      <div className="mb-3 flex items-center justify-between">
+        {inner}
+        {action}
+      </div>
+    );
+  }
   return (
-    <Link href={href} className="mb-3 flex items-center justify-between">
-      {inner}
-      <ChevronRight className="h-5 w-5 text-muted-foreground" />
-    </Link>
+    <div className="mb-3 flex items-center justify-between">
+      <Link href={href} className="flex flex-1 items-center justify-between">
+        {inner}
+        <ChevronRight className="h-5 w-5 text-muted-foreground" />
+      </Link>
+      {action && <div className="ml-2">{action}</div>}
+    </div>
   );
 }
 
@@ -156,35 +171,50 @@ const POSTER_STYLE: CSSProperties = {
   minHeight: "7.875rem",
 };
 
+type TileBadges = {
+  favorite?: boolean | null;
+  rewatchCount?: number | null;
+  rewatchQueued?: boolean | null;
+};
+
 function PosterTile({
   title,
   posterPath,
+  favorite,
+  rewatchCount,
+  rewatchQueued,
 }: {
   title: string;
   posterPath: string | null;
-}) {
+} & TileBadges) {
   const src = posterPath ? posterUrl(posterPath, "w185") : null;
   return (
-    <div
-      className="relative overflow-hidden rounded-lg bg-[#2c2c2e]"
-      style={POSTER_STYLE}
-    >
-      {src ? (
-        // eslint-disable-next-line @next/next/no-img-element -- plain img always paints; next/image fill was collapsing
-        <img
-          src={src}
-          alt={title}
-          className="absolute inset-0 h-full w-full object-cover"
-          loading="lazy"
-          decoding="async"
-        />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center bg-[#3a7bd5] p-2 text-center">
-          <span className="text-xs font-medium text-white">
-            {title || "No title yet"}
-          </span>
-        </div>
-      )}
+    <div className="relative" style={POSTER_STYLE}>
+      <div
+        className="absolute inset-0 overflow-hidden rounded-lg bg-[#2c2c2e]"
+      >
+        {src ? (
+          // eslint-disable-next-line @next/next/no-img-element -- plain img always paints; next/image fill was collapsing
+          <img
+            src={src}
+            alt={title}
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-[#3a7bd5] p-2 text-center">
+            <span className="text-xs font-medium text-white">
+              {title || "No title yet"}
+            </span>
+          </div>
+        )}
+      </div>
+      <PosterBadges
+        favorite={favorite}
+        rewatchCount={rewatchCount}
+        rewatchQueued={rewatchQueued}
+      />
     </div>
   );
 }
@@ -194,7 +224,9 @@ function PosterCarousel({
   hrefPrefix,
   emptyLabel,
 }: {
-  items: { tmdbId: number; title: string; posterPath: string | null }[];
+  items: (
+    { tmdbId: number; title: string; posterPath: string | null } & TileBadges
+  )[];
   hrefPrefix: string;
   emptyLabel: string;
 }) {
@@ -207,14 +239,20 @@ function PosterCarousel({
   }
 
   return (
-    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 pt-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {items.map((item) => (
         <Link
           key={item.tmdbId}
           href={`${hrefPrefix}/${item.tmdbId}`}
           className="block shrink-0"
         >
-          <PosterTile title={item.title} posterPath={item.posterPath} />
+          <PosterTile
+            title={item.title}
+            posterPath={item.posterPath}
+            favorite={item.favorite}
+            rewatchCount={item.rewatchCount}
+            rewatchQueued={item.rewatchQueued}
+          />
         </Link>
       ))}
     </div>
@@ -230,24 +268,35 @@ type RailItem = {
   subAccent?: boolean;
   /** Stored 1–10 rating — render as full star row instead of "★ 4.5" text */
   rating?: number | null;
-};
+} & TileBadges;
 
 /** Poster rail with a title + caption under each tile (Recently Watched / Top Rated). */
 function CaptionedRail({ items }: { items: RailItem[] }) {
   if (items.length === 0) return null;
 
   return (
-    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 pt-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {items.map((item) => (
         <Link key={item.key} href={item.href} className="block shrink-0">
-          <PosterTile title={item.title} posterPath={item.posterPath} />
+          <PosterTile
+            title={item.title}
+            posterPath={item.posterPath}
+            favorite={item.favorite}
+            rewatchCount={item.rewatchCount}
+            rewatchQueued={item.rewatchQueued}
+          />
           <div style={TILE_STYLE}>
             <p className="mt-1.5 truncate text-xs font-semibold text-white">
               {item.title}
             </p>
             {item.rating != null && item.rating > 0 ? (
-              <div className="mt-0.5 flex items-center gap-0.5">
+              <div className="mt-0.5 flex items-center gap-1">
                 <StarRatingDisplay value={item.rating} size={11} />
+                {item.rewatchCount != null && item.rewatchCount >= 2 && (
+                  <span className="text-[9px] font-black text-success">
+                    ×{item.rewatchCount}
+                  </span>
+                )}
               </div>
             ) : (
               <p
@@ -256,7 +305,9 @@ function CaptionedRail({ items }: { items: RailItem[] }) {
                   item.subAccent ? "text-primary" : "text-muted-foreground"
                 )}
               >
-                {item.sub}
+                {item.rewatchCount != null && item.rewatchCount >= 2
+                  ? `⟳ ×${item.rewatchCount} · ${item.sub}`
+                  : item.sub}
               </p>
             )}
           </div>
@@ -490,7 +541,9 @@ export default async function ProfilePage() {
         title: movies.title,
         posterPath: movies.posterPath,
         backdropPath: movies.backdropPath,
+        releaseDate: movies.releaseDate,
         rating: userMovies.rating,
+        favorite: userMovies.favorite,
         watchedAt: userMovies.watchedAt,
       })
       .from(userMovies)
@@ -506,6 +559,60 @@ export default async function ProfilePage() {
       .limit(20),
   ]);
 
+  // Rewatch signals for the movie tiles: total completions + queue flags.
+  // Both tolerate pre-migration DBs (missing rewatch_queued / empty history).
+  const recentMovieIds = recentMovies.map((m) => m.tmdbId);
+  const [movieRewatchCounts, queuedMovieIds] = await Promise.all([
+    (async () => {
+      const map = new Map<number, number>();
+      if (recentMovieIds.length === 0) return map;
+      try {
+        const rows = await withDbRetry(() =>
+          db
+            .select({
+              tmdbId: watchHistory.tmdbId,
+              count: sql<number>`count(*)::int`,
+            })
+            .from(watchHistory)
+            .where(
+              and(
+                eq(watchHistory.userId, userId),
+                eq(watchHistory.mediaType, "movie"),
+                inArray(watchHistory.tmdbId, recentMovieIds)
+              )
+            )
+            .groupBy(watchHistory.tmdbId)
+        );
+        for (const r of rows) map.set(r.tmdbId, Number(r.count));
+      } catch {
+        /* history unavailable — badges hide */
+      }
+      return map;
+    })(),
+    (async () => {
+      const set = new Set<number>();
+      if (recentMovieIds.length === 0) return set;
+      try {
+        const rows = await withDbRetry(() =>
+          db
+            .select({ tmdbId: userMovies.tmdbId })
+            .from(userMovies)
+            .where(
+              and(
+                eq(userMovies.userId, userId),
+                eq(userMovies.rewatchQueued, true),
+                inArray(userMovies.tmdbId, recentMovieIds)
+              )
+            )
+        );
+        for (const r of rows) set.add(r.tmdbId);
+      } catch {
+        /* pre-migration — no queue flags */
+      }
+      return set;
+    })(),
+  ]);
+
   // One tile per show/movie (latest watch wins) so the rail shows distinct posters.
   type RecentRaw = {
     key: string;
@@ -516,6 +623,11 @@ export default async function ProfilePage() {
     sub: string;
     subAccent: boolean;
     rating?: number | null;
+    favorite?: boolean | null;
+    rewatchCount?: number | null;
+    rewatchQueued?: boolean | null;
+    year?: string | null;
+    tmdbId?: number;
     watchedAt: Date | null;
   };
   const recentCandidates: RecentRaw[] = [
@@ -539,6 +651,11 @@ export default async function ProfilePage() {
       sub: m.rating != null ? "" : "Movie",
       subAccent: m.rating != null,
       rating: m.rating,
+      favorite: m.favorite,
+      rewatchCount: movieRewatchCounts.get(m.tmdbId) ?? 1,
+      rewatchQueued: queuedMovieIds.has(m.tmdbId),
+      year: m.releaseDate ? m.releaseDate.slice(0, 4) : null,
+      tmdbId: m.tmdbId,
       watchedAt: m.watchedAt,
     })),
   ].sort(
@@ -555,9 +672,21 @@ export default async function ProfilePage() {
   }
 
   const recentItems: RailItem[] = recentDeduped.map(
-    ({ backdropPath: _b, watchedAt: _w, ...item }) => item
+    ({ backdropPath: _b, watchedAt: _w, year: _y, tmdbId: _t, ...item }) => item
   );
   const bannerBackdrop = recentDeduped[0]?.backdropPath ?? null;
+  const fridayShareItems = recentDeduped
+    .filter((i) => i.key.startsWith("mv-") && i.tmdbId != null)
+    .slice(0, 4)
+    .map((i) => ({
+      tmdbId: i.tmdbId as number,
+      title: i.title,
+      posterPath: i.posterPath,
+      rating: i.rating,
+      favorite: i.favorite,
+      rewatchCount: i.rewatchCount,
+      year: i.year,
+    }));
 
   // ----- top rated (movies + shows via derived episode-rating score) -----
   const [topMovies, topShows] = await Promise.all([
@@ -900,6 +1029,7 @@ export default async function ProfilePage() {
           tmdbId: movies.tmdbId,
           title: movies.title,
           posterPath: movies.posterPath,
+          favorite: userMovies.favorite,
         })
         .from(userMovies)
         .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
@@ -911,6 +1041,7 @@ export default async function ProfilePage() {
           tmdbId: movies.tmdbId,
           title: movies.title,
           posterPath: movies.posterPath,
+          favorite: userMovies.favorite,
         })
         .from(userMovies)
         .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
@@ -921,6 +1052,68 @@ export default async function ProfilePage() {
         .limit(20),
       db.select().from(userLists).where(eq(userLists.userId, userId)),
     ]);
+
+  // Rewatch badges for the Movies / Favorite-movies rails.
+  const railMovieIds = [
+    ...new Set([...allMovies, ...favoriteMovies].map((m) => m.tmdbId)),
+  ];
+  const railRewatchCounts = new Map<number, number>();
+  const railQueued = new Set<number>();
+  if (railMovieIds.length > 0) {
+    try {
+      const rows = await withDbRetry(() =>
+        db
+          .select({
+            tmdbId: watchHistory.tmdbId,
+            count: sql<number>`count(*)::int`,
+          })
+          .from(watchHistory)
+          .where(
+            and(
+              eq(watchHistory.userId, userId),
+              eq(watchHistory.mediaType, "movie"),
+              inArray(watchHistory.tmdbId, railMovieIds)
+            )
+          )
+          .groupBy(watchHistory.tmdbId)
+      );
+      for (const r of rows) railRewatchCounts.set(r.tmdbId, Number(r.count));
+    } catch {
+      /* badges hide */
+    }
+    try {
+      const rows = await withDbRetry(() =>
+        db
+          .select({ tmdbId: userMovies.tmdbId })
+          .from(userMovies)
+          .where(
+            and(
+              eq(userMovies.userId, userId),
+              eq(userMovies.rewatchQueued, true),
+              inArray(userMovies.tmdbId, railMovieIds)
+            )
+          )
+      );
+      for (const r of rows) railQueued.add(r.tmdbId);
+    } catch {
+      /* pre-migration */
+    }
+  }
+  const withRailBadges = <
+    T extends { tmdbId: number; favorite?: boolean | null },
+  >(
+    items: T[]
+  ) =>
+    items.map((m) => ({
+      ...m,
+      favorite: m.favorite ?? undefined,
+      rewatchCount: railRewatchCounts.get(m.tmdbId) ?? null,
+      rewatchQueued: railQueued.has(m.tmdbId),
+    }));
+  const allMoviesBadged = withRailBadges(allMovies);
+  const favoriteMoviesBadged = withRailBadges(
+    favoriteMovies.map((m) => ({ ...m, favorite: true }))
+  );
 
   // Resolve up to 4 poster previews per list so the Lists section isn't blank text.
   type ListItemRef = { tmdbId?: number; type?: string };
@@ -1138,7 +1331,10 @@ export default async function ProfilePage() {
         {/* ---------- Recently watched ---------- */}
         {recentItems.length > 0 && (
           <section className="mb-8">
-            <SectionHeader title="Recently watched" />
+            <SectionHeader
+              title="Recently watched"
+              action={<FridayShareButton items={fridayShareItems} />}
+            />
             <CaptionedRail items={recentItems} />
           </section>
         )}
@@ -1247,7 +1443,7 @@ export default async function ProfilePage() {
         <section className="mb-8">
           <SectionHeader title="Movies" href="/profile/list/movies" />
           <PosterCarousel
-            items={allMovies}
+            items={allMoviesBadged}
             hrefPrefix="/movie"
             emptyLabel="No movies yet — add some from Explore"
           />
@@ -1260,7 +1456,7 @@ export default async function ProfilePage() {
             heart
           />
           <PosterCarousel
-            items={favoriteMovies}
+            items={favoriteMoviesBadged}
             hrefPrefix="/movie"
             emptyLabel="No favorite movies yet"
           />

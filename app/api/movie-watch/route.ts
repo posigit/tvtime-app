@@ -5,6 +5,13 @@ import { ensureMovie } from "@/lib/ensure";
 import { eq, and } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
+function isMissingColumn(err: unknown): boolean {
+  const msg = String(
+    (err as { message?: unknown })?.message ?? err ?? ""
+  ).toLowerCase();
+  return msg.includes("rewatch_queued") || msg.includes("42703");
+}
+
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -46,28 +53,92 @@ export async function POST(request: Request) {
     // Parent row must exist (FK) before user_movies insert
     await ensureMovie(tmdbId);
 
-    const now = new Date();
-    await withDbRetry(() =>
-      db
-        .insert(userMovies)
-        .values({
-          userId: session.user.id,
-          tmdbId,
-          status,
-          watchedAt: status === "watched" ? now : null,
-          updatedAt: now,
+    // Re-adding a WATCHED movie to the list = queue a rewatch (Letterboxd
+    // style): keep status=watched + rating/history, set rewatchQueued=true so
+    // it resurfaces in Watch Next. This is the "re-add for rewatch" answer.
+    if (status === "want_to_watch" || status === "for_later") {
+      const existing = await withDbRetry(() =>
+        db.query.userMovies.findFirst({
+          where: and(
+            eq(userMovies.userId, session.user.id),
+            eq(userMovies.tmdbId, tmdbId)
+          ),
         })
-        .onConflictDoUpdate({
-          target: [userMovies.userId, userMovies.tmdbId],
-          set: {
-            status,
-            watchedAt: status === "watched" ? now : null,
-            updatedAt: now,
-          },
-        })
-    );
+      ).catch(() => null);
+      if (existing?.status === "watched") {
+        try {
+          await withDbRetry(() =>
+            db
+              .update(userMovies)
+              .set({ rewatchQueued: true, updatedAt: new Date() })
+              .where(
+                and(
+                  eq(userMovies.userId, session.user.id),
+                  eq(userMovies.tmdbId, tmdbId)
+                )
+              )
+          );
+        } catch (err) {
+          // Migration not applied yet — fall through and keep watched state.
+          if (!isMissingColumn(err)) throw err;
+        }
+        return NextResponse.json({
+          success: true,
+          queuedRewatch: true,
+          status: "watched",
+        });
+      }
+    }
 
-    if (status === "watched") {
+    const now = new Date();
+    const targetStatus = status === "for_later" ? "want_to_watch" : status;
+    try {
+      await withDbRetry(() =>
+        db
+          .insert(userMovies)
+          .values({
+            userId: session.user.id,
+            tmdbId,
+            status: targetStatus,
+            watchedAt: targetStatus === "watched" ? now : null,
+            updatedAt: now,
+            ...(targetStatus === "watched" ? { rewatchQueued: false } : {}),
+          })
+          .onConflictDoUpdate({
+            target: [userMovies.userId, userMovies.tmdbId],
+            set: {
+              status: targetStatus,
+              watchedAt: targetStatus === "watched" ? now : null,
+              updatedAt: now,
+              ...(targetStatus === "watched" ? { rewatchQueued: false } : {}),
+            },
+          })
+      );
+    } catch (err) {
+      if (!isMissingColumn(err)) throw err;
+      // Retry without the new column on pre-migration databases.
+      await withDbRetry(() =>
+        db
+          .insert(userMovies)
+          .values({
+            userId: session.user.id,
+            tmdbId,
+            status: targetStatus,
+            watchedAt: targetStatus === "watched" ? now : null,
+            updatedAt: now,
+          })
+          .onConflictDoUpdate({
+            target: [userMovies.userId, userMovies.tmdbId],
+            set: {
+              status: targetStatus,
+              watchedAt: targetStatus === "watched" ? now : null,
+              updatedAt: now,
+            },
+          })
+      );
+    }
+
+    if (targetStatus === "watched") {
       // Watch history entry + finished → drop any stale resume bookmark
       await withDbRetry(() =>
         db.insert(watchHistory).values({
@@ -91,7 +162,7 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, status: targetStatus });
   } catch (err) {
     console.error("movie-watch failed:", err);
     return NextResponse.json(
