@@ -349,8 +349,17 @@ export default async function MovieDetailPage({
           </div>
         ) : null}
 
-        {/* Backdrop band — sharp, ~50% of the viewport */}
-        <div className="relative h-[48dvh] max-h-[460px] min-h-[320px] overflow-hidden">
+        {/* Backdrop band — sharp, ~50% of the viewport.
+            The mask feathers the WHOLE band (art + scrims) into the blurred
+            ambience below, so no container edge can show as a line. */}
+        <div
+          className="relative h-[48dvh] max-h-[460px] min-h-[320px] overflow-hidden"
+          style={{
+            maskImage: "linear-gradient(to bottom, black 55%, transparent 98%)",
+            WebkitMaskImage:
+              "linear-gradient(to bottom, black 55%, transparent 98%)",
+          }}
+        >
           {backdropSrc ? (
             <Image
               src={backdropSrc}
@@ -359,14 +368,6 @@ export default async function MovieDetailPage({
               fill
               sizes="100vw"
               className="object-cover"
-              style={{
-                // Feather the bottom edge so the art dissolves into the page
-                // instead of cutting off at the container boundary.
-                maskImage:
-                  "linear-gradient(to bottom, black 50%, transparent 99%)",
-                WebkitMaskImage:
-                  "linear-gradient(to bottom, black 50%, transparent 99%)",
-              }}
               unoptimized
               priority
             />
