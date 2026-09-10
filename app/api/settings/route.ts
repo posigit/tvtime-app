@@ -85,6 +85,27 @@ export async function POST(request: Request) {
   }
   if (isBannedSubLang(merged.subs)) merged.subs = "en";
   if (isBannedSubLang(merged.audio)) merged.audio = "en";
+  // Offline-download prefs (client-clamped; re-clamp defensively).
+  merged.downloadMode = merged.downloadMode === true;
+  if (
+    merged.downloadQuality !== 480 &&
+    merged.downloadQuality !== 720 &&
+    merged.downloadQuality !== 1080 &&
+    merged.downloadQuality !== "best"
+  ) {
+    merged.downloadQuality = DEFAULT_VIX_SETTINGS.downloadQuality;
+  }
+  if (
+    typeof merged.downloadCapMb !== "number" ||
+    !Number.isFinite(merged.downloadCapMb)
+  ) {
+    merged.downloadCapMb = DEFAULT_VIX_SETTINGS.downloadCapMb;
+  } else {
+    merged.downloadCapMb = Math.max(
+      100,
+      Math.min(32_000, merged.downloadCapMb)
+    );
+  }
 
   await db
     .insert(userSettings)

@@ -3,11 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
-import { History, MoreHorizontal, CalendarDays } from "lucide-react";
+import { Download, History, MoreHorizontal, CalendarDays } from "lucide-react";
+import { DownloadSettingsSheet } from "@/components/download-settings-sheet";
 
 /** Profile "⋯" menu: Watch history, Import data + Sign out */
 export function ProfileMenu() {
   const [open, setOpen] = useState(false);
+  const [downloadsOpen, setDownloadsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -58,6 +60,17 @@ export function ProfileMenu() {
           </Link>
           <button
             type="button"
+            onClick={() => {
+              setOpen(false);
+              setDownloadsOpen(true);
+            }}
+            className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-medium text-white hover:bg-secondary"
+          >
+            <Download className="h-4 w-4" />
+            Download settings
+          </button>
+          <button
+            type="button"
             onClick={() => signOut({ callbackUrl: "/login" })}
             className="w-full px-4 py-3 text-left text-sm font-medium text-white hover:bg-secondary"
           >
@@ -65,6 +78,10 @@ export function ProfileMenu() {
           </button>
         </div>
       )}
+      <DownloadSettingsSheet
+        open={downloadsOpen}
+        onClose={() => setDownloadsOpen(false)}
+      />
     </div>
   );
 }

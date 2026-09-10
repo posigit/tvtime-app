@@ -8,10 +8,18 @@
  *
  * Bump VERSION when changing strategies so activate() purges old caches.
  */
-const VERSION = "5";
+const VERSION = "6";
 const SHELL_CACHE = `tvtime-shell-v${VERSION}`;
 const STATIC_CACHE = `tvtime-static-v${VERSION}`;
 const IMAGE_CACHE = `tvtime-images-v${VERSION}`;
+
+/**
+ * Offline downloads live here (UNVERSIONED on purpose — bumping VERSION
+ * must never wipe saved episodes). Playlists + segments are stored under
+ * `/api/dl?playlist=<key>` / `/api/dl?u=<canonical>` keys written by the
+ * downloader; served below with manual 206 slicing for seeking.
+ */
+const DOWNLOAD_CACHE = "tvtime-downloads";
 
 const ALL_CACHES = [SHELL_CACHE, STATIC_CACHE, IMAGE_CACHE];
 
@@ -42,7 +50,10 @@ self.addEventListener("activate", (event) => {
       const keys = await caches.keys();
       await Promise.all(
         keys
-          .filter((key) => !ALL_CACHES.includes(key))
+          .filter(
+            (key) =>
+              !ALL_CACHES.includes(key) && !key.startsWith(DOWNLOAD_CACHE)
+          )
           .map((key) => caches.delete(key))
       );
       await self.clients.claim();
@@ -61,6 +72,17 @@ self.addEventListener("fetch", (event) => {
     if (isTmdbImage(url)) {
       event.respondWith(staleWhileRevalidateImage(request));
     }
+    return;
+  }
+
+  // --- Offline downloads: same-origin /api/dl serve path ---
+  // Playlist + segment URLs are pre-canonicalized by the downloader, so an
+  // exact cache lookup is correct even after signed source URLs rotate.
+  if (
+    url.origin === self.location.origin &&
+    url.pathname === "/api/dl"
+  ) {
+    event.respondWith(serveDownload(request));
     return;
   }
 
@@ -176,6 +198,66 @@ function trimCache(cacheName, maxItems) {
     const extra = keys.length - maxItems;
     await Promise.all(keys.slice(0, extra).map((key) => cache.delete(key)));
   });
+}
+
+/* ---------- Offline downloads ---------- */
+
+async function serveDownload(request) {
+  try {
+    const cache = await caches.open(DOWNLOAD_CACHE);
+    const cached = await cache.match(request);
+    if (!cached) {
+      return new Response("Download not found — it may have been removed.", {
+        status: 404,
+        headers: { "Content-Type": "text/plain" },
+      });
+    }
+    return serveRange(cached, request);
+  } catch {
+    return new Response("Offline", {
+      status: 503,
+      headers: { "Content-Type": "text/plain" },
+    });
+  }
+}
+
+/**
+ * The Cache API stores whole bodies only — slice 206 responses manually so
+ * hls.js fMP4 seeking and Safari native playback can scrub offline
+ * downloads. Segments are a few MB, so buffering is cheap.
+ */
+async function serveRange(cached, request) {
+  const range = request.headers.get("range");
+  if (!range) return cached;
+  const m = /bytes=(\d*)-(\d*)/.exec(range);
+  if (!m) return cached;
+  try {
+    const buf = await cached.arrayBuffer();
+    const total = buf.byteLength;
+    let start = m[1] === "" ? Math.max(0, total - Number(m[2] || 0)) : Number(m[1]);
+    let end = m[2] === "" ? total - 1 : Number(m[2]);
+    if (!Number.isFinite(start) || !Number.isFinite(end) || start >= total) {
+      return new Response(null, {
+        status: 416,
+        headers: { "Content-Range": `bytes */${total}` },
+      });
+    }
+    end = Math.min(end, total - 1);
+    if (end < start) {
+      return new Response(null, {
+        status: 416,
+        headers: { "Content-Range": `bytes */${total}` },
+      });
+    }
+    const slice = buf.slice(start, end + 1);
+    const headers = new Headers(cached.headers);
+    headers.set("Content-Range", `bytes ${start}-${end}/${total}`);
+    headers.set("Content-Length", String(end - start + 1));
+    headers.set("Accept-Ranges", "bytes");
+    return new Response(slice, { status: 206, headers });
+  } catch {
+    return cached;
+  }
 }
 
 /* ---------- New-episode push alerts ---------- */

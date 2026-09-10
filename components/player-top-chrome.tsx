@@ -23,6 +23,7 @@ import type {
   StreamSource,
 } from "@/lib/player-native-types";
 import { useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
 
 type PlayerTopChromeProps = {
   title: string;
@@ -86,6 +87,8 @@ type PlayerTopChromeProps = {
   onLock: () => void;
   onClose: () => void;
   onKeepChrome: () => void;
+  /** Offline download button (vix-player supplies it; null when gated off). */
+  downloadSlot?: ReactNode;
   subMenuRef: RefObject<HTMLDivElement | null>;
   audioMenuRef: RefObject<HTMLDivElement | null>;
   qualityMenuRef: RefObject<HTMLDivElement | null>;
@@ -146,6 +149,7 @@ export function PlayerTopChrome({
   onLock,
   onClose,
   onKeepChrome,
+  downloadSlot,
   subMenuRef,
   audioMenuRef,
   qualityMenuRef,
@@ -196,6 +200,7 @@ export function PlayerTopChrome({
           </p>
         </div>
         <div className="pointer-events-auto flex max-w-full shrink-0 items-center gap-1.5 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] sm:flex-wrap sm:justify-end sm:gap-2 sm:overflow-visible sm:pb-0 [&::-webkit-scrollbar]:hidden">
+          {downloadSlot}
           {(mode === "native" ||
             (mode === "iframe" && activeSource === "cinesrc")) && (
             <button

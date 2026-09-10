@@ -15,6 +15,7 @@ import {
   withCineSrcQuality,
 } from "@/lib/embed-sources";
 import { ResumeOverlay } from "@/components/resume-overlay";
+import { DownloadButton } from "@/components/download-button";
 import {
   IframeSubtitleOverlay,
   SubtitleOverlay,
@@ -107,6 +108,8 @@ export function VixPlayer({
   episode,
   autoResume = false,
   source = "vix",
+  initialPlaylistUrl = null,
+  initialSubVtt = null,
 }: {
   src: string;
   title: string;
@@ -124,6 +127,13 @@ export function VixPlayer({
   autoResume?: boolean;
   /** Stream backend: "vix" (default) or "goated". */
   source?: "vix" | "goated";
+  /**
+   * Offline playback: a cached `/api/dl?playlist=` URL served by the service
+   * worker. Skips stream resolution and forces native mode.
+   */
+  initialPlaylistUrl?: string | null;
+  /** Stored subtitle for offline playback (injected, never fetched). */
+  initialSubVtt?: { vtt: string; label: string } | null;
 }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -266,6 +276,8 @@ export function VixPlayer({
   }, [subSource]);
   /** Externally injected VTT tracks (VDRK / OpenSubtitles) so we can hide them. */
   const injectedTracksRef = useRef<TextTrack[]>([]);
+  /** Offline playback: stored VTT already injected (inject once per mount). */
+  const offlineSubInjectedRef = useRef(false);
   /** Last fetched external VTT — re-used when adjusting sync delay (no re-fetch). */
   const externalVttRef = useRef<{ vtt: string; label: string } | null>(null);
   /** Set by the native effect; lets the picker re-run subtitle loading. */
@@ -340,7 +352,11 @@ export function VixPlayer({
   // (Registered embed keys count even when they have no URL for this media
   // shape — e.g. movie-only embeds on a TV show — so we fall back to the
   // vixsrc iframe instead of running the native goated cascade.)
-  const isEmbedActive = EMBED_SOURCES.some((s) => s.key === activeSource);
+  // Offline override: a cached playlist skips resolution AND embed mode —
+  // bytes are already on-device, so native playback is always correct.
+  const offlineOverride = initialPlaylistUrl != null;
+  const isEmbedActive =
+    !offlineOverride && EMBED_SOURCES.some((s) => s.key === activeSource);
   // mode: native -> iframe -> error
   const mode = isEmbedActive
     ? iframeError
@@ -1109,6 +1125,12 @@ export function VixPlayer({
   // ---------- resolve native stream (single fetch, single source of truth) ----------
   useEffect(() => {
     if (!streamable || !tmdbId || !type) return;
+    // Offline: play the cached playlist directly, no resolution.
+    if (offlineOverride && initialPlaylistUrl) {
+      setPlaylistUrl(initialPlaylistUrl);
+      setStreamFailed(false);
+      return;
+    }
     // Embed sources have no native resolver — mode is already "iframe".
     if (isEmbedActive) return;
     let cancelled = false;
@@ -1139,7 +1161,7 @@ export function VixPlayer({
       cancelled = true;
       controller.abort();
     };
-  }, [streamable, type, tmdbId, season, episode, activeSource, isEmbedActive]);
+  }, [streamable, type, tmdbId, season, episode, activeSource, isEmbedActive, offlineOverride, initialPlaylistUrl]);
 
   // ---------- Driven-embed subtitles (VDRK / OpenSubs overlay) ----------
   // CineSrc hides its CC menu (controls=false) with no subtitle postMessage
@@ -1287,6 +1309,27 @@ export function VixPlayer({
     revertExternalSub,
     onPendingSeekSettled,
   ]);
+
+  // ---------- offline subtitles (stored VTT, never fetched) ----------
+  // The engine's own sub cascade would fail offline and surface an error —
+  // inject the downloaded track directly and clear any such error instead.
+  useEffect(() => {
+    if (!offlineOverride || !initialSubVtt) return;
+    if (mode !== "native" || !videoRef.current) return;
+    if (offlineSubInjectedRef.current) return;
+    offlineSubInjectedRef.current = true;
+    const delay = loadVixSettings().subDelaySeconds;
+    const tr = injectVttTrack(
+      videoRef.current,
+      initialSubVtt.vtt,
+      initialSubVtt.label,
+      true,
+      delay
+    );
+    if (tr) injectedTracksRef.current.push(tr);
+    setHasExternalSubs(true);
+    setSubError(null);
+  }, [mode, offlineOverride, initialSubVtt]);
 
 
   const flushPosition = useCallback(() => {
@@ -2337,6 +2380,20 @@ export function VixPlayer({
           qualityMenuRef={qualityMenuRef}
           setHlsAudioTrackRef={setHlsAudioTrackRef}
           setHlsQualityRef={setHlsQualityRef}
+          downloadSlot={
+            streamable && type && tmdbId ? (
+              <DownloadButton
+                item={{
+                  type,
+                  tmdbId,
+                  season,
+                  episode,
+                  title,
+                }}
+                variant="icon"
+              />
+            ) : undefined
+          }
         />
       )}
 

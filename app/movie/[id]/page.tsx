@@ -48,6 +48,7 @@ import { WatchProviders } from "@/components/watch-providers";
 import { CommunityReviews } from "@/components/community-reviews";
 import { ScoreStrip } from "@/components/score-strip";
 import { MovieVixButton } from "@/components/movie-vix-button";
+import { DownloadButton } from "@/components/download-button";
 import { getPlaybackPosition } from "@/lib/playback";
 
 function formatRuntime(minutes: number) {
@@ -535,6 +536,13 @@ export default async function MovieDetailPage({
             />
           )}
         </div>
+
+        {/* Offline download — null (zero space) while download mode is off. */}
+        <DownloadButton
+          variant="bar"
+          className="mt-3"
+          item={{ type: "movie", tmdbId, title: movie.title }}
+        />
 
         {isWatched && diaryDates.length > 0 && (
           <MovieDiaryLine dates={diaryDates} />

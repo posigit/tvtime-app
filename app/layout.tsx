@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { OfflinePlayerHost } from "@/components/offline-player-host";
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -41,6 +42,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full min-h-dvh bg-black text-white">
         <Providers>{children}</Providers>
+        <OfflinePlayerHost />
       </body>
     </html>
   );

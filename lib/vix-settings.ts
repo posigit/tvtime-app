@@ -58,6 +58,18 @@ export type VixSettings = {
   videoFit: "fit" | "cover" | "stretch";
   /** Iframe zoom (CSS scale crop) — cross-origin frames lack aspect APIs. */
   embedZoom: 1 | 1.25 | 1.5;
+  /**
+   * Offline-download mode. Off by default; download buttons only render
+   * while this is on (profile → Download settings).
+   */
+  downloadMode: boolean;
+  /**
+   * Preferred download height for offline copies. "best" takes the top
+   * variant the source offers (big files — desktop territory).
+   */
+  downloadQuality: 480 | 720 | 1080 | "best";
+  /** Self-imposed offline storage cap in MiB (default 950). */
+  downloadCapMb: number;
 };
 
 export const VIX_SETTINGS_KEY = "vix-settings";
@@ -84,6 +96,9 @@ export const DEFAULT_VIX_SETTINGS: VixSettings = {
   subBgBlur: "md",
   videoFit: "fit",
   embedZoom: 1,
+  downloadMode: false,
+  downloadQuality: 720,
+  downloadCapMb: 950,
 };
 
 /** Language codes that should NEVER apply as a default (hard user rule).
@@ -176,6 +191,23 @@ function clampSettings(merged: VixSettings): VixSettings {
   }
   next.autoplayNext = next.autoplayNext !== false;
   next.autoRotate = next.autoRotate !== false;
+  next.downloadMode = next.downloadMode === true;
+  if (
+    next.downloadQuality !== 480 &&
+    next.downloadQuality !== 720 &&
+    next.downloadQuality !== 1080 &&
+    next.downloadQuality !== "best"
+  ) {
+    next.downloadQuality = 720;
+  }
+  if (
+    typeof next.downloadCapMb !== "number" ||
+    !Number.isFinite(next.downloadCapMb)
+  ) {
+    next.downloadCapMb = 950;
+  } else {
+    next.downloadCapMb = Math.max(100, Math.min(32_000, next.downloadCapMb));
+  }
   return next;
 }
 
@@ -203,6 +235,8 @@ export function saveVixSettings(patch: Partial<VixSettings>) {
     delete safePatch.muted;
     const next = clampSettings({ ...loadVixSettings(), ...safePatch });
     window.localStorage.setItem(VIX_SETTINGS_KEY, JSON.stringify(next));
+    // Let live UI (download buttons, settings sheets) react without reload.
+    window.dispatchEvent(new CustomEvent("vix-settings-changed"));
     queueServerSync();
   } catch {
     /* storage unavailable — persistence is best-effort */

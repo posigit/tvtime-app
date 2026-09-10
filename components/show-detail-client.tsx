@@ -16,6 +16,7 @@ import { WatchProviders } from "@/components/watch-providers";
 import { CommunityReviews } from "@/components/community-reviews";
 import { TrailerButton } from "@/components/trailer-button";
 import { ScoreStrip } from "@/components/score-strip";
+import { DownloadButton } from "@/components/download-button";
 import { VixPlayer } from "@/components/vix-player";
 import { UpNextCard } from "@/components/up-next-card";
 import { EndOfLineCard } from "@/components/end-of-line-card";
@@ -1256,6 +1257,17 @@ export function ShowDetailClient({
                                 <Play className="h-3.5 w-3.5 fill-current" />
                               </button>
                             )}
+                            <DownloadButton
+                              variant="icon"
+                              item={{
+                                type: "tv",
+                                tmdbId: show.tmdbId,
+                                season: ep.seasonNumber,
+                                episode: ep.episodeNumber,
+                                title: `${show.title} — S${ep.seasonNumber}E${ep.episodeNumber}`,
+                                subtitle: ep.title,
+                              }}
+                            />
                             <button
                               onClick={() => handleEpisodeToggle(ep, !watched)}
                               disabled={!aired && !watched}

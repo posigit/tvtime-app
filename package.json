@@ -24,6 +24,7 @@
     "csv-parse": "^7.0.1",
     "drizzle-orm": "^0.45.2",
     "hls.js": "^1.6.16",
+    "idb-keyval": "^6.3.0",
     "lucide-react": "^1.24.0",
     "next": "16.2.10",
     "next-auth": "^5.0.0-beta.31",
