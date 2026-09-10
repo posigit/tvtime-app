@@ -45,18 +45,18 @@ export function MovieVixButton({
           completionRef.current = false;
           setOpen(true);
         }}
-        className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-[1.25rem] bg-white/[0.08] px-4 py-3 text-center text-white shadow-[0_8px_24px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.15)] ring-1 ring-white/15 backdrop-blur-xl transition hover:bg-white/[0.12] active:scale-[0.99]"
+        className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-2xl bg-white/[0.09] px-4 py-2.5 text-center text-white shadow-[0_8px_24px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.15)] ring-1 ring-white/15 backdrop-blur-xl transition hover:bg-white/[0.13] active:scale-[0.99]"
       >
         {/* hairline top highlight — the only "sheen", kept faint */}
         <span
           aria-hidden
           className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent"
         />
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.14] text-white ring-1 ring-white/25 backdrop-blur-xl transition group-hover:bg-white/[0.2]">
-          <Play className="h-4 w-4 fill-current" />
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/[0.14] text-white ring-1 ring-white/25 backdrop-blur-xl transition group-hover:bg-white/[0.2]">
+          <Play className="h-3.5 w-3.5 fill-current" />
         </span>
         <span className="min-w-0">
-          <span className="block text-sm font-black">
+          <span className="block text-[13px] font-black leading-none">
             {resume ? "Resume" : isWatched ? "Rewatch now" : "Watch now"}
           </span>
           {resume?.timeLeft && (
