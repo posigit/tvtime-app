@@ -10,10 +10,7 @@ function formatDiaryDate(d: Date): string {
   });
 }
 
-/**
- * Letterboxd-diary style provenance line under the actions:
- * "Watched ×3 · First Jan 2021 · Last Fri" + last-3 date chips.
- */
+/** Letterboxd-diary style: "Watched ×3 · Aug 30 · Sep 4" — last-3 chips only. */
 export function MovieDiaryLine({
   dates,
 }: {
@@ -23,8 +20,6 @@ export function MovieDiaryLine({
   if (dates.length === 0) return null;
   const sorted = [...dates].sort((a, b) => b.getTime() - a.getTime());
   const count = sorted.length;
-  const first = sorted[sorted.length - 1];
-  const last = sorted[0];
 
   return (
     <div className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1.5 px-1">
@@ -37,17 +32,6 @@ export function MovieDiaryLine({
         {count >= 2 ? `Watched ×${count}` : "Watched once"}
       </span>
       <span className="text-[11px] text-white/30">·</span>
-      <span className="text-[11px] font-medium text-white/45">
-        First {formatDiaryDate(first)}
-      </span>
-      {count >= 2 && (
-        <>
-          <span className="text-[11px] text-white/30">·</span>
-          <span className="text-[11px] font-medium text-white/45">
-            Last {formatDiaryDate(last)}
-          </span>
-        </>
-      )}
       {sorted.slice(0, 3).map((d, i) => (
         <span
           key={`${d.getTime()}-${i}`}
