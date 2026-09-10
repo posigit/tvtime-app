@@ -81,8 +81,8 @@ export function ReactionPicker({
               "flex items-center justify-center rounded-full transition-all",
               size === "md" ? "h-9 w-9 text-lg" : "h-8 w-8 text-base",
               on
-                ? "bg-success/20 ring-1 ring-success"
-                : "bg-card ring-1 ring-white/10 hover:bg-secondary",
+                ? "bg-success/20 ring-1 ring-success shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]"
+                : "bg-white/[0.08] ring-1 ring-white/15 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] hover:bg-white/20",
               pendingKey !== null && "opacity-60"
             )}
           >

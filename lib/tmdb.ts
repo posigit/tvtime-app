@@ -120,18 +120,40 @@ export async function getTvSeason(tmdbId: number, seasonNumber: number) {
   }>(`/tv/${tmdbId}/season/${seasonNumber}`);
 }
 
-export async function getMovieDetails(tmdbId: number) {
-  return tmdbFetch<{
-    id: number;
-    title: string;
-    overview?: string;
-    poster_path?: string;
-    backdrop_path?: string;
-    release_date?: string;
-    runtime?: number;
-    status?: string;
-    vote_average?: number;
-  }>(`/movie/${tmdbId}`);
+export type TmdbGenre = { id: number; name: string };
+
+export type TmdbCompany = {
+  id: number;
+  name: string;
+  logo_path?: string | null;
+  origin_country?: string;
+};
+
+export type MovieDetails = {
+  id: number;
+  title: string;
+  overview?: string;
+  tagline?: string;
+  poster_path?: string;
+  backdrop_path?: string;
+  release_date?: string;
+  runtime?: number;
+  status?: string;
+  vote_average?: number;
+  vote_count?: number;
+  budget?: number;
+  revenue?: number;
+  imdb_id?: string | null;
+  original_language?: string;
+  adult?: boolean;
+  genres?: TmdbGenre[];
+  production_companies?: TmdbCompany[];
+};
+
+export async function getMovieDetails(
+  tmdbId: number
+): Promise<MovieDetails> {
+  return tmdbFetch<MovieDetails>(`/movie/${tmdbId}`);
 }
 
 export type TmdbCrewMember = {
@@ -663,6 +685,101 @@ export async function getWatchProviders(
     rent: mapProviders(entry.rent),
     buy: mapProviders(entry.buy),
   };
+}
+
+export type TmdbLogo = {
+  file_path: string;
+  iso_639_1?: string | null;
+  width?: number;
+  height?: number;
+  vote_average?: number;
+  vote_count?: number;
+};
+
+export function logoUrl(
+  path: string | null | undefined,
+  size: "w154" | "w185" | "w300" | "w500" | "original" = "w500"
+) {
+  if (!path) return null;
+  return `${TMDB_IMAGE_BASE_URL}/${size}${path}`;
+}
+
+/**
+ * Title treatments in the film's original font (TMDB /movie/{id}/images).
+ * Prefer English artwork with the most votes, fall back to anything.
+ */
+export async function getMovieImages(tmdbId: number): Promise<{
+  logos: TmdbLogo[];
+}> {
+  const data = await tmdbFetch<{ logos?: TmdbLogo[] }>(
+    `/movie/${tmdbId}/images`,
+    {},
+    { revalidate: 86400 }
+  );
+  return { logos: data.logos ?? [] };
+}
+
+export function pickMovieLogo(logos: TmdbLogo[] | null | undefined): string | null {
+  if (!logos?.length) return null;
+  const ranked = [...logos].sort(
+    (a, b) => (b.vote_count ?? 0) - (a.vote_count ?? 0)
+  );
+  const en = ranked.find((l) => l.iso_639_1 === "en");
+  return (en ?? ranked[0]).file_path ?? null;
+}
+
+export type TmdbReleaseInfo = {
+  certification?: string;
+  iso_639_1?: string | null;
+  note?: string;
+  release_date?: string;
+  type?: number;
+};
+
+export type TmdbReleaseCountry = {
+  iso_3166_1: string;
+  release_dates: TmdbReleaseInfo[];
+};
+
+/**
+ * Parental-guide source: /movie/{id}/release_dates.
+ * Prefers US theatrical, then the app region, then anything rated.
+ */
+export async function getMovieReleaseDates(
+  tmdbId: number
+): Promise<TmdbReleaseCountry[]> {
+  const data = await tmdbFetch<{ results?: TmdbReleaseCountry[] }>(
+    `/movie/${tmdbId}/release_dates`,
+    {},
+    { revalidate: 86400 }
+  );
+  return data.results ?? [];
+}
+
+export function pickCertification(
+  countries: TmdbReleaseCountry[] | null | undefined,
+  region?: string
+): { code: string; country: string } | null {
+  if (!countries?.length) return null;
+  const wanted = [region?.toUpperCase(), "US"].filter(Boolean) as string[];
+  const byIso = new Map(countries.map((c) => [c.iso_3166_1, c]));
+  const ordered = [
+    ...wanted.map((iso) => byIso.get(iso)).filter(Boolean),
+    ...countries,
+  ] as TmdbReleaseCountry[];
+  for (const entry of ordered) {
+    const rated = (entry.release_dates ?? []).filter(
+      (r) => r.certification && r.certification.trim().length > 0
+    );
+    if (rated.length === 0) continue;
+    // Theatrical (3) first, then digital (4), premiere (1), limited (2)…
+    rated.sort((a, b) => {
+      const rank = (t?: number) => (t === 3 ? 0 : t === 4 ? 1 : 2);
+      return rank(a.type) - rank(b.type);
+    });
+    return { code: rated[0].certification!.trim(), country: entry.iso_3166_1 };
+  }
+  return null;
 }
 
 export function providerLogoUrl(path: string | null | undefined) {

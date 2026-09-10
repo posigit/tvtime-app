@@ -117,6 +117,7 @@ export function MovieWatchButton({
   }
 
   // ----- full: detail page state controls stay secondary to playback -----
+  // Active states pick up the page theme (--theme set by detail pages).
   const inMyList = status === "want_to_watch";
   const watched = status === "watched";
   return (
@@ -131,10 +132,10 @@ export function MovieWatchButton({
       >
         <span
           className={cn(
-            "flex h-11 w-11 items-center justify-center rounded-full transition group-active:scale-[0.94]",
+            "flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-xl transition group-active:scale-[0.94]",
             inMyList
-              ? "bg-primary text-black"
-              : "bg-white/[0.07] text-white/75 ring-1 ring-white/15 hover:bg-white/[0.12] hover:text-white"
+              ? "bg-[rgb(var(--theme)/0.9)] text-white ring-1 ring-white/40 shadow-[0_8px_24px_rgb(var(--theme)/0.55),inset_0_1px_0_rgba(255,255,255,0.45)]"
+              : "bg-white/[0.1] text-white/80 ring-1 ring-white/25 shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.25)] hover:bg-white/20 hover:text-white"
           )}
         >
           {inMyList ? (
@@ -157,10 +158,10 @@ export function MovieWatchButton({
       >
         <span
           className={cn(
-            "flex h-11 w-11 items-center justify-center rounded-full transition group-active:scale-[0.94]",
+            "flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-xl transition group-active:scale-[0.94]",
             watched
-              ? "bg-primary text-black"
-              : "bg-white/[0.07] text-white/75 ring-1 ring-white/15 hover:bg-white/[0.12] hover:text-white"
+              ? "bg-[rgb(var(--theme)/0.9)] text-white ring-1 ring-white/40 shadow-[0_8px_24px_rgb(var(--theme)/0.55),inset_0_1px_0_rgba(255,255,255,0.45)]"
+              : "bg-white/[0.1] text-white/80 ring-1 ring-white/25 shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.25)] hover:bg-white/20 hover:text-white"
           )}
         >
           <Check className="h-4 w-4" strokeWidth={3} />

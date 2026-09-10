@@ -14,6 +14,7 @@ import { formatPlaybackTime } from "@/lib/playback-format";
  * Auto-marks the movie watched when playback ends; when the movie is already
  * watched (e.g. a queued rewatch), finishing logs a rewatch stamp instead.
  * When a saved position exists, becomes a "Resume · time left" CTA.
+ * Liquid-glass pill tinted by the page theme (--theme set by detail pages).
  */
 export function MovieVixButton({
   tmdbId,
@@ -44,9 +45,14 @@ export function MovieVixButton({
           completionRef.current = false;
           setOpen(true);
         }}
-        className="group relative flex w-full items-center justify-center gap-3 rounded-2xl bg-primary px-4 py-3 text-center text-black transition hover:bg-primary/90 active:scale-[0.99]"
+        className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-[1.25rem] bg-[rgb(var(--theme)/0.26)] px-4 py-3 text-center text-white shadow-[0_12px_32px_rgb(var(--theme)/0.35),inset_0_1px_0_rgba(255,255,255,0.35)] ring-1 ring-white/30 backdrop-blur-2xl transition hover:bg-[rgb(var(--theme)/0.36)] active:scale-[0.99]"
       >
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black text-primary transition group-hover:scale-105">
+        {/* liquid-glass sheen across the top edge */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-6 top-0 h-1/2 rounded-b-full bg-gradient-to-b from-white/40 to-transparent opacity-70"
+        />
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--theme)/0.9)] text-white shadow-[0_0_20px_rgb(var(--theme)/0.6)] transition group-hover:scale-105">
           <Play className="h-4 w-4 fill-current" />
         </span>
         <span className="min-w-0">
@@ -54,15 +60,15 @@ export function MovieVixButton({
             {resume ? "Resume" : isWatched ? "Rewatch now" : "Watch now"}
           </span>
           {resume?.timeLeft && (
-            <span className="mt-0.5 block text-xs font-semibold text-black/60">
+            <span className="mt-0.5 block text-xs font-semibold text-white/60">
               {resume.timeLeft} remaining
             </span>
           )}
         </span>
         {resume && (
-          <span className="absolute right-4 flex h-1.5 w-14 shrink-0 overflow-hidden rounded-full bg-black/20">
+          <span className="absolute right-4 flex h-1.5 w-14 shrink-0 overflow-hidden rounded-full bg-white/20">
             <span
-              className="block h-full rounded-full bg-black"
+              className="block h-full rounded-full bg-white"
               style={{ width: `${playback?.progressPercent ?? 0}%` }}
             />
           </span>

@@ -9,6 +9,7 @@ import { useToast } from "@/components/toast";
 /**
  * Compact favorite toggle (round heart icon). Persists via /api/favorite.
  * Rendered only once the user has actually watched/consumed the title.
+ * Liquid-glass circle; glows pink when active.
  */
 export function FavoriteButton({
   mediaType,
@@ -58,10 +59,10 @@ export function FavoriteButton({
       aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
       title={favorite ? "Remove from favorites" : "Add to favorites"}
       className={cn(
-        "flex h-9 w-9 items-center justify-center rounded-full transition-colors disabled:opacity-50",
+        "flex h-9 w-9 items-center justify-center rounded-full backdrop-blur-xl transition-all active:scale-90 disabled:opacity-50",
         favorite
-          ? "bg-primary text-black"
-          : "bg-black/60 text-white ring-1 ring-white/20 backdrop-blur hover:bg-black/80"
+          ? "bg-pink-500/25 text-pink-400 ring-1 ring-pink-400/50 shadow-[0_8px_24px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.3)]"
+          : "bg-white/[0.12] text-white ring-1 ring-white/30 shadow-[0_8px_24px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.25)] hover:bg-white/25"
       )}
     >
       <Heart

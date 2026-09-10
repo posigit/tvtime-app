@@ -84,10 +84,10 @@ export function MovieRewatchButton({
         aria-label={queued ? "Queued for rewatch" : "Rewatch movie"}
         title={queued ? "Queued for rewatch" : "Rewatch movie"}
         className={cn(
-          "flex h-9 flex-shrink-0 items-center gap-1.5 rounded-full px-3 ring-1 transition-colors disabled:opacity-50",
+          "flex h-9 flex-shrink-0 items-center gap-1.5 rounded-full px-3 ring-1 backdrop-blur-xl transition-all active:scale-95 disabled:opacity-50",
           queued
-            ? "bg-primary text-black ring-primary"
-            : "bg-card text-white ring-white/15 hover:bg-secondary"
+            ? "bg-primary text-black ring-white/40 shadow-[0_8px_24px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.5)]"
+            : "bg-white/[0.1] text-white ring-white/25 shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.25)] hover:bg-white/20"
         )}
       >
         {queued ? (

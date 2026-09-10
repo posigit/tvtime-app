@@ -210,6 +210,28 @@
     height: calc(18rem + env(safe-area-inset-top, 0px));
   }
 
+  /**
+   * Liquid-glass panel — frosted surface with an inset top highlight.
+   * Use for detail-page cards (facts, studios, trailer frame) so controls
+   * floating over artwork stay readable without solid fills.
+   * Picks up the page theme when `--theme` is set (movie detail pages),
+   * falling back to a neutral frost elsewhere.
+   */
+  .glass-panel {
+    background: linear-gradient(
+      160deg,
+      rgb(var(--theme, 255 255 255) / 0.13),
+      rgba(255, 255, 255, 0.04) 55%,
+      rgb(var(--theme, 255 255 255) / 0.07)
+    );
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow:
+      0 12px 32px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+
   /** Profile banner under status bar (base h-44 = 11rem) */
   .h-profile-hero {
     height: calc(11rem + env(safe-area-inset-top, 0px));

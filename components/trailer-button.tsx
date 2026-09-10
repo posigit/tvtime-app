@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
  * ▶ Trailer link — opens YouTube directly (YouTube app on phones).
  * Plain anchor: no modal, no embed, nothing to stutter.
  * Renders nothing when no trailer key is available.
+ * Liquid-glass pill so it sits cleanly over artwork.
  */
 export function TrailerButton({
   trailerKey,
@@ -24,7 +25,7 @@ export function TrailerButton({
       rel="noopener noreferrer"
       aria-label={`Watch ${title} trailer on YouTube`}
       className={cn(
-        "flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-wide text-white ring-1 ring-white/15 backdrop-blur transition hover:bg-white/20 active:scale-95",
+        "flex items-center gap-1.5 rounded-full bg-white/[0.14] px-4 py-2 text-xs font-black uppercase tracking-wide text-white ring-1 ring-white/30 shadow-[0_8px_24px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.35)] backdrop-blur-xl transition hover:bg-white/25 active:scale-95",
         className
       )}
     >
