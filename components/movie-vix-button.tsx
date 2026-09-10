@@ -14,7 +14,7 @@ import { formatPlaybackTime } from "@/lib/playback-format";
  * Auto-marks the movie watched when playback ends; when the movie is already
  * watched (e.g. a queued rewatch), finishing logs a rewatch stamp instead.
  * When a saved position exists, becomes a "Resume · time left" CTA.
- * Liquid-glass pill tinted by the page theme (--theme set by detail pages).
+ * True liquid glass: neutral frost, hairline highlight, no heavy sheen.
  */
 export function MovieVixButton({
   tmdbId,
@@ -45,14 +45,14 @@ export function MovieVixButton({
           completionRef.current = false;
           setOpen(true);
         }}
-        className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-[1.25rem] bg-[rgb(var(--theme)/0.26)] px-4 py-3 text-center text-white shadow-[0_12px_32px_rgb(var(--theme)/0.35),inset_0_1px_0_rgba(255,255,255,0.35)] ring-1 ring-white/30 backdrop-blur-2xl transition hover:bg-[rgb(var(--theme)/0.36)] active:scale-[0.99]"
+        className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-[1.25rem] bg-white/[0.08] px-4 py-3 text-center text-white shadow-[0_8px_24px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.15)] ring-1 ring-white/15 backdrop-blur-xl transition hover:bg-white/[0.12] active:scale-[0.99]"
       >
-        {/* liquid-glass sheen across the top edge */}
+        {/* hairline top highlight — the only "sheen", kept faint */}
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-x-6 top-0 h-1/2 rounded-b-full bg-gradient-to-b from-white/40 to-transparent opacity-70"
+          className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent"
         />
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--theme)/0.9)] text-white shadow-[0_0_20px_rgb(var(--theme)/0.6)] transition group-hover:scale-105">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.14] text-white ring-1 ring-white/25 backdrop-blur-xl transition group-hover:bg-white/[0.2]">
           <Play className="h-4 w-4 fill-current" />
         </span>
         <span className="min-w-0">

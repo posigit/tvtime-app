@@ -1,14 +1,11 @@
 import { cn } from "@/lib/utils";
-import {
-  FreshIcon,
-  RottenIcon,
-  PopcornIcon,
-  TmdbIcon,
-} from "@/components/rt-icons";
+import { TmdbIcon } from "@/components/rt-icons";
 
 /**
  * Horizontal strip of critic/audience scores for detail pages.
  * Renders only the scores that exist; hidden entirely when none do.
+ * Uses the same emoji treatment as series detail (🍅 / 🍿) — the custom
+ * SVG tomato/popcorn buckets rendered muddy at small sizes.
  */
 export function ScoreStrip({
   rtScore,
@@ -31,12 +28,11 @@ export function ScoreStrip({
   if (rtScore != null && rtScore >= 0) {
     cells.push({
       key: "rt",
-      icon:
-        rtScore >= 60 ? (
-          <FreshIcon className="h-7 w-7" />
-        ) : (
-          <RottenIcon className="h-7 w-7" />
-        ),
+      icon: (
+        <span className="text-xl leading-none" title="Rotten Tomatoes">
+          🍅
+        </span>
+      ),
       value: `${rtScore}%`,
       label: "Tomatometer",
     });
@@ -44,7 +40,11 @@ export function ScoreStrip({
   if (rtAudienceScore != null && rtAudienceScore >= 0) {
     cells.push({
       key: "aud",
-      icon: <PopcornIcon className="h-7 w-7" />,
+      icon: (
+        <span className="text-xl leading-none" title="Popcornmeter">
+          🍿
+        </span>
+      ),
       value: `${rtAudienceScore}%`,
       label: "Popcornmeter",
     });

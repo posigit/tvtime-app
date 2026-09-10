@@ -41,14 +41,13 @@ import { MovieWatchButton } from "@/components/movie-watch-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { MovieRewatchButton } from "@/components/movie-rewatch-button";
 import { MovieDiaryLine } from "@/components/movie-diary-line";
-import { ReactionPicker } from "@/components/reaction-picker";
+// import { ReactionPicker } from "@/components/reaction-picker"; // hidden for now
 import { MovieRating } from "@/components/star-rating";
 import { DiscoverRail } from "@/components/discover-rail";
 import { WatchProviders } from "@/components/watch-providers";
 import { CommunityReviews } from "@/components/community-reviews";
 import { ScoreStrip } from "@/components/score-strip";
 import { MovieVixButton } from "@/components/movie-vix-button";
-import { FreshIcon, RottenIcon } from "@/components/rt-icons";
 import { getPlaybackPosition } from "@/lib/playback";
 
 function formatRuntime(minutes: number) {
@@ -360,6 +359,14 @@ export default async function MovieDetailPage({
               fill
               sizes="100vw"
               className="object-cover"
+              style={{
+                // Feather the bottom edge so the art dissolves into the page
+                // instead of cutting off at the container boundary.
+                maskImage:
+                  "linear-gradient(to bottom, black 50%, transparent 99%)",
+                WebkitMaskImage:
+                  "linear-gradient(to bottom, black 50%, transparent 99%)",
+              }}
               unoptimized
               priority
             />
@@ -380,10 +387,10 @@ export default async function MovieDetailPage({
           />
           <div
             aria-hidden
-            className="absolute inset-x-0 bottom-0 h-[45%]"
+            className="absolute inset-x-0 bottom-0 h-[65%]"
             style={{
               background:
-                "radial-gradient(90% 100% at 50% 100%, rgb(var(--theme) / 0.4), transparent 70%), linear-gradient(to top, #000 4%, transparent)",
+                "radial-gradient(90% 100% at 50% 100%, rgb(var(--theme) / 0.4), transparent 70%), linear-gradient(to top, #000 22%, rgb(0 0 0 / 0.65) 52%, transparent)",
             }}
           />
 
@@ -408,7 +415,7 @@ export default async function MovieDetailPage({
           </div>
         </div>
 
-        <div className="relative px-4">
+        <div className="relative px-4 pb-5">
           {/* Poster card overlapping the backdrop fade (~50% width) */}
           <div className="mx-auto -mt-28 w-[50%] max-w-[220px]">
             <div className="relative aspect-[2/3] overflow-hidden rounded-[1.75rem] shadow-[0_24px_80px_-16px_rgb(var(--theme)/0.6),0_10px_30px_rgba(0,0,0,0.6)] ring-1 ring-white/25">
@@ -471,11 +478,9 @@ export default async function MovieDetailPage({
             ) : null}
             {heroRt != null ? (
               <span className="inline-flex items-center gap-1 text-sm font-bold text-white/85">
-                {heroRt >= 60 ? (
-                  <FreshIcon className="h-4 w-4" />
-                ) : (
-                  <RottenIcon className="h-4 w-4" />
-                )}
+                <span className="text-xl leading-none" title="Rotten Tomatoes">
+                  🍅
+                </span>
                 {heroRt}%
               </span>
             ) : movie.voteAverage ? (
@@ -532,6 +537,7 @@ export default async function MovieDetailPage({
           <MovieDiaryLine dates={diaryDates} />
         )}
 
+        {/* Reactions hidden for now — emoji row felt noisy next to scores.
         <div className="mt-3">
           <ReactionPicker
             size="md"
@@ -539,6 +545,7 @@ export default async function MovieDetailPage({
             initialKeys={movieReactionKeys}
           />
         </div>
+        */}
 
         {/* Critic + audience scores in frosted glass */}
         <div className="glass-panel mt-4 overflow-hidden rounded-3xl">
