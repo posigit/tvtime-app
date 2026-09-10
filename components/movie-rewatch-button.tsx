@@ -86,12 +86,12 @@ export function MovieRewatchButton({
         className={cn(
           "flex h-9 flex-shrink-0 items-center gap-1.5 rounded-full px-3 ring-1 backdrop-blur-xl transition-all active:scale-95 disabled:opacity-50",
           queued
-            ? "bg-primary text-black ring-white/40 shadow-[0_8px_24px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.5)]"
+            ? "bg-white/[0.14] text-white ring-white/35 shadow-[0_8px_24px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.35)]"
             : "bg-white/[0.1] text-white ring-white/25 shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.25)] hover:bg-white/20"
         )}
       >
         {queued ? (
-          <Check className="h-4 w-4" strokeWidth={3} />
+          <Check className="h-4 w-4 text-primary" strokeWidth={3} />
         ) : (
           <RotateCcw className="h-4 w-4" strokeWidth={2.5} />
         )}
@@ -122,27 +122,11 @@ export function MovieRewatchButton({
           onClick={() => pendingMode === null && setOpen(false)}
         >
           <div
-            className="w-full max-w-sm rounded-2xl bg-card p-5"
+            className="w-full max-w-sm rounded-[1.75rem] bg-[#1c1c1e]/80 p-5 shadow-[0_24px_64px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.12)] ring-1 ring-white/15 backdrop-blur-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="mb-1 text-lg font-black text-white">
+            <p className="mb-4 text-lg font-black text-white">
               {queued ? "Queued for rewatch" : "Rewatch this?"}
-            </p>
-            <p className="mb-4 text-[13px] leading-relaxed text-muted-foreground">
-              {queued ? (
-                <>
-                  It&apos;s sitting in <b className="text-white">Watch Next</b>{" "}
-                  with a Rewatch badge — screenshot away. Finish it to log{" "}
-                  <b className="text-white">×{count + 1}</b>, or log it now.
-                </>
-              ) : (
-                <>
-                  <b className="text-white">Plan it</b> to resurface in Watch
-                  Next (rating + history stay), or{" "}
-                  <b className="text-white">log it now</b> if you just finished
-                  it{count >= 1 ? ` — badge becomes ×${count + 1}` : ""}.
-                </>
-              )}
             </p>
             <div className="space-y-2">
               {!queued && (
@@ -150,49 +134,37 @@ export function MovieRewatchButton({
                   type="button"
                   onClick={() => run("queue")}
                   disabled={pendingMode !== null}
-                  className="flex w-full items-center gap-3 rounded-xl bg-primary px-4 py-3 text-left text-sm font-black text-black disabled:opacity-50"
+                  className="flex w-full items-center gap-3 rounded-2xl bg-white/[0.12] px-4 py-3.5 text-left text-sm font-black text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] ring-1 ring-white/25 backdrop-blur-xl transition active:scale-[0.99] hover:bg-white/[0.18] disabled:opacity-50"
                 >
-                  <BookmarkPlus className="h-5 w-5" strokeWidth={2.5} />
-                  <span>
-                    Plan rewatch
-                    <span className="block text-[11px] font-semibold text-black/60">
-                      Back to Watch Next · no date stamped
-                    </span>
-                  </span>
+                  <BookmarkPlus
+                    className="h-5 w-5 shrink-0 text-primary"
+                    strokeWidth={2.5}
+                  />
+                  {pendingMode === "queue" ? "Planning…" : "Plan rewatch"}
                 </button>
               )}
               <button
                 type="button"
                 onClick={() => run("log")}
                 disabled={pendingMode !== null}
-                className={cn(
-                  "flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-bold",
-                  queued
-                    ? "bg-primary text-black"
-                    : "bg-secondary text-white hover:bg-white/10"
-                )}
+                className="flex w-full items-center gap-3 rounded-2xl bg-white/[0.07] px-4 py-3.5 text-left text-sm font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] ring-1 ring-white/15 backdrop-blur-xl transition active:scale-[0.99] hover:bg-white/[0.12] disabled:opacity-50"
               >
-                <History className="h-5 w-5" strokeWidth={2.5} />
-                <span>
-                  {pendingMode === "log" ? "Logging…" : "Log rewatch now"}
-                  <span
-                    className={cn(
-                      "block text-[11px] font-semibold",
-                      queued ? "text-black/60" : "text-white/50"
-                    )}
-                  >
-                    Stamps today · resume resets · ×{count + 1}
-                  </span>
-                </span>
+                <History
+                  className="h-5 w-5 shrink-0 text-white/80"
+                  strokeWidth={2.5}
+                />
+                {pendingMode === "log" ? "Logging…" : "Log rewatch now"}
               </button>
               {queued && (
                 <button
                   type="button"
                   onClick={() => run("unqueue")}
                   disabled={pendingMode !== null}
-                  className="w-full rounded-full border border-white/20 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                  className="w-full rounded-full py-3 text-sm font-semibold text-white/60 transition hover:text-white disabled:opacity-50"
                 >
-                  Remove from queue
+                  {pendingMode === "unqueue"
+                    ? "Removing…"
+                    : "Remove from queue"}
                 </button>
               )}
               {!queued && (
@@ -200,7 +172,7 @@ export function MovieRewatchButton({
                   type="button"
                   onClick={() => setOpen(false)}
                   disabled={pendingMode !== null}
-                  className="w-full rounded-full border border-white/20 py-3 text-sm font-medium text-white"
+                  className="w-full rounded-full py-2.5 text-sm font-medium text-white/60 transition hover:text-white"
                 >
                   Cancel
                 </button>

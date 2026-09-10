@@ -270,9 +270,9 @@ export function WatchLaterTools({
           type="button"
           onClick={surprise}
           disabled={poolAll.length === 0}
-          className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-black uppercase tracking-wide text-black active:scale-95 disabled:opacity-40"
+          className="flex items-center gap-1.5 rounded-full bg-white/[0.1] px-4 py-2 text-xs font-black uppercase tracking-wide text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] ring-1 ring-white/25 backdrop-blur-xl transition active:scale-95 hover:bg-white/[0.16] disabled:opacity-40"
         >
-          <Shuffle className="h-3.5 w-3.5" />
+          <Shuffle className="h-3.5 w-3.5 text-primary" />
           {pick ? "Surprise again" : "Surprise me"}
         </button>
         <p className="max-w-xs text-center text-[10px] leading-snug text-muted-foreground">

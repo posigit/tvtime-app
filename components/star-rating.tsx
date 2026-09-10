@@ -210,12 +210,10 @@ export function MovieRating({
       </div>
       <div className="flex items-center gap-3">
         <StarRatingInput value={rating} onChange={save} disabled={pending} />
-        {rating != null ? (
+        {rating != null && (
           <span className="min-w-[3rem] text-center text-lg font-black tabular-nums text-primary">
             {formatStars(rating)}
           </span>
-        ) : (
-          <span className="text-xs text-white/35">Tap a star · halves count</span>
         )}
       </div>
       {rating != null && (

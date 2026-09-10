@@ -221,6 +221,7 @@ function MovieList({ items }: { items: MovieRow[] }) {
                 favorite={movie.favorite}
                 rewatchCount={movie.rewatchCount}
                 rewatchQueued={movie.rewatchQueued}
+                compact
               />
             </div>
             <div className="min-w-0 flex-1 py-0.5">

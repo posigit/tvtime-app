@@ -512,12 +512,6 @@ export default async function MovieDetailPage({
           playback={playback}
         />
 
-        {isWatched && isRewatchQueued && (
-          <p className="mt-2 rounded-xl bg-primary/10 px-3 py-2 text-center text-[11px] font-bold text-primary ring-1 ring-primary/30">
-            Queued for rewatch · sitting in Watch Next
-          </p>
-        )}
-
         <div className="mt-3 flex items-center gap-3">
           <div className="flex-1">
             <MovieWatchButton
