@@ -34,9 +34,9 @@ import { ProfileTaste } from "@/components/profile-taste";
 import { ProfileYearRecap } from "@/components/profile-year-recap";
 import { StarRatingDisplay } from "@/components/star-rating";
 import { PosterBadges } from "@/components/poster-badges";
-import { FridayShareButton } from "@/components/friday-share";
 import { ProfilePlaybackShelf } from "@/components/recent-streams";
 import { getContinueWatching, getWatchHistory } from "@/lib/playback";
+import { timed, perfLog, perfStart } from "@/lib/perf";
 import {
   aggregateGenres,
   currentStreak as calcCurrentStreak,
@@ -58,12 +58,10 @@ function SectionHeader({
   title,
   href,
   heart,
-  action,
 }: {
   title: string;
   href?: string;
   heart?: boolean;
-  action?: React.ReactNode;
 }) {
   const inner = (
     <div className="flex items-center gap-2.5">
@@ -76,25 +74,14 @@ function SectionHeader({
     </div>
   );
 
-  if (!href && !action) {
+  if (!href) {
     return <div className="mb-3">{inner}</div>;
   }
-  if (!href) {
-    return (
-      <div className="mb-3 flex items-center justify-between">
-        {inner}
-        {action}
-      </div>
-    );
-  }
   return (
-    <div className="mb-3 flex items-center justify-between">
-      <Link href={href} className="flex flex-1 items-center justify-between">
-        {inner}
-        <ChevronRight className="h-5 w-5 text-muted-foreground" />
-      </Link>
-      {action && <div className="ml-2">{action}</div>}
-    </div>
+    <Link href={href} className="mb-3 flex items-center justify-between">
+      {inner}
+      <ChevronRight className="h-5 w-5 text-muted-foreground" />
+    </Link>
   );
 }
 
@@ -290,13 +277,8 @@ function CaptionedRail({ items }: { items: RailItem[] }) {
               {item.title}
             </p>
             {item.rating != null && item.rating > 0 ? (
-              <div className="mt-0.5 flex items-center gap-1">
+              <div className="mt-0.5 flex items-center gap-0.5">
                 <StarRatingDisplay value={item.rating} size={11} />
-                {item.rewatchCount != null && item.rewatchCount >= 2 && (
-                  <span className="text-[9px] font-black text-success">
-                    ×{item.rewatchCount}
-                  </span>
-                )}
               </div>
             ) : (
               <p
@@ -305,9 +287,7 @@ function CaptionedRail({ items }: { items: RailItem[] }) {
                   item.subAccent ? "text-primary" : "text-muted-foreground"
                 )}
               >
-                {item.rewatchCount != null && item.rewatchCount >= 2
-                  ? `⟳ ×${item.rewatchCount} · ${item.sub}`
-                  : item.sub}
+                {item.sub}
               </p>
             )}
           </div>
@@ -320,108 +300,139 @@ function CaptionedRail({ items }: { items: RailItem[] }) {
 // ---------- page ----------
 
 export default async function ProfilePage() {
+  const pageStart = perfStart();
   const userId = await requireAuth();
   const session = await auth();
 
-  // ----- stats data -----
-  const [episodeCount] = await db
-    .select({ value: count() })
-    .from(watchedEpisodes)
-    .where(eq(watchedEpisodes.userId, userId));
-
-  const [tvRuntime] = await db
-    .select({ value: sql<number>`COALESCE(SUM(${shows.episodeRuntime}), 0)` })
-    .from(watchedEpisodes)
-    .innerJoin(shows, eq(watchedEpisodes.showTmdbId, shows.tmdbId))
-    .where(eq(watchedEpisodes.userId, userId));
-
-  const [moviesWatched] = await db
-    .select({
-      value: count(),
-      minutes: sql<number>`COALESCE(SUM(${movies.runtime}), 0)`,
-    })
-    .from(userMovies)
-    .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
-    .where(and(eq(userMovies.userId, userId), eq(userMovies.status, "watched")));
-
-  const [showCount] = await db
-    .select({ value: count() })
-    .from(userShows)
-    .where(eq(userShows.userId, userId));
-
-  const [movieTotal] = await db
-    .select({ value: count() })
-    .from(userMovies)
-    .where(eq(userMovies.userId, userId));
-
-  const [continueWatching, recentStreams] = await Promise.all([
-    withDbRetry(() => getContinueWatching(userId, 10)).catch(() => []),
-    withDbRetry(() => getWatchHistory(userId, 30)).catch(() => []),
-  ]);
-
+  // ----- stats data (one parallel wave — 6 cheap counts share the pool) -----
   const monthStart = new Date();
   monthStart.setDate(1);
   monthStart.setHours(0, 0, 0, 0);
 
-  const [episodesThisMonth] = await db
-    .select({ value: count() })
-    .from(watchedEpisodes)
-    .where(
-      and(
-        eq(watchedEpisodes.userId, userId),
-        gte(watchedEpisodes.watchedAt, monthStart)
-      )
-    );
+  const [
+    [episodeCount],
+    [tvRuntime],
+    [moviesWatched],
+    [showCount],
+    [movieTotal],
+    [episodesThisMonth],
+  ] = await timed("profile:stats", () =>
+    Promise.all([
+      timed("profile:stat:episodes", () =>
+        db
+          .select({ value: count() })
+          .from(watchedEpisodes)
+          .where(eq(watchedEpisodes.userId, userId))
+      ),
+      timed("profile:stat:tvRuntime", () =>
+        db
+          .select({
+            value: sql<number>`COALESCE(SUM(${shows.episodeRuntime}), 0)`,
+          })
+          .from(watchedEpisodes)
+          .innerJoin(shows, eq(watchedEpisodes.showTmdbId, shows.tmdbId))
+          .where(eq(watchedEpisodes.userId, userId))
+      ),
+      timed("profile:stat:movies", () =>
+        db
+          .select({
+            value: count(),
+            minutes: sql<number>`COALESCE(SUM(${movies.runtime}), 0)`,
+          })
+          .from(userMovies)
+          .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
+          .where(
+            and(eq(userMovies.userId, userId), eq(userMovies.status, "watched"))
+          )
+      ),
+      timed("profile:stat:shows", () =>
+        db
+          .select({ value: count() })
+          .from(userShows)
+          .where(eq(userShows.userId, userId))
+      ),
+      timed("profile:stat:movieTotal", () =>
+        db
+          .select({ value: count() })
+          .from(userMovies)
+          .where(eq(userMovies.userId, userId))
+      ),
+      timed("profile:stat:month", () =>
+        db
+          .select({ value: count() })
+          .from(watchedEpisodes)
+          .where(
+            and(
+              eq(watchedEpisodes.userId, userId),
+              gte(watchedEpisodes.watchedAt, monthStart)
+            )
+          )
+      ),
+    ])
+  );
+
+  const [continueWatching, recentStreams] = await timed(
+    "profile:shelves",
+    () =>
+      Promise.all([
+        withDbRetry(() => getContinueWatching(userId, 10)).catch(() => []),
+        withDbRetry(() => getWatchHistory(userId, 30)).catch(() => []),
+      ])
+  );
 
   // Activity by day for streak + heatmap. Sourced from the append-only
   // watch_history (every completion keeps its date, rewatches included) UNION
   // current library state (covers pre-history imports). Merged on title-day
   // keys so a completion stamped in both tables counts once, while unwatching
   // (which clears state) can never erase the historical fact of the watch.
-  const [histRows, stateMovieRows, stateEpRows] = await Promise.all([
-    db
-      .select({
-        day: sql<string>`TO_CHAR(${watchHistory.watchedAt}, 'YYYY-MM-DD')`,
-        mediaType: watchHistory.mediaType,
-        tmdbId: watchHistory.tmdbId,
-        seasonNumber: watchHistory.seasonNumber,
-        episodeNumber: watchHistory.episodeNumber,
-      })
-      .from(watchHistory)
-      .where(
-        and(
-          eq(watchHistory.userId, userId),
-          isNotNull(watchHistory.watchedAt)
-        )
-      ),
-    db
-      .select({
-        day: sql<string>`TO_CHAR(${userMovies.watchedAt}, 'YYYY-MM-DD')`,
-        tmdbId: userMovies.tmdbId,
-      })
-      .from(userMovies)
-      .where(
-        and(
-          eq(userMovies.userId, userId),
-          eq(userMovies.status, "watched"),
-          isNotNull(userMovies.watchedAt)
-        )
-      ),
-    db
-      .select({
-        day: sql<string>`TO_CHAR(${watchedEpisodes.watchedAt}, 'YYYY-MM-DD')`,
-        tmdbId: watchedEpisodes.showTmdbId,
-        seasonNumber: watchedEpisodes.seasonNumber,
-        episodeNumber: watchedEpisodes.episodeNumber,
-      })
-      .from(watchedEpisodes)
-      .where(
-        and(
-          eq(watchedEpisodes.userId, userId),
-          isNotNull(watchedEpisodes.watchedAt)
-        )
-      ),
-  ]);
+  const [histRows, stateMovieRows, stateEpRows] = await timed(
+    "profile:activity",
+    () =>
+      Promise.all([
+        db
+          .select({
+            day: sql<string>`TO_CHAR(${watchHistory.watchedAt}, 'YYYY-MM-DD')`,
+            mediaType: watchHistory.mediaType,
+            tmdbId: watchHistory.tmdbId,
+            seasonNumber: watchHistory.seasonNumber,
+            episodeNumber: watchHistory.episodeNumber,
+          })
+          .from(watchHistory)
+          .where(
+            and(
+              eq(watchHistory.userId, userId),
+              isNotNull(watchHistory.watchedAt)
+            )
+          ),
+        db
+          .select({
+            day: sql<string>`TO_CHAR(${userMovies.watchedAt}, 'YYYY-MM-DD')`,
+            tmdbId: userMovies.tmdbId,
+          })
+          .from(userMovies)
+          .where(
+            and(
+              eq(userMovies.userId, userId),
+              eq(userMovies.status, "watched"),
+              isNotNull(userMovies.watchedAt)
+            )
+          ),
+        db
+          .select({
+            day: sql<string>`TO_CHAR(${watchedEpisodes.watchedAt}, 'YYYY-MM-DD')`,
+            tmdbId: watchedEpisodes.showTmdbId,
+            seasonNumber: watchedEpisodes.seasonNumber,
+            episodeNumber: watchedEpisodes.episodeNumber,
+          })
+          .from(watchedEpisodes)
+          .where(
+            and(
+              eq(watchedEpisodes.userId, userId),
+              isNotNull(watchedEpisodes.watchedAt)
+            )
+          ),
+      ])
+  );
 
   const dayTitleSets = new Map<string, Set<string>>();
   const addDayTitle = (
@@ -468,27 +479,29 @@ export default async function ProfilePage() {
   // ----- identity -----
   // "Watching since" = earliest watch activity in your data (import included),
   // not the app account creation date (which is often the install year).
-  const [[firstEp], [firstMovie]] = await Promise.all([
-    db
-      .select({
-        first: sql<string | Date | null>`MIN(${watchedEpisodes.watchedAt})`,
-      })
-      .from(watchedEpisodes)
-      .where(
-        and(
-          eq(watchedEpisodes.userId, userId),
-          isNotNull(watchedEpisodes.watchedAt)
-        )
-      ),
-    db
-      .select({
-        first: sql<string | Date | null>`MIN(${userMovies.watchedAt})`,
-      })
-      .from(userMovies)
-      .where(
-        and(eq(userMovies.userId, userId), isNotNull(userMovies.watchedAt))
-      ),
-  ]);
+  const [[firstEp], [firstMovie]] = await timed("profile:identity", () =>
+    Promise.all([
+      db
+        .select({
+          first: sql<string | Date | null>`MIN(${watchedEpisodes.watchedAt})`,
+        })
+        .from(watchedEpisodes)
+        .where(
+          and(
+            eq(watchedEpisodes.userId, userId),
+            isNotNull(watchedEpisodes.watchedAt)
+          )
+        ),
+      db
+        .select({
+          first: sql<string | Date | null>`MIN(${userMovies.watchedAt})`,
+        })
+        .from(userMovies)
+        .where(
+          and(eq(userMovies.userId, userId), isNotNull(userMovies.watchedAt))
+        ),
+    ])
+  );
 
   const parseActivityDate = (v: string | Date | null | undefined): Date | null => {
     if (v == null) return null;
@@ -513,105 +526,111 @@ export default async function ProfilePage() {
     : null;
 
   // ----- recently watched (episodes + movies, merged by recency) -----
-  const [recentEpisodes, recentMovies] = await Promise.all([
-    db
-      .select({
-        tmdbId: shows.tmdbId,
-        title: shows.title,
-        posterPath: shows.posterPath,
-        backdropPath: shows.backdropPath,
-        seasonNumber: watchedEpisodes.seasonNumber,
-        episodeNumber: watchedEpisodes.episodeNumber,
-        watchedAt: watchedEpisodes.watchedAt,
-      })
-      .from(watchedEpisodes)
-      .innerJoin(shows, eq(watchedEpisodes.showTmdbId, shows.tmdbId))
-      .where(
-        and(
-          eq(watchedEpisodes.userId, userId),
-          isNotNull(watchedEpisodes.watchedAt)
+  const [recentEpisodes, recentMovies] = await timed("profile:recent", () =>
+    Promise.all([
+      db
+        .select({
+          tmdbId: shows.tmdbId,
+          title: shows.title,
+          posterPath: shows.posterPath,
+          backdropPath: shows.backdropPath,
+          seasonNumber: watchedEpisodes.seasonNumber,
+          episodeNumber: watchedEpisodes.episodeNumber,
+          watchedAt: watchedEpisodes.watchedAt,
+        })
+        .from(watchedEpisodes)
+        .innerJoin(shows, eq(watchedEpisodes.showTmdbId, shows.tmdbId))
+        .where(
+          and(
+            eq(watchedEpisodes.userId, userId),
+            isNotNull(watchedEpisodes.watchedAt)
+          )
         )
-      )
-      .orderBy(desc(watchedEpisodes.watchedAt))
-      // Extra rows so dedupe-by-show still fills ≥4 tiles
-      .limit(40),
-    db
-      .select({
-        tmdbId: movies.tmdbId,
-        title: movies.title,
-        posterPath: movies.posterPath,
-        backdropPath: movies.backdropPath,
-        releaseDate: movies.releaseDate,
-        rating: userMovies.rating,
-        favorite: userMovies.favorite,
-        watchedAt: userMovies.watchedAt,
-      })
-      .from(userMovies)
-      .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
-      .where(
-        and(
-          eq(userMovies.userId, userId),
-          eq(userMovies.status, "watched"),
-          isNotNull(userMovies.watchedAt)
+        .orderBy(desc(watchedEpisodes.watchedAt))
+        // Extra rows so dedupe-by-show still fills ≥4 tiles
+        .limit(40),
+      db
+        .select({
+          tmdbId: movies.tmdbId,
+          title: movies.title,
+          posterPath: movies.posterPath,
+          backdropPath: movies.backdropPath,
+          releaseDate: movies.releaseDate,
+          rating: userMovies.rating,
+          favorite: userMovies.favorite,
+          watchedAt: userMovies.watchedAt,
+        })
+        .from(userMovies)
+        .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
+        .where(
+          and(
+            eq(userMovies.userId, userId),
+            eq(userMovies.status, "watched"),
+            isNotNull(userMovies.watchedAt)
+          )
         )
-      )
-      .orderBy(desc(userMovies.watchedAt))
-      .limit(20),
-  ]);
+        .orderBy(desc(userMovies.watchedAt))
+        .limit(20),
+    ])
+  );
 
   // Rewatch signals for the movie tiles: total completions + queue flags.
   // Both tolerate pre-migration DBs (missing rewatch_queued / empty history).
   const recentMovieIds = recentMovies.map((m) => m.tmdbId);
-  const [movieRewatchCounts, queuedMovieIds] = await Promise.all([
-    (async () => {
-      const map = new Map<number, number>();
-      if (recentMovieIds.length === 0) return map;
-      try {
-        const rows = await withDbRetry(() =>
-          db
-            .select({
-              tmdbId: watchHistory.tmdbId,
-              count: sql<number>`count(*)::int`,
-            })
-            .from(watchHistory)
-            .where(
-              and(
-                eq(watchHistory.userId, userId),
-                eq(watchHistory.mediaType, "movie"),
-                inArray(watchHistory.tmdbId, recentMovieIds)
-              )
-            )
-            .groupBy(watchHistory.tmdbId)
-        );
-        for (const r of rows) map.set(r.tmdbId, Number(r.count));
-      } catch {
-        /* history unavailable — badges hide */
-      }
-      return map;
-    })(),
-    (async () => {
-      const set = new Set<number>();
-      if (recentMovieIds.length === 0) return set;
-      try {
-        const rows = await withDbRetry(() =>
-          db
-            .select({ tmdbId: userMovies.tmdbId })
-            .from(userMovies)
-            .where(
-              and(
-                eq(userMovies.userId, userId),
-                eq(userMovies.rewatchQueued, true),
-                inArray(userMovies.tmdbId, recentMovieIds)
-              )
-            )
-        );
-        for (const r of rows) set.add(r.tmdbId);
-      } catch {
-        /* pre-migration — no queue flags */
-      }
-      return set;
-    })(),
-  ]);
+  const [movieRewatchCounts, queuedMovieIds] = await timed(
+    "profile:recent:badges",
+    () =>
+      Promise.all([
+        (async () => {
+          const map = new Map<number, number>();
+          if (recentMovieIds.length === 0) return map;
+          try {
+            const rows = await withDbRetry(() =>
+              db
+                .select({
+                  tmdbId: watchHistory.tmdbId,
+                  count: sql<number>`count(*)::int`,
+                })
+                .from(watchHistory)
+                .where(
+                  and(
+                    eq(watchHistory.userId, userId),
+                    eq(watchHistory.mediaType, "movie"),
+                    inArray(watchHistory.tmdbId, recentMovieIds)
+                  )
+                )
+                .groupBy(watchHistory.tmdbId)
+            );
+            for (const r of rows) map.set(r.tmdbId, Number(r.count));
+          } catch {
+            /* history unavailable — badges hide */
+          }
+          return map;
+        })(),
+        (async () => {
+          const set = new Set<number>();
+          if (recentMovieIds.length === 0) return set;
+          try {
+            const rows = await withDbRetry(() =>
+              db
+                .select({ tmdbId: userMovies.tmdbId })
+                .from(userMovies)
+                .where(
+                  and(
+                    eq(userMovies.userId, userId),
+                    eq(userMovies.rewatchQueued, true),
+                    inArray(userMovies.tmdbId, recentMovieIds)
+                  )
+                )
+            );
+            for (const r of rows) set.add(r.tmdbId);
+          } catch {
+            /* pre-migration — no queue flags */
+          }
+          return set;
+        })(),
+      ])
+  );
 
   // One tile per show/movie (latest watch wins) so the rail shows distinct posters.
   type RecentRaw = {
@@ -626,8 +645,6 @@ export default async function ProfilePage() {
     favorite?: boolean | null;
     rewatchCount?: number | null;
     rewatchQueued?: boolean | null;
-    year?: string | null;
-    tmdbId?: number;
     watchedAt: Date | null;
   };
   const recentCandidates: RecentRaw[] = [
@@ -654,8 +671,6 @@ export default async function ProfilePage() {
       favorite: m.favorite,
       rewatchCount: movieRewatchCounts.get(m.tmdbId) ?? 1,
       rewatchQueued: queuedMovieIds.has(m.tmdbId),
-      year: m.releaseDate ? m.releaseDate.slice(0, 4) : null,
-      tmdbId: m.tmdbId,
       watchedAt: m.watchedAt,
     })),
   ].sort(
@@ -672,56 +687,46 @@ export default async function ProfilePage() {
   }
 
   const recentItems: RailItem[] = recentDeduped.map(
-    ({ backdropPath: _b, watchedAt: _w, year: _y, tmdbId: _t, ...item }) => item
+    ({ backdropPath: _b, watchedAt: _w, ...item }) => item
   );
   const bannerBackdrop = recentDeduped[0]?.backdropPath ?? null;
-  const fridayShareItems = recentDeduped
-    .filter((i) => i.key.startsWith("mv-") && i.tmdbId != null)
-    .slice(0, 4)
-    .map((i) => ({
-      tmdbId: i.tmdbId as number,
-      title: i.title,
-      posterPath: i.posterPath,
-      rating: i.rating,
-      favorite: i.favorite,
-      rewatchCount: i.rewatchCount,
-      year: i.year,
-    }));
 
   // ----- top rated (movies + shows via derived episode-rating score) -----
-  const [topMovies, topShows] = await Promise.all([
-    db
-      .select({
-        tmdbId: movies.tmdbId,
-        title: movies.title,
-        posterPath: movies.posterPath,
-        rating: userMovies.rating,
-      })
-      .from(userMovies)
-      .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
-      .where(and(eq(userMovies.userId, userId), isNotNull(userMovies.rating)))
-      .orderBy(desc(userMovies.rating))
-      .limit(12),
-    db
-      .select({
-        tmdbId: shows.tmdbId,
-        title: shows.title,
-        posterPath: shows.posterPath,
-        avgScore: sql<number>`AVG(${watchedEpisodes.rating})::float`,
-        ratedCount: count(),
-      })
-      .from(watchedEpisodes)
-      .innerJoin(shows, eq(watchedEpisodes.showTmdbId, shows.tmdbId))
-      .where(
-        and(
-          eq(watchedEpisodes.userId, userId),
-          isNotNull(watchedEpisodes.rating)
+  const [topMovies, topShows] = await timed("profile:topRated", () =>
+    Promise.all([
+      db
+        .select({
+          tmdbId: movies.tmdbId,
+          title: movies.title,
+          posterPath: movies.posterPath,
+          rating: userMovies.rating,
+        })
+        .from(userMovies)
+        .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
+        .where(and(eq(userMovies.userId, userId), isNotNull(userMovies.rating)))
+        .orderBy(desc(userMovies.rating))
+        .limit(12),
+      db
+        .select({
+          tmdbId: shows.tmdbId,
+          title: shows.title,
+          posterPath: shows.posterPath,
+          avgScore: sql<number>`AVG(${watchedEpisodes.rating})::float`,
+          ratedCount: count(),
+        })
+        .from(watchedEpisodes)
+        .innerJoin(shows, eq(watchedEpisodes.showTmdbId, shows.tmdbId))
+        .where(
+          and(
+            eq(watchedEpisodes.userId, userId),
+            isNotNull(watchedEpisodes.rating)
+          )
         )
-      )
-      .groupBy(shows.tmdbId, shows.title, shows.posterPath)
-      .orderBy(desc(sql`AVG(${watchedEpisodes.rating})`))
-      .limit(12),
-  ]);
+        .groupBy(shows.tmdbId, shows.title, shows.posterPath)
+        .orderBy(desc(sql`AVG(${watchedEpisodes.rating})`))
+        .limit(12),
+    ])
+  );
 
   const topRatedItems: RailItem[] = [
     ...topMovies.map((m) => ({
@@ -750,7 +755,8 @@ export default async function ProfilePage() {
 
   // ----- Taste snapshot (avg scores + genres from tmdb_data) -----
   const [showRatingAgg, movieRatingAgg, showGenreRows, movieGenreRows] =
-    await Promise.all([
+    await timed("profile:taste", () =>
+      Promise.all([
       db
         .select({
           avg: sql<number>`AVG(${watchedEpisodes.rating})::float`,
@@ -802,7 +808,8 @@ export default async function ProfilePage() {
             eq(userMovies.status, "watched")
           )
         ),
-    ]);
+      ])
+    );
 
   const taste: TasteSnapshot = {
     avgShowScore: showRatingAgg?.avg ?? null,
@@ -837,18 +844,14 @@ export default async function ProfilePage() {
   const yearStart = new Date(year, 0, 1);
   const yearEnd = new Date(year + 1, 0, 1);
 
-  const [
-    yearEpStats,
-    yearMovieStats,
-    yearShowCandidates,
-    yearTopMovieRows,
-    yearShowGenreRows,
-  ] = await Promise.all([
-    db
-      .select({
-        episodes: sql<number>`count(*)::int`,
-        minutes: sql<number>`COALESCE(SUM(${shows.episodeRuntime}), 0)::int`,
-      })
+  const [yearEpStats, yearMovieStats, yearShowCandidates, yearTopMovieRows] =
+    await timed("profile:year", () =>
+    Promise.all([
+      db
+        .select({
+          episodes: sql<number>`count(*)::int`,
+          minutes: sql<number>`COALESCE(SUM(${shows.episodeRuntime}), 0)::int`,
+        })
       .from(watchedEpisodes)
       .innerJoin(shows, eq(watchedEpisodes.showTmdbId, shows.tmdbId))
       .where(
@@ -877,11 +880,14 @@ export default async function ProfilePage() {
         )
       )
       .then((r) => r[0]),
-    // Per-show year totals + time span (for bulk-import demotion)
+    // Per-show year totals + time span (for bulk-import demotion).
+    // Also carries tmdbData so the year-genre breakdown reuses this one
+    // scan instead of running a second GROUP BY over the same rows.
     db
       .select({
         title: shows.title,
         posterPath: shows.posterPath,
+        tmdbData: shows.tmdbData,
         episodes: sql<number>`count(*)::int`,
         days: sql<number>`count(DISTINCT TO_CHAR(${watchedEpisodes.watchedAt}, 'YYYY-MM-DD'))::int`,
         spanSec: sql<number>`EXTRACT(EPOCH FROM (max(${watchedEpisodes.watchedAt}) - min(${watchedEpisodes.watchedAt})))::float`,
@@ -896,7 +902,7 @@ export default async function ProfilePage() {
           lt(watchedEpisodes.watchedAt, yearEnd)
         )
       )
-      .groupBy(shows.tmdbId, shows.title, shows.posterPath),
+      .groupBy(shows.tmdbId, shows.title, shows.posterPath, shows.tmdbData),
     // Highest-rated movie watched this year (must have a rating)
     db
       .select({
@@ -918,23 +924,14 @@ export default async function ProfilePage() {
       )
       .orderBy(desc(userMovies.rating), desc(userMovies.watchedAt))
       .limit(1),
-    db
-      .select({
-        tmdbData: shows.tmdbData,
-        weight: sql<number>`count(*)::int`,
-      })
-      .from(watchedEpisodes)
-      .innerJoin(shows, eq(watchedEpisodes.showTmdbId, shows.tmdbId))
-      .where(
-        and(
-          eq(watchedEpisodes.userId, userId),
-          isNotNull(watchedEpisodes.watchedAt),
-          gte(watchedEpisodes.watchedAt, yearStart),
-          lt(watchedEpisodes.watchedAt, yearEnd)
-        )
-      )
-      .groupBy(shows.tmdbId, shows.tmdbData),
-  ]);
+    ])
+  );
+
+  // Year-genre weights reuse the per-show scan above (episodes == row count).
+  const yearShowGenreRows = yearShowCandidates.map((s) => ({
+    tmdbData: s.tmdbData,
+    weight: s.episodes,
+  }));
 
   // Most watched = highest episode count this year.
   // Only demote pure bulk dumps (many eps, single day, all within ~30s) so
@@ -1001,7 +998,8 @@ export default async function ProfilePage() {
   // limit(20) "recently updated" slice leaves the rails empty whenever
   // favorites aren't among the 20 most-recently-touched library rows.
   const [allShows, favoriteShows, allMovies, favoriteMovies, lists] =
-    await Promise.all([
+    await timed("profile:rails", () =>
+      Promise.all([
       db
         .select({
           tmdbId: shows.tmdbId,
@@ -1050,8 +1048,9 @@ export default async function ProfilePage() {
         )
         .orderBy(desc(userMovies.updatedAt))
         .limit(20),
-      db.select().from(userLists).where(eq(userLists.userId, userId)),
-    ]);
+        db.select().from(userLists).where(eq(userLists.userId, userId)),
+      ])
+    );
 
   // Rewatch badges for the Movies / Favorite-movies rails.
   const railMovieIds = [
@@ -1059,6 +1058,7 @@ export default async function ProfilePage() {
   ];
   const railRewatchCounts = new Map<number, number>();
   const railQueued = new Set<number>();
+  await timed("profile:rails:badges", async () => {
   if (railMovieIds.length > 0) {
     try {
       const rows = await withDbRetry(() =>
@@ -1099,6 +1099,7 @@ export default async function ProfilePage() {
       /* pre-migration */
     }
   }
+  });
   const withRailBadges = <
     T extends { tmdbId: number; favorite?: boolean | null },
   >(
@@ -1135,20 +1136,28 @@ export default async function ProfilePage() {
 
   const moviePreviewIds = [...listPreviewIds.movie];
   const showPreviewIds = [...listPreviewIds.tv];
-  const [listMoviePosters, listShowPosters] = await Promise.all([
-    moviePreviewIds.length > 0
-      ? db
-          .select({ tmdbId: movies.tmdbId, posterPath: movies.posterPath })
-          .from(movies)
-          .where(inArray(movies.tmdbId, moviePreviewIds))
-      : Promise.resolve([] as { tmdbId: number; posterPath: string | null }[]),
-    showPreviewIds.length > 0
-      ? db
-          .select({ tmdbId: shows.tmdbId, posterPath: shows.posterPath })
-          .from(shows)
-          .where(inArray(shows.tmdbId, showPreviewIds))
-      : Promise.resolve([] as { tmdbId: number; posterPath: string | null }[]),
-  ]);
+  const [listMoviePosters, listShowPosters] = await timed(
+    "profile:lists",
+    () =>
+      Promise.all([
+        moviePreviewIds.length > 0
+          ? db
+              .select({ tmdbId: movies.tmdbId, posterPath: movies.posterPath })
+              .from(movies)
+              .where(inArray(movies.tmdbId, moviePreviewIds))
+          : Promise.resolve(
+              [] as { tmdbId: number; posterPath: string | null }[]
+            ),
+        showPreviewIds.length > 0
+          ? db
+              .select({ tmdbId: shows.tmdbId, posterPath: shows.posterPath })
+              .from(shows)
+              .where(inArray(shows.tmdbId, showPreviewIds))
+          : Promise.resolve(
+              [] as { tmdbId: number; posterPath: string | null }[]
+            ),
+      ])
+  );
 
   const posterByMovie = new Map(
     listMoviePosters.map((m) => [m.tmdbId, m.posterPath])
@@ -1194,6 +1203,8 @@ export default async function ProfilePage() {
   const adminUsername = process.env.ADMIN_USERNAME || "posi";
   const isAdmin =
     name.toLowerCase() === adminUsername.toLowerCase();
+
+  perfLog("profile:totalFetch", pageStart);
 
   return (
     <div className="min-h-dvh bg-black pb-nav-page">
@@ -1331,10 +1342,7 @@ export default async function ProfilePage() {
         {/* ---------- Recently watched ---------- */}
         {recentItems.length > 0 && (
           <section className="mb-8">
-            <SectionHeader
-              title="Recently watched"
-              action={<FridayShareButton items={fridayShareItems} />}
-            />
+            <SectionHeader title="Recently watched" />
             <CaptionedRail items={recentItems} />
           </section>
         )}

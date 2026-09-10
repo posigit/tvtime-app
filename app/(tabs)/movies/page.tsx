@@ -9,7 +9,7 @@ import { SectionLabel } from "@/components/section-label";
 import { LayoutToggle } from "@/components/layout-toggle";
 import { RatingBadge } from "@/components/star-rating";
 import { PosterBadges } from "@/components/poster-badges";
-import { FridayShareButton } from "@/components/friday-share";
+import { timed, perfLog, perfStart } from "@/lib/perf";
 import { posterUrl } from "@/lib/tmdb";
 import {
   isUnreleased,
@@ -244,15 +244,6 @@ function MovieList({ items }: { items: MovieRow[] }) {
                 {movie.rtScore != null && movie.rtScore >= 0 && (
                   <span className="text-primary">🍅 {movie.rtScore}%</span>
                 )}
-                {movie.rewatchQueued ? (
-                  <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wide text-primary">
-                    Queued rewatch
-                  </span>
-                ) : movie.rewatchCount != null && movie.rewatchCount >= 2 ? (
-                  <span className="text-[11px] font-bold text-success">
-                    ⟳ ×{movie.rewatchCount}
-                  </span>
-                ) : null}
               </div>
             </div>
           </Link>
@@ -321,6 +312,7 @@ export default async function MoviesPage({
   const gridLayout = layoutPref === "grid";
 
   const userId = await requireAuth();
+  const pageStart = perfStart();
 
   // userMovies select is tolerant of pre-migration DBs (no rewatch_queued yet).
   let userMoviesList: {
@@ -338,25 +330,27 @@ export default async function MoviesPage({
     updatedAt: Date;
   }[];
   try {
-    userMoviesList = await withDbRetry(() =>
-      db
-        .select({
-          tmdbId: movies.tmdbId,
-          title: movies.title,
-          posterPath: movies.posterPath,
-          releaseDate: movies.releaseDate,
-          runtime: movies.runtime,
-          rtScore: movies.rtScore,
-          status: userMovies.status,
-          watchedAt: userMovies.watchedAt,
-          rating: userMovies.rating,
-          favorite: userMovies.favorite,
-          rewatchQueued: userMovies.rewatchQueued,
-          updatedAt: userMovies.updatedAt,
-        })
-        .from(userMovies)
-        .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
-        .where(eq(userMovies.userId, userId))
+    userMoviesList = await timed("movies:library", () =>
+      withDbRetry(() =>
+        db
+          .select({
+            tmdbId: movies.tmdbId,
+            title: movies.title,
+            posterPath: movies.posterPath,
+            releaseDate: movies.releaseDate,
+            runtime: movies.runtime,
+            rtScore: movies.rtScore,
+            status: userMovies.status,
+            watchedAt: userMovies.watchedAt,
+            rating: userMovies.rating,
+            favorite: userMovies.favorite,
+            rewatchQueued: userMovies.rewatchQueued,
+            updatedAt: userMovies.updatedAt,
+          })
+          .from(userMovies)
+          .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
+          .where(eq(userMovies.userId, userId))
+      )
     );
   } catch {
     const fallback = await withDbRetry(() =>
@@ -388,21 +382,23 @@ export default async function MoviesPage({
       .filter((m) => m.status === "watched")
       .map((m) => m.tmdbId);
     if (watchedIds.length > 0) {
-      const rows = await withDbRetry(() =>
-        db
-          .select({
-            tmdbId: watchHistory.tmdbId,
-            count: sql<number>`count(*)::int`,
-          })
-          .from(watchHistory)
-          .where(
-            and(
-              eq(watchHistory.userId, userId),
-              eq(watchHistory.mediaType, "movie"),
-              inArray(watchHistory.tmdbId, watchedIds)
+      const rows = await timed("movies:rewatchCounts", () =>
+        withDbRetry(() =>
+          db
+            .select({
+              tmdbId: watchHistory.tmdbId,
+              count: sql<number>`count(*)::int`,
+            })
+            .from(watchHistory)
+            .where(
+              and(
+                eq(watchHistory.userId, userId),
+                eq(watchHistory.mediaType, "movie"),
+                inArray(watchHistory.tmdbId, watchedIds)
+              )
             )
-          )
-          .groupBy(watchHistory.tmdbId)
+            .groupBy(watchHistory.tmdbId)
+        )
       );
       for (const r of rows) rewatchCounts.set(r.tmdbId, Number(r.count));
     }
@@ -422,9 +418,10 @@ export default async function MoviesPage({
 
   // Exclude anything already in the library (watched or listed) from Surprise
   const libraryIds = new Set(withCounts.map((m) => m.tmdbId));
-  const surprisePool = await getUnseenGreatMoviesPool(libraryIds).catch(
-    () => []
+  const surprisePool = await timed("movies:surprise", () =>
+    getUnseenGreatMoviesPool(libraryIds).catch(() => [])
   );
+  perfLog("movies:totalFetch", pageStart);
 
   const wantToWatchAll = withCounts.filter(
     (m) => m.status === "want_to_watch" || m.status === "for_later"
@@ -462,16 +459,6 @@ export default async function MoviesPage({
   const watched = withCounts
     .filter((m) => m.status === "watched")
     .sort((a, b) => (b.watchedAt?.getTime() ?? 0) - (a.watchedAt?.getTime() ?? 0));
-
-  const fridayShareItems = watched.slice(0, 4).map((m) => ({
-    tmdbId: m.tmdbId,
-    title: m.title,
-    posterPath: m.posterPath,
-    rating: m.rating,
-    favorite: m.favorite,
-    rewatchCount: m.rewatchCount,
-    year: m.releaseDate ? m.releaseDate.slice(0, 4) : null,
-  }));
 
   return (
     <div className="min-h-dvh bg-black px-4 pb-nav-page">
@@ -520,11 +507,8 @@ export default async function MoviesPage({
 
           {watched.length > 0 && (
             <section className="mb-6">
-              <div className="relative mb-3 mt-2 flex items-center justify-center gap-2">
+              <div className="mb-3 flex justify-center">
                 <SectionLabel>Recently Watched</SectionLabel>
-                <div className="absolute right-0 top-1/2 -translate-y-1/2">
-                  <FridayShareButton items={fridayShareItems} />
-                </div>
               </div>
               <MovieGrid items={watched.slice(0, 30)} />
             </section>

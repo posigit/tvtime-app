@@ -15,6 +15,7 @@ import {
   gt,
   inArray,
   isNotNull,
+  or,
 } from "drizzle-orm";
 
 export type PlaybackSummary = {
@@ -184,6 +185,15 @@ export async function getContinueWatching(
   const showIds = rows
     .filter((row) => row.mediaType === "tv")
     .map((row) => row.tmdbId);
+  // Only these exact episodes are ever looked up below (result is capped at
+  // `limit`) — never fetch whole-season catalogs for the tile map.
+  const tvTuples = rows
+    .filter((row) => row.mediaType === "tv")
+    .map((row) => ({
+      showTmdbId: row.tmdbId,
+      seasonNumber: row.seasonNumber,
+      episodeNumber: row.episodeNumber,
+    }));
 
   const [movieRows, showRows, episodeRows] = await Promise.all([
     movieIds.length > 0
@@ -207,7 +217,7 @@ export async function getContinueWatching(
           .from(shows)
           .where(inArray(shows.tmdbId, showIds))
       : Promise.resolve([]),
-    showIds.length > 0
+    tvTuples.length > 0
       ? db
           .select({
             showTmdbId: episodes.showTmdbId,
@@ -218,7 +228,17 @@ export async function getContinueWatching(
             runtime: episodes.runtime,
           })
           .from(episodes)
-          .where(inArray(episodes.showTmdbId, showIds))
+          .where(
+            or(
+              ...tvTuples.map((k) =>
+                and(
+                  eq(episodes.showTmdbId, k.showTmdbId),
+                  eq(episodes.seasonNumber, k.seasonNumber),
+                  eq(episodes.episodeNumber, k.episodeNumber)
+                )
+              )
+            )
+          )
       : Promise.resolve([]),
   ]);
 
@@ -442,6 +462,14 @@ export async function getWatchHistory(
   const selected = raw.slice(0, limit);
   const movieIds = selected.filter((row) => row.mediaType === "movie").map((row) => row.tmdbId);
   const showIds = selected.filter((row) => row.mediaType === "tv").map((row) => row.tmdbId);
+  // Same scoping as getContinueWatching: only selected episodes need titles.
+  const selectedTvTuples = selected
+    .filter((row) => row.mediaType === "tv")
+    .map((row) => ({
+      showTmdbId: row.tmdbId,
+      seasonNumber: row.seasonNumber,
+      episodeNumber: row.episodeNumber,
+    }));
   const [movieRows, showRows, episodeRows] = await Promise.all([
     movieIds.length > 0
       ? db
@@ -455,7 +483,7 @@ export async function getWatchHistory(
           .from(shows)
           .where(inArray(shows.tmdbId, showIds))
       : Promise.resolve([]),
-    showIds.length > 0
+    selectedTvTuples.length > 0
       ? db
           .select({
             showTmdbId: episodes.showTmdbId,
@@ -464,7 +492,17 @@ export async function getWatchHistory(
             title: episodes.title,
           })
           .from(episodes)
-          .where(inArray(episodes.showTmdbId, showIds))
+          .where(
+            or(
+              ...selectedTvTuples.map((k) =>
+                and(
+                  eq(episodes.showTmdbId, k.showTmdbId),
+                  eq(episodes.seasonNumber, k.seasonNumber),
+                  eq(episodes.episodeNumber, k.episodeNumber)
+                )
+              )
+            )
+          )
       : Promise.resolve([]),
   ]);
   const movieById = new Map(movieRows.map((row) => [row.tmdbId, row]));

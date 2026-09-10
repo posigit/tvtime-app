@@ -43,6 +43,25 @@ export function isTransientDbError(err: unknown): boolean {
   const code = errCode(err);
   const message = errMessage(err).toLowerCase();
 
+  // Permanent schema/query errors — retrying is pure burn (8 attempts of
+  // backoff on something that will never succeed, e.g. a missing column on
+  // a DB where migrations haven't applied). Fail fast so callers' fallbacks
+  // kick in immediately.
+  if (
+    code === "42703" || // undefined_column
+    code === "42704" || // undefined_object
+    code === "42883" || // undefined_function
+    code === "42P01" || // undefined_table
+    code === "42601" || // syntax_error
+    code === "42846" || // cannot_coerce
+    code === "23502" || // not_null_violation
+    code === "23503" || // foreign_key_violation
+    code === "23505" || // unique_violation
+    code === "22P02" // invalid_text_representation
+  ) {
+    return false;
+  }
+
   if (
     code === "57P03" || // starting up
     code === "57P01" || // admin shutdown
