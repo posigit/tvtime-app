@@ -88,7 +88,7 @@ function diagnoseResolveFailure(r: {
     return "Downloads need the stream resolver — VIX_RESOLVER_URL isn't set on this deployment, and the sources block it directly. Streaming still works via embeds, but offline needs native. Set the env var and redeploy.";
   }
   if (r.code === "resolution_failed") {
-    return `Stream resolver failed${r.detail ? ` (${r.detail})` : ""} Check the resolver service, then retry.`;
+    return `Stream resolver failed${r.detail ? ` (${r.detail})` : ""} If it names the resolver, revive/redeploy that service (its /health should return ok), check VIX_RESOLVER_URL, then retry.`;
   }
   if (r.code === "upstream_unreachable") {
     return "Sources are unreachable from this deployment right now. Retry in a bit — embed streaming is unaffected.";

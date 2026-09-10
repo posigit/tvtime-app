@@ -91,7 +91,16 @@ export async function GET(req: NextRequest) {
           imdbId: await fetchImdbId(type, id),
         });
       }
-      stages.resolver = `resolver ${res.status}`;
+      // Capture a snippet of the resolver's error body — Railway's own
+      // "Application not found" vs the resolver's JSON tells you whether the
+      // SERVICE is dead vs the source blocking it.
+      let bodyHint = "";
+      try {
+        bodyHint = (await res.text()).slice(0, 160);
+      } catch {
+        /* ignore */
+      }
+      stages.resolver = `resolver ${res.status}${bodyHint ? ` — ${bodyHint}` : ""}`;
       // Non-2xx from the resolver: fall through to the direct attempt.
     } catch (err) {
       stages.resolver =
