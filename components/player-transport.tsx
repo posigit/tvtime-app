@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  Check,
   Maximize,
   Minimize,
   Pause,
   Play,
   RotateCcw,
+  Server,
   Volume2,
   VolumeX,
 } from "lucide-react";
@@ -29,6 +31,13 @@ type PlayerTransportProps = {
   onToggleMute: () => void;
   onVolume: (volume: number) => void;
   onToggleFullscreen: () => void;
+  /**
+   * CineSrc sub-server picker (bottom bar, so the top chrome stays uncrowded).
+   * Rendered only when provided (CineSrc driven embed).
+   */
+  serverOptions?: { id: string; name: string; sub?: string }[];
+  activeServer?: string;
+  onPickServer?: (id: string) => void;
 };
 
 /**
@@ -52,6 +61,9 @@ export function PlayerTransport({
   onToggleMute,
   onVolume,
   onToggleFullscreen,
+  serverOptions,
+  activeServer = "auto",
+  onPickServer,
 }: PlayerTransportProps) {
   const safeDur = Number.isFinite(duration) && duration > 0 ? duration : 0;
   const ratio = safeDur > 0 ? Math.min(1, Math.max(0, currentTime / safeDur)) : 0;
@@ -59,6 +71,34 @@ export function PlayerTransport({
   // UA-based. iOS Safari ignores HTMLMediaElement.volume — mute only.
   // Lazy init: player only mounts client-side after open, so no SSR mismatch.
   const [volumeSupported] = useState(() => canControlVolume(null));
+  const [serverMenuOpen, setServerMenuOpen] = useState(false);
+  const serverMenuRef = useRef<HTMLDivElement>(null);
+  const activeServerLabel =
+    serverOptions?.find((s) => s.id === activeServer)?.name ?? "Auto";
+  // Outside-dismiss + Escape for the sub-server menu (mirrors top chrome).
+  useEffect(() => {
+    if (!serverMenuOpen) return;
+    const onPointer = (e: MouseEvent | TouchEvent) => {
+      const node = e.target as Node | null;
+      if (serverMenuRef.current && node && !serverMenuRef.current.contains(node)) {
+        setServerMenuOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        setServerMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("touchstart", onPointer, { passive: true });
+    document.addEventListener("keydown", onKey, true);
+    return () => {
+      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("touchstart", onPointer);
+      document.removeEventListener("keydown", onKey, true);
+    };
+  }, [serverMenuOpen]);
 
   return (
     <div
@@ -140,6 +180,61 @@ export function PlayerTransport({
               -{formatPlayerClock(remaining)}
             </span>
             <div className="ml-auto flex items-center gap-1.5">
+              {serverOptions && onPickServer && (
+                <div ref={serverMenuRef} className="relative">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setServerMenuOpen((v) => !v);
+                    }}
+                    aria-label={`Sub-server (currently ${activeServerLabel})`}
+                    aria-expanded={serverMenuOpen}
+                    aria-haspopup="menu"
+                    title={`Server: ${activeServerLabel}`}
+                    className="flex h-9 items-center gap-1.5 rounded-full bg-black/50 px-3 text-xs font-bold text-white ring-1 ring-white/15 backdrop-blur transition hover:bg-black/70"
+                  >
+                    <Server className="h-4 w-4" />
+                    <span className="hidden sm:inline">{activeServerLabel}</span>
+                  </button>
+                  {serverMenuOpen && (
+                    <div
+                      role="menu"
+                      aria-label="Sub-servers"
+                      className="absolute bottom-full right-0 z-30 mb-2 max-h-[40vh] w-44 overflow-y-auto overscroll-contain rounded-xl border border-white/15 bg-white/[0.06] py-1 shadow-2xl backdrop-blur-2xl [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.25)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/20"
+                    >
+                      {serverOptions.map((s) => (
+                        <button
+                          key={s.id}
+                          type="button"
+                          role="menuitem"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setServerMenuOpen(false);
+                            onPickServer(s.id);
+                          }}
+                          className={cn(
+                            "flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-sm font-medium text-white transition hover:bg-white/10",
+                            activeServer === s.id && "text-primary"
+                          )}
+                        >
+                          <span className="flex min-w-0 flex-col">
+                            <span className="truncate">{s.name}</span>
+                            {s.sub && s.sub !== s.name && (
+                              <span className="truncate text-[10px] font-semibold uppercase tracking-wide text-white/40">
+                                {s.sub}
+                              </span>
+                            )}
+                          </span>
+                          {activeServer === s.id && (
+                            <Check className="h-4 w-4 flex-shrink-0" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
               <button
                 type="button"
                 onClick={(e) => {

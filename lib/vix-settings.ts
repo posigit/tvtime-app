@@ -9,6 +9,7 @@
  * version discards that poisoned state.
  */
 import type { StreamSource } from "@/lib/player-native-types";
+import { CINESRC_MAX_KNOWN_SERVERS, CINESRC_SEED_SERVERS } from "@/lib/embed-sources";
 
 export type VixSettings = {
   /** Settings schema version — bump to invalidate old stored state. */
@@ -41,6 +42,17 @@ export type VixSettings = {
   subSource: "auto" | "off" | "stream" | "vdrk" | "opensub";
   /** Last stream backend the user picked (native or embed source). */
   preferredSource: StreamSource;
+  /**
+   * CineSrc sub-server hint ("auto" = CineSrc picks). Sent as
+   * `lastserver=<id>&prioritize=true` on the CineSrc embed URL.
+   * Case is preserved: ids must match CineSrc's own server ids verbatim.
+   */
+  cineSrcServer: string;
+  /**
+   * Real CineSrc server ids discovered via the embed's `cinesrc:sourceused`
+   * event (e.g. "Nebula"). Drives the sub-server picker options.
+   */
+  cineSrcKnownServers: string[];
   /**
    * Subtitle timing offset in seconds (positive = later). Applies to
    * injected VDRK/OpenSubtitles cues; stream-embedded CC is unaffected.
@@ -88,6 +100,8 @@ export const DEFAULT_VIX_SETTINGS: VixSettings = {
   autoplayNext: true,
   autoRotate: true,
   preferredSource: "vix",
+  cineSrcServer: "auto",
+  cineSrcKnownServers: [...CINESRC_SEED_SERVERS],
   subSource: "auto",
   subDelaySeconds: 0,
   subFontSize: "md",
@@ -130,6 +144,34 @@ function clampSettings(merged: VixSettings): VixSettings {
   ] as const;
   if (!(SOURCE_VALUES as readonly string[]).includes(next.preferredSource)) {
     next.preferredSource = "vix";
+  }
+  // CineSrc sub-server hint: any non-empty id is accepted (it must match one
+  // of CineSrc's real server ids verbatim — case preserved, never lowered).
+  if (typeof next.cineSrcServer !== "string" || !next.cineSrcServer.trim()) {
+    next.cineSrcServer = "auto";
+  } else if (next.cineSrcServer !== "auto") {
+    next.cineSrcServer = next.cineSrcServer.trim();
+  }
+  // Discovered server ids: non-empty strings, deduped, order-kept, capped.
+  if (!Array.isArray(next.cineSrcKnownServers)) {
+    next.cineSrcKnownServers = [...CINESRC_SEED_SERVERS];
+  } else {
+    const seen = new Set<string>();
+    const ids = next.cineSrcKnownServers
+      .filter(
+        (id): id is string =>
+          typeof id === "string" && !!id.trim()
+      )
+      .map((id) => id.trim());
+    for (const id of ids) seen.add(id.toLowerCase());
+    // Never lose the seed ids (older installs stored an empty list).
+    for (const seed of CINESRC_SEED_SERVERS) {
+      if (!seen.has(seed.toLowerCase())) {
+        ids.push(seed);
+        seen.add(seed.toLowerCase());
+      }
+    }
+    next.cineSrcKnownServers = ids.slice(0, CINESRC_MAX_KNOWN_SERVERS);
   }
   if (
     typeof next.subDelaySeconds !== "number" ||

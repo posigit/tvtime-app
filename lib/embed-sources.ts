@@ -45,9 +45,12 @@ export const EMBED_SOURCES: EmbedSourceDef[] = [
     name: "VidFast",
     base: "https://vidfast.vc",
     host: "vidfast.vc",
-    movieUrl: (tmdbId) => `https://vidfast.vc/movie/${tmdbId}?autoPlay=true&title=true&poster=true`,
+    // Host-driven like CineSrc (tap-catcher owns taps, our transport owns
+    // play/seek/volume via the command channel): hide its title overlay and
+    // internal next/auto-next so only our chrome and Up Next advance episodes.
+    movieUrl: (tmdbId) => `https://vidfast.vc/movie/${tmdbId}?autoPlay=true&title=false&poster=true`,
     tvUrl: (tmdbId, season, episode) =>
-      `https://vidfast.vc/tv/${tmdbId}/${season}/${episode}?autoPlay=true&title=true&poster=true&nextButton=true&autoNext=true`,
+      `https://vidfast.vc/tv/${tmdbId}/${season}/${episode}?autoPlay=true&title=false&poster=true&nextButton=false&autoNext=false`,
   },
   {
     key: "mapple",
@@ -161,6 +164,120 @@ export function withCineSrcQuality(src: string, quality: "auto" | number): strin
   } catch {
     return src;
   }
+}
+
+/**
+ * CineSrc sub-servers (its own server menu, exposed in our player).
+ *
+ * CineSrc documents `lastserver` (preferred server id) + `prioritize=true`
+ * embed params, and the embed reports the server it actually uses via the
+ * `cinesrc:sourceused { sourceId }` event. Valid ids are CineSrc's own
+ * (e.g. "Nebula") — they can only be learned from that event, never guessed.
+ * Display names use Greek-god aliases per user request; the real id is always
+ * kept alongside so the menu shows what the embed itself will report.
+ */
+export type CineSrcServerDef = { id: string; name: string; sub?: string };
+
+/** Greek-god display aliases, assigned to discovered servers in order. */
+export const CINESRC_SERVER_ALIASES = [
+  "Zeus",
+  "Odysseus",
+  "Athena",
+  "Apollo",
+  "Hermes",
+  "Artemis",
+  "Ares",
+  "Hades",
+  "Poseidon",
+  "Demeter",
+  "Hera",
+  "Hephaestus",
+  "Aphrodite",
+  "Dionysus",
+];
+
+/**
+ * CineSrc's real provider ids in its own rotation order, captured from the
+ * embed's console (`[Embed] Provider <id> error`, 2026-09-11). These double
+ * as the valid `lastserver` values.
+ */
+export const CINESRC_SEED_SERVERS = [
+  "nebula",
+  "lisbon",
+  "surge",
+  "spark",
+  "storm",
+  "aurora",
+  "rush",
+  "blizzard",
+  "mist",
+  "thunder",
+  "wave",
+  "paris",
+  "sturm",
+  "brisa",
+];
+
+/** Max servers remembered (persisted discovery list stays small). */
+export const CINESRC_MAX_KNOWN_SERVERS = 20;
+
+/** Greek alias for a discovered server id (falls back to the raw id). */
+export function cineSrcAliasFor(serverId: string, index: number): string {
+  return CINESRC_SERVER_ALIASES[index] ?? serverId;
+}
+
+/**
+ * Picker options: Auto + one entry per discovered real server id.
+ * Each entry shows the Greek alias with the real id as sub-label.
+ */
+export function buildCineSrcServerOptions(knownIds: string[]): CineSrcServerDef[] {
+  const seen = new Set<string>();
+  const options: CineSrcServerDef[] = [{ id: "auto", name: "Auto" }];
+  let aliasIndex = 0;
+  for (const raw of knownIds) {
+    if (typeof raw !== "string" || !raw.trim()) continue;
+    const id = raw.trim();
+    const key = id.toLowerCase();
+    if (id === "auto" || seen.has(key)) continue;
+    seen.add(key);
+    if (options.length - 1 >= CINESRC_MAX_KNOWN_SERVERS) break;
+    options.push({ id, name: cineSrcAliasFor(id, aliasIndex), sub: id });
+    aliasIndex++;
+  }
+  return options;
+}
+
+/**
+ * Set (or clear with "auto") CineSrc's preferred-server hint. Named servers
+ * set `lastserver=<id>&prioritize=true`; "auto" drops both params so CineSrc
+ * picks its own default. The id must be one of CineSrc's real server ids
+ * (learned from `cinesrc:sourceused`) — unknown ids are ignored server-side.
+ */
+export function withCineSrcServer(src: string, serverId: string): string {
+  try {
+    const url = new URL(src);
+    if (!serverId || serverId === "auto") {
+      url.searchParams.delete("lastserver");
+      url.searchParams.delete("prioritize");
+    } else {
+      url.searchParams.set("lastserver", serverId);
+      url.searchParams.set("prioritize", "true");
+    }
+    return url.toString();
+  } catch {
+    return src;
+  }
+}
+
+/**
+ * Display name for a CineSrc server id within a known list: Greek alias when
+ * discovered, "Auto" for the default. Unknown ids show raw (never blank).
+ */
+export function cineSrcServerLabel(serverId: string, knownIds: string[] = []): string {
+  if (!serverId || serverId === "auto") return "Auto";
+  const idx = knownIds.indexOf(serverId);
+  if (idx >= 0) return cineSrcAliasFor(serverId, idx);
+  return serverId;
 }
 
 export const CINESRC_ORIGIN = "https://cinesrc.st";

@@ -7,12 +7,15 @@ import {
 } from "@/lib/vixsrc";
 import {
   EMBED_SOURCES,
+  CINESRC_MAX_KNOWN_SERVERS,
+  buildCineSrcServerOptions,
   embedUrlFor,
   isEmbedPlayerOrigin,
   sendCineSrcCommand,
   sendVidfastCommand,
   sourceLabel,
   withCineSrcQuality,
+  withCineSrcServer,
 } from "@/lib/embed-sources";
 import { ResumeOverlay } from "@/components/resume-overlay";
 import { DownloadButton } from "@/components/download-button";
@@ -152,6 +155,8 @@ export function VixPlayer({
   const remoteDurationRef = useRef(0);
   const iframePausedRef = useRef(true);
   const iframeMutedRef = useRef(false);
+  /** Last nonzero volume for driven-embed unmute (VidFast mutes via level 0). */
+  const lastVolumeRef = useRef(loadVixSettings().volume || 1);
   /** Parsed VDRK cues rendered over the CineSrc iframe (no <video> track). */
   const [iframeCues, setIframeCues] = useState<VttCue[]>([]);
   /** Resume override for CineSrc quality switches (reload keeps position). */
@@ -258,6 +263,23 @@ export function VixPlayer({
   const [qualitySelection, setQualitySelection] = useState<"auto" | number>(
     () => loadVixSettings().quality
   );
+  /** CineSrc sub-server hint (Auto = CineSrc picks). Persisted in settings. */
+  const [cineSrcServer, setCineSrcServer] = useState<string>(
+    () => loadVixSettings().cineSrcServer || "auto"
+  );
+  /**
+   * Real CineSrc server ids discovered via `cinesrc:sourceused` (e.g. Nebula).
+   * Persisted so the picker survives restarts; appended in first-seen order.
+   */
+  const [cineSrcKnownServers, setCineSrcKnownServers] = useState<string[]>(
+    () => loadVixSettings().cineSrcKnownServers ?? []
+  );
+  const knownServersRef = useRef(cineSrcKnownServers);
+  useEffect(() => {
+    knownServersRef.current = cineSrcKnownServers;
+  }, [cineSrcKnownServers]);
+  /** Server id the embed reports it is actually using (sourceused event). */
+  const [liveCineSrcServer, setLiveCineSrcServer] = useState<string | null>(null);
   const setHlsQualityRef = useRef<((next: "auto" | number) => void) | null>(
     null
   );
@@ -575,17 +597,17 @@ export function VixPlayer({
     [activeSource]
   );
 
-  // CineSrc is the only embed we remote-control (controls=false hides its
-  // chrome, so ours must replace it). VidFast/Mapple stay fully interactive —
-  // layering our transport over their working chrome gave two dead players.
+  // CineSrc (controls=false) and VidFast (title/next overlays off) hide their
+  // chrome, so ours must replace them. Mapple stays fully interactive — it
+  // has no command channel, so layering our transport over it would brick it.
   /** True for iframe embeds we drive (transport + tap-catcher + lock). */
-  const isDrivenEmbed = mode === "iframe" && activeSource === "cinesrc";
+  const isDrivenEmbed =
+    mode === "iframe" && (activeSource === "cinesrc" || activeSource === "vidfast");
   const vidfastEmbed = mode === "iframe" && activeSource === "vidfast";
   const mappleEmbed = mode === "iframe" && activeSource === "mapple";
-  // Subs only need a clock: driven embeds (transport) + VidFast/Mapple
-  // (read-only timeupdate clock). VidFast must stay here even though it is
-  // NOT driven — dropping it silently disables its entire CC flow.
-  const clockEmbed = isDrivenEmbed || mappleEmbed || vidfastEmbed;
+  // Subs only need a clock: driven embeds (transport) + Mapple
+  // (read-only timeupdate clock).
+  const clockEmbed = isDrivenEmbed || mappleEmbed;
 
   /** Native / driven-embed ±10s seek, with a transient on-screen cue. */
   const seekBy = useCallback(
@@ -1540,10 +1562,17 @@ export function VixPlayer({
 
   const togglePlay = useCallback(() => {
     if (isDrivenEmbed) {
-      sendCineSrcCommand(
-        iframeRef.current,
-        iframePausedRef.current ? "play" : "pause"
-      );
+      if (activeSource === "vidfast") {
+        sendVidfastCommand(
+          iframeRef.current,
+          iframePausedRef.current ? "play" : "pause"
+        );
+      } else {
+        sendCineSrcCommand(
+          iframeRef.current,
+          iframePausedRef.current ? "play" : "pause"
+        );
+      }
       bumpChrome();
       return;
     }
@@ -1552,7 +1581,7 @@ export function VixPlayer({
     if (v.paused) void v.play().catch(() => {});
     else v.pause();
     bumpChrome();
-  }, [isDrivenEmbed, bumpChrome]);
+  }, [isDrivenEmbed, activeSource, bumpChrome]);
 
   const seekBySeconds = useCallback(
     (delta: number) => {
@@ -1596,7 +1625,15 @@ export function VixPlayer({
     if (isDrivenEmbed) {
       const next = !iframeMutedRef.current;
       iframeMutedRef.current = next;
-      sendCineSrcCommand(iframeRef.current, "setMuted", [next]);
+      if (activeSource === "vidfast") {
+        // VidFast has no discrete mute — mute is volume level 0, unmute
+        // restores the last nonzero level.
+        sendVidfastCommand(iframeRef.current, "volume", {
+          level: next ? 0 : lastVolumeRef.current,
+        });
+      } else {
+        sendCineSrcCommand(iframeRef.current, "setMuted", [next]);
+      }
       setTransport((t) => ({ ...t, muted: next }));
       bumpChrome();
       return;
@@ -1606,15 +1643,20 @@ export function VixPlayer({
     // Session-only mute — never persisted (see vix-settings).
     v.muted = !v.muted;
     bumpChrome();
-  }, [isDrivenEmbed, bumpChrome]);
+  }, [isDrivenEmbed, activeSource, bumpChrome]);
 
   const setVolume = useCallback(
     (vol: number) => {
       const next = Math.max(0, Math.min(1, vol));
       if (isDrivenEmbed) {
         iframeMutedRef.current = next === 0;
-        sendCineSrcCommand(iframeRef.current, "setVolume", [next]);
-        sendCineSrcCommand(iframeRef.current, "setMuted", [next === 0]);
+        if (next > 0) lastVolumeRef.current = next;
+        if (activeSource === "vidfast") {
+          sendVidfastCommand(iframeRef.current, "volume", { level: next });
+        } else {
+          sendCineSrcCommand(iframeRef.current, "setVolume", [next]);
+          sendCineSrcCommand(iframeRef.current, "setMuted", [next === 0]);
+        }
         setTransport((t) => ({ ...t, volume: next, muted: next === 0 }));
         saveVixSettings({ volume: next });
         bumpChrome();
@@ -1627,7 +1669,7 @@ export function VixPlayer({
       saveVixSettings({ volume: next });
       bumpChrome();
     },
-    [isDrivenEmbed, bumpChrome]
+    [isDrivenEmbed, activeSource, bumpChrome]
   );
 
   /** Cycle screen fill: object-fit on native, CSS zoom on embeds. */
@@ -1677,6 +1719,22 @@ export function VixPlayer({
           };
           if (ev === "ready" || ev === "loadedmetadata") {
             setMediaReady(true);
+          }
+          // CineSrc reports the server it actually uses (e.g. Nebula).
+          // Learn it: the id doubles as the valid `lastserver` value, so
+          // discovered servers become switchable picker entries.
+          if (ev === "sourceused") {
+            const sid = (e.data as { sourceId?: unknown }).sourceId;
+            if (typeof sid === "string" && sid.trim()) {
+              const id = sid.trim();
+              setLiveCineSrcServer(id);
+              if (!knownServersRef.current.includes(id)) {
+                const next = [...knownServersRef.current, id].slice(0, CINESRC_MAX_KNOWN_SERVERS);
+                knownServersRef.current = next;
+                setCineSrcKnownServers(next);
+                saveVixSettings({ cineSrcKnownServers: next });
+              }
+            }
           }
           if (ev === "ratechange" && typeof payload.playbackRate === "number") {
             const rate = payload.playbackRate;
@@ -2003,13 +2061,15 @@ export function VixPlayer({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [flushPosition, subMenuOpen, audioMenuOpen, qualityMenuOpen]);
 
-  // Desktop keyboard shortcuts (native + CineSrc via its command channel).
+  // Desktop keyboard shortcuts (native + driven embeds via command channels).
   // Custom chrome owns transport — no native <video controls> to
   // double-toggle against. Other embeds keep their own keys when focused.
   useEffect(() => {
     // Inline (not the render const below): deps evaluate before it exists.
-    const cinesrcKeys = mode === "iframe" && activeSource === "cinesrc";
-    if ((mode !== "native" && !cinesrcKeys) || locked) return;
+    const drivenKeys =
+      mode === "iframe" &&
+      (activeSource === "cinesrc" || activeSource === "vidfast");
+    if ((mode !== "native" && !drivenKeys) || locked) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
       if (subMenuOpen || audioMenuOpen || qualityMenuOpen) return;
@@ -2129,10 +2189,33 @@ export function VixPlayer({
   if (cinesrcFrame && qualitySelection !== "auto") {
     iframeSrc = withCineSrcQuality(iframeSrc, qualitySelection);
   }
+  // Stale-hint guard: a stored non-auto hint that matches no discovered real
+  // server (e.g. from before discovery existed) can never work — send Auto.
+  // The stored value stays until the user picks a real server (then replaced).
+  const effectiveCineSrcServer =
+    cineSrcServer !== "auto" &&
+    cineSrcKnownServers.length > 0 &&
+    !cineSrcKnownServers.includes(cineSrcServer)
+      ? "auto"
+      : cineSrcServer;
+  // CineSrc sub-server hint: lastserver + prioritize (Auto clears both).
+  if (cinesrcFrame && effectiveCineSrcServer !== "auto") {
+    iframeSrc = withCineSrcServer(iframeSrc, effectiveCineSrcServer);
+  }
   const handleCineSrcQuality = useCallback(
     (next: "auto" | number) => {
       setQualitySelection(next);
       saveVixSettings({ quality: next });
+      setCineSrcT(Math.floor(remotePositionRef.current));
+      bumpChrome();
+    },
+    [bumpChrome]
+  );
+  /** Sub-server switch: same position-preserving reload as quality switches. */
+  const handleCineSrcServer = useCallback(
+    (next: string) => {
+      setCineSrcServer(next);
+      saveVixSettings({ cineSrcServer: next });
       setCineSrcT(Math.floor(remotePositionRef.current));
       bumpChrome();
     },
@@ -2270,6 +2353,9 @@ export function VixPlayer({
           onToggleMute={toggleMute}
           onVolume={setVolume}
           onToggleFullscreen={toggleFullscreen}
+          serverOptions={cineSrcEmbed ? buildCineSrcServerOptions(cineSrcKnownServers) : undefined}
+          activeServer={liveCineSrcServer ?? cineSrcServer}
+          onPickServer={cineSrcEmbed ? handleCineSrcServer : undefined}
         />
       )}
 

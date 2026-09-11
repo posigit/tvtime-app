@@ -18,7 +18,7 @@ import {
   isPromoCue,
   parseVttCues,
 } from "../lib/player-subs";
-import { embedUrlFor, withCineSrcQuality } from "../lib/embed-sources";
+import { CINESRC_SEED_SERVERS, buildCineSrcServerOptions, cineSrcAliasFor, cineSrcServerLabel, embedUrlFor, withCineSrcQuality, withCineSrcServer } from "../lib/embed-sources";
 import { DEFAULT_VIX_SETTINGS } from "../lib/vix-settings";
 import { NEXT_FAB_RATIO, RESUME_END_RATIO } from "../lib/player-constants";
 
@@ -142,6 +142,43 @@ assert.equal(
   ),
   "https://cinesrc.st/embed/movie/1?controls=false"
 );
+
+// CineSrc sub-server hint (Auto clears it; real ids set lastserver).
+// Ids must be CineSrc's own (learned from cinesrc:sourceused) — e.g. Nebula.
+assert.equal(
+  withCineSrcServer("https://cinesrc.st/embed/movie/1?controls=false", "Nebula"),
+  "https://cinesrc.st/embed/movie/1?controls=false&lastserver=Nebula&prioritize=true"
+);
+assert.equal(
+  withCineSrcServer(
+    "https://cinesrc.st/embed/movie/1?controls=false&lastserver=Nebula&prioritize=true",
+    "auto"
+  ),
+  "https://cinesrc.st/embed/movie/1?controls=false"
+);
+// Discovered servers get Greek aliases in order, real id kept as sub-label.
+assert.equal(cineSrcAliasFor("nebula", 0), "Zeus");
+assert.equal(cineSrcAliasFor("lisbon", 1), "Odysseus");
+assert.equal(cineSrcServerLabel("auto"), "Auto");
+assert.equal(cineSrcServerLabel("nebula", ["nebula"]), "Zeus");
+assert.equal(cineSrcServerLabel("Mystery", []), "Mystery");
+assert.deepEqual(buildCineSrcServerOptions(["nebula", "lisbon"]), [
+  { id: "auto", name: "Auto" },
+  { id: "nebula", name: "Zeus", sub: "nebula" },
+  { id: "lisbon", name: "Odysseus", sub: "lisbon" },
+]);
+// Case-insensitive dedupe: "Nebula" (live event) + "nebula" (seed) = one entry.
+assert.deepEqual(buildCineSrcServerOptions(["Nebula", "nebula", "sturm"]), [
+  { id: "auto", name: "Auto" },
+  { id: "Nebula", name: "Zeus", sub: "Nebula" },
+  { id: "sturm", name: "Odysseus", sub: "sturm" },
+]);
+// Seed list matches the embed's own rotation order (captured 2026-09-11).
+assert.deepEqual(CINESRC_SEED_SERVERS.slice(0, 4), ["nebula", "lisbon", "surge", "spark"]);
+assert.ok(CINESRC_SEED_SERVERS.includes("sturm"));
+assert.ok(CINESRC_SEED_SERVERS.includes("brisa"));
+assert.equal(DEFAULT_VIX_SETTINGS.cineSrcServer, "auto");
+assert.deepEqual(DEFAULT_VIX_SETTINGS.cineSrcKnownServers, CINESRC_SEED_SERVERS);
 
 // Promo cues (VDRK ad spam) are dropped; dialogue is never touched.
 assert.equal(isPromoCue("Visit hoofoot.ru to watch all sports"), true);
