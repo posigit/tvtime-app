@@ -39,6 +39,11 @@ type PlayerTransportProps = {
   activeServer?: string;
   onPickServer?: (id: string) => void;
   /**
+   * Reports sub-server menu open state so the parent can keep chrome awake
+   * while it is open (same as the top CC/audio/quality menus).
+   */
+  onServerMenuOpenChange?: (open: boolean) => void;
+  /**
    * Opaque bottom strip. Driven embeds that keep rendering their own control
    * bar (VidFast has no param to hide it) would otherwise ghost through our
    * translucent gradient — solid black buries it.
@@ -70,6 +75,7 @@ export function PlayerTransport({
   serverOptions,
   activeServer = "auto",
   onPickServer,
+  onServerMenuOpenChange,
   opaqueBottom = false,
 }: PlayerTransportProps) {
   const safeDur = Number.isFinite(duration) && duration > 0 ? duration : 0;
@@ -80,6 +86,10 @@ export function PlayerTransport({
   const [volumeSupported] = useState(() => canControlVolume(null));
   const [serverMenuOpen, setServerMenuOpen] = useState(false);
   const serverMenuRef = useRef<HTMLDivElement>(null);
+  // Keep parent chrome awake while the menu is open (matches top menus).
+  useEffect(() => {
+    onServerMenuOpenChange?.(serverMenuOpen);
+  }, [serverMenuOpen, onServerMenuOpenChange]);
   const activeServerLabel =
     serverOptions?.find((s) => s.id === activeServer)?.name ?? "Auto";
   // Outside-dismiss + Escape for the sub-server menu (mirrors top chrome).

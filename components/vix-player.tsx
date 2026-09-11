@@ -316,6 +316,8 @@ export function VixPlayer({
   const [subMenuOpen, setSubMenuOpen] = useState(false);
   const [audioMenuOpen, setAudioMenuOpen] = useState(false);
   const [qualityMenuOpen, setQualityMenuOpen] = useState(false);
+  /** Bottom sub-server menu (transport) — keeps chrome awake like top menus. */
+  const [serverMenuOpen, setServerMenuOpen] = useState(false);
   /** Surface external-subtitle fetch failures instead of stranding the picker. */
   const [subError, setSubError] = useState<string | null>(null);
   /** Top OpenSubtitles files (max 3) for the CC picker. */
@@ -420,6 +422,7 @@ export function VixPlayer({
     setOpenSubItems([]);
     openSubListKeyRef.current = null;
     setCineSrcT(null);
+    setServerMenuOpen(false);
     if (tapCueTimerRef.current) {
       clearTimeout(tapCueTimerRef.current);
       tapCueTimerRef.current = null;
@@ -645,12 +648,12 @@ export function VixPlayer({
     // Auto-hide only while playing and no menus are open.
     if (playing) {
       chromeHideTimerRef.current = setTimeout(() => {
-        if (!subMenuOpen && !audioMenuOpen && !qualityMenuOpen) {
+        if (!subMenuOpen && !audioMenuOpen && !qualityMenuOpen && !serverMenuOpen) {
           setChromeVisible(false);
         }
       }, 3200);
     }
-  }, [locked, subMenuOpen, audioMenuOpen, qualityMenuOpen]);
+  }, [locked, subMenuOpen, audioMenuOpen, qualityMenuOpen, serverMenuOpen]);
 
   /** Double-tap ±10s; single tap toggles custom chrome (no native controls). */
   const handleTap = useCallback(
@@ -992,6 +995,7 @@ export function VixPlayer({
     setOpenSubItems([]);
     openSubListKeyRef.current = null;
     setCineSrcT(null);
+    setServerMenuOpen(false);
     // Keep ended/nearEnd so binge overlays don't double-fire after a switch.
     bookmarkClearedRef.current = false;
   }, [activeSource, savePosition]);
@@ -2356,6 +2360,7 @@ export function VixPlayer({
           serverOptions={cineSrcEmbed ? buildCineSrcServerOptions(cineSrcKnownServers) : undefined}
           activeServer={liveCineSrcServer ?? cineSrcServer}
           onPickServer={cineSrcEmbed ? handleCineSrcServer : undefined}
+          onServerMenuOpenChange={setServerMenuOpen}
           opaqueBottom={activeSource === "vidfast"}
         />
       )}
