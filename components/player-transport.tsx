@@ -38,6 +38,12 @@ type PlayerTransportProps = {
   serverOptions?: { id: string; name: string; sub?: string }[];
   activeServer?: string;
   onPickServer?: (id: string) => void;
+  /**
+   * Opaque bottom strip. Driven embeds that keep rendering their own control
+   * bar (VidFast has no param to hide it) would otherwise ghost through our
+   * translucent gradient — solid black buries it.
+   */
+  opaqueBottom?: boolean;
 };
 
 /**
@@ -64,6 +70,7 @@ export function PlayerTransport({
   serverOptions,
   activeServer = "auto",
   onPickServer,
+  opaqueBottom = false,
 }: PlayerTransportProps) {
   const safeDur = Number.isFinite(duration) && duration > 0 ? duration : 0;
   const ratio = safeDur > 0 ? Math.min(1, Math.max(0, currentTime / safeDur)) : 0;
@@ -156,7 +163,7 @@ export function PlayerTransport({
       </div>
 
       {/* Bottom scrubber + volume / FS */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-10 sm:px-4 sm:pb-4">
+      <div className={cn("pointer-events-none absolute inset-x-0 bottom-0 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-10 sm:px-4 sm:pb-4", opaqueBottom ? "bg-black" : "bg-gradient-to-t from-black/90 via-black/50 to-transparent")}>
         <div className="pointer-events-auto flex flex-col gap-2">
           <label className="sr-only" htmlFor="player-seek">
             Seek

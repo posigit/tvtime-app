@@ -2356,6 +2356,7 @@ export function VixPlayer({
           serverOptions={cineSrcEmbed ? buildCineSrcServerOptions(cineSrcKnownServers) : undefined}
           activeServer={liveCineSrcServer ?? cineSrcServer}
           onPickServer={cineSrcEmbed ? handleCineSrcServer : undefined}
+          opaqueBottom={activeSource === "vidfast"}
         />
       )}
 
