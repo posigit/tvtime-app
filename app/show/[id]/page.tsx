@@ -9,10 +9,13 @@ import {
 } from "@/components/show-detail-client";
 import { filterNewMedia } from "@/lib/recommend";
 import {
+  getTvImages,
   getTvRecommendations,
   getTvSimilar,
   getTvVideos,
   getWatchProviders,
+  logoUrl,
+  pickMovieLogo,
   pickTrailerKey,
 } from "@/lib/tmdb";
 import { getCommunityReviews } from "@/lib/reviews";
@@ -76,7 +79,7 @@ export default async function ShowDetailPage({
 
   const ownedIds = new Set(ownedShows.map((s) => s.tmdbId));
 
-  const [similarRaw, recsRaw, providers, reviews, videos, theme] =
+  const [similarRaw, recsRaw, providers, reviews, videos, theme, images] =
     await Promise.all([
       getTvSimilar(tmdbId).catch(() => []),
       getTvRecommendations(tmdbId).catch(() => []),
@@ -110,7 +113,11 @@ export default async function ShowDetailPage({
       getTvVideos(tmdbId).catch(() => []),
       // Per-show page theme (poster-dominant color) — same accents as movies.
       getMovieTheme(show.posterPath, show.backdropPath),
+      getTvImages(tmdbId).catch(() => ({ logos: [] })),
     ]);
+
+  // Original-font title treatment (TMDB logo artwork), like movies.
+  const logoSrc = logoUrl(pickMovieLogo(images?.logos));
 
   const moreLikeThis = filterNewMedia(similarRaw, ownedIds, 12);
   const recommended = filterNewMedia(recsRaw, ownedIds, 12);
@@ -187,6 +194,7 @@ export default async function ShowDetailPage({
       reviews={reviews}
       trailerKey={pickTrailerKey(videos)}
       theme={theme}
+      logoSrc={logoSrc}
     />
   );
 }

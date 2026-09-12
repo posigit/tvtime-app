@@ -96,6 +96,7 @@ export function ShowDetailClient({
   reviews,
   trailerKey = null,
   playbackPositions = {},
+  logoSrc = null,
   theme,
 }: {
   show: DetailShow;
@@ -111,6 +112,7 @@ export function ShowDetailClient({
   reviews?: ReviewsPayload;
   trailerKey?: string | null;
   playbackPositions?: Record<string, PlaybackSummary>;
+  logoSrc?: string | null;
   theme: MovieTheme;
 }) {
   const router = useRouter();
@@ -804,9 +806,23 @@ export function ShowDetailClient({
           </div>
         </div>
 
-        {/* Title */}
-        <h1 className="mt-4 text-center text-3xl font-black tracking-tight text-white drop-shadow">
-          {show.title}
+        {/* Title — original-font logo artwork when available, like movies */}
+        <h1 className="mt-4 flex justify-center px-6 text-center">
+          {logoSrc ? (
+            <Image
+              src={logoSrc}
+              alt={show.title}
+              width={512}
+              height={288}
+              sizes="(max-width: 480px) 80vw, 400px"
+              className="h-20 w-auto max-w-[85%] object-contain drop-shadow-[0_6px_20px_rgba(0,0,0,0.9)]"
+              unoptimized
+            />
+          ) : (
+            <span className="text-3xl font-black tracking-tight text-white drop-shadow">
+              {show.title}
+            </span>
+          )}
         </h1>
         {rewatchCounts[0] > 0 && (
           <div className="mt-1.5 flex justify-center">

@@ -728,6 +728,21 @@ export function pickMovieLogo(logos: TmdbLogo[] | null | undefined): string | nu
   return (en ?? ranked[0]).file_path ?? null;
 }
 
+/**
+ * Title treatments in the show's original font (TMDB /tv/{id}/images).
+ * Same shape and ranking as movies.
+ */
+export async function getTvImages(tmdbId: number): Promise<{
+  logos: TmdbLogo[];
+}> {
+  const data = await tmdbFetch<{ logos?: TmdbLogo[] }>(
+    `/tv/${tmdbId}/images`,
+    {},
+    { revalidate: 86400 }
+  );
+  return { logos: data.logos ?? [] };
+}
+
 export type TmdbReleaseInfo = {
   certification?: string;
   iso_639_1?: string | null;
