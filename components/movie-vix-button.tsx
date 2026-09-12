@@ -52,11 +52,20 @@ export function MovieVixButton({
         className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl px-4 py-2.5 text-center text-white ring-1 ring-white/20 backdrop-blur-2xl transition active:scale-[0.99]"
         style={{
           background:
-            "linear-gradient(160deg, rgb(var(--theme, 255 255 255) / 0.22), rgba(255, 255, 255, 0.06) 55%, rgb(var(--theme, 255 255 255) / 0.12))",
+            "linear-gradient(160deg, rgb(var(--theme, 255 255 255) / 0.42), rgba(255, 255, 255, 0.07) 55%, rgb(var(--theme, 255 255 255) / 0.26))",
           boxShadow:
-            "0 8px 24px rgba(0, 0, 0, 0.45), 0 0 32px rgb(var(--theme, 255 255 255) / 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25)",
+            "0 8px 24px rgba(0, 0, 0, 0.45), 0 0 48px rgb(var(--theme, 255 255 255) / 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25)",
         }}
       >
+        {/* theme color pooling across the top — reads on near-black pages */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(120% 130% at 50% 0%, rgb(var(--theme, 255 255 255) / 0.38), transparent 70%)",
+          }}
+        />
         {/* hairline top highlight — the only "sheen", kept faint */}
         <span
           aria-hidden
@@ -67,7 +76,7 @@ export function MovieVixButton({
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/[0.18] text-white ring-1 ring-white/50 backdrop-blur-2xl transition group-hover:scale-105"
           style={{
             boxShadow:
-              "0 12px 32px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 0 44px rgb(var(--theme, 255 255 255) / 0.5)",
+              "0 12px 32px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 0 44px rgb(var(--theme, 255 255 255) / 0.65)",
           }}
         >
           {mode === "rewatch" ? (
