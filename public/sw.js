@@ -69,6 +69,16 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(request.url);
 
+  // Dev mode (?dev=1, see providers.tsx): serve /api/dl ONLY. Everything
+  // else (HMR, navigations, build chunks) goes straight to the network so
+  // the worker can never interfere with development.
+  if (
+    new URL(self.location.href).searchParams.get("dev") === "1" &&
+    !(url.origin === self.location.origin && url.pathname === "/api/dl")
+  ) {
+    return;
+  }
+
   // --- Cross-origin: only TMDB images ---
   if (url.origin !== self.location.origin) {
     if (isTmdbImage(url)) {

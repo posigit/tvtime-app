@@ -6,7 +6,6 @@ import { ArrowLeft, Download } from "lucide-react";
 import {
   DownloadRow,
   requestOfflinePlay,
-  useOnline,
 } from "@/components/download-row";
 import {
   formatBytes,
@@ -24,7 +23,6 @@ import {
  * resume/retry refuse while offline (rows handle that themselves).
  */
 export default function DownloadsPage() {
-  const online = useOnline();
   const [items, setItems] = useState<DownloadRecord[]>([]);
   const [ready, setReady] = useState(false);
 
@@ -68,13 +66,6 @@ export default function DownloadsPage() {
           </p>
         </div>
       </div>
-
-      {!online && (
-        <p className="mt-3 rounded-2xl bg-primary/10 px-4 py-2.5 text-xs font-bold text-primary ring-1 ring-primary/30">
-          You&apos;re offline — saved videos still play. New downloads need a
-          connection.
-        </p>
-      )}
 
       <div className="mt-4 space-y-2">
         {!ready ? (

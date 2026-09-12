@@ -16,9 +16,12 @@ function SettingsHydrator() {
 
 export function Providers({ children }: { children: ReactNode }) {
   useEffect(() => {
-    // Avoid SW hijacking HMR / dev navigations
-    if (process.env.NODE_ENV !== "production") return;
     if (!("serviceWorker" in navigator)) return;
+    // Production: full offline shell. Dev (?dev=1): /api/dl ONLY, so
+    // offline-download playback works in dev without the worker touching
+    // HMR, navigations or build chunks (see DEV_MODE in public/sw.js).
+    const swUrl =
+      process.env.NODE_ENV === "production" ? "/sw.js" : "/sw.js?dev=1";
 
     let cancelled = false;
     let reg: ServiceWorkerRegistration | null = null;
@@ -29,11 +32,11 @@ export function Providers({ children }: { children: ReactNode }) {
       }
     };
 
-    navigator.serviceWorker
-      .register("/sw.js", {
-        // Always revalidate sw.js (server also sends no-cache headers)
-        updateViaCache: "none",
-      })
+      navigator.serviceWorker
+        .register(swUrl, {
+          // Always revalidate sw.js (server also sends no-cache headers)
+          updateViaCache: "none",
+        })
       .then((registration) => {
         if (cancelled) return;
         reg = registration;

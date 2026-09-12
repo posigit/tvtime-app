@@ -35,6 +35,12 @@ export function OfflinePlayerHost() {
     const onPlay = (e: Event) => {
       const key = (e as CustomEvent<{ key: string }>).detail?.key;
       if (!key) return;
+      // /api/dl is served ONLY by the service worker (no app route exists).
+      // Without a controlling SW the player would spin on 404s — say so.
+      if (!("serviceWorker" in navigator) || !navigator.serviceWorker.controller) {
+        toast("Offline player isn't ready — reload once online, then retry", "error");
+        return;
+      }
       void (async () => {
         const rec = (await getManifest())[key];
         if (!rec) {

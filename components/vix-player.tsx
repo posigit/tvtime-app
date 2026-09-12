@@ -407,18 +407,23 @@ export function VixPlayer({
   const offlineOverride = initialPlaylistUrl != null;
   const isEmbedActive =
     !offlineOverride && EMBED_SOURCES.some((s) => s.key === activeSource);
-  // mode: native -> iframe -> error
+  // mode: native -> iframe -> error.
+  // Offline has no iframe fallback (there is no embed to fall back to, and
+  // the cached playlist would render as garbage in a frame) — a dead native
+  // stream goes straight to error with download-specific copy below.
   const mode = isEmbedActive
     ? iframeError
       ? "error"
       : "iframe"
-    : streamFailed
-      ? iframeError
-        ? "error"
-        : "iframe"
-      : playlistUrl
-        ? "native"
-        : "loading";
+    : offlineOverride && streamFailed
+      ? "error"
+      : streamFailed
+        ? iframeError
+          ? "error"
+          : "iframe"
+        : playlistUrl
+          ? "native"
+          : "loading";
 
   useEffect(() => {
     onEventRef.current = onEvent;
@@ -2671,11 +2676,15 @@ export function VixPlayer({
       {hasError && (
         <div className="absolute inset-0 z-[6] flex items-center justify-center bg-black/85 p-6 text-center">
           <div>
-            <p className="font-bold text-white">Player unavailable here</p>
-            <p className="mt-1 text-sm text-white/55">
-              Try switching to another source.
+            <p className="font-bold text-white">
+              {offlineOverride ? "Couldn't play this download" : "Player unavailable here"}
             </p>
-            {streamable && (
+            <p className="mt-1 text-sm text-white/55">
+              {offlineOverride
+                ? "The saved file may be incomplete — try downloading it again."
+                : "Try switching to another source."}
+            </p>
+            {streamable && !offlineOverride && (
               <button
                 type="button"
                 onClick={() => {
