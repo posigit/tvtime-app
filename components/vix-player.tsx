@@ -80,6 +80,13 @@ import type {
 let loggedRejectedOrigin = false;
 
 /**
+ * Lock survives episode auto-advance within a session. Advancing remounts the
+ * player (key change) which would otherwise drop a pocket-lock mid-binge.
+ * Cleared on close/unlock; a fresh page load starts unlocked.
+ */
+let sessionLocked = false;
+
+/**
  * Full-screen VixSrc player overlay.
  *
  * Primary path: resolves the stream through /api/vixsrc/stream and plays the
@@ -218,7 +225,11 @@ export function VixPlayer({
   // win over a stale show-page bookmark. Lookup always re-reads /api/playback.
   const [resumePosition, setResumePosition] = useState<number | null>(null);
   const [resumeKey, setResumeKey] = useState<string | null>(null);
-  const [locked, setLocked] = useState(false);
+  const [locked, setLocked] = useState(sessionLocked);
+  // Persist lock across episode-advance remounts (same session only).
+  useEffect(() => {
+    sessionLocked = locked;
+  }, [locked]);
   /** Custom chrome only — native <video controls> are off (dual-layer fix). */
   const [chromeVisible, setChromeVisible] = useState(true);
   /** True once the media element can actually play (not just playlist resolved). */
@@ -2589,6 +2600,7 @@ export function VixPlayer({
             setLocked(true);
           }}
           onClose={() => {
+            sessionLocked = false;
             void flushPosition().then(() => {
               onClose();
             });

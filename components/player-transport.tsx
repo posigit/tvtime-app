@@ -13,6 +13,7 @@ import {
   VolumeX,
 } from "lucide-react";
 import { formatPlayerClock } from "@/lib/player-progress";
+import { NEXT_FAB_RATIO } from "@/lib/player-constants";
 import { canControlVolume } from "@/lib/player-seek";
 import type { IntroDbSegments } from "@/lib/introdb";
 import { cn } from "@/lib/utils";
@@ -92,9 +93,9 @@ export function PlayerTransport({
     safeDur > 0 && segments
       ? (
           [
-            { seg: segments.intro, label: "Intro", cls: "bg-amber-400/80" },
+            { seg: segments.intro, label: "Intro", cls: "bg-purple-400/80" },
             { seg: segments.recap, label: "Recap", cls: "bg-sky-400/80" },
-            { seg: segments.outro, label: "Outro", cls: "bg-violet-400/80" },
+            { seg: segments.outro, label: "Outro", cls: "bg-rose-400/80" },
           ] as const
         )
           .filter((m) => m.seg != null && m.seg.end > m.seg.start)
@@ -106,6 +107,14 @@ export function PlayerTransport({
           })
           .filter((m) => m.width > 0)
       : [];
+  // Exact Up Next fire point: outro start when known, else the 96% fallback.
+  // (Was implicit before — the outro block covered it only when data exists.)
+  const upNextAt =
+    safeDur > 0
+      ? segments?.outro && segments.outro.end > segments.outro.start
+        ? Math.max(0, Math.min(1, segments.outro.start / safeDur))
+        : NEXT_FAB_RATIO
+      : null;
   // UA-based. iOS Safari ignores HTMLMediaElement.volume — mute only.
   // Lazy init: player only mounts client-side after open, so no SSR mismatch.
   const [volumeSupported] = useState(() => canControlVolume(null));
@@ -222,6 +231,13 @@ export function PlayerTransport({
                   style={{ left: `${m.left * 100}%`, width: `${m.width * 100}%` }}
                 />
               ))}
+              {upNextAt != null && (
+                <div
+                  title="Up Next"
+                  className="absolute inset-y-0 w-0.5 bg-white"
+                  style={{ left: `calc(${upNextAt * 100}% - 1px)` }}
+                />
+              )}
             </div>
             <input
               id="player-seek"
