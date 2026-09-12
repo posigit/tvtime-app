@@ -17,6 +17,11 @@ import {
   writeOfflinePosition,
 } from "@/lib/downloads";
 import {
+  isInPictureInPicture,
+  supportsPictureInPicture,
+  togglePictureInPicture,
+} from "@/lib/player-pip";
+import {
   EMBED_SOURCES,
   CINESRC_MAX_KNOWN_SERVERS,
   buildCineSrcServerOptions,
@@ -263,6 +268,14 @@ export function VixPlayer({
     volume: 1,
   });
   const [isFullscreen, setIsFullscreen] = useState(false);
+  /**
+   * PiP capability, probed lazily without a video element: standard-API
+   * browsers resolve here; WebKit-only ones (iOS Safari) resolve optimist-
+   * ically unless in standalone PWA, and the toggle re-probes on the live
+   * element at tap time. Static per browser — never needs re-probing.
+   */
+  const [pipSupported] = useState(() => supportsPictureInPicture(null));
+  const [pipActiveRaw, setPipActive] = useState(false);
   const chromeHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** Blocks synthetic mouse click after touch chrome toggle. */
   const lastTouchChromeRef = useRef(0);
@@ -445,12 +458,12 @@ export function VixPlayer({
           ? "error"
           : "iframe"
         : playlistUrl
-          ? "native"
-          : "loading";
+            ? "native"
+            : "loading";
 
   useEffect(() => {
-    onEventRef.current = onEvent;
-  }, [onEvent]);
+      onEventRef.current = onEvent;
+    }, [onEvent]);
 
   useEffect(() => {
     onCloseRef.current = onClose;
@@ -1873,6 +1886,51 @@ export function VixPlayer({
     bumpChrome();
   }, [bumpChrome]);
 
+  // Picture-in-Picture (native <video> only). State is event-driven like
+  // fullscreen (setState lives in listeners, never in the effect body).
+  // Injected subtitle tracks flip to native-visible while PiP is active —
+  // the overlay can't paint inside the PiP window — and back on leave.
+  // SubSource "off" never resurrects hidden captions.
+  useEffect(() => {
+    if (mode !== "native") return;
+    const video = videoRef.current;
+    if (!video) return;
+    const setTracksNative = (show: boolean) => {
+      if (show && subSourceRef.current === "off") return;
+      for (const t of injectedTracksRef.current) t.mode = show ? "showing" : "hidden";
+    };
+    // One sync for all three events: standard enter/leave plus WebKit's
+    // mode-change (iOS fires only the latter — state + tracks flip there too).
+    const syncPiP = () => {
+      const active = isInPictureInPicture(video);
+      setPipActive(active);
+      setTracksNative(active);
+    };
+    video.addEventListener("enterpictureinpicture", syncPiP);
+    video.addEventListener("leavepictureinpicture", syncPiP);
+    const w = video as HTMLVideoElement & {
+      addEventListener(t: string, l: () => void): void;
+      removeEventListener(t: string, l: () => void): void;
+    };
+    w.addEventListener("webkitpresentationmodechanged", syncPiP);
+    return () => {
+      video.removeEventListener("enterpictureinpicture", syncPiP);
+      video.removeEventListener("leavepictureinpicture", syncPiP);
+      w.removeEventListener("webkitpresentationmodechanged", syncPiP);
+      setTracksNative(false);
+    };
+  }, [mode, playlistUrl]);
+
+  const togglePiP = useCallback(() => {
+    const video = videoRef.current;
+    if (!video || mode !== "native") return;
+    navigator.vibrate?.(10);
+    // State syncs back through the PiP events above (or stays put on failure).
+    void togglePictureInPicture(video).then(() => {
+      bumpChrome();
+    });
+  }, [mode, bumpChrome]);
+
   // ---------- iframe fallback: postMessage bridge ----------
   useEffect(() => {
     const handler = (e: MessageEvent) => {
@@ -2568,6 +2626,9 @@ export function VixPlayer({
           onToggleMute={toggleMute}
           onVolume={setVolume}
           onToggleFullscreen={toggleFullscreen}
+          showPiP={mode === "native" && pipSupported}
+          pipActive={mode === "native" && pipActiveRaw}
+          onTogglePiP={togglePiP}
           serverOptions={cineSrcEmbed ? buildCineSrcServerOptions(cineSrcKnownServers) : undefined}
           activeServer={liveCineSrcServer ?? cineSrcServer}
           onPickServer={cineSrcEmbed ? handleCineSrcServer : undefined}
