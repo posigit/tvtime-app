@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Bookmark, Check, Plus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -168,8 +169,10 @@ export function AddToListButton({
           fill={inAny ? "currentColor" : "none"}
         />
       </button>
-      {open && (
-        <div className="fixed inset-0 z-[90]" role="dialog" aria-modal="true" aria-label="Add to list">
+      {open &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div className="fixed inset-0 z-[90]" role="dialog" aria-modal="true" aria-label="Add to list">
           <button
             type="button"
             aria-label="Close"
@@ -266,8 +269,9 @@ export function AddToListButton({
               </>
             )}
           </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </>
   );
 }
