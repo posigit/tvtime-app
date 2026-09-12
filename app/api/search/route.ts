@@ -17,6 +17,11 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const query = (searchParams.get("q") || searchParams.get("query") || "").trim();
+  const typeParam = searchParams.get("type");
+  const typeFilter: "all" | "movie" | "tv" =
+    typeParam === "movie" || typeParam === "tv" ? typeParam : "all";
+  const yearParam = searchParams.get("year") ?? "";
+  const yearFilter = /^\d{4}$/.test(yearParam) ? yearParam : null;
 
   if (query.length < 2) {
     return NextResponse.json({ results: [] });
@@ -49,6 +54,14 @@ export async function GET(request: Request) {
       .filter(
         (r: { media_type?: string }) =>
           r.media_type === "tv" || r.media_type === "movie"
+      )
+      .filter((r: { media_type?: string }) =>
+        typeFilter === "all" ? true : r.media_type === typeFilter
+      )
+      .filter((r: { first_air_date?: string; release_date?: string }) =>
+        yearFilter == null
+          ? true
+          : ((r.first_air_date || r.release_date || "").slice(0, 4) === yearFilter)
       )
       .slice(0, 10);
 
