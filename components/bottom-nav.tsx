@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Clapperboard, Search, Tv, User } from "lucide-react";
+import { Clapperboard, Download, Search, Tv, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useDownloadMode } from "@/components/download-button";
 
 const tabs = [
   { href: "/shows", label: "Shows", icon: Tv },
@@ -11,6 +12,9 @@ const tabs = [
   { href: "/explore", label: "Explore", icon: Search },
   { href: "/profile", label: "Profile", icon: User },
 ] as const;
+
+/** Downloads tab: only while download mode is on (same gate as the buttons). */
+const downloadsTab = { href: "/downloads", label: "Saved", icon: Download } as const;
 
 function isTabActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -28,6 +32,9 @@ function scrollPageToTop() {
 export function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
+  // Downloads tab joins only in download mode; five tabs share space evenly.
+  const showDownloads = useDownloadMode();
+  const visibleTabs = showDownloads ? [...tabs, downloadsTab] : tabs;
 
   return (
     <nav
@@ -35,7 +42,7 @@ export function BottomNav() {
       aria-label="Main"
     >
       <div className="mx-auto flex max-w-md items-center justify-around pt-1">
-        {tabs.map((tab) => {
+        {visibleTabs.map((tab) => {
           const Icon = tab.icon;
           const active = isTabActive(pathname, tab.href);
 
@@ -60,7 +67,7 @@ export function BottomNav() {
                 }
               }}
               className={cn(
-                "flex min-h-11 min-w-[4.25rem] flex-col items-center justify-center gap-0.5 px-3 py-1.5 text-xs transition-colors active:scale-95",
+                "flex min-h-11 min-w-[3.25rem] flex-1 flex-col items-center justify-center gap-0.5 px-2 py-1.5 text-xs transition-colors active:scale-95",
                 active ? "text-white" : "text-muted-foreground"
               )}
             >

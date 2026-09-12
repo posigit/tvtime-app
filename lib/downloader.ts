@@ -533,6 +533,15 @@ async function runDownload(
   rec.downloadedAt = Date.now();
   rec.lastUsedAt = Date.now();
   await commitRecord(rec);
+  // Completion is silent at the engine layer by design — broadcast for UI
+  // (toast with View action lives in the app shell, not here).
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(
+      new CustomEvent("tvtime:download-done", {
+        detail: { key: rec.key, title: rec.title },
+      })
+    );
+  }
 }
 
 async function fetchDownloadSubs(

@@ -12,14 +12,20 @@ import { cn } from "@/lib/utils";
 
 export type ToastType = "success" | "error" | "info";
 
+export type ToastAction = {
+  label: string;
+  onClick: () => void;
+};
+
 type ToastItem = {
   id: number;
   message: string;
   type: ToastType;
+  action?: ToastAction;
 };
 
 type ToastContextValue = {
-  toast: (message: string, type?: ToastType) => void;
+  toast: (message: string, type?: ToastType, action?: ToastAction) => void;
 };
 
 const ToastContext = createContext<ToastContextValue | null>(null);
@@ -34,10 +40,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const toast = useCallback(
-    (message: string, type: ToastType = "success") => {
+    (message: string, type: ToastType = "success", action?: ToastAction) => {
       const id = ++idSeq;
-      setToasts((prev) => [...prev.slice(-2), { id, message, type }]);
-      window.setTimeout(() => dismiss(id), 2800);
+      setToasts((prev) => [...prev.slice(-2), { id, message, type, action }]);
+      // Action toasts linger so there's time to tap.
+      window.setTimeout(() => dismiss(id), action ? 6000 : 2800);
     },
     [dismiss]
   );
@@ -98,6 +105,28 @@ function ToastPill({
         </span>
       )}
       {item.message}
+      {item.action && (
+        <span
+          role="button"
+          tabIndex={0}
+          aria-label={item.action.label}
+          onClick={(e) => {
+            e.stopPropagation();
+            item.action!.onClick();
+            onDismiss();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.stopPropagation();
+              item.action!.onClick();
+              onDismiss();
+            }
+          }}
+          className="ml-2 shrink-0 cursor-pointer rounded-full bg-primary px-3 py-1 text-xs font-black text-black"
+        >
+          {item.action.label}
+        </span>
+      )}
     </button>
   );
 }

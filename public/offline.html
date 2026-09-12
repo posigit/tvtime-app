@@ -19,26 +19,73 @@
         background: #000;
         color: #fff;
         font-family: system-ui, -apple-system, Segoe UI, sans-serif;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        padding: 1.5rem;
+        padding: 1.5rem 1rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
         padding-top: env(safe-area-inset-top, 0px);
-        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      .wrap {
+        max-width: 32rem;
+        margin: 0 auto;
       }
       h1 {
         font-size: 1.25rem;
         font-weight: 700;
-        margin: 0 0 0.5rem;
+        margin: 0.5rem 0 0.25rem;
       }
-      p {
+      .sub {
         color: #8e8e93;
-        margin: 0 0 1.25rem;
-        font-size: 0.95rem;
+        margin: 0 0 1rem;
+        font-size: 0.9rem;
         line-height: 1.4;
       }
-      button {
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 1rem;
+        padding: 0.75rem 0.875rem;
+        margin-bottom: 0.5rem;
+      }
+      .meta {
+        min-width: 0;
+        flex: 1;
+      }
+      .title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .detail {
+        font-size: 0.72rem;
+        color: rgba(255, 255, 255, 0.45);
+        margin-top: 0.15rem;
+      }
+      .btn {
+        appearance: none;
+        border: 0;
+        cursor: pointer;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 999px;
+        font-size: 1rem;
+        line-height: 1;
+      }
+      .play {
+        background: #f5c518;
+        color: #000;
+      }
+      .del {
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.6);
+      }
+      .retry {
         appearance: none;
         border: 0;
         border-radius: 999px;
@@ -50,14 +97,343 @@
         text-transform: uppercase;
         padding: 0.85rem 1.5rem;
         cursor: pointer;
+        margin-top: 0.5rem;
+      }
+      .empty {
+        text-align: center;
+        padding: 2.5rem 1rem;
+        color: #8e8e93;
+      }
+      #player {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        background: #000;
+      }
+      #player.open {
+        display: block;
+      }
+      #vid {
+        width: 100%;
+        height: 100%;
+      }
+      #close {
+        position: absolute;
+        top: calc(0.75rem + env(safe-area-inset-top, 0px));
+        right: 0.75rem;
+        z-index: 51;
+      }
+      #ptitle {
+        position: absolute;
+        top: calc(1rem + env(safe-area-inset-top, 0px));
+        left: 1rem;
+        right: 4rem;
+        z-index: 51;
+        font-size: 0.85rem;
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-shadow: 0 1px 8px #000;
+        pointer-events: none;
       }
     </style>
   </head>
   <body>
-    <div>
+    <div class="wrap">
       <h1>You're offline</h1>
-      <p>Reconnect to load your shows and movies.</p>
-      <button type="button" onclick="location.reload()">Try again</button>
+      <p class="sub" id="status">Loading your downloads…</p>
+      <div id="list"></div>
+      <button type="button" class="retry" onclick="location.reload()">Try again</button>
     </div>
+    <div id="player" role="dialog" aria-modal="true" aria-label="Offline player">
+      <p id="ptitle"></p>
+      <button type="button" id="close" class="btn del" aria-label="Close player">✕</button>
+      <video id="vid" controls playsinline></video>
+    </div>
+    <script>
+      "use strict";
+      /* Standalone offline launcher: zero dependencies, works with nothing
+         cached except this page + /vendor/hls.min.js + your bytes. Reads the
+         same idb-keyval manifest the app writes (db "keyval-store",
+         store "keyval", key "tvtime-download-manifest-v1"). */
+      var DB = "keyval-store",
+        STORE = "keyval",
+        MKEY = "tvtime-download-manifest-v1",
+        DLCACHE = "tvtime-downloads";
+
+      function fmt(n) {
+        if (n == null || !isFinite(n) || n < 0) return "";
+        if (n < 1024) return Math.round(n) + " B";
+        if (n < 1048576) return Math.round(n / 1024) + " KB";
+        if (n < 1073741824) return Math.round(n / 1048576) + " MB";
+        return (n / 1073741824).toFixed(1) + " GB";
+      }
+
+      function idbGet() {
+        return new Promise(function (resolve) {
+          try {
+            var open = indexedDB.open(DB);
+            open.onerror = function () {
+              resolve(null);
+            };
+            open.onsuccess = function () {
+              try {
+                var db = open.result;
+                if (!db.objectStoreNames.contains(STORE)) {
+                  resolve(null);
+                  return;
+                }
+                var tx = db.transaction(STORE, "readonly");
+                var req = tx.objectStore(STORE).get(MKEY);
+                req.onsuccess = function () {
+                  resolve(req.result || null);
+                };
+                req.onerror = function () {
+                  resolve(null);
+                };
+              } catch (e) {
+                resolve(null);
+              }
+            };
+          } catch (e) {
+            resolve(null);
+          }
+        });
+      }
+
+      function idbSet(manifest) {
+        return new Promise(function (resolve) {
+          try {
+            var open = indexedDB.open(DB);
+            open.onerror = function () {
+              resolve();
+            };
+            open.onsuccess = function () {
+              try {
+                var tx = db_transaction(open.result);
+                var req = tx.objectStore(STORE).put(manifest, MKEY);
+                req.onsuccess = req.onerror = function () {
+                  resolve();
+                };
+              } catch (e) {
+                resolve();
+              }
+            };
+          } catch (e) {
+            resolve();
+          }
+        });
+        function db_transaction(db) {
+          return db.transaction(STORE, "readwrite");
+        }
+      }
+
+      var records = [];
+      var hls = null;
+      var hlsReady = null;
+
+      function loadHls() {
+        if (window.Hls) return Promise.resolve(true);
+        if (!hlsReady) {
+          hlsReady = new Promise(function (resolve) {
+            var s = document.createElement("script");
+            s.src = "/vendor/hls.min.js";
+            s.onload = function () {
+              resolve(!!window.Hls);
+            };
+            s.onerror = function () {
+              resolve(false);
+            };
+            document.head.appendChild(s);
+          });
+        }
+        return hlsReady;
+      }
+
+      function closePlayer() {
+        try {
+          if (hls) {
+            hls.destroy();
+            hls = null;
+          }
+        } catch (e) {}
+        var v = document.getElementById("vid");
+        try {
+          v.pause();
+        } catch (e) {}
+        v.removeAttribute("src");
+        v.load();
+        Array.prototype.forEach.call(v.querySelectorAll("track"), function (t) {
+          if (t.src && t.src.indexOf("blob:") === 0) {
+            try {
+              URL.revokeObjectURL(t.src);
+            } catch (e) {}
+          }
+          t.remove();
+        });
+        document.getElementById("player").classList.remove("open");
+      }
+
+      function playRecord(rec) {
+        var url = "/api/dl?playlist=" + encodeURIComponent(rec.key);
+        document.getElementById("ptitle").textContent = rec.title || "Offline video";
+        document.getElementById("player").classList.add("open");
+        var v = document.getElementById("vid");
+        if (rec.subVtt) {
+          try {
+            var blob = new Blob([rec.subVtt], { type: "text/vtt" });
+            var track = document.createElement("track");
+            track.kind = "subtitles";
+            track.label = rec.subLabel || "Subtitles";
+            track.srclang = "en";
+            track.src = URL.createObjectURL(blob);
+            track.default = true;
+            v.appendChild(track);
+          } catch (e) {}
+        }
+        // Native HLS (Safari) needs no library and never fails to load it.
+        if (v.canPlayType("application/vnd.apple.mpegurl")) {
+          v.src = url;
+          v.play().catch(function () {});
+          return;
+        }
+        loadHls().then(function (ok) {
+          if (!ok || !window.Hls || !window.Hls.isSupported()) {
+            document.getElementById("ptitle").textContent =
+              "Can't play here — reopen with connection once";
+            return;
+          }
+          hls = new window.Hls({ maxBufferLength: 60 });
+          hls.loadSource(url);
+          hls.attachMedia(v);
+          hls.on(window.Hls.Events.MANIFEST_PARSED, function () {
+            v.play().catch(function () {});
+          });
+          hls.on(window.Hls.Events.ERROR, function (_, data) {
+            if (data && data.fatal) {
+              try {
+                hls.destroy();
+              } catch (e) {}
+              hls = null;
+            }
+          });
+        });
+      }
+
+      function delRecord(key) {
+        var rec = null;
+        for (var i = 0; i < records.length; i++) {
+          if (records[i].key === key) rec = records[i];
+        }
+        idbGet().then(function (m) {
+          var urls = rec && rec.fileUrls ? rec.fileUrls.slice() : [];
+          urls.push("/api/dl?playlist=" + encodeURIComponent(key));
+          var done = function () {
+            if (m) {
+              delete m[key];
+              idbSet(m).then(render);
+            } else {
+              render();
+            }
+          };
+          try {
+            caches.open(DLCACHE).then(
+              function (cache) {
+                Promise.all(
+                  urls.map(function (u) {
+                    return cache.delete(u).catch(function () {});
+                  })
+                ).then(done, done);
+              },
+              done
+            );
+          } catch (e) {
+            done();
+          }
+        });
+      }
+
+      function esc(s) {
+        return String(s == null ? "" : s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function render() {
+        idbGet().then(function (m) {
+          var list = document.getElementById("list");
+          var status = document.getElementById("status");
+          records = [];
+          if (m) {
+            Object.keys(m).forEach(function (k) {
+              if (m[k] && m[k].state === "done") records.push(m[k]);
+            });
+            records.sort(function (a, b) {
+              return (b.downloadedAt || 0) - (a.downloadedAt || 0);
+            });
+          }
+          if (!records.length) {
+            status.textContent = "No downloads on this device yet.";
+            list.innerHTML =
+              '<div class="empty">Connect, download a movie or episode,<br />then watch it here with no connection.</div>';
+            return;
+          }
+          status.textContent =
+            records.length +
+            (records.length === 1 ? " video" : " videos") +
+            " ready offline — tap ▶ to play.";
+          var html = "";
+          records.forEach(function (r) {
+            var sub = r.subtitle ? esc(r.subtitle) : "";
+            var q = r.quality === "best" ? "Best" : r.quality + "p";
+            html +=
+              '<div class="row"><div class="meta"><div class="title">' +
+              esc(r.title) +
+              "</div>" +
+              (sub ? '<div class="detail">' + sub + "</div>" : "") +
+              '<div class="detail">' +
+              esc(fmt(r.sizeBytes) + " · " + q) +
+              "</div></div>" +
+              '<button type="button" class="btn play" data-play="' +
+              esc(r.key) +
+              '" aria-label="Play ' +
+              esc(r.title) +
+              ' offline">▶</button>' +
+              '<button type="button" class="btn del" data-del="' +
+              esc(r.key) +
+              '" aria-label="Delete ' +
+              esc(r.title) +
+              '">🗑</button></div>';
+          });
+          list.innerHTML = html;
+          Array.prototype.forEach.call(
+            list.querySelectorAll("[data-play]"),
+            function (b) {
+              b.addEventListener("click", function () {
+                var k = b.getAttribute("data-play");
+                for (var i = 0; i < records.length; i++) {
+                  if (records[i].key === k) playRecord(records[i]);
+                }
+              });
+            }
+          );
+          Array.prototype.forEach.call(
+            list.querySelectorAll("[data-del]"),
+            function (b) {
+              b.addEventListener("click", function () {
+                delRecord(b.getAttribute("data-del"));
+              });
+            }
+          );
+        });
+      }
+
+      document.getElementById("close").addEventListener("click", closePlayer);
+      render();
+    </script>
   </body>
 </html>

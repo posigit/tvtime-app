@@ -8,7 +8,7 @@
  *
  * Bump VERSION when changing strategies so activate() purges old caches.
  */
-const VERSION = "6";
+const VERSION = "7";
 const SHELL_CACHE = `tvtime-shell-v${VERSION}`;
 const STATIC_CACHE = `tvtime-static-v${VERSION}`;
 const IMAGE_CACHE = `tvtime-images-v${VERSION}`;
@@ -30,6 +30,8 @@ const PRECACHE_URLS = [
   "/icons/icon-192x192.png",
   "/icons/icon-512x512.png",
   "/avatars/profile.jpg",
+  // Offline player engine for the offline.html downloads launcher.
+  "/vendor/hls.min.js",
 ];
 
 const IMAGE_CACHE_MAX = 250;
@@ -92,7 +94,13 @@ self.addEventListener("fetch", (event) => {
   }
 
   // --- Document navigations: network-first, offline shell fallback ---
+  // Exception: /downloads is fully local (IndexedDB library) — serve its
+  // shell stale-while-revalidate so the library opens with zero connection.
   if (request.mode === "navigate") {
+    if (url.pathname === "/downloads") {
+      event.respondWith(staleWhileRevalidateDocument(request));
+      return;
+    }
     event.respondWith(networkFirstNavigation(request));
     return;
   }
@@ -103,10 +111,11 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // --- Icons / avatar / manifest / offline page: cache-first ---
+  // --- Icons / avatar / manifest / offline page / vendor: cache-first ---
   if (
     url.pathname.startsWith("/icons/") ||
     url.pathname.startsWith("/avatars/") ||
+    url.pathname.startsWith("/vendor/") ||
     url.pathname === "/manifest.json" ||
     url.pathname === "/offline.html" ||
     url.pathname === "/favicon.ico"
@@ -150,6 +159,35 @@ async function networkFirstNavigation(request) {
       })
     );
   }
+}
+
+/**
+ * The /downloads library shell: 100% local data (IndexedDB + Cache
+ * Storage), so stale-while-revalidate is safe — offline cold starts render
+ * instantly, online visits refresh the shell in the background.
+ */
+async function staleWhileRevalidateDocument(request) {
+  const cache = await caches.open(SHELL_CACHE);
+  const url = new URL(request.url);
+  const cached =
+    (await cache.match(request)) || (await cache.match(url.pathname));
+  const networkPromise = fetch(request)
+    .then(async (response) => {
+      if (response && response.ok) {
+        await cache.put(url.pathname, response.clone());
+      }
+      return response;
+    })
+    .catch(() => cached);
+  return (
+    cached ||
+    networkPromise ||
+    (await cache.match("/offline.html")) ||
+    new Response("Offline", {
+      status: 503,
+      headers: { "Content-Type": "text/plain" },
+    })
+  );
 }
 
 async function cacheFirst(request, cacheName) {
