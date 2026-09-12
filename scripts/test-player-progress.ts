@@ -21,6 +21,7 @@ import {
 import { CINESRC_SEED_SERVERS, buildCineSrcServerOptions, cineSrcAliasFor, cineSrcServerLabel, embedUrlFor, withCineSrcQuality, withCineSrcServer } from "../lib/embed-sources";
 import { DEFAULT_VIX_SETTINGS } from "../lib/vix-settings";
 import { NEXT_FAB_RATIO, RESUME_END_RATIO } from "../lib/player-constants";
+import { normalizeSegment, parseSegmentSec } from "../lib/introdb";
 
 assert.equal(isResumablePosition(3, 100), false);
 assert.equal(isResumablePosition(10, 100), true);
@@ -199,5 +200,17 @@ assert.equal(clean[0].text, "I see dead people");
 
 assert.equal(RESUME_END_RATIO, 0.92);
 assert.equal(NEXT_FAB_RATIO, 0.96);
+
+// IntroDB segment parsing (numbers + clock strings, ms fallback, rejects).
+assert.equal(parseSegmentSec(58), 58);
+assert.equal(parseSegmentSec("00:58"), 58);
+assert.equal(parseSegmentSec("01:02:03"), 3723);
+assert.equal(parseSegmentSec(-5), null);
+assert.equal(parseSegmentSec("nope"), null);
+assert.equal(parseSegmentSec(null), null);
+assert.deepEqual(normalizeSegment({ start_sec: 2, end_sec: 58 }), { start: 2, end: 58 });
+assert.deepEqual(normalizeSegment({ start_ms: 2000, end_ms: 58000 }), { start: 2, end: 58 });
+assert.equal(normalizeSegment(null), null);
+assert.equal(normalizeSegment({ start_sec: 60, end_sec: 30 }), null);
 
 console.log("player-progress: all assertions passed");

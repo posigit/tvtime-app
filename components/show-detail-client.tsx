@@ -1379,36 +1379,40 @@ export function ShowDetailClient({
         </div>
       )}
 
-      {/* ---------- Up-next autoplay overlay (over the player) ---------- */}
-      {upNext && playerEp && (
-        <UpNextCard
-          episode={upNext}
-          currentSeason={playerEp.seasonNumber}
-          countdown={upNextCount}
-          onPlay={playUpNext}
-          onCancel={cancelUpNext}
-        />
-      )}
-
-      {/* Glass Next: only after ≥96% AND countdown is gone (post-cancel). */}
-      {nearEnd && manualNext && playerEp && !upNext && (
-        <NextEpisodeFab onNext={playUpNext} />
-      )}
-
-      {/* End of the line: the played episode ended and there's no next aired
-          episode — keep the player open so the finale plays to the true end.
-          Small bottom-right card, auto-dismisses; X dismisses only the card. */}
-      {seriesEnded && playerEp && (
-        <EndOfLineCard
-          episodeLabel={`${show.title} — S${playerEp.seasonNumber}E${playerEp.episodeNumber}`}
-          onDismiss={() => setSeriesEnded(false)}
-        />
-      )}
-
       {/* ---------- VixSrc streaming player ---------- */}
       {playerEp && (
         <VixPlayer
           key={`${show.tmdbId}-${playerEp.seasonNumber}-${playerEp.episodeNumber}`}
+          overlaySlot={
+            <>
+              {/* Up-next autoplay overlay — inside the shell: fullscreen-safe. */}
+              {upNext && playerEp && (
+                <UpNextCard
+                  episode={upNext}
+                  currentSeason={playerEp.seasonNumber}
+                  countdown={upNextCount}
+                  onPlay={playUpNext}
+                  onCancel={cancelUpNext}
+                />
+              )}
+
+              {/* Glass Next: only after …96% AND countdown is gone (post-cancel). */}
+              {nearEnd && manualNext && playerEp && !upNext && (
+                <NextEpisodeFab onNext={playUpNext} />
+              )}
+
+              {/* End of the line: the played episode ended and there's no next
+                  aired episode — keep the player open so the finale plays to
+                  the true end. Small bottom-right card, auto-dismisses; X
+                  dismisses only the card. */}
+              {seriesEnded && playerEp && (
+                <EndOfLineCard
+                  episodeLabel={`${show.title} — S${playerEp.seasonNumber}E${playerEp.episodeNumber}`}
+                  onDismiss={() => setSeriesEnded(false)}
+                />
+              )}
+            </>
+          }
           src={vixTvUrl(
             show.tmdbId,
             playerEp.seasonNumber,

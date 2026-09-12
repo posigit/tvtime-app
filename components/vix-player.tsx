@@ -1,10 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { LoaderCircle, LockOpen } from "lucide-react";
+import type { ReactNode } from "react";
+import { LoaderCircle, LockOpen, SkipForward } from "lucide-react";
 import {
   parseVixPlayerEventData,
 } from "@/lib/vixsrc";
+import {
+  EMPTY_SEGMENTS,
+  fetchSegments,
+  type IntroDbSegment,
+  type IntroDbSegments,
+} from "@/lib/introdb";
 import {
   EMBED_SOURCES,
   CINESRC_MAX_KNOWN_SERVERS,
@@ -113,6 +120,7 @@ export function VixPlayer({
   source = "vix",
   initialPlaylistUrl = null,
   initialSubVtt = null,
+  overlaySlot = null,
 }: {
   src: string;
   title: string;
@@ -137,6 +145,12 @@ export function VixPlayer({
   initialPlaylistUrl?: string | null;
   /** Stored subtitle for offline playback (injected, never fetched). */
   initialSubVtt?: { vtt: string; label: string } | null;
+  /**
+   * Overlays rendered INSIDE the player shell (Up Next card, Next FAB,
+   * end-of-line card). The shell is the fullscreen element — anything
+   * outside it vanishes in fullscreen, so parents must pass overlays here.
+   */
+  overlaySlot?: ReactNode;
 }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -406,6 +420,16 @@ export function VixPlayer({
     onNearEndRef.current = onNearEnd;
   }, [onNearEnd]);
 
+  // ---------- IntroDB segments (skip intro/recap, outro → Up Next) ----------
+  // State lives here (above the [src] reset effect); the fetch effect sits
+  // further down next to ensureIframeImdb, which it depends on.
+  const [segments, setSegments] = useState<IntroDbSegments>(EMPTY_SEGMENTS);
+  const segmentsRef = useRef(segments);
+  useEffect(() => {
+    segmentsRef.current = segments;
+  }, [segments]);
+  const segmentsKeyRef = useRef<string | null>(null);
+
   useEffect(() => {
     endedRef.current = false;
     lastTimeRef.current = 0;
@@ -423,6 +447,8 @@ export function VixPlayer({
     openSubListKeyRef.current = null;
     setCineSrcT(null);
     setServerMenuOpen(false);
+    segmentsKeyRef.current = null;
+    setSegments(EMPTY_SEGMENTS);
     if (tapCueTimerRef.current) {
       clearTimeout(tapCueTimerRef.current);
       tapCueTimerRef.current = null;
@@ -1018,6 +1044,26 @@ export function VixPlayer({
     }
   }, [type, tmdbId]);
 
+  // ---------- IntroDB segments fetch (TV only) ----------
+  // Needs ensureIframeImdb (defined above). Fetched once per episode (key
+  // gate); the reset effect clears the key on title change.
+  useEffect(() => {
+    if (type !== "tv" || !tmdbId || season == null || episode == null) return;
+    const key = `${tmdbId}:${season}:${episode}`;
+    if (segmentsKeyRef.current === key) return;
+    segmentsKeyRef.current = key;
+    let cancelled = false;
+    void (async () => {
+      const imdb = imdbIdRef.current ?? (await ensureIframeImdb());
+      if (cancelled || !imdb) return;
+      const segs = await fetchSegments({ imdbId: imdb, season, episode });
+      if (!cancelled) setSegments(segs);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [type, tmdbId, season, episode, mode, playlistUrl, activeSource, ensureIframeImdb]);
+
   /** Load top-3 OpenSubtitles list once per episode (no download quota). */
   const ensureOpenSubList = useCallback(async () => {
     let imdb = imdbIdRef.current;
@@ -1472,6 +1518,13 @@ export function VixPlayer({
       const dur = Number.isFinite(video.duration) ? video.duration : 0;
       const t = video.currentTime;
 
+      // Real outro start (IntroDB) beats the 96% heuristic; 96% below stays
+      // as the fallback when there is no outro data.
+      const outroNative = segmentsRef.current.outro;
+      if (!nearEndFiredRef.current && outroNative && dur > 0 && t >= outroNative.start) {
+        nearEndFiredRef.current = true;
+        onNearEndRef.current?.();
+      }
       if (!nearEndFiredRef.current && isNearEndPosition(t, dur, NEXT_FAB_RATIO)) {
         nearEndFiredRef.current = true;
         onNearEndRef.current?.();
@@ -1979,6 +2032,18 @@ export function VixPlayer({
         return;
       }
 
+      // Real outro start (IntroDB) beats the 96% heuristic; 96% below stays
+      // as the fallback when there is no outro data.
+      const outroEmbed = segmentsRef.current.outro;
+      if (
+        !nearEndFiredRef.current &&
+        outroEmbed &&
+        remoteDurationRef.current > 0 &&
+        remotePositionRef.current >= outroEmbed.start
+      ) {
+        nearEndFiredRef.current = true;
+        onNearEndRef.current?.();
+      }
       if (
         !nearEndFiredRef.current &&
         isNearEndPosition(
@@ -2225,6 +2290,33 @@ export function VixPlayer({
     },
     [bumpChrome]
   );
+  // Intro/recap skip (IntroDB times, TV only). Native + driven embeds only —
+  // interactive iframes have no seek API, so the button would be dead there.
+  // Rendered inside the shell, so it works in fullscreen.
+  const skipTarget: { seg: IntroDbSegment; label: string } | null =
+    type === "tv" && !locked && (mode === "native" || isDrivenEmbed)
+      ? segments.intro &&
+        transport.currentTime >= segments.intro.start &&
+        transport.currentTime < segments.intro.end
+        ? { seg: segments.intro, label: "Skip Intro" }
+        : segments.recap &&
+            transport.currentTime >= segments.recap.start &&
+            transport.currentTime < segments.recap.end
+          ? { seg: segments.recap, label: "Skip Recap" }
+          : null
+      : null;
+  const skipToTime = useCallback(
+    (end: number) => {
+      const target = end + 0.5;
+      if (mode === "native") {
+        void seekVideo(target);
+      } else if (isDrivenEmbed) {
+        sendEmbedSeek(clampEmbedTime(target));
+      }
+      bumpChrome();
+    },
+    [mode, isDrivenEmbed, seekVideo, sendEmbedSeek, bumpChrome]
+  );
   // Transport only after media can play — otherwise black screen + fake pause/±10.
   const cineSrcEmbed = mode === "iframe" && activeSource === "cinesrc";
   const showTransport =
@@ -2364,6 +2456,26 @@ export function VixPlayer({
           opaqueBottom={activeSource === "vidfast"}
         />
       )}
+
+      {/* Skip Intro/Recap (IntroDB times) — inside the shell: fullscreen-safe. */}
+      {skipTarget && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            skipToTime(skipTarget.seg.end);
+          }}
+          aria-label={skipTarget.label}
+          className="absolute bottom-28 right-4 z-40 flex h-10 items-center gap-2 rounded-full border border-white/25 bg-black/70 px-4 text-sm font-bold text-white shadow-xl backdrop-blur transition hover:bg-black/90 active:scale-95 sm:bottom-32"
+        >
+          <SkipForward className="h-4 w-4 fill-white" />
+          {skipTarget.label}
+        </button>
+      )}
+
+      {/* Parent overlays (Up Next, Next FAB, end-of-line) — inside the shell:
+          fixed overlays outside the fullscreen element vanish. */}
+      {overlaySlot}
 
       {!locked && chromeVisible && (
         <PlayerTopChrome

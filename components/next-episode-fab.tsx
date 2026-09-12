@@ -4,7 +4,10 @@ import { SkipForward } from "lucide-react";
 
 /**
  * Non-blocking liquid-glass Next control. Icon-only so it stays out of the
- * center of the frame; parent decides when to show (e.g. ≥96% after cancel).
+ * center of the frame; parent decides when to show (e.g. …96% after cancel).
+ *
+ * Absolute (not fixed): rendered inside the player shell so it survives
+ * fullscreen — fixed overlays outside the fullscreen element vanish.
  */
 export function NextEpisodeFab({
   onNext,
@@ -14,7 +17,7 @@ export function NextEpisodeFab({
   label?: string;
 }) {
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[110] flex justify-end p-3 pb-5 sm:p-5">
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 flex justify-end p-3 pb-5 sm:p-5">
       <button
         type="button"
         onClick={onNext}

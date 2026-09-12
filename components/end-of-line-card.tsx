@@ -35,7 +35,7 @@ export function EndOfLineCard({
   }, []);
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[110] flex justify-end p-4 pb-5">
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 flex justify-end p-4 pb-5">
       <div
         className={`pointer-events-auto flex items-center gap-2.5 rounded-full border border-white/10 bg-black/80 py-2 pl-4 pr-2 shadow-2xl backdrop-blur transition-all duration-250 ${
           leaving ? "translate-y-2 opacity-0" : "translate-y-0 opacity-100"

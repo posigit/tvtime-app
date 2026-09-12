@@ -35,7 +35,7 @@ export function UpNextCard({
   const CIRC = 2 * Math.PI * R;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[110] flex justify-end p-3 pb-4 sm:p-5">
+    <div className="absolute inset-x-0 bottom-0 z-40 flex justify-end p-3 pb-4 sm:p-5">
       {/* Play surface — whole card is the play button */}
       <button
         type="button"
