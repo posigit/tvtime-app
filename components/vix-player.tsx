@@ -13,6 +13,10 @@ import {
   type IntroDbSegments,
 } from "@/lib/introdb";
 import {
+  clearOfflinePosition,
+  writeOfflinePosition,
+} from "@/lib/downloads";
+import {
   EMBED_SOURCES,
   CINESRC_MAX_KNOWN_SERVERS,
   buildCineSrcServerOptions,
@@ -126,8 +130,12 @@ export function VixPlayer({
   episode,
   autoResume = false,
   source = "vix",
+  initialPosition = null,
   initialPlaylistUrl = null,
   initialSubVtt = null,
+  initialSubAlts = null,
+  offlineKey = null,
+  initialSegments = null,
   overlaySlot = null,
 }: {
   src: string;
@@ -141,7 +149,7 @@ export function VixPlayer({
   season?: number;
   episode?: number;
   /** Position supplied by a Continue Watching/detail CTA. */
-  initialPosition?: number;
+  initialPosition?: number | null;
   /** Seek directly to initialPosition instead of showing the prompt. */
   autoResume?: boolean;
   /** Stream backend: "vix" (default) or "goated". */
@@ -151,8 +159,14 @@ export function VixPlayer({
    * worker. Skips stream resolution and forces native mode.
    */
   initialPlaylistUrl?: string | null;
+  /** Download key for offline resume positions (local only). */
+  offlineKey?: string | null;
+  /** Segments captured with the download — preferred over fetching. */
+  initialSegments?: IntroDbSegments | null;
   /** Stored subtitle for offline playback (injected, never fetched). */
   initialSubVtt?: { vtt: string; label: string } | null;
+  /** Stored spare subtitle files (best-first) for offline switching. */
+  initialSubAlts?: { vtt: string; label: string }[] | null;
   /**
    * Overlays rendered INSIDE the player shell (Up Next card, Next FAB,
    * end-of-line card). The shell is the fullscreen element — anything
@@ -167,6 +181,10 @@ export function VixPlayer({
   const imdbIdRef = useRef<string | null>(null);
   const lastSavedPosRef = useRef(0);
   const lastSavedAtRef = useRef(0);
+  /** Throttle for offline position mirror writes (savePosition ticks often). */
+  const offlinePosAtRef = useRef(0);
+  /** One-shot guard for the offline auto-resume seek below. */
+  const offlineResumeDoneRef = useRef(false);
   const onEventRef = useRef(onEvent);
   const onCloseRef = useRef(onClose);
   const onNearEndRef = useRef(onNearEnd);
@@ -349,6 +367,11 @@ export function VixPlayer({
   /** Top OpenSubtitles files (max 3) for the CC picker. */
   const [openSubItems, setOpenSubItems] = useState<OpenSubListItem[]>([]);
   const [openSubFileId, setOpenSubFileId] = useState<number | null>(null);
+  /** Stored-file picker override (best-first; null = injected default active). */
+  const [savedSubAltPick, setSavedSubAltPick] = useState<number | null>(null);
+  /** Active stored-file index: explicit pick wins, else the injected default. */
+  const savedSubAltIndex =
+    savedSubAltPick ?? (initialSubVtt && initialSubAlts?.length ? 0 : null);
   const [openSubListLoading, setOpenSubListLoading] = useState(false);
   const openSubListKeyRef = useRef<string | null>(null);
   const subMenuRef = useRef<HTMLDivElement>(null);
@@ -439,8 +462,11 @@ export function VixPlayer({
 
   // ---------- IntroDB segments (skip intro/recap, outro → Up Next) ----------
   // State lives here (above the [src] reset effect); the fetch effect sits
-  // further down next to ensureIframeImdb, which it depends on.
-  const [segments, setSegments] = useState<IntroDbSegments>(EMPTY_SEGMENTS);
+  // further down next to ensureIframeImdb, which it depends on. Stored
+  // segments seed state directly (offline-first, no effect setState).
+  const [segments, setSegments] = useState<IntroDbSegments>(
+    () => initialSegments ?? EMPTY_SEGMENTS
+  );
   const segmentsRef = useRef(segments);
   useEffect(() => {
     segmentsRef.current = segments;
@@ -492,10 +518,19 @@ export function VixPlayer({
 
   const savePosition = useCallback(
     (pos: number, duration: number, force = false) => {
-      // Pending engine seek / resume floor: drop 0–5s warmup reports only.
-      // A backward scrub (43:00 → 3:00) must save — that is the new bookmark.
+      // Pending engine seek / resume floor: drop 0—5s warmup reports only.
+      // A backward scrub (43:00 → 3:00) is the new bookmark — keep it.
       if (isPreSeekNoise(pos, pendingSeekPosRef.current)) return;
       if (isPreSeekNoise(pos, resumePosRef.current)) return;
+      // Offline: mirror to the local position store (server saves below
+      // fail without connection). Throttled — timeupdate ticks constantly.
+      if (offlineOverride && offlineKey) {
+        const now = Date.now();
+        if (force || now - offlinePosAtRef.current > 2000) {
+          offlinePosAtRef.current = now;
+          writeOfflinePosition(offlineKey, pos, duration);
+        }
+      }
       // Delegate to shared save rules (throttle, 92% clear, ordered queue).
       const run = createSavePosition(playbackParams, {
         saveEnabledRef,
@@ -506,10 +541,12 @@ export function VixPlayer({
       });
       run(pos, duration, force);
     },
-    [playbackParams]
+    [playbackParams, offlineOverride, offlineKey]
   );
 
   const clearPosition = useCallback(() => {
+    // Offline finish: drop the local bookmark with the server one.
+    if (offlineOverride && offlineKey) clearOfflinePosition(offlineKey);
     const run = createClearPosition(playbackParams, {
       saveEnabledRef,
       endedRef,
@@ -518,7 +555,7 @@ export function VixPlayer({
       lastSavedAtRef,
     });
     run();
-  }, [playbackParams]);
+  }, [playbackParams, offlineOverride, offlineKey]);
 
   const seekVideo = useCallback((t: number) => {
     const v = videoRef.current;
@@ -975,6 +1012,21 @@ export function VixPlayer({
     holdForResumeRef.current = false;
   }, [mode]);
 
+  // Offline auto-resume: jump straight to the locally stored stop position
+  // (no prompt — explicit user choice for downloads). seekAndArmSaves holds
+  // the video paused and enables saves only once the seek lands. Deferred to
+  // a microtask like the prompt-based resume below (not sync setState).
+  useEffect(() => {
+    if (!offlineOverride || offlineResumeDoneRef.current) return;
+    if (mode !== "native" || initialPosition == null) return;
+    if (!Number.isFinite(initialPosition) || initialPosition <= RESUME_MIN_SECONDS) return;
+    offlineResumeDoneRef.current = true;
+    const position = initialPosition;
+    queueMicrotask(() => {
+      void seekAndArmSaves(position);
+    });
+  }, [offlineOverride, mode, initialPosition, seekAndArmSaves]);
+
   // ---------- source switching ----------
   // Picker order: cinesrc, vidfast, mapple, vidlink, vidnest, 2embed, then vix.
   // goated stays last and disabled (degraded backend).
@@ -1074,6 +1126,13 @@ export function VixPlayer({
     // lets the cleanup cancel the only in-flight request while the second run
     // sees the key and returns — no segments ever load.
     if (segmentsKeyRef.current === key) return;
+    // Stored segments (captured with the download) win over the network —
+    // this is what makes skip/outro work fully offline. Key-marked done so
+    // the fetch below never re-runs for them.
+    if (initialSegments) {
+      segmentsKeyRef.current = key;
+      return;
+    }
     let cancelled = false;
     void (async () => {
       const imdb = imdbIdRef.current ?? (await ensureIframeImdb());
@@ -1091,7 +1150,7 @@ export function VixPlayer({
     return () => {
       cancelled = true;
     };
-  }, [type, tmdbId, season, episode, mode, playlistUrl, activeSource, ensureIframeImdb]);
+  }, [type, tmdbId, season, episode, mode, playlistUrl, activeSource, ensureIframeImdb, initialSegments]);
 
   /** Load top-3 OpenSubtitles list once per episode (no download quota). */
   const ensureOpenSubList = useCallback(async () => {
@@ -1129,6 +1188,7 @@ export function VixPlayer({
       setSubError(null);
       if (next !== "opensub") {
         setOpenSubFileId(null);
+        setSavedSubAltPick(null);
         setSubMenuOpen(false);
       }
       // subs mirrors the source so applySettings() can drive off/stream
@@ -1172,6 +1232,7 @@ export function VixPlayer({
         return;
       }
       setOpenSubFileId(item.fileId);
+      setSavedSubAltPick(null);
       setSubSource("opensub");
       subSourceRef.current = "opensub";
       setSubError(null);
@@ -1198,6 +1259,30 @@ export function VixPlayer({
       setSubMenuOpen(false);
     },
     [season, episode, clockEmbed, ensureIframeImdb]
+  );
+
+  /** Switch to one of the stored spare subtitle files (offline, no fetch). */
+  const handleSavedSubAltPick = useCallback(
+    (index: number) => {
+      const alt = initialSubAlts?.[index];
+      if (!videoRef.current || !alt) {
+        setSubError("Subtitles unavailable");
+        return;
+      }
+      setSavedSubAltPick(index);
+      setOpenSubFileId(null);
+      setSubSource("opensub");
+      subSourceRef.current = "opensub";
+      setSubError(null);
+      saveVixSettings({ subSource: "opensub", subs: "en" });
+      // Swap via the engine hook (disables old tracks, injects with current
+      // delay) instead of duplicating its track surgery here.
+      externalVttRef.current = { vtt: alt.vtt, label: alt.label };
+      setHasExternalSubs(true);
+      reapplyExternalSubsRef.current?.();
+      setSubMenuOpen(false);
+    },
+    [initialSubAlts]
   );
 
   // Prefetch OS list when CC menu opens on OpenSubs.
@@ -1399,6 +1484,9 @@ export function VixPlayer({
       savePosition,
       revertExternalSub,
       onPendingSeekSettled,
+      // Offline with a stored track: engine must not fetch or wipe it.
+      // Stable per mount (host remounts per open), listed for correctness.
+      offlineStoredSubs: offlineOverride && initialSubVtt != null,
     });
   }, [
     mode,
@@ -1411,6 +1499,8 @@ export function VixPlayer({
     type,
     revertExternalSub,
     onPendingSeekSettled,
+    offlineOverride,
+    initialSubVtt,
   ]);
 
   // ---------- offline subtitles (stored VTT, never fetched) ----------
@@ -2563,6 +2653,9 @@ export function VixPlayer({
           onOpenSubPick={(item) => {
             void handleOpenSubPick(item);
           }}
+          savedSubAlts={(initialSubAlts ?? []).map((a) => ({ label: a.label }))}
+          savedSubAltIndex={savedSubAltIndex}
+          onSavedSubAltPick={handleSavedSubAltPick}
           hasExternalSubs={hasExternalSubs}
           subDelay={subDelay}
           onAdjustSubDelay={adjustSubDelay}

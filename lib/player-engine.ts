@@ -56,6 +56,13 @@ export type AttachNativePlaybackArgs = {
   setStreamFailed: Dispatch<SetStateAction<boolean>>;
   savePosition: (pos: number, duration: number, force?: boolean) => void;
   revertExternalSub: (failed: "vdrk" | "opensub") => void;
+  /**
+   * Offline playback with a stored subtitle track already injected by the
+   * host: skip all network subtitle cascades and never wipe injected tracks
+   * ( reload becomes applySettings-only ). Overlay visibility still follows
+   * subSource state.
+   */
+  offlineStoredSubs?: boolean;
   /** Fired once when pending seek lands (or is abandoned). */
   onPendingSeekSettled?: (result: { pos: number; ok: boolean }) => void;
 };
@@ -96,6 +103,7 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
     setStreamFailed,
     savePosition,
     revertExternalSub,
+    offlineStoredSubs = false,
     onPendingSeekSettled,
   } = args;
 
@@ -347,6 +355,9 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
       let osLoaded = false;
       let osLoading = false;
       const maybeLoadFallbackSubtitles = async () => {
+        // Offline with stored subs: the host already injected the track —
+        // never fetch, never wipe, never revert (all three would strand us).
+        if (offlineStoredSubs) return;
         if (osLoaded || osLoading || !hls) return;
         const src = subSourceRef.current;
         if (src === "off" || src === "stream") return; // handled by applySettings
@@ -439,6 +450,13 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
 
       // Expose a re-run hook so the picker can force a source without remount.
       reloadSubsRef.current = () => {
+        // Offline with stored subs: keep the mounted track, only re-apply
+        // audio/quality (which work offline). Overlay visibility follows
+        // subSource state, so "off" still hides.
+        if (offlineStoredSubs) {
+          applySettings();
+          return;
+        }
         osLoaded = false;
         osLoading = false;
         externalVttRef.current = null;
@@ -728,6 +746,8 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
         }
       };
       reloadSubsRef.current = () => {
+        // Offline with stored subs: the mounted track stays, period.
+        if (offlineStoredSubs) return;
         for (const t of injectedTracksRef.current) t.mode = "disabled";
         injectedTracksRef.current = [];
         externalVttRef.current = null;
@@ -759,8 +779,9 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
         if (tr) injectedTracksRef.current.push(tr);
       };
       // Auto + forced external both need a settle delay for textTracks.
+      // Skipped offline with stored subs (nothing to load).
       const src0 = subSourceRef.current;
-      if (src0 !== "off") {
+      if (src0 !== "off" && !offlineStoredSubs) {
         safariTimerRef.current = window.setTimeout(
           () => void loadSafariExternal(),
           1200

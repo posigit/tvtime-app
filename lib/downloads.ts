@@ -51,6 +51,17 @@ export type DownloadRecord = {
   /** Auto-downloaded external subtitle (VTT text, kilobytes). */
   subVtt: string | null;
   subLabel: string | null;
+  /**
+   * Spare OpenSubtitles files (best + up to 2 alternates) for switching
+   * when the default misaligns. Each VTT is kilobytes; capped at fetch.
+   */
+  subAlts: { vtt: string; label: string }[];
+  /** IntroDB segments captured at download time (skip works offline). */
+  segments: {
+    intro: { start: number; end: number } | null;
+    recap: { start: number; end: number } | null;
+    outro: { start: number; end: number } | null;
+  } | null;
   downloadedAt: number;
   /** Touch on play/finish — drives LRU eviction. */
   lastUsedAt: number;
@@ -561,5 +572,67 @@ export async function verifyRecordFiles(key: string): Promise<boolean> {
     return true;
   } catch {
     return true;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Offline resume positions (local only — server sync is a later phase) */
+/* ------------------------------------------------------------------ */
+
+/**
+ * localStorage mirror of where offline playback stopped, per download key.
+ * Shape is shared with public/offline.html (raw localStorage, same key):
+ *   { [dlKey]: { pos: number; dur: number; at: number } }
+ */
+const OFFLINE_POS_LS_KEY = "tvtime-offline-positions";
+
+export type OfflinePosition = { pos: number; dur: number; at: number };
+
+function readPosMap(): Record<string, OfflinePosition> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(OFFLINE_POS_LS_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as Record<string, OfflinePosition>;
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+/** Persist an offline stop position (throttle callers to ~2s). */
+export function writeOfflinePosition(key: string, pos: number, dur: number): void {
+  if (typeof window === "undefined") return;
+  if (!key || !Number.isFinite(pos) || pos < 0) return;
+  try {
+    const map = readPosMap();
+    map[key] = {
+      pos,
+      dur: Number.isFinite(dur) && dur > 0 ? dur : 0,
+      at: Date.now(),
+    };
+    window.localStorage.setItem(OFFLINE_POS_LS_KEY, JSON.stringify(map));
+  } catch {
+    /* storage unavailable — resume just won't stick */
+  }
+}
+
+export function readOfflinePosition(key: string): OfflinePosition | null {
+  if (!key) return null;
+  const entry = readPosMap()[key];
+  if (!entry || !Number.isFinite(entry.pos) || entry.pos <= 0) return null;
+  return entry;
+}
+
+export function clearOfflinePosition(key: string): void {
+  if (typeof window === "undefined" || !key) return;
+  try {
+    const map = readPosMap();
+    if (map[key]) {
+      delete map[key];
+      window.localStorage.setItem(OFFLINE_POS_LS_KEY, JSON.stringify(map));
+    }
+  } catch {
+    /* ignore */
   }
 }

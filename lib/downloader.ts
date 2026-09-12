@@ -13,6 +13,7 @@
 
 import { resolveStreamPlaylist } from "@/lib/player-stream";
 import { fetchExternalVtt } from "@/lib/player-subs";
+import { fetchSegments } from "@/lib/introdb";
 import { loadVixSettings, matchLang } from "@/lib/vix-settings";
 import {
   DL_CACHE,
@@ -139,6 +140,8 @@ export async function startDownload(req: DownloadRequest): Promise<void> {
     error: undefined,
     subVtt: existing?.subVtt ?? null,
     subLabel: existing?.subLabel ?? null,
+    subAlts: existing?.subAlts ?? [],
+    segments: existing?.segments ?? null,
     downloadedAt: 0,
     lastUsedAt: now,
   };
@@ -269,6 +272,25 @@ async function runDownload(
   }
   rec.usedSource = resolved.usedSource ?? source;
   await upsertRecord(rec);
+
+  // 1b. IntroDB segments (TV only, needs the resolved IMDb id): captured now
+  // so skip intro/recap + outro Up Next keep working fully offline.
+  if (
+    req.type === "tv" &&
+    req.season != null &&
+    req.episode != null &&
+    resolved.imdbId
+  ) {
+    try {
+      rec.segments = await fetchSegments({
+        imdbId: resolved.imdbId,
+        season: req.season,
+        episode: req.episode,
+      });
+    } catch {
+      /* segments are a bonus — never fail the download for them */
+    }
+  }
 
   // 2. Master → variant at/below the quality setting. The resolver may
   // hand back a relative same-origin proxy path — absolutize once so every
@@ -514,12 +536,28 @@ async function runDownload(
   fileUrls.add(playlistKey);
   rec.fileUrls = [...fileUrls];
 
-  // 7. Auto-subtitles: same cascade the player uses (VDRK → OpenSubs).
+  // 7. Auto-subtitles: same cascade the player uses (VDRK → OpenSubs),
+  // plus spares (best-first, up to 3 total) for offline switching when the
+  // default misaligns. Skipped entirely when subs are off/stream-only.
   try {
     const sub = await fetchDownloadSubs(req, resolved.imdbId, signal);
     if (sub) {
       rec.subVtt = sub.vtt;
       rec.subLabel = sub.label;
+    }
+    const subOpts = loadVixSettings().subSource;
+    if (subOpts === "vdrk" || subOpts === "auto" || subOpts === "opensub") {
+      const alts = await fetchDownloadSubAlts(
+        req,
+        resolved.imdbId,
+        sub?.fileId,
+        signal
+      );
+      const entries = [
+        ...(sub ? [{ vtt: sub.vtt, label: sub.label }] : []),
+        ...alts,
+      ].slice(0, 3);
+      if (entries.length > 0) rec.subAlts = entries;
     }
   } catch (e) {
     // Pause/cancel during subtitles must still stop the download.
@@ -548,7 +586,7 @@ async function fetchDownloadSubs(
   req: DownloadRequest,
   imdbId: string | null,
   signal: AbortSignal
-): Promise<{ vtt: string; label: string } | null> {
+): Promise<{ vtt: string; label: string; fileId?: number } | null> {
   const settings = loadVixSettings();
   const subSource = settings.subSource;
   if (subSource === "off" || subSource === "stream") return null;
@@ -574,8 +612,60 @@ async function fetchDownloadSubs(
     episode: req.episode,
     signal,
   });
-  if (os?.vtt) return { vtt: os.vtt, label: os.label };
+  if (os?.vtt) return { vtt: os.vtt, label: os.label, fileId: os.fileId };
   return null;
+}
+
+/** VTT files bigger than this are skipped as alternates (outliers). */
+const MAX_ALT_VTT_BYTES = 500 * 1024;
+
+/**
+ * Up to 2 spare OpenSubtitles files (best + 2 alts total per user choice)
+ * so a misaligned default can be swapped offline. Never throws, never fails
+ * the download; honors abort between files.
+ */
+async function fetchDownloadSubAlts(
+  req: DownloadRequest,
+  imdbId: string | null,
+  excludeFileId: number | undefined,
+  signal: AbortSignal
+): Promise<{ vtt: string; label: string }[]> {
+  const out: { vtt: string; label: string }[] = [];
+  if (!imdbId) return out;
+  try {
+    const q = new URLSearchParams({ imdbId, lang: "en", list: "1" });
+    if (req.season != null) q.set("season", String(req.season));
+    if (req.episode != null) q.set("episode", String(req.episode));
+    const res = await fetch(`/api/vixsrc/subs?${q.toString()}`, { signal });
+    if (!res.ok) return out;
+    const data = (await res.json()) as {
+      items?: { fileId: number; label: string }[];
+    };
+    for (const item of data.items ?? []) {
+      if (out.length >= 2) break;
+      if (item.fileId === excludeFileId) continue;
+      if (signal.aborted) throw abortError();
+      try {
+        const ext = await fetchExternalVtt({
+          source: "opensub",
+          imdbId,
+          season: req.season,
+          episode: req.episode,
+          fileId: item.fileId,
+          label: item.label,
+          signal,
+        });
+        if (ext?.vtt && ext.vtt.length <= MAX_ALT_VTT_BYTES) {
+          out.push({ vtt: ext.vtt, label: ext.label });
+        }
+      } catch {
+        /* one bad file skips — the rest still land */
+      }
+    }
+  } catch {
+    /* alts are a bonus */
+  }
+  return out;
 }
 
 async function enforceQuota(rec: DownloadRecord, signal: AbortSignal): Promise<void> {

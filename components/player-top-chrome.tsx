@@ -56,6 +56,10 @@ type PlayerTopChromeProps = {
   openSubFileId: number | null;
   openSubListLoading: boolean;
   onOpenSubPick: (item: OpenSubListItem) => void;
+  /** Stored subtitle files (downloaded with the item) for offline switching. */
+  savedSubAlts: { label: string }[];
+  savedSubAltIndex: number | null;
+  onSavedSubAltPick: (index: number) => void;
   hasExternalSubs: boolean;
   subDelay: number;
   onAdjustSubDelay: (delta: number) => void;
@@ -134,6 +138,9 @@ export function PlayerTopChrome({
   openSubFileId,
   openSubListLoading,
   onOpenSubPick,
+  savedSubAlts,
+  savedSubAltIndex,
+  onSavedSubAltPick,
   hasExternalSubs,
   subDelay,
   onAdjustSubDelay,
@@ -475,6 +482,41 @@ export function PlayerTopChrome({
                       )}
                     </button>
                   ))}
+
+                  {/* Stored files (downloaded with the item) — offline switching
+                      when the default misaligns. */}
+                  {subSource === "opensub" && savedSubAlts.length > 0 && (
+                    <div className="border-t border-white/10 py-1">
+                      <p className="px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-white/45">
+                        Saved files
+                      </p>
+                      {savedSubAlts.map((alt, i) => (
+                        <button
+                          key={`${i}-${alt.label}`}
+                          type="button"
+                          role="menuitem"
+                          onClick={() => onSavedSubAltPick(i)}
+                          className={cn(
+                            "flex w-full flex-col gap-0.5 px-3.5 py-2 text-left hover:bg-secondary",
+                            savedSubAltIndex === i &&
+                              "bg-secondary/60 text-primary"
+                          )}
+                        >
+                          <span className="flex items-center justify-between gap-2 text-xs font-semibold text-white">
+                            <span className="truncate">
+                              {i + 1}. {alt.label}
+                            </span>
+                            {savedSubAltIndex === i && (
+                              <Check className="h-3.5 w-3.5 shrink-0" />
+                            )}
+                          </span>
+                          <span className="text-[10px] font-medium text-white/40">
+                            SAVED
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Top 3 OpenSubtitles releases — pick the one that syncs. */}
                   {subSource === "opensub" && (

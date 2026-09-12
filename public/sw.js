@@ -98,6 +98,17 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // --- IntroDB segments: static per episode — cache for offline/flaky nets.
+  // Served stale-while-revalidate so skip/outro survive airplane mode even
+  // for titles downloaded before segments were captured on the record.
+  if (
+    url.origin === self.location.origin &&
+    url.pathname === "/api/introdb/segments"
+  ) {
+    event.respondWith(staleWhileRevalidateJson(request));
+    return;
+  }
+
   // --- Never intercept / cache these (auth, mutations, live data) ---
   if (shouldBypass(url, request)) {
     return;
@@ -176,8 +187,7 @@ async function networkFirstNavigation(request) {
  * Storage), so stale-while-revalidate is safe — offline cold starts render
  * instantly, online visits refresh the shell in the background.
  */
-async function staleWhileRevalidateDocument(request) {
-  const cache = await caches.open(SHELL_CACHE);
+async function staleWhileRevalidateDocument(request) {  const cache = await caches.open(SHELL_CACHE);
   const url = new URL(request.url);
   const cached =
     (await cache.match(request)) || (await cache.match(url.pathname));
@@ -200,8 +210,35 @@ async function staleWhileRevalidateDocument(request) {
   );
 }
 
-async function cacheFirst(request, cacheName) {
-  const cache = await caches.open(cacheName);
+/**
+ * Tiny static JSON (IntroDB segments): cache-first with background refresh.
+ * Keyed by full URL (query included — one entry per episode).
+ */
+async function staleWhileRevalidateJson(request) {
+  const cache = await caches.open(SHELL_CACHE);
+  const cached = await cache.match(request);
+  const networkPromise = fetch(request)
+    .then(async (response) => {
+      if (response && response.ok) {
+        await cache.put(request, response.clone());
+      }
+      return response;
+    })
+    .catch(() => cached);
+  if (cached) {
+    void networkPromise.catch(() => {});
+    return cached;
+  }
+  return (
+    networkPromise ||
+    new Response("null", {
+      status: 504,
+      headers: { "Content-Type": "application/json" },
+    })
+  );
+}
+
+async function cacheFirst(request, cacheName) {  const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
   if (cached) return cached;
 

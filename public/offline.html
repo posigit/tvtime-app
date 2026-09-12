@@ -138,6 +138,42 @@
         text-shadow: 0 1px 8px #000;
         pointer-events: none;
       }
+      #extras {
+        position: absolute;
+        top: calc(3rem + env(safe-area-inset-top, 0px));
+        left: 1rem;
+        z-index: 51;
+        display: flex;
+        gap: 0.5rem;
+      }
+      .pill {
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        cursor: pointer;
+        background: rgba(0, 0, 0, 0.55);
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 0.4rem 0.75rem;
+        backdrop-filter: blur(8px);
+      }
+      #skip {
+        position: absolute;
+        right: 1rem;
+        bottom: 4.5rem;
+        z-index: 51;
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        cursor: pointer;
+        background: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 800;
+        border-radius: 999px;
+        padding: 0.6rem 1.1rem;
+        backdrop-filter: blur(8px);
+      }
     </style>
   </head>
   <body>
@@ -150,6 +186,12 @@
     <div id="player" role="dialog" aria-modal="true" aria-label="Offline player">
       <p id="ptitle"></p>
       <button type="button" id="close" class="btn del" aria-label="Close player">✕</button>
+      <div id="extras">
+        <button type="button" id="spd" class="pill" aria-label="Playback speed">1×</button>
+        <button type="button" id="ccbtn" class="pill" aria-label="Switch subtitles">CC</button>
+        <button type="button" id="fit" class="pill" aria-label="Screen fit">Fit</button>
+      </div>
+      <button type="button" id="skip" class="pill" hidden>Skip</button>
       <video id="vid" controls playsinline></video>
     </div>
     <script>
@@ -233,6 +275,48 @@
       var records = [];
       var hls = null;
       var hlsReady = null;
+      /* Per-playback UI state (speed / subs / fit / skip / resume). */
+      var curKey = null;
+      var curSegs = null;
+      var trackIdx = 0;
+      var trackCount = 0;
+      var rateIdx = 0;
+      var fitCover = false;
+      var lastPosSave = 0;
+      var RATES = [1, 1.25, 1.5, 2];
+      var POS_LS = "tvtime-offline-positions";
+
+      function readPos(key) {
+        try {
+          var m = JSON.parse(localStorage.getItem(POS_LS) || "{}");
+          var e = m && m[key];
+          if (e && isFinite(e.pos) && e.pos > 10) {
+            var d = e.dur || 0;
+            if (!d || e.pos < d * 0.92) return e.pos;
+          }
+        } catch (err) {}
+        return 0;
+      }
+
+      function writePos(key, pos, dur) {
+        if (!key || !isFinite(pos) || pos < 0) return;
+        try {
+          var m = JSON.parse(localStorage.getItem(POS_LS) || "{}") || {};
+          m[key] = { pos: pos, dur: dur || 0, at: Date.now() };
+          localStorage.setItem(POS_LS, JSON.stringify(m));
+        } catch (err) {}
+      }
+
+      function clearPos(key) {
+        if (!key) return;
+        try {
+          var m = JSON.parse(localStorage.getItem(POS_LS) || "{}") || {};
+          if (m[key]) {
+            delete m[key];
+            localStorage.setItem(POS_LS, JSON.stringify(m));
+          }
+        } catch (err) {}
+      }
 
       function loadHls() {
         if (window.Hls) return Promise.resolve(true);
@@ -253,6 +337,21 @@
       }
 
       function closePlayer() {
+        if (curKey) {
+          try {
+            var vv = document.getElementById("vid");
+            if (isFinite(vv.currentTime) && vv.currentTime > 10) {
+              var dd = isFinite(vv.duration) ? vv.duration : 0;
+              if (!dd || vv.currentTime < dd * 0.92) {
+                writePos(curKey, vv.currentTime, dd);
+              } else {
+                clearPos(curKey);
+              }
+            }
+          } catch (e) {}
+        }
+        curKey = null;
+        curSegs = null;
         try {
           if (hls) {
             hls.destroy();
@@ -278,21 +377,67 @@
 
       function playRecord(rec) {
         var url = "/api/dl?playlist=" + encodeURIComponent(rec.key);
+        curKey = rec.key;
+        curSegs = rec.segments || null;
+        trackIdx = 0;
+        rateIdx = 0;
+        fitCover = false;
+        lastPosSave = 0;
         document.getElementById("ptitle").textContent = rec.title || "Offline video";
         document.getElementById("player").classList.add("open");
         var v = document.getElementById("vid");
-        if (rec.subVtt) {
+        v.playbackRate = 1;
+        v.style.objectFit = "contain";
+        document.getElementById("spd").textContent = "1×";
+        document.getElementById("fit").textContent = "Fit";
+        /* All stored subtitle files as native tracks (best first). */
+        var files = [];
+        if (rec.subVtt) files.push({ vtt: rec.subVtt, label: rec.subLabel || "Subtitles" });
+        (rec.subAlts || []).forEach(function (a) {
+          if (a && a.vtt) files.push({ vtt: a.vtt, label: a.label || "Subtitles" });
+        });
+        trackCount = files.length;
+        files.forEach(function (f, i) {
           try {
-            var blob = new Blob([rec.subVtt], { type: "text/vtt" });
+            var blob = new Blob([f.vtt], { type: "text/vtt" });
             var track = document.createElement("track");
             track.kind = "subtitles";
-            track.label = rec.subLabel || "Subtitles";
+            track.label = f.label;
             track.srclang = "en";
             track.src = URL.createObjectURL(blob);
-            track.default = true;
+            if (i === 0) track.default = true;
             v.appendChild(track);
           } catch (e) {}
-        }
+        });
+        updateCcBtn();
+        /* Resume jump + position tracking + skip window. */
+        var resumeAt = readPos(curKey);
+        v.onloadedmetadata = function () {
+          if (resumeAt > 0) {
+            try {
+              v.currentTime = resumeAt;
+            } catch (e) {}
+          }
+        };
+        v.ontimeupdate = function () {
+          var t = v.currentTime;
+          var d = isFinite(v.duration) ? v.duration : 0;
+          var now = Date.now();
+          if (isFinite(t) && t > 0 && now - lastPosSave > 5000) {
+            lastPosSave = now;
+            writePos(curKey, t, d);
+          }
+          updateSkip(t);
+        };
+        v.onpause = function () {
+          if (isFinite(v.currentTime) && v.currentTime > 0) {
+            var d = isFinite(v.duration) ? v.duration : 0;
+            writePos(curKey, v.currentTime, d);
+          }
+        };
+        v.onended = function () {
+          clearPos(curKey);
+        };
         // Native HLS (Safari) needs no library and never fails to load it.
         if (v.canPlayType("application/vnd.apple.mpegurl")) {
           v.src = url;
@@ -320,6 +465,56 @@
             }
           });
         });
+      }
+
+      function updateCcBtn() {
+        var b = document.getElementById("ccbtn");
+        b.textContent = trackCount > 1 ? "CC " + (trackIdx + 1) + "/" + trackCount : "CC";
+      }
+
+      function cycleSubs() {
+        var v = document.getElementById("vid");
+        if (trackCount < 2) return;
+        trackIdx = (trackIdx + 1) % trackCount;
+        var tracks = v.textTracks;
+        for (var i = 0; i < tracks.length; i++) {
+          try {
+            tracks[i].mode = i === trackIdx ? "showing" : "hidden";
+          } catch (e) {}
+        }
+        updateCcBtn();
+      }
+
+      function activeSeg(t) {
+        if (!curSegs || !isFinite(t)) return null;
+        var cands = [
+          { seg: curSegs.intro, label: "Skip Intro" },
+          { seg: curSegs.recap, label: "Skip Recap" },
+        ];
+        for (var i = 0; i < cands.length; i++) {
+          var s = cands[i].seg;
+          if (s && s.start != null && s.end != null && t >= s.start && t < s.end) {
+            return { end: s.end, label: cands[i].label };
+          }
+        }
+        return null;
+      }
+
+      function updateSkip(t) {
+        var btn = document.getElementById("skip");
+        var hit = activeSeg(t);
+        if (hit) {
+          btn.textContent = hit.label;
+          btn.hidden = false;
+          btn.onclick = function () {
+            try {
+              document.getElementById("vid").currentTime = hit.end + 0.5;
+            } catch (e) {}
+          };
+        } else {
+          btn.hidden = true;
+          btn.onclick = null;
+        }
       }
 
       function delRecord(key) {
@@ -433,6 +628,22 @@
       }
 
       document.getElementById("close").addEventListener("click", closePlayer);
+      document.getElementById("spd").addEventListener("click", function () {
+        rateIdx = (rateIdx + 1) % RATES.length;
+        var r = RATES[rateIdx];
+        try {
+          document.getElementById("vid").playbackRate = r;
+        } catch (e) {}
+        document.getElementById("spd").textContent = r + "×";
+      });
+      document.getElementById("ccbtn").addEventListener("click", cycleSubs);
+      document.getElementById("fit").addEventListener("click", function () {
+        fitCover = !fitCover;
+        try {
+          document.getElementById("vid").style.objectFit = fitCover ? "cover" : "contain";
+        } catch (e) {}
+        document.getElementById("fit").textContent = fitCover ? "Cover" : "Fit";
+      });
       render();
     </script>
   </body>

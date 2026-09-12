@@ -5,9 +5,12 @@ import { VixPlayer } from "@/components/vix-player";
 import {
   dlPlaylistUrl,
   getManifest,
+  readOfflinePosition,
   touchRecord,
   verifyRecordFiles,
 } from "@/lib/downloads";
+import { isResumablePosition } from "@/lib/player-progress";
+import type { IntroDbSegments } from "@/lib/introdb";
 import { useToast } from "@/components/toast";
 
 /**
@@ -23,6 +26,12 @@ export function OfflinePlayerHost() {
     nonce: number;
   } | null>(null);
   const [sub, setSub] = useState<{ vtt: string; label: string } | null>(null);
+  /** Local stop position for auto-resume (jump straight, no prompt). */
+  const [resumeAt, setResumeAt] = useState<number | null>(null);
+  /** Segments captured with the download (offline skip/outro). */
+  const [storedSegments, setStoredSegments] = useState<IntroDbSegments | null>(null);
+  /** Stored spare subtitle files (best-first) for offline switching. */
+  const [storedAlts, setStoredAlts] = useState<{ vtt: string; label: string }[] | null>(null);
   const [meta, setMeta] = useState<{
     title: string;
     type: "movie" | "tv";
@@ -60,6 +69,15 @@ export function OfflinePlayerHost() {
         setSub(
           rec.subVtt ? { vtt: rec.subVtt, label: rec.subLabel ?? "Subtitles" } : null
         );
+        // Auto-resume from the local stop position when still mid-way.
+        const stored = readOfflinePosition(key);
+        setResumeAt(
+          stored && isResumablePosition(stored.pos, stored.dur)
+            ? stored.pos
+            : null
+        );
+        setStoredSegments(rec.segments ?? null);
+        setStoredAlts(rec.subAlts?.length ? rec.subAlts : null);
         setMeta({
           title: rec.title,
           type: rec.type === "movie" ? "movie" : "tv",
@@ -78,6 +96,9 @@ export function OfflinePlayerHost() {
     setReq(null);
     setMeta(null);
     setSub(null);
+    setResumeAt(null);
+    setStoredSegments(null);
+    setStoredAlts(null);
   }, []);
 
   if (!req || !meta) return null;
@@ -92,8 +113,12 @@ export function OfflinePlayerHost() {
       season={meta.season}
       episode={meta.episode}
       autoResume={false}
+      initialPosition={resumeAt}
       initialPlaylistUrl={dlPlaylistUrl(req.key)}
+      offlineKey={req.key}
       initialSubVtt={sub}
+      initialSubAlts={storedAlts}
+      initialSegments={storedSegments}
       onEvent={() => {}}
       onClose={close}
     />
