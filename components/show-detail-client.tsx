@@ -31,7 +31,7 @@ import type { TmdbMediaCard, WatchProvidersResult } from "@/lib/tmdb";
 import type { ReviewsPayload } from "@/lib/reviews";
 import type { PlaybackSummary } from "@/lib/playback";
 import { formatPlaybackTime } from "@/lib/playback-format";
-import { Check, ChevronDown, ChevronLeft, MoreHorizontal, Play } from "lucide-react";
+import { BookmarkCheck, Check, ChevronDown, ChevronLeft, MoreHorizontal, Play, Plus } from "lucide-react";
 
 export type DetailEpisode = {
   seasonNumber: number;
@@ -125,7 +125,9 @@ export function ShowDetailClient({
   });
   const watchedMapRef = useRef(watchedMap);
   const [rewatchCounts, setRewatchCounts] = useState(initialRewatchCounts);
-  const [activeTab, setActiveTab] = useState<"about" | "episodes">("about");
+  const [activeTab, setActiveTab] = useState<"about" | "episodes">(() =>
+    initialFollowing ? "episodes" : "about"
+  );
   const [confetti, setConfetti] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [following, setFollowing] = useState(initialFollowing);
@@ -952,13 +954,23 @@ export function ShowDetailClient({
           <button
             onClick={toggleFollow}
             className={cn(
-              "mt-5 w-full rounded-full py-3 text-sm font-bold transition-colors",
+              "mt-5 flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-bold backdrop-blur-xl transition-all active:scale-[0.99]",
               following
-                ? "bg-card text-white"
-                : "bg-primary text-black"
+                ? "bg-primary/[0.14] text-primary ring-1 ring-primary/40 shadow-[0_8px_24px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.15)]"
+                : "bg-primary text-black shadow-[0_8px_24px_rgba(0,0,0,0.45)] hover:brightness-110"
             )}
           >
-            {following ? "✓ In your watch list" : "Add to watch list"}
+            {following ? (
+              <>
+                <BookmarkCheck className="h-4 w-4" strokeWidth={2.5} />
+                In your watchlist
+              </>
+            ) : (
+              <>
+                <Plus className="h-4 w-4" strokeWidth={2.5} />
+                Add to watchlist
+              </>
+            )}
           </button>
 
           {providers && <WatchProviders providers={providers} />}
