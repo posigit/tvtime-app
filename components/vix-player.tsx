@@ -1953,11 +1953,14 @@ export function VixPlayer({
         remoteDurationRef.current = d.duration;
       }
 
-      // VidFast drives our transport like CineSrc (play/pause/seek/volume).
+      // Driven embeds (VidFast + CineSrc) feed our transport clock
+      // (play/pause/seek/volume/time). Without this the UI clock freezes at
+      // 0:00 — scrubber, time readout, seeker markers and the Skip button all
+      // die while progress saves (remote refs above) keep working.
       // Other PLAYER_EVENT embeds (Mapple/VidLink/2Embed/vixsrc fallback) only
       // feed progress below — their chrome stays in charge until locked.
       if (
-        activeSource === "vidfast" &&
+        (activeSource === "vidfast" || activeSource === "cinesrc") &&
         (d.event === "play" ||
           d.event === "pause" ||
           d.event === "seeked" ||
