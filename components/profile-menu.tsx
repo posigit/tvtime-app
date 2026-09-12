@@ -5,6 +5,7 @@ import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { Download, History, MoreHorizontal, CalendarDays } from "lucide-react";
 import { DownloadSettingsSheet } from "@/components/download-settings-sheet";
+import { InstallButton } from "@/components/install-button";
 
 /** Profile "⋯" menu: Watch history, Import data + Sign out */
 export function ProfileMenu() {
@@ -69,6 +70,7 @@ export function ProfileMenu() {
             <Download className="h-4 w-4" />
             Library
           </button>
+          <InstallButton />
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: "/login" })}

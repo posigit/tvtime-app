@@ -24,6 +24,21 @@ export async function GET(request: Request) {
   }
 
   const started = Date.now();
+  // Integration presence (flags only, never values) so a dashboard can tell
+  // "not configured" apart from "down" — e.g. OpenSubtitles 501s.
+  const integrations = {
+    tmdb: Boolean(
+      process.env.TMDB_API_KEY || process.env.NEXT_PUBLIC_TMDB_API_KEY
+    ),
+    vixResolver: Boolean(process.env.VIX_RESOLVER_URL),
+    openSubtitles:
+      Boolean(process.env.OPENSUBTITLES_API_KEY) &&
+      Boolean(process.env.OPENSUBTITLES_USERNAME) &&
+      Boolean(process.env.OPENSUBTITLES_PASSWORD),
+    push:
+      Boolean(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) &&
+      Boolean(process.env.VAPID_PRIVATE_KEY),
+  };
   try {
     // A few retries so a mid-wake ping still succeeds
     await pingDb(5, 1000);
@@ -32,6 +47,7 @@ export async function GET(request: Request) {
       db: "up",
       ms: Date.now() - started,
       ts: new Date().toISOString(),
+      integrations,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -42,6 +58,7 @@ export async function GET(request: Request) {
         error: message,
         ms: Date.now() - started,
         ts: new Date().toISOString(),
+        integrations,
       },
       { status: 503 }
     );

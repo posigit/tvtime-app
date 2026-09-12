@@ -2619,7 +2619,7 @@ export function VixPlayer({
       role="dialog"
       aria-modal="true"
       aria-label={`${title} player`}
-      className="fixed inset-0 z-[100] flex flex-col bg-black"
+      className="fixed inset-0 z-[100] flex touch-manipulation flex-col bg-black"
     >
       {mode === "native" && (
         <video
@@ -2703,7 +2703,7 @@ export function VixPlayer({
 
       {isDrivenEmbed && !locked && (
         <div
-          className="absolute inset-0 z-[15]"
+          className="absolute inset-0 z-[15] touch-manipulation"
           onTouchEnd={handleTap}
           onClick={handleVideoClick}
         />

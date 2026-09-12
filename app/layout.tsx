@@ -25,8 +25,10 @@ export const viewport: Viewport = {
   themeColor: "#000000",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  // Pinch zoom allowed (a11y); double-tap zoom is already suppressed where
+  // it matters by touch-manipulation on the player, so seek taps are safe.
+  maximumScale: 5,
+  userScalable: true,
   // Edge-to-edge under notch / home indicator (standalone PWA)
   viewportFit: "cover",
 };
