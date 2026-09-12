@@ -294,8 +294,10 @@ export function sendCineSrcCommand(
 }
 
 /**
- * VidFast control channel: { command: "play" | "pause" | "seek" | "volume",
- * extra fields per command (seek -> { time }, volume -> { level }) }.
+ * VidFast control channel, per its PostMessage docs:
+ * {command:"play"} | {command:"pause"} | {command:"seek", time} |
+ * {command:"volume", level: 0-1} | {command:"mute", muted: bool} |
+ * {command:"getStatus"} (replies via PLAYER_EVENT playerstatus).
  * Always targets "*" per VidFast's own docs: the player redirects across
  * vidfast.* mirrors internally, so the src origin is unreliable and an
  * explicit origin silently drops every command (dead remote). Inbound
@@ -303,7 +305,7 @@ export function sendCineSrcCommand(
  */
 export function sendVidfastCommand(
   iframe: HTMLIFrameElement | null,
-  command: "play" | "pause" | "seek" | "volume" | "getStatus",
+  command: "play" | "pause" | "seek" | "volume" | "mute" | "getStatus",
   data: Record<string, unknown> = {}
 ): void {
   iframe?.contentWindow?.postMessage({ command, ...data }, "*");

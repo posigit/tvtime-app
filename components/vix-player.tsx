@@ -169,8 +169,6 @@ export function VixPlayer({
   const remoteDurationRef = useRef(0);
   const iframePausedRef = useRef(true);
   const iframeMutedRef = useRef(false);
-  /** Last nonzero volume for driven-embed unmute (VidFast mutes via level 0). */
-  const lastVolumeRef = useRef(loadVixSettings().volume || 1);
   /** Parsed VDRK cues rendered over the CineSrc iframe (no <video> track). */
   const [iframeCues, setIframeCues] = useState<VttCue[]>([]);
   /** Resume override for CineSrc quality switches (reload keeps position). */
@@ -1695,11 +1693,7 @@ export function VixPlayer({
       const next = !iframeMutedRef.current;
       iframeMutedRef.current = next;
       if (activeSource === "vidfast") {
-        // VidFast has no discrete mute — mute is volume level 0, unmute
-        // restores the last nonzero level.
-        sendVidfastCommand(iframeRef.current, "volume", {
-          level: next ? 0 : lastVolumeRef.current,
-        });
+        sendVidfastCommand(iframeRef.current, "mute", { muted: next });
         window.setTimeout(() => sendVidfastCommand(iframeRef.current, "getStatus"), 350);
       } else {
         sendCineSrcCommand(iframeRef.current, "setMuted", [next]);
@@ -1720,7 +1714,6 @@ export function VixPlayer({
       const next = Math.max(0, Math.min(1, vol));
       if (isDrivenEmbed) {
         iframeMutedRef.current = next === 0;
-        if (next > 0) lastVolumeRef.current = next;
         if (activeSource === "vidfast") {
           sendVidfastCommand(iframeRef.current, "volume", { level: next });
           window.setTimeout(() => sendVidfastCommand(iframeRef.current, "getStatus"), 350);
