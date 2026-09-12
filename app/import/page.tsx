@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { posterUrl } from "@/lib/tmdb";
@@ -39,16 +40,28 @@ export default function ImportPage() {
     movieReactions: number;
     lists: number;
   } | null>(null);
+  const [uploaded, setUploaded] = useState(false);
+  const [zipName, setZipName] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const startParse = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/import/parse", { method: "POST" });
+      const file = fileRef.current?.files?.[0];
+      let res: Response;
+      if (file) {
+        const form = new FormData();
+        form.append("file", file);
+        res = await fetch("/api/import/parse", { method: "POST", body: form });
+      } else {
+        res = await fetch("/api/import/parse", { method: "POST" });
+      }
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setShowMappings(data.showMappings);
       setMovieMappings(data.movieMappings);
       setStats(data.stats);
+      setUploaded(data.uploaded === true);
     } catch (err) {
       alert("Parse failed: " + (err as Error).message);
     } finally {
@@ -86,7 +99,7 @@ export default function ImportPage() {
       const res = await fetch("/api/import/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ showMappings, movieMappings }),
+        body: JSON.stringify({ showMappings, movieMappings, uploaded }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -106,13 +119,44 @@ export default function ImportPage() {
       <h1 className="mb-4 text-2xl font-bold">Import TV Time Data</h1>
 
       {!stats && (
-        <Button
-          onClick={startParse}
-          disabled={loading}
-          className="w-full bg-primary text-black hover:bg-primary/90"
-        >
-          {loading ? "Parsing & Mapping..." : "Start Import"}
-        </Button>
+        <>
+          <label
+            htmlFor="gdpr-zip"
+            className="mb-2 block cursor-pointer rounded-xl border border-dashed border-white/20 bg-card p-4 text-center transition hover:border-white/40"
+          >
+            <span className="block text-sm font-semibold">
+              {zipName ?? "Drop your TV Time export zip here"}
+            </span>
+            <span className="mt-0.5 block text-xs text-muted-foreground">
+              …or leave empty to use the server folder
+            </span>
+            <input
+              ref={fileRef}
+              id="gdpr-zip"
+              type="file"
+              accept=".zip,application/zip"
+              className="sr-only"
+              onChange={(e) => {
+                setZipName(e.target.files?.[0]?.name ?? null);
+                setStats(null);
+              }}
+            />
+          </label>
+          <Button
+            onClick={startParse}
+            disabled={loading}
+            className="w-full bg-primary text-black hover:bg-primary/90"
+          >
+            {loading ? "Parsing & Mapping..." : "Start Import"}
+          </Button>
+          <Link
+            href="/api/export"
+            prefetch={false}
+            className="mt-2 flex w-full items-center justify-center rounded-md border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10"
+          >
+            Download library backup (JSON)
+          </Link>
+        </>
       )}
 
       {stats && (
