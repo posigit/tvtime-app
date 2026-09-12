@@ -22,7 +22,7 @@ export function requestOfflinePlay(key: string) {
 
 /**
  * Global completion toast. The engine broadcasts tvtime:download-done;
- * this shows "Downloaded — View" which jumps to the library. Mount once
+ * this shows "Saved · View" which jumps to the library. Mount once
  * inside the toast provider.
  */
 export function DownloadDoneNotifier() {
@@ -31,7 +31,9 @@ export function DownloadDoneNotifier() {
   useEffect(() => {
     const onDone = (e: Event) => {
       const d = (e as CustomEvent<{ key?: string; title?: string }>).detail;
-      toast(`Downloaded${d?.title ? ` ${d.title}` : ""}`, "success", {
+      // Record titles use " — " (Show — S1E3); the toast drops it — no dashes.
+      const title = (d?.title ?? "").replaceAll(" — ", " ").trim();
+      toast(title ? `Saved · ${title}` : "Saved", "success", {
         label: "View",
         onClick: () => router.push("/library"),
       });
