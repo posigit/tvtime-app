@@ -4,7 +4,7 @@ import { SessionProvider, useSession } from "next-auth/react";
 import { ReactNode, useEffect } from "react";
 import { ToastProvider } from "@/components/toast";
 import { hydrateVixSettings } from "@/lib/vix-settings";
-import { initPlaybackOutbox } from "@/lib/player-playback-api";
+import { initPlaybackOutbox } from "@/lib/offline/store";
 
 /** Hydrates player settings once the session is known (per-user data). */
 function SettingsHydrator() {

@@ -3,6 +3,8 @@
  * Run: npx tsx scripts/test-player-progress.ts
  */
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
 import {
   addStartAt,
   formatPlayerClock,
@@ -24,7 +26,11 @@ import { CINESRC_SEED_SERVERS, buildCineSrcServerOptions, cineSrcAliasFor, cineS
 import { DEFAULT_VIX_SETTINGS } from "../lib/vix-settings";
 import { NEXT_FAB_RATIO, RESUME_END_RATIO } from "../lib/player-constants";
 import { normalizeSegment, parseSegmentSec } from "../lib/introdb";
-import { coalesceOutbox } from "../lib/player-playback-api";
+import { coalesceOutbox } from "../lib/offline/store";
+import {
+  VOLATILE_PARAMS,
+  canonicalMediaKey,
+} from "../lib/offline/hls";
 
 assert.equal(isResumablePosition(3, 100), false);
 assert.equal(isResumablePosition(10, 100), true);
@@ -256,5 +262,33 @@ assert.equal(
   coalesceOutbox([e1], { params: "b", method: "POST", at: 3, attempts: 0 }).length,
   2
 );
+
+// Canonical keys: stable across signed-URL rotation (resume depends on it).
+assert.equal(
+  canonicalMediaKey("https://cdn.example.com/s/1.ts?token=AAA&expires=1"),
+  canonicalMediaKey("https://cdn.example.com/s/1.ts?token=BBB&expires=2&asn=3")
+);
+assert.ok(canonicalMediaKey("https://cdn.example.com/s/1.ts").startsWith("media:"));
+assert.deepEqual(VOLATILE_PARAMS, ["token", "expires", "asn"]);
+
+// offline.html parity: the standalone launcher hardcodes the store contract
+// (it can't import TS). If these drift, cold-start offline breaks silently.
+{
+  const html = fs.readFileSync(
+    path.join(__dirname, "..", "public", "offline.html"),
+    "utf8"
+  );
+  for (const needle of [
+    "keyval-store",
+    '"keyval"',
+    "tvtime-download-manifest-v1",
+    "tvtime-downloads",
+    "tvtime-offline-positions",
+    "/api/dl?playlist=",
+    "/vendor/hls.min.js",
+  ]) {
+    assert.ok(html.includes(needle), `offline.html missing ${needle}`);
+  }
+}
 
 console.log("player-progress: all assertions passed");

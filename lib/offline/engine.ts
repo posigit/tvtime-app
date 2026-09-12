@@ -1,0 +1,766 @@
+/**
+ * Offline download engine (page context).
+ *
+ * Flow per item: resolve native playlist (vix/goated cascade — iframe
+ * sources can never download, the browser never touches their bytes) →
+ * pick variant at/below the quality setting → fetch segments + init + keys
+ * through the same same-origin paths the player uses → store bytes in the
+ * `tvtime-downloads` cache under `/api/dl?u=` keys → store the rewritten
+ * playlist under `/api/dl?playlist=` → auto-fetch the subtitle track →
+ * mark done. Pause/resume/cancel via per-key AbortControllers; resume
+ * skips bytes already in the cache.
+ */
+
+import { resolveStreamPlaylist } from "@/lib/player-stream";
+import { fetchExternalVtt } from "@/lib/player-subs";
+import { fetchSegments } from "@/lib/introdb";
+import { loadVixSettings, matchLang } from "@/lib/vix-settings";
+import {
+  DL_CACHE,
+  commitRecord,
+  deleteRecordFiles,
+  downloadKey,
+  ensurePersisted,
+  getAllSync,
+  getManifest,
+  getRecordSync,
+  removeRecord,
+  storageStats,
+  updateProgress,
+  upsertRecord,
+  usedBytes,
+  type DownloadRecord,
+} from "@/lib/offline/store";
+import {
+  buildOfflineMaster,
+  canonicalMediaKey,
+  dlFileUrl,
+  dlPlaylistUrl,
+  estimateBytes,
+  isMasterPlaylist,
+  parseMasterAudio,
+  parseMasterVariants,
+  parseMediaPlaylist,
+  pickAudioEntry,
+  pickVariant,
+  rewritePlaylistForOffline,
+  type AudioEntry,
+  type MediaParts,
+  type VariantInfo,
+} from "@/lib/offline/hls";
+import { formatBytes } from "@/lib/utils";
+
+export type DownloadRequest = {
+  type: "movie" | "tv";
+  tmdbId: number;
+  season?: number;
+  episode?: number;
+  title: string;
+  subtitle?: string;
+};
+
+const CONCURRENCY = 4;
+
+const activeControllers = new Map<string, AbortController>();
+const pauseIntents = new Set<string>();
+const cancelIntents = new Set<string>();
+
+export function isDownloadActive(key: string): boolean {
+  return activeControllers.has(key);
+}
+
+function abortError(): Error {
+  const e = new Error("aborted");
+  e.name = "AbortError";
+  return e;
+}
+
+/** Per-piece network ceiling: a hung connection must fail, never freeze. */
+const PIECE_TIMEOUT_MS = 30000;
+/** No completed piece for this long with work remaining = stalled. */
+const STALL_TIMEOUT_MS = 60000;
+
+/**
+ * fetch with a timeout that never masquerades as a user pause/cancel:
+ * parent-signal aborts rethrow as AbortError (pause path); timeouts throw a
+ * plain Error (error state + retry path).
+ */
+async function fetchPiece(input: string, signal: AbortSignal): Promise<Response> {
+  const timeout = AbortSignal.timeout(PIECE_TIMEOUT_MS);
+  try {
+    return await fetch(input, { signal: AbortSignal.any([signal, timeout]) });
+  } catch (err) {
+    if (signal.aborted) throw abortError();
+    if (err instanceof Error && err.name === "TimeoutError") {
+      throw new Error("A piece stalled — tap to retry");
+    }
+    throw err;
+  }
+}
+
+/**
+ * Turn a failed native resolution into an honest message. The generic
+ * "no downloadable stream" hid the real cause: on Vercel-class hosting the
+ * sources block direct requests, so without the standalone resolver
+ * (VIX_RESOLVER_URL) there is no native path at all — while iframe
+ * playback keeps working, which made the old message look like a lie.
+ */
+function diagnoseResolveFailure(r: {
+  code?: string;
+  detail?: string;
+  attempts?: Array<{ source: string; ok: boolean; error?: string }>;
+}): string {
+  if (r.code === "resolver_unconfigured") {
+    return "Downloads need the stream resolver — VIX_RESOLVER_URL isn't set on this deployment, and the sources block it directly. Streaming still works via embeds, but offline needs native. Set the env var and redeploy.";
+  }
+  if (r.code === "resolution_failed") {
+    return `Stream resolver failed${r.detail ? ` (${r.detail})` : ""} If it names the resolver, revive/redeploy that service (its /health should return ok), check VIX_RESOLVER_URL, then retry.`;
+  }
+  if (r.code === "upstream_unreachable") {
+    return "Sources are unreachable from this deployment right now. Retry in a bit — embed streaming is unaffected.";
+  }
+  const tried = (r.attempts ?? [])
+    .filter((a) => !a.ok)
+    .map((a) => a.source)
+    .join(", ");
+  return `No downloadable stream${tried ? ` (tried: ${tried})` : ""} — the title may only exist on embed sources right now.`;
+}
+
+export async function startDownload(req: DownloadRequest): Promise<void> {
+  const settings = loadVixSettings();
+  if (!settings.downloadMode) {
+    throw new Error("Download mode is off — enable it in Download settings.");
+  }
+  const key = downloadKey(
+    req.type === "movie" ? "movie" : "episode",
+    req.tmdbId,
+    req.season,
+    req.episode
+  );
+  const existing = getRecordSync(key) ?? (await getManifest())[key];
+  if (existing && (existing.state === "active" || existing.state === "queued")) {
+    return; // already running
+  }
+  if (activeControllers.has(key)) return;
+
+  const now = Date.now();
+  const rec: DownloadRecord = {
+    key,
+    type: req.type === "movie" ? "movie" : "episode",
+    tmdbId: req.tmdbId,
+    season: req.season,
+    episode: req.episode,
+    title: req.title,
+    subtitle: req.subtitle,
+    quality: settings.downloadQuality,
+    usedSource: existing?.usedSource ?? "",
+    durationSec: existing?.durationSec ?? 0,
+    estimateBytes: existing?.estimateBytes ?? 0,
+    sizeBytes: 0,
+    // Resume seeds the bar where the last run left off (capped at known
+    // totals) instead of visibly restarting at 0%. Verification still runs
+    // over every piece, so evicted bytes re-download and the final counts
+    // stay honest.
+    bytesDone: Math.min(
+      existing?.bytesDone ?? 0,
+      existing?.estimateBytes || Number.POSITIVE_INFINITY
+    ),
+    totalSegments: existing?.totalSegments ?? 0,
+    doneSegments: Math.min(
+      existing?.doneSegments ?? 0,
+      existing?.totalSegments || Number.POSITIVE_INFINITY
+    ),
+    fileUrls: [],
+    state: "queued",
+    error: undefined,
+    subVtt: existing?.subVtt ?? null,
+    subLabel: existing?.subLabel ?? null,
+    subAlts: existing?.subAlts ?? [],
+    segments: existing?.segments ?? null,
+    downloadedAt: 0,
+    lastUsedAt: now,
+  };
+  await upsertRecord(rec);
+
+  const controller = new AbortController();
+  activeControllers.set(key, controller);
+  try {
+    await runDownload(req, rec, controller.signal);
+  } catch (err) {
+    // Stop straggler workers still burning data after the first failure.
+    // (Pause/cancel paths already aborted; this is a no-op for them.)
+    controller.abort();
+    const cancelled = controller.signal.aborted;
+    // Identity, not just presence: another tab/session may have registered
+    // its own controller under this key after ours died.
+    const ownedHere = activeControllers.get(key) === controller;
+    if (cancelIntents.has(key)) {
+      cancelIntents.delete(key);
+      pauseIntents.delete(key);
+      await deleteRecordFiles(rec);
+      await removeRecord(key);
+      return;
+    }
+    const live = getRecordSync(key) ?? (await getManifest())[key];
+    // Deleted or finished elsewhere — never resurrect or clobber.
+    if (!live || live.state === "done") return;
+    if (live.state === "paused" || (ownedHere && cancelled && pauseIntents.has(key))) {
+      pauseIntents.delete(key);
+      await commitRecord({ ...rec, state: "paused", error: undefined });
+      return;
+    }
+    // Another live loop owns this key now — hands off, don't clobber it.
+    if (!ownedHere) return;
+    await commitRecord({
+      ...rec,
+      state: "error",
+      error: err instanceof Error ? err.message : "Download failed",
+    });
+  } finally {
+    if (activeControllers.get(key) === controller) activeControllers.delete(key);
+  }
+}
+
+/**
+ * Pause a download. Always lands: aborts the live controller when this
+ * instance owns one, and otherwise flips durable state directly so the row
+ * can't strand in "active" (second tab, HMR module reset, lost map entry).
+ */
+export async function pauseDownload(key: string): Promise<void> {
+  pauseIntents.add(key);
+  const controller = activeControllers.get(key);
+  if (controller) {
+    controller.abort();
+    return;
+  }
+  pauseIntents.delete(key);
+  const rec = getRecordSync(key) ?? (await getManifest())[key];
+  if (rec && (rec.state === "active" || rec.state === "queued")) {
+    await commitRecord({ ...rec, state: "paused", error: undefined });
+  }
+}
+
+export async function resumeDownload(req: DownloadRequest): Promise<void> {
+  const key = downloadKey(
+    req.type === "movie" ? "movie" : "episode",
+    req.tmdbId,
+    req.season,
+    req.episode
+  );
+  // Consume any stale pause intent so the fresh loop can't trip on it.
+  pauseIntents.delete(key);
+  const rec = getRecordSync(key);
+  if (rec && rec.state !== "done") {
+    await upsertRecord({ ...rec, state: "queued", error: undefined });
+  }
+  return startDownload(req);
+}
+
+export function cancelDownload(key: string) {
+  if (!activeControllers.has(key)) {
+    // Not running — just drop the row + files.
+    void (async () => {
+      const rec = getRecordSync(key);
+      if (rec) await deleteRecordFiles(rec);
+      await removeRecord(key);
+    })();
+    return;
+  }
+  cancelIntents.add(key);
+  pauseIntents.delete(key);
+  activeControllers.get(key)?.abort();
+}
+
+export async function deleteDownload(key: string): Promise<void> {
+  cancelIntents.delete(key);
+  pauseIntents.delete(key);
+  activeControllers.get(key)?.abort();
+  activeControllers.delete(key);
+  const rec = getRecordSync(key);
+  if (rec) await deleteRecordFiles(rec);
+  await removeRecord(key);
+}
+
+async function runDownload(
+  req: DownloadRequest,
+  rec: DownloadRecord,
+  signal: AbortSignal
+): Promise<void> {
+  const throwIfAborted = () => {
+    if (signal.aborted) throw abortError();
+  };
+
+  rec.state = "active";
+  await upsertRecord(rec);
+
+  // 1. Resolve a native playlist (vix/goated cascade covers vix fallback).
+  const preferred = loadVixSettings().preferredSource;
+  const source = preferred === "vix" || preferred === "goated" ? preferred : "goated";
+  const resolved = await resolveStreamPlaylist({
+    source,
+    type: req.type,
+    tmdbId: req.tmdbId,
+    season: req.season,
+    episode: req.episode,
+    signal,
+  });
+  throwIfAborted();
+  if (!resolved.playlistUrl) {
+    throw new Error(diagnoseResolveFailure(resolved));
+  }
+  rec.usedSource = resolved.usedSource ?? source;
+  await upsertRecord(rec);
+
+  // 1b. IntroDB segments (TV only, needs the resolved IMDb id): captured now
+  // so skip intro/recap + outro Up Next keep working fully offline.
+  if (
+    req.type === "tv" &&
+    req.season != null &&
+    req.episode != null &&
+    resolved.imdbId
+  ) {
+    try {
+      rec.segments = await fetchSegments({
+        imdbId: resolved.imdbId,
+        season: req.season,
+        episode: req.episode,
+      });
+    } catch {
+      /* segments are a bonus — never fail the download for them */
+    }
+  }
+
+  // 2. Master → variant at/below the quality setting. The resolver may
+  // hand back a relative same-origin proxy path — absolutize once so every
+  // URL resolution below (variants, segments, keys) actually works.
+  const playlistBase = new URL(
+    resolved.playlistUrl,
+    window.location.origin
+  ).toString();
+  const masterRes = await fetchPiece(playlistBase, signal);
+  if (!masterRes.ok) throw new Error(`Stream lookup failed (${masterRes.status})`);
+  const masterText = await masterRes.text();
+  throwIfAborted();
+
+  let mediaUrl = playlistBase;
+  let mediaText = masterText;
+  let bandwidth = 0;
+  let pickedVariant: VariantInfo | null = null;
+  const isMaster = isMasterPlaylist(masterText);
+  if (isMaster) {
+    const variants = parseMasterVariants(masterText, playlistBase);
+    pickedVariant = pickVariant(variants, rec.quality);
+    if (!pickedVariant) throw new Error("No playable quality found for this title.");
+    const vRes = await fetchPiece(pickedVariant.url, signal);
+    if (!vRes.ok) throw new Error(`Quality fetch failed (${vRes.status})`);
+    mediaText = await vRes.text();
+    mediaUrl = pickedVariant.url;
+    bandwidth = pickedVariant.bandwidth;
+    throwIfAborted();
+  }
+
+  // 3. Segments + keys. Sample-AES can't be cached — refuse up front.
+  const parts = parseMediaPlaylist(mediaText, mediaUrl);
+  if (parts.sampleAes) {
+    throw new Error("This source is encrypted and can't be saved offline.");
+  }
+  if (parts.segments.length === 0) {
+    throw new Error("No video segments found in this stream.");
+  }
+
+  // 3b. Separate audio rendition. Vix-style masters pair each video variant
+  // with an EXT-X-MEDIA audio group — skip this and downloads play silent.
+  let audioParts: MediaParts | null = null;
+  let audioUrl: string | null = null;
+  let audioText: string | null = null;
+  let audioEntry: AudioEntry | null = null;
+  if (isMaster && pickedVariant?.audioGroup) {
+    const entries = parseMasterAudio(masterText, playlistBase).filter(
+      (e) => e.groupId === (pickedVariant as VariantInfo).audioGroup
+    );
+    audioEntry = pickAudioEntry(
+      entries,
+      loadVixSettings().audio || "en",
+      matchLang
+    );
+    if (audioEntry) {
+      const aRes = await fetchPiece(audioEntry.url, signal);
+      if (!aRes.ok) throw new Error(`Audio track fetch failed (${aRes.status})`);
+      let aText = await aRes.text();
+      audioUrl = audioEntry.url;
+      if (isMasterPlaylist(aText)) {
+        const aVars = parseMasterVariants(aText, audioEntry.url);
+        if (aVars.length === 0) {
+          throw new Error("No audio track found for this title.");
+        }
+        const aPicked = aVars[0]!;
+        const avRes = await fetchPiece(aPicked.url, signal);
+        if (!avRes.ok) throw new Error(`Audio track fetch failed (${avRes.status})`);
+        aText = await avRes.text();
+        audioUrl = aPicked.url;
+      }
+      const parsed = parseMediaPlaylist(aText, audioUrl);
+      if (parsed.sampleAes) {
+        throw new Error("This source is encrypted and can't be saved offline.");
+      }
+      if (parsed.segments.length === 0) {
+        // Audio declared but empty — video-only rather than a failure.
+        audioEntry = null;
+        audioUrl = null;
+      } else {
+        audioParts = parsed;
+        audioText = aText;
+      }
+      throwIfAborted();
+    }
+  }
+
+  rec.durationSec = parts.durationSec;
+  rec.totalSegments =
+    parts.segments.length + (audioParts?.segments.length ?? 0);
+  rec.estimateBytes = estimateBytes(bandwidth, parts.durationSec);
+  await upsertRecord(rec);
+
+  // 4. Quota: device headroom + the 950MB-style self cap (LRU-evict to fit).
+  await enforceQuota(rec, signal);
+
+  // 5. Fetch everything into the cache (resume skips what's already there).
+  const cache = await caches.open(DL_CACHE);
+  const fileUrls = new Set<string>();
+  let doneSeg = 0;
+  let measuredBytes = 0;
+
+  const readSize = (r: Response | undefined): number => {
+    const n = Number(r?.headers.get("Content-Length") ?? 0);
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  };
+
+  const mpegResponse = (text: string, noStore = false) =>
+    new Response(text, {
+      headers: {
+        "Content-Type": "application/vnd.apple.mpegurl",
+        "Cache-Control": noStore ? "no-store" : "public, max-age=31536000",
+      },
+    });
+
+  // Watchdog clock: refreshed on every completed piece (hits count too).
+  // If the loop stops completing with work remaining, the download failed
+  // silently before — now it surfaces as error + retry instead.
+  let lastProgressAt = Date.now();
+
+  const reportProgress = async () => {
+    lastProgressAt = Date.now();
+    // Display never moves backward (resume seed) and verification still
+    // counts every piece, so the final totals stay exact either way.
+    rec.bytesDone = Math.max(rec.bytesDone, measuredBytes);
+    rec.doneSegments = Math.max(rec.doneSegments, doneSeg);
+    // Track owned files continuously so a mid-flight pause/cancel/delete
+    // removes partial bytes instead of orphaning them.
+    rec.fileUrls = [...fileUrls];
+    await updateProgress(rec.key, {
+      bytesDone: rec.bytesDone,
+      doneSegments: doneSeg,
+    });
+  };
+
+  const storeParts = async (
+    list: MediaParts,
+    label: string
+  ): Promise<void> => {
+    const jobs: { original: string; dlUrl: string; kind: "seg" | "key" }[] = [];
+    if (list.mapUrl) {
+      jobs.push({
+        original: list.mapUrl,
+        dlUrl: dlFileUrl(canonicalMediaKey(list.mapUrl)),
+        kind: "key",
+      });
+    }
+    for (const k of list.keys) {
+      jobs.push({
+        original: k.url,
+        dlUrl: dlFileUrl(canonicalMediaKey(k.url)),
+        kind: "key",
+      });
+    }
+    for (const s of list.segments) {
+      jobs.push({
+        original: s,
+        dlUrl: dlFileUrl(canonicalMediaKey(s)),
+        kind: "seg",
+      });
+    }
+    let cursor = 0;
+    const worker = async () => {
+      for (;;) {
+        throwIfAborted();
+        // Durable reconcile: pause/delete from another tab (or a lost
+        // controller map) must stop this loop even though no local signal
+        // fired. Cheap sync mirror read per iteration.
+        const live = getRecordSync(rec.key);
+        if (!live || live.state === "paused") throw abortError();
+        // Stall watchdog: all workers hung with jobs left used to freeze
+        // the bar at its last percent forever with no error state.
+        if (Date.now() - lastProgressAt > STALL_TIMEOUT_MS) {
+          throw new Error("Stalled — tap to retry");
+        }
+        const i = cursor++;
+        if (i >= jobs.length) return;
+        const job = jobs[i]!;
+        const hit = await cache.match(job.dlUrl);
+        if (hit) {
+          fileUrls.add(job.dlUrl);
+          if (job.kind === "seg") {
+            doneSeg++;
+            measuredBytes += readSize(hit);
+            await reportProgress();
+          }
+          continue;
+        }
+        const res = await fetchPiece(job.original, signal);
+        if (!res.ok) throw new Error(`${label} piece failed.`);
+        const buf = await res.arrayBuffer();
+        if (buf.byteLength === 0) throw new Error(`${label} piece was empty.`);
+        const stored = new Response(buf, {
+          headers: {
+            "Content-Type":
+              res.headers.get("content-type") ?? "application/octet-stream",
+            "Content-Length": String(buf.byteLength),
+            "Cache-Control": "public, max-age=31536000",
+          },
+        });
+        try {
+          await cache.put(job.dlUrl, stored);
+        } catch (e) {
+          if (
+            e instanceof DOMException &&
+            (e.name === "QuotaExceededError" || e.code === 22)
+          ) {
+            throw new Error("Out of device space — free storage and retry.");
+          }
+          throw e;
+        }
+        fileUrls.add(job.dlUrl);
+        if (job.kind === "seg") {
+          doneSeg++;
+          measuredBytes += buf.byteLength;
+          await reportProgress();
+        }
+        throwIfAborted();
+      }
+    };
+    await Promise.all(
+      Array.from({ length: Math.min(CONCURRENCY, jobs.length) }, () => worker())
+    );
+  };
+
+  await storeParts(parts, "Video");
+  throwIfAborted();
+  if (audioParts) await storeParts(audioParts, "Audio");
+  throwIfAborted();
+
+  // 6. Store rewritten playlists last — only complete sets ever play.
+  const videoStoredUrl = dlFileUrl(canonicalMediaKey(mediaUrl));
+  await cache.put(
+    videoStoredUrl,
+    mpegResponse(rewritePlaylistForOffline(mediaText, mediaUrl))
+  );
+  fileUrls.add(videoStoredUrl);
+  let topText: string;
+  if (audioParts && audioUrl && audioText && audioEntry && pickedVariant) {
+    const audioStoredUrl = dlFileUrl(canonicalMediaKey(audioUrl));
+    await cache.put(
+      audioStoredUrl,
+      mpegResponse(rewritePlaylistForOffline(audioText, audioUrl))
+    );
+    fileUrls.add(audioStoredUrl);
+    topText = buildOfflineMaster({
+      variant: pickedVariant,
+      videoPlaylistUrl: videoStoredUrl,
+      audio: audioEntry,
+      audioPlaylistUrl: audioStoredUrl,
+    });
+  } else {
+    topText = rewritePlaylistForOffline(mediaText, mediaUrl);
+  }
+  const playlistKey = dlPlaylistUrl(rec.key);
+  await cache.put(playlistKey, mpegResponse(topText, true));
+  fileUrls.add(playlistKey);
+  rec.fileUrls = [...fileUrls];
+
+  // 7. Auto-subtitles: same cascade the player uses (VDRK → OpenSubs),
+  // plus spares (best-first, up to 3 total) for offline switching when the
+  // default misaligns. Skipped entirely when subs are off/stream-only.
+  // Bounded: a hung subtitle fetch must not park a finished video at 99%.
+  try {
+    const subsSignal = AbortSignal.any([signal, AbortSignal.timeout(30000)]);
+    const sub = await fetchDownloadSubs(req, resolved.imdbId, subsSignal);
+    if (sub) {
+      rec.subVtt = sub.vtt;
+      rec.subLabel = sub.label;
+    }
+    const subOpts = loadVixSettings().subSource;
+    if (subOpts === "vdrk" || subOpts === "auto" || subOpts === "opensub") {
+      const alts = await fetchDownloadSubAlts(
+        req,
+        resolved.imdbId,
+        sub?.fileId,
+        subsSignal
+      );
+      const entries = [
+        ...(sub ? [{ vtt: sub.vtt, label: sub.label }] : []),
+        ...alts,
+      ].slice(0, 3);
+      if (entries.length > 0) rec.subAlts = entries;
+    }
+  } catch (e) {
+    // User pause/cancel (parent signal) still stops the download; a subs
+    // timeout just completes the video without subtitles.
+    if (signal.aborted) throw e;
+    /* subs are a bonus — never fail the download for them */
+  }
+
+  rec.sizeBytes = measuredBytes;
+  rec.state = "done";
+  rec.error = undefined;
+  rec.downloadedAt = Date.now();
+  rec.lastUsedAt = Date.now();
+  await commitRecord(rec);
+  // Completion is silent at the engine layer by design — broadcast for UI
+  // (toast with View action lives in the app shell, not here).
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(
+      new CustomEvent("tvtime:download-done", {
+        detail: { key: rec.key, title: rec.title },
+      })
+    );
+  }
+}
+
+async function fetchDownloadSubs(
+  req: DownloadRequest,
+  imdbId: string | null,
+  signal: AbortSignal
+): Promise<{ vtt: string; label: string; fileId?: number } | null> {
+  const settings = loadVixSettings();
+  const subSource = settings.subSource;
+  if (subSource === "off" || subSource === "stream") return null;
+  if (signal.aborted) throw abortError();
+  if (subSource === "vdrk" || subSource === "auto") {
+    const vdrk = await fetchExternalVtt({
+      source: "vdrk",
+      type: req.type,
+      tmdbId: req.tmdbId,
+      season: req.season,
+      episode: req.episode,
+      signal,
+    });
+    if (vdrk?.vtt) return { vtt: vdrk.vtt, label: vdrk.label };
+    if (subSource === "vdrk") return null;
+  }
+  if (!imdbId) return null;
+  if (signal.aborted) throw abortError();
+  const os = await fetchExternalVtt({
+    source: "opensub",
+    imdbId,
+    season: req.season,
+    episode: req.episode,
+    signal,
+  });
+  if (os?.vtt) return { vtt: os.vtt, label: os.label, fileId: os.fileId };
+  return null;
+}
+
+/** VTT files bigger than this are skipped as alternates (outliers). */
+const MAX_ALT_VTT_BYTES = 500 * 1024;
+
+/**
+ * Up to 2 spare OpenSubtitles files (best + 2 alts total per user choice)
+ * so a misaligned default can be swapped offline. Never throws, never fails
+ * the download; honors abort between files.
+ */
+async function fetchDownloadSubAlts(
+  req: DownloadRequest,
+  imdbId: string | null,
+  excludeFileId: number | undefined,
+  signal: AbortSignal
+): Promise<{ vtt: string; label: string }[]> {
+  const out: { vtt: string; label: string }[] = [];
+  if (!imdbId) return out;
+  try {
+    const q = new URLSearchParams({ imdbId, lang: "en", list: "1" });
+    if (req.season != null) q.set("season", String(req.season));
+    if (req.episode != null) q.set("episode", String(req.episode));
+    const res = await fetch(`/api/vixsrc/subs?${q.toString()}`, { signal });
+    if (!res.ok) return out;
+    const data = (await res.json()) as {
+      items?: { fileId: number; label: string }[];
+    };
+    for (const item of data.items ?? []) {
+      if (out.length >= 2) break;
+      if (item.fileId === excludeFileId) continue;
+      if (signal.aborted) throw abortError();
+      try {
+        const ext = await fetchExternalVtt({
+          source: "opensub",
+          imdbId,
+          season: req.season,
+          episode: req.episode,
+          fileId: item.fileId,
+          label: item.label,
+          signal,
+        });
+        if (ext?.vtt && ext.vtt.length <= MAX_ALT_VTT_BYTES) {
+          out.push({ vtt: ext.vtt, label: ext.label });
+        }
+      } catch {
+        /* one bad file skips — the rest still land */
+      }
+    }
+  } catch {
+    /* alts are a bonus */
+  }
+  return out;
+}
+
+async function enforceQuota(rec: DownloadRecord, signal: AbortSignal): Promise<void> {
+  const settings = loadVixSettings();
+  const capBytes = settings.downloadCapMb * 1024 * 1024;
+  const all = getAllSync();
+  const need = rec.estimateBytes;
+
+  // LRU: evict oldest finished downloads until the estimate fits the cap.
+  if (need > 0) {
+    let used = usedBytes(all);
+    const victims = all
+      .filter((r) => r.state === "done" && r.key !== rec.key)
+      .sort((a, b) => a.lastUsedAt - b.lastUsedAt);
+    for (const v of victims) {
+      if (signal.aborted) throw abortError();
+      if (used + need <= capBytes) break;
+      await deleteRecordFiles(v);
+      await removeRecord(v.key);
+      used -= v.sizeBytes;
+    }
+    if (used + need > capBytes) {
+      throw new Error(
+        `Needs ~${formatBytes(need)} — free space or raise the cap in Download settings.`
+      );
+    }
+  }
+
+  // Device headroom (best-effort — the OS has the final word).
+  try {
+    const stats = await storageStats();
+    if (
+      need > 0 &&
+      stats.quota != null &&
+      stats.usage != null &&
+      stats.usage + need > stats.quota
+    ) {
+      throw new Error("Not enough device storage for this download.");
+    }
+    await ensurePersisted().catch(() => false);
+  } catch (e) {
+    if (e instanceof Error && /device storage/.test(e.message)) throw e;
+  }
+}
