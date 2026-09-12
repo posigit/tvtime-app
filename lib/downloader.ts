@@ -73,6 +73,29 @@ function abortError(): Error {
   return e;
 }
 
+/** Per-piece network ceiling: a hung connection must fail, never freeze. */
+const PIECE_TIMEOUT_MS = 30000;
+/** No completed piece for this long with work remaining = stalled. */
+const STALL_TIMEOUT_MS = 60000;
+
+/**
+ * fetch with a timeout that never masquerades as a user pause/cancel:
+ * parent-signal aborts rethrow as AbortError (pause path); timeouts throw a
+ * plain Error (error state + retry path).
+ */
+async function fetchPiece(input: string, signal: AbortSignal): Promise<Response> {
+  const timeout = AbortSignal.timeout(PIECE_TIMEOUT_MS);
+  try {
+    return await fetch(input, { signal: AbortSignal.any([signal, timeout]) });
+  } catch (err) {
+    if (signal.aborted) throw abortError();
+    if (err instanceof Error && err.name === "TimeoutError") {
+      throw new Error("A piece stalled — tap to retry");
+    }
+    throw err;
+  }
+}
+
 /**
  * Turn a failed native resolution into an honest message. The generic
  * "no downloadable stream" hid the real cause: on Vercel-class hosting the
@@ -132,9 +155,19 @@ export async function startDownload(req: DownloadRequest): Promise<void> {
     durationSec: existing?.durationSec ?? 0,
     estimateBytes: existing?.estimateBytes ?? 0,
     sizeBytes: 0,
-    bytesDone: 0,
+    // Resume seeds the bar where the last run left off (capped at known
+    // totals) instead of visibly restarting at 0%. Verification still runs
+    // over every piece, so evicted bytes re-download and the final counts
+    // stay honest.
+    bytesDone: Math.min(
+      existing?.bytesDone ?? 0,
+      existing?.estimateBytes || Number.POSITIVE_INFINITY
+    ),
     totalSegments: existing?.totalSegments ?? 0,
-    doneSegments: 0,
+    doneSegments: Math.min(
+      existing?.doneSegments ?? 0,
+      existing?.totalSegments || Number.POSITIVE_INFINITY
+    ),
     fileUrls: [],
     state: "queued",
     error: undefined,
@@ -152,6 +185,9 @@ export async function startDownload(req: DownloadRequest): Promise<void> {
   try {
     await runDownload(req, rec, controller.signal);
   } catch (err) {
+    // Stop straggler workers still burning data after the first failure.
+    // (Pause/cancel paths already aborted; this is a no-op for them.)
+    controller.abort();
     const cancelled = controller.signal.aborted;
     // Identity, not just presence: another tab/session may have registered
     // its own controller under this key after ours died.
@@ -299,7 +335,7 @@ async function runDownload(
     resolved.playlistUrl,
     window.location.origin
   ).toString();
-  const masterRes = await fetch(playlistBase, { signal });
+  const masterRes = await fetchPiece(playlistBase, signal);
   if (!masterRes.ok) throw new Error(`Stream lookup failed (${masterRes.status})`);
   const masterText = await masterRes.text();
   throwIfAborted();
@@ -313,7 +349,7 @@ async function runDownload(
     const variants = parseMasterVariants(masterText, playlistBase);
     pickedVariant = pickVariant(variants, rec.quality);
     if (!pickedVariant) throw new Error("No playable quality found for this title.");
-    const vRes = await fetch(pickedVariant.url, { signal });
+    const vRes = await fetchPiece(pickedVariant.url, signal);
     if (!vRes.ok) throw new Error(`Quality fetch failed (${vRes.status})`);
     mediaText = await vRes.text();
     mediaUrl = pickedVariant.url;
@@ -346,7 +382,7 @@ async function runDownload(
       matchLang
     );
     if (audioEntry) {
-      const aRes = await fetch(audioEntry.url, { signal });
+      const aRes = await fetchPiece(audioEntry.url, signal);
       if (!aRes.ok) throw new Error(`Audio track fetch failed (${aRes.status})`);
       let aText = await aRes.text();
       audioUrl = audioEntry.url;
@@ -356,7 +392,7 @@ async function runDownload(
           throw new Error("No audio track found for this title.");
         }
         const aPicked = aVars[0]!;
-        const avRes = await fetch(aPicked.url, { signal });
+        const avRes = await fetchPiece(aPicked.url, signal);
         if (!avRes.ok) throw new Error(`Audio track fetch failed (${avRes.status})`);
         aText = await avRes.text();
         audioUrl = aPicked.url;
@@ -405,9 +441,17 @@ async function runDownload(
       },
     });
 
+  // Watchdog clock: refreshed on every completed piece (hits count too).
+  // If the loop stops completing with work remaining, the download failed
+  // silently before — now it surfaces as error + retry instead.
+  let lastProgressAt = Date.now();
+
   const reportProgress = async () => {
-    rec.bytesDone = measuredBytes;
-    rec.doneSegments = doneSeg;
+    lastProgressAt = Date.now();
+    // Display never moves backward (resume seed) and verification still
+    // counts every piece, so the final totals stay exact either way.
+    rec.bytesDone = Math.max(rec.bytesDone, measuredBytes);
+    rec.doneSegments = Math.max(rec.doneSegments, doneSeg);
     // Track owned files continuously so a mid-flight pause/cancel/delete
     // removes partial bytes instead of orphaning them.
     rec.fileUrls = [...fileUrls];
@@ -452,6 +496,11 @@ async function runDownload(
         // fired. Cheap sync mirror read per iteration.
         const live = getRecordSync(rec.key);
         if (!live || live.state === "paused") throw abortError();
+        // Stall watchdog: all workers hung with jobs left used to freeze
+        // the bar at its last percent forever with no error state.
+        if (Date.now() - lastProgressAt > STALL_TIMEOUT_MS) {
+          throw new Error("Stalled — tap to retry");
+        }
         const i = cursor++;
         if (i >= jobs.length) return;
         const job = jobs[i]!;
@@ -465,7 +514,7 @@ async function runDownload(
           }
           continue;
         }
-        const res = await fetch(job.original, { signal });
+        const res = await fetchPiece(job.original, signal);
         if (!res.ok) throw new Error(`${label} piece failed.`);
         const buf = await res.arrayBuffer();
         if (buf.byteLength === 0) throw new Error(`${label} piece was empty.`);
@@ -539,8 +588,10 @@ async function runDownload(
   // 7. Auto-subtitles: same cascade the player uses (VDRK → OpenSubs),
   // plus spares (best-first, up to 3 total) for offline switching when the
   // default misaligns. Skipped entirely when subs are off/stream-only.
+  // Bounded: a hung subtitle fetch must not park a finished video at 99%.
   try {
-    const sub = await fetchDownloadSubs(req, resolved.imdbId, signal);
+    const subsSignal = AbortSignal.any([signal, AbortSignal.timeout(30000)]);
+    const sub = await fetchDownloadSubs(req, resolved.imdbId, subsSignal);
     if (sub) {
       rec.subVtt = sub.vtt;
       rec.subLabel = sub.label;
@@ -551,7 +602,7 @@ async function runDownload(
         req,
         resolved.imdbId,
         sub?.fileId,
-        signal
+        subsSignal
       );
       const entries = [
         ...(sub ? [{ vtt: sub.vtt, label: sub.label }] : []),
@@ -560,8 +611,9 @@ async function runDownload(
       if (entries.length > 0) rec.subAlts = entries;
     }
   } catch (e) {
-    // Pause/cancel during subtitles must still stop the download.
-    if (e instanceof Error && e.name === "AbortError") throw e;
+    // User pause/cancel (parent signal) still stops the download; a subs
+    // timeout just completes the video without subtitles.
+    if (signal.aborted) throw e;
     /* subs are a bonus — never fail the download for them */
   }
 
