@@ -11,19 +11,17 @@ import {
   saveVixSettings,
 } from "@/lib/vix-settings";
 import {
-  deleteRecordFiles,
   ensurePersisted,
   formatBytes,
   getAllSync,
   getManifest,
-  removeRecord,
   storageStats,
   subscribeDownloads,
   touchRecord,
   verifyRecordFiles,
   type DownloadRecord,
 } from "@/lib/downloads";
-import { pauseDownload, resumeDownload } from "@/lib/downloader";
+import { deleteDownload, pauseDownload, resumeDownload } from "@/lib/downloader";
 
 type Quality = 480 | 720 | 1080 | "best";
 
@@ -477,24 +475,20 @@ function DownloadRow({
             <Pause className="h-4 w-4" />
           </button>
         )}
-        {(r.state === "done" ||
-          r.state === "error" ||
-          r.state === "missing") && (
-          <button
-            type="button"
-            onClick={() => {
-              void (async () => {
-                const rec = (await getManifest())[r.key];
-                if (rec) await deleteRecordFiles(rec);
-                await removeRecord(r.key);
-              })();
-            }}
-            aria-label={`Delete ${r.title}`}
-            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-white/[0.08] text-white/60 ring-1 ring-white/15 transition hover:bg-white/15 hover:text-white active:scale-95"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
-        )}
+        {/* Delete is always available — mid-download too. deleteDownload
+            aborts an in-flight fetch before removing bytes + record. */}
+        <button
+          type="button"
+          onClick={() => {
+            void deleteDownload(r.key).catch((e: unknown) =>
+              toast(e instanceof Error ? e.message : "Couldn't delete", "error")
+            );
+          }}
+          aria-label={`Delete ${r.title}`}
+          className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-white/[0.08] text-white/60 ring-1 ring-white/15 transition hover:bg-white/15 hover:text-white active:scale-95"
+        >
+          <Trash2 className="h-4 w-4" />
+        </button>
         {r.state === "done" && (
           <span className="flex h-6 w-6 items-center justify-center">
             <Check className="h-4 w-4 text-success" strokeWidth={3} />
