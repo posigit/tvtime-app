@@ -33,7 +33,7 @@ export function DownloadDoneNotifier() {
       const d = (e as CustomEvent<{ key?: string; title?: string }>).detail;
       toast(`Downloaded${d?.title ? ` ${d.title}` : ""}`, "success", {
         label: "View",
-        onClick: () => router.push("/downloads"),
+        onClick: () => router.push("/library"),
       });
     };
     window.addEventListener("tvtime:download-done", onDone);
@@ -67,7 +67,7 @@ function qualityLabel(r: DownloadRecord): string {
 
 /**
  * One download row: progress, play/pause/resume/delete. Shared by the
- * Download settings sheet and the /downloads library page. Resume/retry
+ * Download settings sheet and the /library page. Resume/retry
  * refuse while offline (fetching is impossible); play/delete stay live.
  */
 export function DownloadRow({
@@ -109,23 +109,23 @@ export function DownloadRow({
   };
 
   return (
-    <div className="flex items-center gap-3 rounded-2xl bg-white/[0.04] px-3.5 py-3 ring-1 ring-white/[0.08]">
+    <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.07] px-3.5 py-3 shadow-lg shadow-black/30 backdrop-blur-xl">
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-bold text-white">{r.title}</p>
+        <p className="truncate text-sm font-bold tracking-tight text-white">{r.title}</p>
         {r.subtitle && (
           <p className="truncate text-xs text-white/45">{r.subtitle}</p>
         )}
-        <p className="mt-1 text-[11px] font-semibold text-white/40">
+        <p className="mt-1 text-[11px] font-semibold tabular-nums text-white/40">
           {r.state === "done" && r.sizeBytes > 0
             ? `${formatBytes(r.sizeBytes)} · ${qualityLabel(r)}`
             : busy
-              ? `${Math.round(progress * 100)}%${r.estimateBytes > 0 ? ` of ~${formatBytes(r.estimateBytes)}` : ""}`
+              ? `${Math.round(progress * 100)}%${r.estimateBytes > 0 ? ` · ~${formatBytes(r.estimateBytes)}` : ""}`
               : r.state === "paused"
                 ? `Paused · ${Math.round(progress * 100)}%`
                 : r.state === "error"
                   ? (r.error ?? "Failed")
                   : r.state === "missing"
-                    ? "Removed from storage — download again"
+                    ? "Removed — download again"
                     : "Waiting…"}
         </p>
         {busy && (

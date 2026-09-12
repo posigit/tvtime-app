@@ -77,7 +77,7 @@ function stateLabel(rec: DownloadRecord | null): string {
     case "paused":
       return "Paused — tap to resume";
     case "done":
-      return "Downloaded — manage in Download settings";
+      return "Downloaded — manage in Library";
     case "error":
       return `Failed (${rec.error ?? "unknown error"}) — tap to retry`;
     case "missing":
@@ -156,7 +156,7 @@ export function DownloadButton({
           toast(e instanceof Error ? e.message : "Couldn't resume", "error")
         );
       }
-      // done → no-op (manage/delete lives in Download settings)
+      // done → no-op (manage/delete lives in Library)
     } catch {
       /* ignore */
     }

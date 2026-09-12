@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -146,7 +146,7 @@ export function DownloadSettingsSheet({
     setMode(next);
     saveVixSettings({ downloadMode: next });
     if (next) void ensurePersisted();
-    toast(next ? "Download mode on — look for ↓" : "Download mode off");
+    toast(next ? "Download mode on â€” look for â†“" : "Download mode off");
   };
 
   const pickQuality = (q: Quality) => {
@@ -186,11 +186,8 @@ export function DownloadSettingsSheet({
         <div className="flex items-start justify-between gap-3 px-4 pb-3 pt-1">
           <div>
             <h2 className="text-xl font-black tracking-tight text-white">
-              Downloads
+              Library
             </h2>
-            <p className="text-xs text-white/40">
-              Watch offline · kept on this device only
-            </p>
           </div>
           <button
             type="button"
@@ -212,12 +209,7 @@ export function DownloadSettingsSheet({
           >
             <span className="text-left">
               <span className="block text-[15px] font-bold text-white">
-                Download mode {mode ? "· On" : "· Off"}
-              </span>
-              <span className="mt-0.5 block text-xs leading-relaxed text-white/45">
-                {mode
-                  ? "↓ buttons show on movies, episodes & in the player"
-                  : "Turn on to reveal ↓ buttons across the app"}
+                Download mode
               </span>
             </span>
             <span
@@ -297,9 +289,9 @@ export function DownloadSettingsSheet({
           <div className="mt-3 rounded-2xl bg-white/[0.04] px-4 py-3.5 ring-1 ring-white/[0.08]">
             <div className="flex items-end justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-sm font-bold text-white">On this device</p>
-                <p className="mt-0.5 truncate text-[11px] text-white/40">
-                  {doneCount} saved · cap {formatBytes(capBytes)}
+                <p className="text-sm font-bold text-white">Storage</p>
+                <p className="mt-0.5 truncate text-[11px] tabular-nums text-white/40">
+                  {doneCount} · {formatBytes(capBytes)} cap
                 </p>
               </div>
               <p className="shrink-0 text-right leading-none">
@@ -319,33 +311,29 @@ export function DownloadSettingsSheet({
                 }}
               />
             </div>
-            <p className="mt-2 text-[11px] leading-relaxed text-white/35">
-              Oldest downloads make room automatically.
-              {usage != null && quota != null && (
-                <> Device free ≈ {formatBytes(quota - usage)}.</>
-              )}
-            </p>
+            {usage != null && quota != null && (
+              <p className="mt-2 text-[11px] font-semibold tabular-nums text-white/35">
+                {formatBytes(quota - usage)} free on device
+              </p>
+            )}
           </div>
 
           {/* Library */}
           <p className="mb-2 mt-5 text-[10px] font-bold uppercase tracking-[0.12em] text-white/40">
-            On this device ({items.length})
+            Library ({items.length})
           </p>
           {items.length === 0 ? (
             <button
               type="button"
               onClick={() => {
                 onClose();
-                toast("Turn on download mode, then tap ↓ on anything");
+                toast("Turn on download mode, then tap â†“ on anything");
               }}
               className="w-full cursor-pointer rounded-2xl bg-white/[0.03] px-4 py-6 text-center ring-1 ring-white/[0.06] transition active:scale-[0.99]"
             >
               <Download className="mx-auto h-5 w-5 text-white/30" />
               <p className="mt-2 text-sm font-semibold text-white/50">
-                Nothing here yet
-              </p>
-              <p className="mt-0.5 text-xs text-white/30">
-                Turn on download mode and tap ↓ on a movie or episode
+                No downloads yet
               </p>
             </button>
           ) : (

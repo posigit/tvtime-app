@@ -17,12 +17,12 @@ import {
 } from "@/lib/downloads";
 
 /**
- * Downloads library: fully local (IndexedDB manifest + Cache Storage
+ * Library: fully local (IndexedDB manifest + Cache Storage
  * bytes), zero server data — so the service worker can serve this shell
  * with no connection and everything still works. Play/delete are local;
  * resume/retry refuse while offline (rows handle that themselves).
  */
-export default function DownloadsPage() {
+export default function LibraryPage() {
   const [items, setItems] = useState<DownloadRecord[]>([]);
   const [ready, setReady] = useState(false);
 
@@ -59,10 +59,10 @@ export default function DownloadsPage() {
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <div className="min-w-0">
-          <h1 className="truncate text-xl font-black text-white">Downloads</h1>
-          <p className="text-xs text-white/45">
-            {doneCount} saved
-            {usedByApp > 0 ? ` · ${formatBytes(usedByApp)} on this device` : ""}
+          <h1 className="truncate text-xl font-black tracking-tight text-white">Library</h1>
+          <p className="text-xs tabular-nums text-white/45">
+            {doneCount}
+            {usedByApp > 0 ? ` · ${formatBytes(usedByApp)}` : ""}
           </p>
         </div>
       </div>
@@ -74,10 +74,7 @@ export default function DownloadsPage() {
           <div className="rounded-2xl bg-white/[0.03] px-4 py-10 text-center ring-1 ring-white/[0.06]">
             <Download className="mx-auto h-5 w-5 text-white/30" />
             <p className="mt-2 text-sm font-semibold text-white/50">
-              Nothing here yet
-            </p>
-            <p className="mt-0.5 text-xs text-white/30">
-              Turn on download mode and tap + on a movie or episode
+              No downloads yet
             </p>
           </div>
         ) : (

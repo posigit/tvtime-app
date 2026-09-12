@@ -67,7 +67,7 @@ export function ProfileMenu() {
             className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-medium text-white hover:bg-secondary"
           >
             <Download className="h-4 w-4" />
-            Download settings
+            Library
           </button>
           <button
             type="button"

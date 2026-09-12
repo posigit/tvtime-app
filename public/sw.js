@@ -115,10 +115,10 @@ self.addEventListener("fetch", (event) => {
   }
 
   // --- Document navigations: network-first, offline shell fallback ---
-  // Exception: /downloads is fully local (IndexedDB library) — serve its
+  // Exception: /library is fully local (IndexedDB library) — serve its
   // shell stale-while-revalidate so the library opens with zero connection.
   if (request.mode === "navigate") {
-    if (url.pathname === "/downloads") {
+    if (url.pathname === "/library") {
       event.respondWith(staleWhileRevalidateDocument(request));
       return;
     }
@@ -183,7 +183,7 @@ async function networkFirstNavigation(request) {
 }
 
 /**
- * The /downloads library shell: 100% local data (IndexedDB + Cache
+ * The /library shell: 100% local data (IndexedDB + Cache
  * Storage), so stale-while-revalidate is safe — offline cold starts render
  * instantly, online visits refresh the shell in the background.
  */

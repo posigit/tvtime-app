@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Clapperboard, Download, Search, Tv, User } from "lucide-react";
+import { Clapperboard, Library, Search, Tv, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDownloadMode } from "@/components/download-button";
 
@@ -13,8 +13,8 @@ const tabs = [
   { href: "/profile", label: "Profile", icon: User },
 ] as const;
 
-/** Downloads tab: only while download mode is on (same gate as the buttons). */
-const downloadsTab = { href: "/downloads", label: "Saved", icon: Download } as const;
+/** Library tab: only while download mode is on (same gate as the buttons). */
+const downloadsTab = { href: "/library", label: "Library", icon: Library } as const;
 
 function isTabActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -32,7 +32,7 @@ function scrollPageToTop() {
 export function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
-  // Downloads tab joins only in download mode; five tabs share space evenly.
+  // Library tab joins only in download mode; five tabs share space evenly.
   const showDownloads = useDownloadMode();
   const visibleTabs = showDownloads ? [...tabs, downloadsTab] : tabs;
 
