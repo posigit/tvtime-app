@@ -242,6 +242,18 @@ export function VixPlayer({
     return preferred;
   });
   const [playlistUrl, setPlaylistUrl] = useState<string | null>(null);
+  // Structured resolve failure (code/detail) for the error card. Cleared on
+  // every fresh attempt (mount, source switch, retry).
+  const [streamError, setStreamError] = useState<{
+    code?: string;
+    detail?: string;
+    message?: string;
+    resolverConfigured?: boolean;
+  } | null>(null);
+  /** Bumped by the error-card Retry button to re-run resolution. */
+  const [retryNonce, setRetryNonce] = useState(0);
+  /** Rebuffer spinner (native waiting/stalled/seek stalls after load). */
+  const [buffering, setBuffering] = useState(false);
   // Non-streamable mounts (no type/tmdbId) go straight to iframe fallback.
   const [streamFailed, setStreamFailed] = useState(() => !streamable);
   const [iframeError, setIframeError] = useState(false);
@@ -506,6 +518,8 @@ export function VixPlayer({
     setMoreMenuOpen(false);
     segmentsKeyRef.current = null;
     setSegments(EMPTY_SEGMENTS);
+    setStreamError(null);
+    setBuffering(false);
     if (tapCueTimerRef.current) {
       clearTimeout(tapCueTimerRef.current);
       tapCueTimerRef.current = null;
@@ -682,6 +696,22 @@ export function VixPlayer({
     return dur > 0 ? Math.max(0, Math.min(target, dur)) : Math.max(0, target);
   };
 
+  /** Play/pause the active driven embed (CineSrc and VidFast channels). */
+  const sendDrivenPlay = useCallback(
+    (play: boolean) => {
+      if (activeSource === "vidfast") {
+        sendVidfastCommand(iframeRef.current, play ? "play" : "pause");
+        // VidFast commands have no ack — re-pull ground truth so a dropped
+        // command can't leave our chrome lying about play state.
+        window.setTimeout(() => sendVidfastCommand(iframeRef.current, "getStatus"), 350);
+      } else {
+        sendCineSrcCommand(iframeRef.current, play ? "play" : "pause");
+      }
+      iframePausedRef.current = !play;
+    },
+    [activeSource]
+  );
+
   /** Seek the active driven embed (CineSrc and VidFast command channels). */
   const sendEmbedSeek = useCallback(
     (target: number) => {
@@ -702,9 +732,16 @@ export function VixPlayer({
     mode === "iframe" && (activeSource === "cinesrc" || activeSource === "vidfast");
   const vidfastEmbed = mode === "iframe" && activeSource === "vidfast";
   const mappleEmbed = mode === "iframe" && activeSource === "mapple";
-  // Subs only need a clock: driven embeds (transport) + Mapple
-  // (read-only timeupdate clock).
-  const clockEmbed = isDrivenEmbed || mappleEmbed;
+  // Subs only need a clock: driven embeds (transport) + read-only
+  // timeupdate clocks (Mapple/VidLink/VidNest/2Embed post PLAYER_EVENT like
+  // the others — same assumption Mapple already ships with).
+  const passiveClockEmbed =
+    mode === "iframe" &&
+    (activeSource === "mapple" ||
+      activeSource === "vidlink" ||
+      activeSource === "vidnest" ||
+      activeSource === "2embed");
+  const clockEmbed = isDrivenEmbed || passiveClockEmbed;
 
   /** Native / driven-embed ±10s seek, with a transient on-screen cue. */
   const seekBy = useCallback(
@@ -804,8 +841,17 @@ export function VixPlayer({
     const pos = resumePosRef.current || resumePosition || 0;
     setResumeKey(null);
     setResumePosition(null);
+    // Driven embeds already loaded at the bookmark via the frame URL — just
+    // dismiss and (re)play. Clear the resume floor so live position reports
+    // near it aren't mistaken for pre-seek noise.
+    if (isDrivenEmbed) {
+      resumePosRef.current = 0;
+      sendDrivenPlay(true);
+      bumpChrome();
+      return;
+    }
     void seekAndArmSaves(pos);
-  }, [resumePosition, seekAndArmSaves]);
+  }, [resumePosition, seekAndArmSaves, isDrivenEmbed, sendDrivenPlay, bumpChrome]);
 
   const handleRestart = useCallback(() => {
     clearPosition();
@@ -820,8 +866,15 @@ export function VixPlayer({
     saveEnabledRef.current = true;
     setResumeKey(null);
     setResumePosition(null);
+    // Driven embeds have no video element: dropping the t= param reloads the
+    // frame from 0 (it autoplays). Native path seeks in place.
+    if (isDrivenEmbed) {
+      setCineSrcT(null);
+      bumpChrome();
+      return;
+    }
     void seekVideo(0);
-  }, [clearPosition, seekVideo]);
+  }, [clearPosition, seekVideo, isDrivenEmbed, bumpChrome]);
 
   // Fetch saved position before native playback starts. Block saves and pause
   // autoplay until this resolves so playback cannot start at 0 or wipe a good
@@ -988,6 +1041,31 @@ export function VixPlayer({
     };
   }, [mode, playlistUrl]);
 
+  // Rebuffer spinner: mid-playback waiting/stalled/seek stalls (the initial
+  // load already has its own pill). Cleared on play/canplay/seek landing.
+  useEffect(() => {
+    if (mode !== "native") return;
+    const v = videoRef.current;
+    if (!v) return;
+    const onStall = () => setBuffering(true);
+    const onGo = () => setBuffering(false);
+    v.addEventListener("waiting", onStall);
+    v.addEventListener("stalled", onStall);
+    v.addEventListener("seeking", onStall);
+    v.addEventListener("playing", onGo);
+    v.addEventListener("canplay", onGo);
+    v.addEventListener("seeked", onGo);
+    return () => {
+      v.removeEventListener("waiting", onStall);
+      v.removeEventListener("stalled", onStall);
+      v.removeEventListener("seeking", onStall);
+      v.removeEventListener("playing", onGo);
+      v.removeEventListener("canplay", onGo);
+      v.removeEventListener("seeked", onGo);
+      setBuffering(false);
+    };
+  }, [mode, playlistUrl]);
+
   // A Continue Watching CTA supplies the position, so seek directly without
   // putting a second confirmation prompt in front of the user.
   // IMPORTANT: do not enable saves until seek lands (see seekAndArmSaves).
@@ -1094,6 +1172,8 @@ export function VixPlayer({
     // Reset playback state so the resolution effect re-runs fresh.
     setPlaylistUrl(null);
     setStreamFailed(false);
+    setStreamError(null);
+    setBuffering(false);
     setIframeError(false);
     setAudioTracks([]);
     setAudioTrackId(-1);
@@ -1109,6 +1189,18 @@ export function VixPlayer({
     // Keep ended/nearEnd so binge overlays don't double-fire after a switch.
     bookmarkClearedRef.current = false;
   }, [activeSource, savePosition]);
+
+  /** Error-card Retry: re-run stream resolution for the same source. */
+  const retryStream = useCallback(() => {
+    setPlaylistUrl(null);
+    setStreamFailed(false);
+    setStreamError(null);
+    setBuffering(false);
+    setIframeError(false);
+    setMediaReady(false);
+    setRetryNonce((n) => n + 1);
+    bumpChrome();
+  }, [bumpChrome]);
 
   // Resolve an IMDb id for embed mode (native gets it from resolvers).
   // Declared before ensureOpenSubList / handleOpenSubPick (deps below).
@@ -1346,6 +1438,7 @@ export function VixPlayer({
       imdbIdRef.current = result.imdbId;
       if (result.playlistUrl) {
         setPlaylistUrl(result.playlistUrl);
+        setStreamError(null);
         return;
       }
       if (result.failed) {
@@ -1355,6 +1448,12 @@ export function VixPlayer({
           result.code ? `(code: ${result.code})` : "",
           result.detail ?? ""
         );
+        setStreamError({
+          code: result.code,
+          detail: result.detail,
+          message: result.errorMessage,
+          resolverConfigured: result.resolverConfigured,
+        });
         setStreamFailed(true);
       }
     });
@@ -1362,7 +1461,7 @@ export function VixPlayer({
       cancelled = true;
       controller.abort();
     };
-  }, [streamable, type, tmdbId, season, episode, activeSource, isEmbedActive, offlineOverride, initialPlaylistUrl]);
+  }, [streamable, type, tmdbId, season, episode, activeSource, isEmbedActive, offlineOverride, initialPlaylistUrl, retryNonce]);
 
   // ---------- Driven-embed subtitles (VDRK / OpenSubs overlay) ----------
   // CineSrc hides its CC menu (controls=false) with no subtitle postMessage
@@ -1752,20 +1851,7 @@ export function VixPlayer({
 
   const togglePlay = useCallback(() => {
     if (isDrivenEmbed) {
-      if (activeSource === "vidfast") {
-        sendVidfastCommand(
-          iframeRef.current,
-          iframePausedRef.current ? "play" : "pause"
-        );
-        // VidFast commands have no ack — re-pull ground truth so a dropped
-        // command can't leave our chrome lying about play state.
-        window.setTimeout(() => sendVidfastCommand(iframeRef.current, "getStatus"), 350);
-      } else {
-        sendCineSrcCommand(
-          iframeRef.current,
-          iframePausedRef.current ? "play" : "pause"
-        );
-      }
+      sendDrivenPlay(iframePausedRef.current);
       bumpChrome();
       return;
     }
@@ -1774,7 +1860,7 @@ export function VixPlayer({
     if (v.paused) void v.play().catch(() => {});
     else v.pause();
     bumpChrome();
-  }, [isDrivenEmbed, activeSource, bumpChrome]);
+  }, [isDrivenEmbed, sendDrivenPlay, bumpChrome]);
 
   const seekBySeconds = useCallback(
     (delta: number) => {
@@ -2414,13 +2500,36 @@ export function VixPlayer({
 
   const isLoading = mode === "loading" || (mode === "native" && !mediaReady);
   const hasError = mode === "error";
+  // Friendly error title from the structured resolve failure (codes beat
+  // guessing). Offline keeps its download-specific copy.
+  const streamErrorText = `${streamError?.code ?? ""} ${streamError?.message ?? ""}`;
+  const streamErrorTitle = offlineOverride
+    ? "Couldn't play this download"
+    : streamError?.resolverConfigured === false
+      ? "Streaming server not set up"
+      : /403|forbidden|blocked/i.test(streamErrorText)
+        ? "Source blocked on this network"
+        : /timeout|timed out|504|522|524/i.test(streamErrorText)
+          ? "Source timed out"
+          : "Player unavailable here";
+  const streamErrorDetail = offlineOverride
+    ? "The saved file may be incomplete — try downloading it again."
+    : streamError?.detail || streamError?.message || "Try switching to another source.";
+  const canRetry = streamable || offlineOverride;
   const playbackKey = playbackParams();
   const showResume =
-    mode === "native" &&
+    (mode === "native" || isDrivenEmbed) &&
     mediaReady &&
     !autoResume &&
     resumePosition != null &&
     resumeKey === playbackKey;
+
+  // Driven embeds autoplay under the resume prompt (their URL already seeks
+  // via t=) — pause while the choice is up so nothing plays unwatched.
+  useEffect(() => {
+    if (!showResume || !isDrivenEmbed) return;
+    sendDrivenPlay(false);
+  }, [showResume, isDrivenEmbed, sendDrivenPlay]);
   const iframeBaseSrc =
     type && tmdbId
       ? embedUrlFor(activeSource, type, tmdbId, season, episode) ?? src
@@ -2556,9 +2665,9 @@ export function VixPlayer({
       )}
 
       {mode === "iframe" && (
-        <div className="h-full w-full overflow-hidden bg-black">
-          <iframe
-            key={iframeSrc}
+          <div className="h-full w-full overflow-hidden bg-black">
+            <iframe
+              key={`${iframeSrc}::${retryNonce}`}
             ref={iframeRef}
             src={iframeSrc}
             title={title}
@@ -2827,28 +2936,43 @@ export function VixPlayer({
         </div>
       )}
 
+      {mode === "native" && buffering && mediaReady && !showResume && (
+        <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-black/60 backdrop-blur">
+            <LoaderCircle className="h-5 w-5 animate-spin text-white/85" />
+          </span>
+        </div>
+      )}
+
       {hasError && (
         <div className="absolute inset-0 z-[6] flex items-center justify-center bg-black/85 p-6 text-center">
           <div>
-            <p className="font-bold text-white">
-              {offlineOverride ? "Couldn't play this download" : "Player unavailable here"}
+            <p className="font-bold text-white">{streamErrorTitle}</p>
+            <p className="mx-auto mt-1 max-w-xs text-sm text-white/55">
+              {streamErrorDetail}
             </p>
-            <p className="mt-1 text-sm text-white/55">
-              {offlineOverride
-                ? "The saved file may be incomplete — try downloading it again."
-                : "Try switching to another source."}
-            </p>
-            {streamable && !offlineOverride && (
-              <button
-                type="button"
-                onClick={() => {
-                  switchSource(nextPlayableSource(activeSource));
-                }}
-                className="mt-4 inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-bold text-black"
-              >
-                Try {sourceLabel(nextPlayableSource(activeSource))}
-              </button>
-            )}
+            <div className="mt-4 flex items-center justify-center gap-2">
+              {canRetry && (
+                <button
+                  type="button"
+                  onClick={retryStream}
+                  className="inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-sm font-bold text-white ring-1 ring-white/20 transition hover:bg-white/20"
+                >
+                  Retry
+                </button>
+              )}
+              {streamable && !offlineOverride && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    switchSource(nextPlayableSource(activeSource));
+                  }}
+                  className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-bold text-black"
+                >
+                  Try {sourceLabel(nextPlayableSource(activeSource))}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}

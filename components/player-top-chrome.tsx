@@ -414,7 +414,10 @@ export function PlayerTopChrome({
             (mode === "iframe" &&
               (activeSource === "cinesrc" ||
                 activeSource === "vidfast" ||
-                activeSource === "mapple"))) && (
+                activeSource === "mapple" ||
+                activeSource === "vidlink" ||
+                activeSource === "vidnest" ||
+                activeSource === "2embed"))) && (
             <div ref={subMenuRef} className="relative">
               <button
                 type="button"
