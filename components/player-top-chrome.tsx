@@ -9,7 +9,6 @@ import {
   Lock,
   MoreHorizontal,
   SkipForward,
-  Smartphone,
   Volume2,
   X,
 } from "lucide-react";
@@ -32,8 +31,6 @@ type PlayerTopChromeProps = {
   activeSource: StreamSource;
   streamable: boolean;
   isLoading: boolean;
-  playbackSpeed: number;
-  onCycleSpeed: () => void;
   videoFit: VixSettings["videoFit"];
   embedZoom: VixSettings["embedZoom"];
   onCycleScreenFill: () => void;
@@ -87,8 +84,6 @@ type PlayerTopChromeProps = {
   showAutoplayToggle?: boolean;
   autoplayNext?: boolean;
   onToggleAutoplayNext?: () => void;
-  autoRotate?: boolean;
-  onToggleAutoRotate?: () => void;
   onLock: () => void;
   onClose: () => void;
   onKeepChrome: () => void;
@@ -116,8 +111,6 @@ export function PlayerTopChrome({
   activeSource,
   streamable,
   isLoading,
-  playbackSpeed,
-  onCycleSpeed,
   videoFit,
   embedZoom,
   onCycleScreenFill,
@@ -157,8 +150,6 @@ export function PlayerTopChrome({
   showAutoplayToggle = false,
   autoplayNext = true,
   onToggleAutoplayNext,
-  autoRotate = true,
-  onToggleAutoRotate,
   onLock,
   onClose,
   onKeepChrome,
@@ -256,17 +247,6 @@ export function PlayerTopChrome({
         </div>
         <div className="pointer-events-auto flex max-w-full shrink-0 items-center gap-1.5 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] sm:flex-wrap sm:justify-end sm:gap-2 sm:overflow-visible sm:pb-0 [&::-webkit-scrollbar]:hidden">
           {downloadSlot}
-          {(mode === "native" ||
-            (mode === "iframe" && activeSource === "cinesrc")) && (
-            <button
-              type="button"
-              onClick={onCycleSpeed}
-              aria-label="Playback speed"
-              className="hidden h-9 items-center rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80 sm:flex"
-            >
-              {playbackSpeed}×
-            </button>
-          )}
           {(mode === "native" || mode === "iframe") && (
             <button
               type="button"
@@ -830,38 +810,9 @@ export function PlayerTopChrome({
               </span>
             </button>
           )}
-          {onToggleAutoRotate && (
-            <button
-              type="button"
-              onClick={() => {
-                onKeepChrome();
-                onToggleAutoRotate();
-              }}
-              aria-label={
-                autoRotate ? "Auto-rotate on" : "Auto-rotate off"
-              }
-              aria-pressed={autoRotate}
-              title={
-                autoRotate
-                  ? "Auto-rotate: fullscreen goes landscape"
-                  : "Auto-rotate: off"
-              }
-              className={cn(
-                "hidden h-9 items-center gap-1.5 rounded-full px-3 text-xs font-bold ring-1 backdrop-blur transition sm:flex",
-                autoRotate
-                  ? "bg-primary/20 text-primary ring-primary/40 hover:bg-primary/30"
-                  : "bg-black/60 text-white/50 ring-white/20 hover:bg-black/80 hover:text-white/80"
-              )}
-            >
-              <Smartphone className="h-4 w-4" />
-              <span className="hidden sm:inline">
-                {autoRotate ? "Auto" : "Fixed"}
-              </span>
-            </button>
-          )}
-          {/* Mobile overflow: portrait phones can't fit every pill — the four
-              stateless controls above hide on small screens and live here
-              with readable labels instead. Desktop keeps the full row. */}
+          {/* Mobile overflow: portrait phones can't fit every pill — fill and
+              autoplay hide on small screens and live here with readable
+              labels instead. Desktop keeps the full row. */}
           <div className="relative sm:hidden">
             <button
               type="button"
@@ -887,19 +838,6 @@ export function PlayerTopChrome({
                 aria-label="More player options"
                 className="fixed inset-x-4 bottom-4 top-auto z-50 overflow-hidden rounded-xl border border-white/15 bg-white/[0.06] py-1 shadow-2xl backdrop-blur-2xl"
               >
-                {(mode === "native" ||
-                  (mode === "iframe" && activeSource === "cinesrc")) && (
-                  <button
-                    type="button"
-                    role="menuitem"
-                    onClick={onCycleSpeed}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-bold text-white transition hover:bg-white/10"
-                  >
-                    <Gauge className="h-4 w-4 text-white/60" />
-                    Speed
-                    <span className="ml-auto text-white/60">{playbackSpeed}×</span>
-                  </button>
-                )}
                 {(mode === "native" || mode === "iframe") && (
                   <button
                     type="button"
@@ -934,23 +872,6 @@ export function PlayerTopChrome({
                     Autoplay next
                     <span className="ml-auto text-white/60">
                       {autoplayNext ? "On" : "Off"}
-                    </span>
-                  </button>
-                )}
-                {onToggleAutoRotate && (
-                  <button
-                    type="button"
-                    role="menuitem"
-                    onClick={() => {
-                      onKeepChrome();
-                      onToggleAutoRotate();
-                    }}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-bold text-white transition hover:bg-white/10"
-                  >
-                    <Smartphone className="h-4 w-4 text-white/60" />
-                    Auto-rotate
-                    <span className="ml-auto text-white/60">
-                      {autoRotate ? "On" : "Off"}
                     </span>
                   </button>
                 )}

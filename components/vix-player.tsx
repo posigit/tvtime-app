@@ -17,11 +17,6 @@ import {
   writeOfflinePosition,
 } from "@/lib/downloads";
 import {
-  isInPictureInPicture,
-  supportsPictureInPicture,
-  togglePictureInPicture,
-} from "@/lib/player-pip";
-import {
   EMBED_SOURCES,
   CINESRC_MAX_KNOWN_SERVERS,
   buildCineSrcServerOptions,
@@ -280,15 +275,7 @@ export function VixPlayer({
     volume: 1,
   });
   const [isFullscreen, setIsFullscreen] = useState(false);
-  /**
-   * PiP capability, probed lazily without a video element: standard-API
-   * browsers resolve here; WebKit-only ones (iOS Safari) resolve optimist-
-   * ically unless in standalone PWA, and the toggle re-probes on the live
-   * element at tap time. Static per browser — never needs re-probing.
-   */
-  const [pipSupported] = useState(() => supportsPictureInPicture(null));
-  const [pipActiveRaw, setPipActive] = useState(false);
-  const chromeHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const chromeHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** Blocks synthetic mouse click after touch chrome toggle. */
   const lastTouchChromeRef = useRef(0);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(
@@ -303,7 +290,8 @@ export function VixPlayer({
   const [autoplayNext, setAutoplayNext] = useState(
     () => loadVixSettings().autoplayNext
   );
-  const [autoRotate, setAutoRotate] = useState(
+  // No UI toggle (user request): orientation follows the saved preference.
+  const [autoRotate] = useState(
     () => loadVixSettings().autoRotate
   );
   const [subDelay, setSubDelay] = useState(
@@ -1964,6 +1952,28 @@ export function VixPlayer({
     bumpChrome();
   }, [mode, videoFit, embedZoom, bumpChrome]);
 
+  /** Cycle playback speed (native + CineSrc — the only embed with a rate API). */
+  const cycleSpeed = useCallback(() => {
+    const cinesrc = mode === "iframe" && activeSource === "cinesrc";
+    const speeds = [0.75, 1, 1.25, 1.5, 2];
+    setPlaybackSpeed((prev) => {
+      const idx = speeds.indexOf(prev);
+      const next =
+        idx >= 0
+          ? (speeds[(idx + 1) % speeds.length] ?? 1)
+          : (speeds.find((s) => s > prev) ?? 1);
+      saveVixSettings({ speed: next });
+      if (cinesrc) {
+        sendCineSrcCommand(iframeRef.current, "setPlaybackRate", [next]);
+      } else {
+        const v = videoRef.current;
+        if (v) v.playbackRate = next;
+      }
+      return next;
+    });
+    bumpChrome();
+  }, [mode, activeSource, bumpChrome]);
+
   const toggleFullscreen = useCallback(() => {
     const root = shellRef.current;
     if (!root) return;
@@ -1971,51 +1981,6 @@ export function VixPlayer({
     else void root.requestFullscreen?.();
     bumpChrome();
   }, [bumpChrome]);
-
-  // Picture-in-Picture (native <video> only). State is event-driven like
-  // fullscreen (setState lives in listeners, never in the effect body).
-  // Injected subtitle tracks flip to native-visible while PiP is active —
-  // the overlay can't paint inside the PiP window — and back on leave.
-  // SubSource "off" never resurrects hidden captions.
-  useEffect(() => {
-    if (mode !== "native") return;
-    const video = videoRef.current;
-    if (!video) return;
-    const setTracksNative = (show: boolean) => {
-      if (show && subSourceRef.current === "off") return;
-      for (const t of injectedTracksRef.current) t.mode = show ? "showing" : "hidden";
-    };
-    // One sync for all three events: standard enter/leave plus WebKit's
-    // mode-change (iOS fires only the latter — state + tracks flip there too).
-    const syncPiP = () => {
-      const active = isInPictureInPicture(video);
-      setPipActive(active);
-      setTracksNative(active);
-    };
-    video.addEventListener("enterpictureinpicture", syncPiP);
-    video.addEventListener("leavepictureinpicture", syncPiP);
-    const w = video as HTMLVideoElement & {
-      addEventListener(t: string, l: () => void): void;
-      removeEventListener(t: string, l: () => void): void;
-    };
-    w.addEventListener("webkitpresentationmodechanged", syncPiP);
-    return () => {
-      video.removeEventListener("enterpictureinpicture", syncPiP);
-      video.removeEventListener("leavepictureinpicture", syncPiP);
-      w.removeEventListener("webkitpresentationmodechanged", syncPiP);
-      setTracksNative(false);
-    };
-  }, [mode, playlistUrl]);
-
-  const togglePiP = useCallback(() => {
-    const video = videoRef.current;
-    if (!video || mode !== "native") return;
-    navigator.vibrate?.(10);
-    // State syncs back through the PiP events above (or stays put on failure).
-    void togglePictureInPicture(video).then(() => {
-      bumpChrome();
-    });
-  }, [mode, bumpChrome]);
 
   // ---------- iframe fallback: postMessage bridge ----------
   useEffect(() => {
@@ -2735,9 +2700,9 @@ export function VixPlayer({
           onToggleMute={toggleMute}
           onVolume={setVolume}
           onToggleFullscreen={toggleFullscreen}
-          showPiP={mode === "native" && pipSupported}
-          pipActive={mode === "native" && pipActiveRaw}
-          onTogglePiP={togglePiP}
+          showSpeed={mode === "native" || cineSrcEmbed}
+          playbackSpeed={playbackSpeed}
+          onCycleSpeed={cycleSpeed}
           serverOptions={cineSrcEmbed ? buildCineSrcServerOptions(cineSrcKnownServers) : undefined}
           activeServer={liveCineSrcServer ?? cineSrcServer}
           onPickServer={cineSrcEmbed ? handleCineSrcServer : undefined}
@@ -2773,29 +2738,10 @@ export function VixPlayer({
           mode={mode}
           activeSource={activeSource}
           streamable={streamable}
-          isLoading={isLoading || (mode === "native" && !mediaReady)}
-          playbackSpeed={playbackSpeed}
-          videoFit={videoFit}
-          embedZoom={embedZoom}
-          onCycleScreenFill={cycleScreenFill}
-          onCycleSpeed={() => {
-            // CineSrc is the only embed with a rate API; VidFast has none,
-            // so the speed button stays CineSrc/native-only (see top chrome).
-            const speeds = [0.75, 1, 1.25, 1.5, 2];
-            const idx = speeds.indexOf(playbackSpeed);
-            const next =
-              idx >= 0
-                ? (speeds[(idx + 1) % speeds.length] ?? 1)
-                : (speeds.find((s) => s > playbackSpeed) ?? 1);
-            setPlaybackSpeed(next);
-            saveVixSettings({ speed: next });
-            if (cineSrcEmbed) {
-              sendCineSrcCommand(iframeRef.current, "setPlaybackRate", [next]);
-              return;
-            }
-            const v = videoRef.current;
-            if (v) v.playbackRate = next;
-          }}
+            isLoading={isLoading || (mode === "native" && !mediaReady)}
+            videoFit={videoFit}
+            embedZoom={embedZoom}
+            onCycleScreenFill={cycleScreenFill}
           audioTracks={audioTracks}
           audioTrackId={audioTrackId}
           audioMenuOpen={audioMenuOpen}
@@ -2850,17 +2796,8 @@ export function VixPlayer({
               return next;
             });
           }}
-          autoRotate={autoRotate}
-          onToggleAutoRotate={() => {
-            navigator.vibrate?.(10);
-            setAutoRotate((prev) => {
-              const next = !prev;
-              saveVixSettings({ autoRotate: next });
-              return next;
-            });
-          }}
-          onLock={() => {
-            navigator.vibrate?.(10);
+            onLock={() => {
+              navigator.vibrate?.(10);
             setLocked(true);
           }}
           onClose={() => {

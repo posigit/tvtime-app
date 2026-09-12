@@ -6,7 +6,6 @@ import {
   Maximize,
   Minimize,
   Pause,
-  PictureInPicture2,
   Play,
   RotateCcw,
   Server,
@@ -34,14 +33,10 @@ type PlayerTransportProps = {
   onToggleMute: () => void;
   onVolume: (volume: number) => void;
   onToggleFullscreen: () => void;
-  /**
-   * Picture-in-Picture (native <video> only — embeds can't cross-origin).
-   * Rendered only when the parent reports support (runtime probe: iOS
-   * standalone PWA typically lacks it, so no dead button there).
-   */
-  showPiP?: boolean;
-  pipActive?: boolean;
-  onTogglePiP?: () => void;
+  /** Playback-speed cycler (native + CineSrc only — sole rate APIs). */
+  showSpeed?: boolean;
+  playbackSpeed?: number;
+  onCycleSpeed?: () => void;
   /**
    * CineSrc sub-server picker (bottom bar, so the top chrome stays uncrowded).
    * Rendered only when provided (CineSrc driven embed).
@@ -85,9 +80,9 @@ export function PlayerTransport({
   onToggleMute,
   onVolume,
   onToggleFullscreen,
-  showPiP = false,
-  pipActive = false,
-  onTogglePiP,
+  showSpeed = false,
+  playbackSpeed = 1,
+  onCycleSpeed,
   serverOptions,
   activeServer = "auto",
   onPickServer,
@@ -278,6 +273,20 @@ export function PlayerTransport({
               -{formatPlayerClock(remaining)}
             </span>
             <div className="ml-auto flex items-center gap-1.5">
+              {showSpeed && onCycleSpeed && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCycleSpeed();
+                  }}
+                  aria-label="Playback speed"
+                  title={`Speed: ${playbackSpeed}×`}
+                  className="flex h-9 items-center rounded-full bg-black/50 px-3 text-xs font-bold text-white ring-1 ring-white/15 backdrop-blur transition hover:bg-black/70"
+                >
+                  {playbackSpeed}×
+                </button>
+              )}
               {serverOptions && onPickServer && (
                 <div ref={serverMenuRef} className="relative">
                   <button
@@ -360,20 +369,6 @@ export function PlayerTransport({
                   onClick={(e) => e.stopPropagation()}
                   className="h-1 w-16 cursor-pointer appearance-none rounded-full bg-white/25 accent-primary sm:w-20 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
                 />
-              )}
-              {showPiP && onTogglePiP && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onTogglePiP();
-                  }}
-                  aria-label={pipActive ? "Exit picture in picture" : "Picture in picture"}
-                  aria-pressed={pipActive}
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white ring-1 ring-white/15 backdrop-blur transition hover:bg-black/70"
-                >
-                  <PictureInPicture2 className="h-4 w-4" />
-                </button>
               )}
               <button
                 type="button"

@@ -184,7 +184,17 @@
       <h1>You're offline</h1>
       <p class="sub" id="status">Loading your downloads…</p>
       <div id="list"></div>
-      <button type="button" class="retry" onclick="location.reload()">Try again</button>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+        <button type="button" class="retry" onclick="location.href='/library'">Open library</button>
+        <button
+          type="button"
+          class="retry"
+          style="background: rgba(255,255,255,0.12); color: #fff;"
+          onclick="location.reload()"
+        >
+          Try again
+        </button>
+      </div>
     </div>
     <div id="player" role="dialog" aria-modal="true" aria-label="Offline player">
       <p id="ptitle"></p>

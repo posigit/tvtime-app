@@ -34,6 +34,7 @@ export function AddToListButton({
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [lists, setLists] = useState<ListRow[] | null>(null);
+  const [listsError, setListsError] = useState(false);
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -48,10 +49,13 @@ export function AddToListButton({
       if (!res.ok) throw new Error("lists failed");
       const data = (await res.json()) as { lists?: ListRow[] };
       setLists((data.lists ?? []).filter((l) => l.type === "custom"));
+      setListsError(false);
     } catch {
-      toast("Couldn't load lists", "error");
+      // Never strand on "Loading…": show the error + create row instead.
+      setLists([]);
+      setListsError(true);
     }
-  }, [tmdbId, mediaType, toast]);
+  }, [tmdbId, mediaType]);
 
   useEffect(() => {
     if (!open) return;
@@ -190,6 +194,12 @@ export function AddToListButton({
             {lists == null ? (
               <p className="px-4 py-6 text-center text-sm text-white/45">Loading…</p>
             ) : (
+              <>
+                {listsError && (
+                  <p className="px-4 pb-1 pt-2 text-center text-xs font-semibold text-red-400">
+                    Couldn&apos;t load lists — check connection, or create one below
+                  </p>
+                )}
               <div className="py-1">
                 {lists.map((l) => (
                   <button
@@ -248,6 +258,7 @@ export function AddToListButton({
                   </button>
                 )}
               </div>
+              </>
             )}
           </div>
         </div>

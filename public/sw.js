@@ -8,7 +8,7 @@
  *
  * Bump VERSION when changing strategies so activate() purges old caches.
  */
-const VERSION = "7";
+const VERSION = "8";
 const SHELL_CACHE = `tvtime-shell-v${VERSION}`;
 const STATIC_CACHE = `tvtime-static-v${VERSION}`;
 const IMAGE_CACHE = `tvtime-images-v${VERSION}`;
@@ -32,6 +32,9 @@ const PRECACHE_URLS = [
   "/avatars/profile.jpg",
   // Offline player engine for the offline.html downloads launcher.
   "/vendor/hls.min.js",
+  // Library shell: static prerender — cold offline opens in OUR player UI,
+  // never the bare launcher, once any online visit has run this worker.
+  "/library",
 ];
 
 const IMAGE_CACHE_MAX = 250;
