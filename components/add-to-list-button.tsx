@@ -173,12 +173,12 @@ export function AddToListButton({
           <button
             type="button"
             aria-label="Close"
-            className="absolute inset-0 bg-black/70 backdrop-blur-[2px]"
+            className="absolute inset-0 bg-black/60"
             onClick={() => setOpen(false)}
           />
           <div
             ref={sheetRef}
-            className="absolute inset-x-3 bottom-3 max-h-[70dvh] overflow-y-auto rounded-2xl border border-white/15 bg-white/[0.07] shadow-2xl backdrop-blur-2xl"
+            className="absolute inset-x-3 bottom-3 max-h-[70dvh] overflow-y-auto rounded-2xl border border-white/15 bg-[#1c1c1e]/95 shadow-2xl backdrop-blur-2xl"
           >
             <div className="flex items-center justify-between px-4 pb-1 pt-3.5">
               <p className="text-sm font-black text-white">Save to list</p>
@@ -201,6 +201,11 @@ export function AddToListButton({
                   </p>
                 )}
               <div className="py-1">
+                {lists.length === 0 && !listsError && !creating && (
+                  <p className="px-4 py-4 text-center text-sm text-white/45">
+                    No lists yet — tap New list below
+                  </p>
+                )}
                 {lists.map((l) => (
                   <button
                     key={l.id}
