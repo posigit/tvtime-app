@@ -25,10 +25,13 @@ export type SubSource = "auto" | "off" | "stream" | "vdrk" | "opensub";
  * (OpenSubtitles SRTs converted from ASS especially): override blocks like
  * {\\an8} / {\\pos(400,570)}, \\N forced breaks, \\h hard spaces. Browsers
  * and our overlay render these literally, so remove them before paint.
+ *
+ * The brace pattern requires a backslash so literal dialogue braces
+ * ("I {love} you") survive — ASS overrides always carry \\ commands.
  */
 export function stripAssTags(text: string): string {
   return text
-    .replace(/\{[^}]*\}/g, "")
+    .replace(/\{\\[^}]*\}/g, "")
     .replace(/\\N/g, "\n")
     .replace(/\\h/g, " ");
 }

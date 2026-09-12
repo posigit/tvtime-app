@@ -215,9 +215,11 @@ assert.deepEqual(normalizeSegment({ start_ms: 2000, end_ms: 58000 }), { start: 2
 assert.equal(normalizeSegment(null), null);
 assert.equal(normalizeSegment({ start_sec: 60, end_sec: 30 }), null);
 
-// ASS/SSA remnants are stripped ({\an8} positioning, \N breaks).
+// ASS/SSA remnants are stripped ({\an8} positioning, \N breaks), but
+// literal dialogue braces survive.
 assert.equal(stripAssTags("{\\an8}Hello world"), "Hello world");
 assert.equal(stripAssTags("{\\pos(400,570)\\an7}Hi\\Nthere"), "Hi\nthere");
+assert.equal(stripAssTags("I {love} you"), "I {love} you");
 assert.equal(stripAssTags("plain dialogue"), "plain dialogue");
 const assVtt = `WEBVTT
 

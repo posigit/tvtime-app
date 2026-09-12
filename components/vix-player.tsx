@@ -1633,6 +1633,9 @@ export function VixPlayer({
           iframeRef.current,
           iframePausedRef.current ? "play" : "pause"
         );
+        // VidFast commands have no ack — re-pull ground truth so a dropped
+        // command can't leave our chrome lying about play state.
+        window.setTimeout(() => sendVidfastCommand(iframeRef.current, "getStatus"), 350);
       } else {
         sendCineSrcCommand(
           iframeRef.current,
@@ -1697,6 +1700,7 @@ export function VixPlayer({
         sendVidfastCommand(iframeRef.current, "volume", {
           level: next ? 0 : lastVolumeRef.current,
         });
+        window.setTimeout(() => sendVidfastCommand(iframeRef.current, "getStatus"), 350);
       } else {
         sendCineSrcCommand(iframeRef.current, "setMuted", [next]);
       }
@@ -1719,6 +1723,7 @@ export function VixPlayer({
         if (next > 0) lastVolumeRef.current = next;
         if (activeSource === "vidfast") {
           sendVidfastCommand(iframeRef.current, "volume", { level: next });
+          window.setTimeout(() => sendVidfastCommand(iframeRef.current, "getStatus"), 350);
         } else {
           sendCineSrcCommand(iframeRef.current, "setVolume", [next]);
           sendCineSrcCommand(iframeRef.current, "setMuted", [next === 0]);
