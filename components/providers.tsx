@@ -4,6 +4,7 @@ import { SessionProvider, useSession } from "next-auth/react";
 import { ReactNode, useEffect } from "react";
 import { ToastProvider } from "@/components/toast";
 import { hydrateVixSettings } from "@/lib/vix-settings";
+import { initPlaybackOutbox } from "@/lib/player-playback-api";
 
 /** Hydrates player settings once the session is known (per-user data). */
 function SettingsHydrator() {
@@ -16,6 +17,8 @@ function SettingsHydrator() {
 
 export function Providers({ children }: { children: ReactNode }) {
   useEffect(() => {
+    // Replay offline playback saves when connectivity returns.
+    initPlaybackOutbox();
     if (!("serviceWorker" in navigator)) return;
     // Production: full offline shell. Dev (?dev=1): /api/dl ONLY, so
     // offline-download playback works in dev without the worker touching

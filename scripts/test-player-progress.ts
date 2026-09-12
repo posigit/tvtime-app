@@ -17,7 +17,6 @@ import {
   SUB_FONT_SCALE,
   cueTextAt,
   isPromoCue,
-  listOpenSubtitles,
   parseVttCues,
   stripAssTags,
 } from "../lib/player-subs";
@@ -25,6 +24,7 @@ import { CINESRC_SEED_SERVERS, buildCineSrcServerOptions, cineSrcAliasFor, cineS
 import { DEFAULT_VIX_SETTINGS } from "../lib/vix-settings";
 import { NEXT_FAB_RATIO, RESUME_END_RATIO } from "../lib/player-constants";
 import { normalizeSegment, parseSegmentSec } from "../lib/introdb";
+import { coalesceOutbox } from "../lib/player-playback-api";
 
 assert.equal(isResumablePosition(3, 100), false);
 assert.equal(isResumablePosition(10, 100), true);
@@ -243,5 +243,18 @@ const assVtt = `WEBVTT
 const assCues = parseVttCues(assVtt);
 assert.equal(assCues.length, 1);
 assert.equal(assCues[0].text, "I see dead people");
+
+// Outbox coalescing: last-write-wins per key; DELETE absorbs POSTs.
+const e1 = { params: "a", method: "POST", body: '{"p":1}', at: 1, attempts: 0 };
+const e2 = { params: "a", method: "POST", body: '{"p":2}', at: 2, attempts: 0 };
+assert.deepEqual(coalesceOutbox([e1], e2), [e2]);
+assert.deepEqual(
+  coalesceOutbox([e1], { params: "a", method: "DELETE", at: 3, attempts: 0 }),
+  [{ params: "a", method: "DELETE", at: 3, attempts: 0 }]
+);
+assert.equal(
+  coalesceOutbox([e1], { params: "b", method: "POST", at: 3, attempts: 0 }).length,
+  2
+);
 
 console.log("player-progress: all assertions passed");
