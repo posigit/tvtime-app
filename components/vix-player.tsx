@@ -2307,9 +2307,11 @@ export function VixPlayer({
   );
   // Intro/recap skip (IntroDB times, TV only). Native + driven embeds only —
   // interactive iframes have no seek API, so the button would be dead there.
-  // Rendered inside the shell, so it works in fullscreen.
+  // Rendered inside the shell (fullscreen-safe) and ABOVE the lock overlay
+  // (z-40 > z-30): a single deliberate skip tap stays available in lock mode
+  // while all other chrome stays buried.
   const skipTarget: { seg: IntroDbSegment; label: string } | null =
-    type === "tv" && !locked && (mode === "native" || isDrivenEmbed)
+    type === "tv" && (mode === "native" || isDrivenEmbed)
       ? segments.intro &&
         transport.currentTime >= segments.intro.start &&
         transport.currentTime < segments.intro.end
