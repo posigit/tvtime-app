@@ -6,7 +6,6 @@ import { Play, RotateCcw } from "lucide-react";
 import { VixPlayer } from "@/components/vix-player";
 import { vixMovieUrl } from "@/lib/vixsrc";
 import { useToast } from "@/components/toast";
-import { cn } from "@/lib/utils";
 import type { PlaybackSummary } from "@/lib/playback";
 import { formatPlaybackTime } from "@/lib/playback-format";
 
@@ -39,8 +38,9 @@ export function MovieVixButton({
     const resume = playback
       ? { timeLeft: formatPlaybackTime(playback.timeLeftSeconds) }
       : null;
-    // State-colored hero CTA: solid yellow to start, yellow-tinted glass to
-    // resume, neutral glass to rewatch — same language as the watchlist pill.
+    // Theme-tinted liquid-glass hero CTA: picks up the movie's own artwork
+    // color (--theme), same vocabulary as the poster glow, genre chips and
+    // trailer play disc. No yellow — states read via icon + copy + meter.
     const mode = resume ? "resume" : isWatched ? "rewatch" : "watch";
     return (
       <button
@@ -49,15 +49,13 @@ export function MovieVixButton({
           completionRef.current = false;
           setOpen(true);
         }}
-        className={cn(
-          "group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-2xl px-4 py-2.5 text-center backdrop-blur-xl transition active:scale-[0.99]",
-          mode === "watch" &&
-            "bg-primary text-black shadow-[0_8px_24px_rgba(0,0,0,0.45)] hover:brightness-110",
-          mode === "resume" &&
-            "bg-primary/[0.14] text-primary ring-1 ring-primary/40 shadow-[0_8px_24px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.15)]",
-          mode === "rewatch" &&
-            "bg-white/[0.09] text-white ring-1 ring-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.15)] hover:bg-white/[0.13]"
-        )}
+        className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl px-4 py-2.5 text-center text-white ring-1 ring-white/20 backdrop-blur-2xl transition active:scale-[0.99]"
+        style={{
+          background:
+            "linear-gradient(160deg, rgb(var(--theme, 255 255 255) / 0.22), rgba(255, 255, 255, 0.06) 55%, rgb(var(--theme, 255 255 255) / 0.12))",
+          boxShadow:
+            "0 8px 24px rgba(0, 0, 0, 0.45), 0 0 32px rgb(var(--theme, 255 255 255) / 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25)",
+        }}
       >
         {/* hairline top highlight — the only "sheen", kept faint */}
         <span
@@ -65,49 +63,37 @@ export function MovieVixButton({
           className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent"
         />
         <span
-          className={cn(
-            "flex h-8 w-8 shrink-0 items-center justify-center rounded-full ring-1 backdrop-blur-xl transition",
-            mode === "watch" && "bg-black/[0.12] text-black ring-black/20",
-            mode === "resume" &&
-              "bg-primary/20 text-primary ring-primary/40 group-hover:bg-primary/25",
-            mode === "rewatch" &&
-              "bg-white/[0.14] text-white ring-white/25 group-hover:bg-white/[0.2]"
-          )}
+          aria-hidden
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/[0.18] text-white ring-1 ring-white/50 backdrop-blur-2xl transition group-hover:scale-105"
+          style={{
+            boxShadow:
+              "0 12px 32px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 0 44px rgb(var(--theme, 255 255 255) / 0.5)",
+          }}
         >
           {mode === "rewatch" ? (
-            <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.5} />
+            <RotateCcw className="h-4 w-4" strokeWidth={2.5} />
           ) : (
-            <Play className="h-3.5 w-3.5 fill-current" />
+            <Play className="h-4 w-4 fill-current" />
           )}
         </span>
         <span className="min-w-0">
-          <span className="block text-[13px] font-black leading-none">
+          <span className="block text-sm font-black leading-none">
             {resume ? "Resume" : isWatched ? "Rewatch now" : "Watch now"}
           </span>
           {resume?.timeLeft && (
-            <span
-              className={cn(
-                "mt-0.5 block text-xs font-semibold",
-                mode === "resume" ? "text-primary/70" : "text-white/60"
-              )}
-            >
+            <span className="mt-0.5 block text-xs font-semibold text-white/60">
               {resume.timeLeft} remaining
             </span>
           )}
         </span>
         {resume && (
-          <span
-            className={cn(
-              "absolute right-4 flex h-1.5 w-14 shrink-0 overflow-hidden rounded-full",
-              mode === "resume" ? "bg-primary/20" : "bg-white/20"
-            )}
-          >
+          <span className="absolute right-4 flex h-1.5 w-14 shrink-0 overflow-hidden rounded-full bg-white/20">
             <span
-              className={cn(
-                "block h-full rounded-full",
-                mode === "resume" ? "bg-primary" : "bg-white"
-              )}
-              style={{ width: `${playback?.progressPercent ?? 0}%` }}
+              className="block h-full rounded-full"
+              style={{
+                width: `${playback?.progressPercent ?? 0}%`,
+                background: "rgb(var(--theme, 255 255 255))",
+              }}
             />
           </span>
         )}
