@@ -12,7 +12,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { searchParams } = new URL(request.url);
-  const hasTmdbId = Number(searchParams.get("tmdbId"));
+  const tmdbParam = searchParams.get("tmdbId");
+  const hasTmdbId = tmdbParam == null ? NaN : Number(tmdbParam);
   const hasMediaType = searchParams.get("mediaType");
   const rows = await db
     .select()

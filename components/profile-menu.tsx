@@ -52,7 +52,7 @@ export function ProfileMenu() {
             Import data
           </Link>
           <Link
-            href="/calendar"
+            href="/calendar?back=/profile"
             onClick={() => setOpen(false)}
             className="flex items-center gap-2 px-4 py-3 text-left text-sm font-medium text-white hover:bg-secondary"
           >

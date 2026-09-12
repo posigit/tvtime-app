@@ -223,14 +223,6 @@ export function PlayerTopChrome({
       window.removeEventListener("scroll", onScroll);
     };
   }, [moreOpen]);
-  /** Close every popup (used when opening another so sheets never stack). */
-  const closeAllMenus = () => {
-    setSubMenuOpen(false);
-    setAudioMenuOpen(false);
-    setQualityMenuOpen(false);
-    setSourceMenuOpen(false);
-    setMoreOpen(false);
-  };
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-30 bg-gradient-to-b from-black/90 via-black/50 to-transparent pt-[max(0.5rem,env(safe-area-inset-top))]">
       {/*

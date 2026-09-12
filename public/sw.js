@@ -40,10 +40,14 @@ const PRECACHE_URLS = [
 const IMAGE_CACHE_MAX = 250;
 
 self.addEventListener("install", (event) => {
+  // Per-URL settle (not addAll): one flaky file must never nuke the whole
+  // precache — offline.html is the survival launcher, it must always land.
   event.waitUntil(
     caches
       .open(SHELL_CACHE)
-      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .then((cache) =>
+        Promise.allSettled(PRECACHE_URLS.map((u) => cache.add(u)))
+      )
       .catch(() => {})
   );
   self.skipWaiting();

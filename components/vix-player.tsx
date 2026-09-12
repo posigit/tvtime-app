@@ -42,7 +42,6 @@ import {
   type VixSettings,
 } from "@/lib/vix-settings";
 import {
-  MAX_PLAYBACK_SECONDS,
   NEXT_FAB_RATIO,
   RESUME_MIN_SECONDS,
 } from "@/lib/player-constants";
@@ -2896,6 +2895,19 @@ export function VixPlayer({
                   className="inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-sm font-bold text-white ring-1 ring-white/20 transition hover:bg-white/20"
                 >
                   Retry
+                </button>
+              )}
+              {!canRetry && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    void flushPosition().then(() => {
+                      onClose();
+                    });
+                  }}
+                  className="inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-sm font-bold text-white ring-1 ring-white/20 transition hover:bg-white/20"
+                >
+                  Close
                 </button>
               )}
               {streamable && !offlineOverride && (
