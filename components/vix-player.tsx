@@ -1060,10 +1060,15 @@ export function VixPlayer({
     let cancelled = false;
     void (async () => {
       const imdb = imdbIdRef.current ?? (await ensureIframeImdb());
-      if (cancelled || !imdb) return;
+      if (cancelled) return;
+      if (!imdb) {
+        console.warn(`[player] introdb skipped for ${key}: no IMDb id`);
+        return;
+      }
       const segs = await fetchSegments({ imdbId: imdb, season, episode });
       if (cancelled) return;
       segmentsKeyRef.current = key;
+      console.info(`[player] introdb segments for ${key}:`, segs);
       setSegments(segs);
     })();
     return () => {
