@@ -37,6 +37,7 @@ import {
 } from "@/lib/app-time";
 import { ensureEpisodes } from "@/lib/ensure";
 import { UpcomingList, UpcomingGroup } from "@/components/upcoming-list";
+import { OnboardingNudge } from "@/components/onboarding-nudge";
 import Link from "next/link";
 import { CalendarDays } from "lucide-react";
 
@@ -412,6 +413,7 @@ export default async function ShowsPage({
 
       {currentView === "watchlist" && (
         <>
+          {watching.length > 0 && watching.length < 3 && <OnboardingNudge />}
           {watchNext.length > 0 && (
             <section className="mb-6">
               <div className="relative mb-3 mt-2 flex justify-center">
@@ -476,6 +478,12 @@ export default async function ShowsPage({
                 className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-black"
               >
                 BROWSE ALL SHOWS
+              </Link>
+              <Link
+                href="/import"
+                className="mt-2.5 rounded-full px-6 py-2.5 text-sm font-bold text-white/70 ring-1 ring-white/20 transition hover:bg-white/10 hover:text-white"
+              >
+                Import your data
               </Link>
             </div>
           )}

@@ -71,10 +71,12 @@ function EmptyState({
   title,
   description,
   cta,
+  secondaryCta,
 }: {
   title: string;
   description: string;
   cta: string;
+  secondaryCta?: { label: string; href: string };
 }) {
   return (
     <div className="flex flex-col items-center justify-center pt-16 text-center">
@@ -87,6 +89,14 @@ function EmptyState({
       >
         {cta}
       </Link>
+      {secondaryCta && (
+        <Link
+          href={secondaryCta.href}
+          className="mt-2.5 rounded-full px-8 py-3 text-sm font-bold text-white/70 ring-1 ring-white/20 transition hover:bg-white/10 hover:text-white"
+        >
+          {secondaryCta.label}
+        </Link>
+      )}
     </div>
   );
 }
@@ -520,6 +530,7 @@ export default async function MoviesPage({
               title="Your watch list is empty!"
               description="Add movies you want to watch."
               cta="Browse all movies"
+              secondaryCta={{ label: "Import your data", href: "/import" }}
             />
           )}
         </>
