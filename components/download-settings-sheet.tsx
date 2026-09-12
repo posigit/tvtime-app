@@ -468,7 +468,7 @@ function DownloadRow({
         {busy && (
           <button
             type="button"
-            onClick={() => pauseDownload(r.key)}
+            onClick={() => void pauseDownload(r.key)}
             aria-label="Pause download"
             className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-white/[0.08] text-white ring-1 ring-white/15 transition hover:bg-white/15 active:scale-95"
           >

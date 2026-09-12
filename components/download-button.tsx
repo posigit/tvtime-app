@@ -150,7 +150,7 @@ export function DownloadButton({
           toast(e instanceof Error ? e.message : "Download failed", "error")
         );
       } else if (busy) {
-        pauseDownload(key);
+        void pauseDownload(key);
       } else if (rec.state === "paused") {
         void resumeDownload(item).catch((e: unknown) =>
           toast(e instanceof Error ? e.message : "Couldn't resume", "error")

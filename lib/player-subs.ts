@@ -178,6 +178,8 @@ export async function fetchExternalVtt(opts: {
   /** OpenSubtitles: download this file instead of auto-best. */
   fileId?: number;
   label?: string;
+  /** Optional abort (offline engine pauses) — player callers omit it. */
+  signal?: AbortSignal;
 }): Promise<ExternalVttResult | null> {
   if (opts.source === "vdrk") {
     if (!opts.tmdbId) return null;
@@ -187,7 +189,7 @@ export async function fetchExternalVtt(opts: {
         opts.type === "tv" && opts.season != null && opts.episode != null
           ? `${base}/${opts.season}/${opts.episode}/English.vtt`
           : `${base}/English.vtt`;
-      const res = await fetch(path);
+      const res = await fetch(path, { signal: opts.signal });
       if (!res.ok) return null;
       const vtt = await res.text();
       if (vtt.trim().length === 0) return null;
@@ -206,7 +208,9 @@ export async function fetchExternalVtt(opts: {
       q.set("fileId", String(opts.fileId));
       if (opts.label) q.set("label", opts.label);
     }
-    const res = await fetch(`/api/vixsrc/subs?${q.toString()}`);
+    const res = await fetch(`/api/vixsrc/subs?${q.toString()}`, {
+      signal: opts.signal,
+    });
     if (!res.ok) return null;
     const data = (await res.json()) as {
       vtt?: string;

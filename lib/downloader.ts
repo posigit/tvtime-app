@@ -150,6 +150,9 @@ export async function startDownload(req: DownloadRequest): Promise<void> {
     await runDownload(req, rec, controller.signal);
   } catch (err) {
     const cancelled = controller.signal.aborted;
+    // Identity, not just presence: another tab/session may have registered
+    // its own controller under this key after ours died.
+    const ownedHere = activeControllers.get(key) === controller;
     if (cancelIntents.has(key)) {
       cancelIntents.delete(key);
       pauseIntents.delete(key);
@@ -157,25 +160,43 @@ export async function startDownload(req: DownloadRequest): Promise<void> {
       await removeRecord(key);
       return;
     }
-    if (cancelled && pauseIntents.has(key)) {
+    const live = getRecordSync(key) ?? (await getManifest())[key];
+    // Deleted or finished elsewhere — never resurrect or clobber.
+    if (!live || live.state === "done") return;
+    if (live.state === "paused" || (ownedHere && cancelled && pauseIntents.has(key))) {
       pauseIntents.delete(key);
       await commitRecord({ ...rec, state: "paused", error: undefined });
       return;
     }
+    // Another live loop owns this key now — hands off, don't clobber it.
+    if (!ownedHere) return;
     await commitRecord({
       ...rec,
       state: "error",
       error: err instanceof Error ? err.message : "Download failed",
     });
   } finally {
-    activeControllers.delete(key);
+    if (activeControllers.get(key) === controller) activeControllers.delete(key);
   }
 }
 
-export function pauseDownload(key: string) {
-  if (!activeControllers.has(key)) return;
+/**
+ * Pause a download. Always lands: aborts the live controller when this
+ * instance owns one, and otherwise flips durable state directly so the row
+ * can't strand in "active" (second tab, HMR module reset, lost map entry).
+ */
+export async function pauseDownload(key: string): Promise<void> {
   pauseIntents.add(key);
-  activeControllers.get(key)?.abort();
+  const controller = activeControllers.get(key);
+  if (controller) {
+    controller.abort();
+    return;
+  }
+  pauseIntents.delete(key);
+  const rec = getRecordSync(key) ?? (await getManifest())[key];
+  if (rec && (rec.state === "active" || rec.state === "queued")) {
+    await commitRecord({ ...rec, state: "paused", error: undefined });
+  }
 }
 
 export async function resumeDownload(req: DownloadRequest): Promise<void> {
@@ -185,6 +206,8 @@ export async function resumeDownload(req: DownloadRequest): Promise<void> {
     req.season,
     req.episode
   );
+  // Consume any stale pause intent so the fresh loop can't trip on it.
+  pauseIntents.delete(key);
   const rec = getRecordSync(key);
   if (rec && rec.state !== "done") {
     await upsertRecord({ ...rec, state: "queued", error: undefined });
@@ -339,7 +362,7 @@ async function runDownload(
   await upsertRecord(rec);
 
   // 4. Quota: device headroom + the 950MB-style self cap (LRU-evict to fit).
-  await enforceQuota(rec);
+  await enforceQuota(rec, signal);
 
   // 5. Fetch everything into the cache (resume skips what's already there).
   const cache = await caches.open(DL_CACHE);
@@ -363,6 +386,9 @@ async function runDownload(
   const reportProgress = async () => {
     rec.bytesDone = measuredBytes;
     rec.doneSegments = doneSeg;
+    // Track owned files continuously so a mid-flight pause/cancel/delete
+    // removes partial bytes instead of orphaning them.
+    rec.fileUrls = [...fileUrls];
     await updateProgress(rec.key, {
       bytesDone: rec.bytesDone,
       doneSegments: doneSeg,
@@ -399,6 +425,11 @@ async function runDownload(
     const worker = async () => {
       for (;;) {
         throwIfAborted();
+        // Durable reconcile: pause/delete from another tab (or a lost
+        // controller map) must stop this loop even though no local signal
+        // fired. Cheap sync mirror read per iteration.
+        const live = getRecordSync(rec.key);
+        if (!live || live.state === "paused") throw abortError();
         const i = cursor++;
         if (i >= jobs.length) return;
         const job = jobs[i]!;
@@ -485,12 +516,14 @@ async function runDownload(
 
   // 7. Auto-subtitles: same cascade the player uses (VDRK → OpenSubs).
   try {
-    const sub = await fetchDownloadSubs(req, resolved.imdbId);
+    const sub = await fetchDownloadSubs(req, resolved.imdbId, signal);
     if (sub) {
       rec.subVtt = sub.vtt;
       rec.subLabel = sub.label;
     }
-  } catch {
+  } catch (e) {
+    // Pause/cancel during subtitles must still stop the download.
+    if (e instanceof Error && e.name === "AbortError") throw e;
     /* subs are a bonus — never fail the download for them */
   }
 
@@ -504,11 +537,13 @@ async function runDownload(
 
 async function fetchDownloadSubs(
   req: DownloadRequest,
-  imdbId: string | null
+  imdbId: string | null,
+  signal: AbortSignal
 ): Promise<{ vtt: string; label: string } | null> {
   const settings = loadVixSettings();
   const subSource = settings.subSource;
   if (subSource === "off" || subSource === "stream") return null;
+  if (signal.aborted) throw abortError();
   if (subSource === "vdrk" || subSource === "auto") {
     const vdrk = await fetchExternalVtt({
       source: "vdrk",
@@ -516,22 +551,25 @@ async function fetchDownloadSubs(
       tmdbId: req.tmdbId,
       season: req.season,
       episode: req.episode,
+      signal,
     });
     if (vdrk?.vtt) return { vtt: vdrk.vtt, label: vdrk.label };
     if (subSource === "vdrk") return null;
   }
   if (!imdbId) return null;
+  if (signal.aborted) throw abortError();
   const os = await fetchExternalVtt({
     source: "opensub",
     imdbId,
     season: req.season,
     episode: req.episode,
+    signal,
   });
   if (os?.vtt) return { vtt: os.vtt, label: os.label };
   return null;
 }
 
-async function enforceQuota(rec: DownloadRecord): Promise<void> {
+async function enforceQuota(rec: DownloadRecord, signal: AbortSignal): Promise<void> {
   const settings = loadVixSettings();
   const capBytes = settings.downloadCapMb * 1024 * 1024;
   const all = getAllSync();
@@ -544,6 +582,7 @@ async function enforceQuota(rec: DownloadRecord): Promise<void> {
       .filter((r) => r.state === "done" && r.key !== rec.key)
       .sort((a, b) => a.lastUsedAt - b.lastUsedAt);
     for (const v of victims) {
+      if (signal.aborted) throw abortError();
       if (used + need <= capBytes) break;
       await deleteRecordFiles(v);
       await removeRecord(v.key);
