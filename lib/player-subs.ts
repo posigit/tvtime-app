@@ -20,6 +20,19 @@ export const SUB_COLORS: Record<VixSettings["subColor"], string> = {
 
 export type SubSource = "auto" | "off" | "stream" | "vdrk" | "opensub";
 
+/**
+ * Strip ASS/SSA formatting that leaks into real-world subtitle files
+ * (OpenSubtitles SRTs converted from ASS especially): override blocks like
+ * {\\an8} / {\\pos(400,570)}, \\N forced breaks, \\h hard spaces. Browsers
+ * and our overlay render these literally, so remove them before paint.
+ */
+export function stripAssTags(text: string): string {
+  return text
+    .replace(/\{[^}]*\}/g, "")
+    .replace(/\\N/g, "\n")
+    .replace(/\\h/g, " ");
+}
+
 export function parseVttTime(t: string): number {
   const parts = t.split(":").map(Number);
   if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
@@ -64,9 +77,10 @@ export function injectVttTrack(
         i++;
       }
       const plain = text.join("\n").trim();
-      if (plain && isPromoCue(plain)) continue;
+      const clean = stripAssTags(plain).trim();
+      if (clean && isPromoCue(clean)) continue;
       try {
-        track.addCue(new VTTCue(start, end, text.join("\n")));
+        track.addCue(new VTTCue(start, end, clean));
       } catch {
         /* skip malformed cue */
       }
@@ -113,11 +127,12 @@ export function parseVttCues(vtt: string, delaySeconds = 0): VttCue[] {
         text.push(lines[i]);
         i++;
       }
-      const plain = text
-        .join("\n")
-        .replace(/<br\s*\/?>/gi, "\n")
-        .replace(/<[^>]+>/g, "")
-        .trim();
+      const plain = stripAssTags(
+        text
+          .join("\n")
+          .replace(/<br\s*\/?>/gi, "\n")
+          .replace(/<[^>]+>/g, "")
+      ).trim();
       if (plain && !isPromoCue(plain)) cues.push({ start, end, text: plain });
     } else {
       i++;

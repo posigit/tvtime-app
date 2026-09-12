@@ -332,6 +332,8 @@ export function VixPlayer({
   const [qualityMenuOpen, setQualityMenuOpen] = useState(false);
   /** Bottom sub-server menu (transport) — keeps chrome awake like top menus. */
   const [serverMenuOpen, setServerMenuOpen] = useState(false);
+  /** Mobile More sheet (top chrome) — same keep-awake contract. */
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   /** Surface external-subtitle fetch failures instead of stranding the picker. */
   const [subError, setSubError] = useState<string | null>(null);
   /** Top OpenSubtitles files (max 3) for the CC picker. */
@@ -447,6 +449,7 @@ export function VixPlayer({
     openSubListKeyRef.current = null;
     setCineSrcT(null);
     setServerMenuOpen(false);
+    setMoreMenuOpen(false);
     segmentsKeyRef.current = null;
     setSegments(EMPTY_SEGMENTS);
     if (tapCueTimerRef.current) {
@@ -674,12 +677,12 @@ export function VixPlayer({
     // Auto-hide only while playing and no menus are open.
     if (playing) {
       chromeHideTimerRef.current = setTimeout(() => {
-        if (!subMenuOpen && !audioMenuOpen && !qualityMenuOpen && !serverMenuOpen) {
+        if (!subMenuOpen && !audioMenuOpen && !qualityMenuOpen && !serverMenuOpen && !moreMenuOpen) {
           setChromeVisible(false);
         }
       }, 3200);
     }
-  }, [locked, subMenuOpen, audioMenuOpen, qualityMenuOpen, serverMenuOpen]);
+  }, [locked, subMenuOpen, audioMenuOpen, qualityMenuOpen, serverMenuOpen, moreMenuOpen]);
 
   /** Double-tap ±10s; single tap toggles custom chrome (no native controls). */
   const handleTap = useCallback(
@@ -1022,6 +1025,7 @@ export function VixPlayer({
     openSubListKeyRef.current = null;
     setCineSrcT(null);
     setServerMenuOpen(false);
+    setMoreMenuOpen(false);
     // Keep ended/nearEnd so binge overlays don't double-fire after a switch.
     bookmarkClearedRef.current = false;
   }, [activeSource, savePosition]);
@@ -1050,14 +1054,19 @@ export function VixPlayer({
   useEffect(() => {
     if (type !== "tv" || !tmdbId || season == null || episode == null) return;
     const key = `${tmdbId}:${season}:${episode}`;
+    // Gate on SUCCESS, not on start: StrictMode double-invokes this effect in
+    // dev (setup → cleanup → setup). Marking the key before the async fetch
+    // lets the cleanup cancel the only in-flight request while the second run
+    // sees the key and returns — no segments ever load.
     if (segmentsKeyRef.current === key) return;
-    segmentsKeyRef.current = key;
     let cancelled = false;
     void (async () => {
       const imdb = imdbIdRef.current ?? (await ensureIframeImdb());
       if (cancelled || !imdb) return;
       const segs = await fetchSegments({ imdbId: imdb, season, episode });
-      if (!cancelled) setSegments(segs);
+      if (cancelled) return;
+      segmentsKeyRef.current = key;
+      setSegments(segs);
     })();
     return () => {
       cancelled = true;
@@ -2454,6 +2463,7 @@ export function VixPlayer({
           onPickServer={cineSrcEmbed ? handleCineSrcServer : undefined}
           onServerMenuOpenChange={setServerMenuOpen}
           opaqueBottom={activeSource === "vidfast"}
+          segments={segments}
         />
       )}
 
@@ -2586,6 +2596,7 @@ export function VixPlayer({
           qualityMenuRef={qualityMenuRef}
           setHlsAudioTrackRef={setHlsAudioTrackRef}
           setHlsQualityRef={setHlsQualityRef}
+          onMoreMenuOpenChange={setMoreMenuOpen}
           downloadSlot={
             streamable && type && tmdbId ? (
               <DownloadButton

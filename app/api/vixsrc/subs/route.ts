@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { stripAssTags } from "@/lib/player-subs";
 
 /**
  * OpenSubtitles (opensubtitles.com) subtitle lookup, gated on env:
@@ -61,7 +62,9 @@ async function getToken(): Promise<string> {
 }
 
 function srtToVtt(srt: string): string {
-  const cleaned = srt
+  // Strip ASS remnants first (OpenSubtitles SRTs converted from ASS carry
+  // {\\an8}-style overrides browsers/overlays render literally).
+  const cleaned = stripAssTags(srt)
     .replace(/^\uFEFF/, "")
     .replace(/\r/g, "")
     .replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, "$1.$2")

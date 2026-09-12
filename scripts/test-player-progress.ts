@@ -16,7 +16,9 @@ import {
   SUB_FONT_SCALE,
   cueTextAt,
   isPromoCue,
+  listOpenSubtitles,
   parseVttCues,
+  stripAssTags,
 } from "../lib/player-subs";
 import { CINESRC_SEED_SERVERS, buildCineSrcServerOptions, cineSrcAliasFor, cineSrcServerLabel, embedUrlFor, withCineSrcQuality, withCineSrcServer } from "../lib/embed-sources";
 import { DEFAULT_VIX_SETTINGS } from "../lib/vix-settings";
@@ -212,5 +214,18 @@ assert.deepEqual(normalizeSegment({ start_sec: 2, end_sec: 58 }), { start: 2, en
 assert.deepEqual(normalizeSegment({ start_ms: 2000, end_ms: 58000 }), { start: 2, end: 58 });
 assert.equal(normalizeSegment(null), null);
 assert.equal(normalizeSegment({ start_sec: 60, end_sec: 30 }), null);
+
+// ASS/SSA remnants are stripped ({\an8} positioning, \N breaks).
+assert.equal(stripAssTags("{\\an8}Hello world"), "Hello world");
+assert.equal(stripAssTags("{\\pos(400,570)\\an7}Hi\\Nthere"), "Hi\nthere");
+assert.equal(stripAssTags("plain dialogue"), "plain dialogue");
+const assVtt = `WEBVTT
+
+00:00:01.000 --> 00:00:03.000
+{\\an8}I see dead people
+`;
+const assCues = parseVttCues(assVtt);
+assert.equal(assCues.length, 1);
+assert.equal(assCues[0].text, "I see dead people");
 
 console.log("player-progress: all assertions passed");

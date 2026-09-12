@@ -7,6 +7,7 @@ import {
   Crop,
   Gauge,
   Lock,
+  MoreHorizontal,
   SkipForward,
   Smartphone,
   Volume2,
@@ -94,6 +95,11 @@ type PlayerTopChromeProps = {
   qualityMenuRef: RefObject<HTMLDivElement | null>;
   setHlsAudioTrackRef: MutableRefObject<((id: number) => void) | null>;
   setHlsQualityRef: MutableRefObject<((next: "auto" | number) => void) | null>;
+  /**
+   * Reports the mobile More-sheet open state so the parent can keep chrome
+   * awake while it is open (same as the other menus).
+   */
+  onMoreMenuOpenChange?: (open: boolean) => void;
 };
 
 /**
@@ -155,6 +161,7 @@ export function PlayerTopChrome({
   qualityMenuRef,
   setHlsAudioTrackRef,
   setHlsQualityRef,
+  onMoreMenuOpenChange,
 }: PlayerTopChromeProps) {
   const [sourceMenuOpen, setSourceMenuOpen] = useState(false);
   const sourceMenuRef = useRef<HTMLDivElement>(null);
@@ -185,6 +192,47 @@ export function PlayerTopChrome({
       window.removeEventListener("scroll", onScroll);
     };
   }, [sourceMenuOpen]);
+  // Mobile More sheet (overflow for speed/fill/autoplay/autorotate on small
+  // portrait screens). Same dismiss + keep-awake contract as other menus.
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    onMoreMenuOpenChange?.(moreOpen);
+  }, [moreOpen, onMoreMenuOpenChange]);
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onPointer = (e: MouseEvent | TouchEvent) => {
+      const node = e.target as Node | null;
+      if (moreRef.current && node && !moreRef.current.contains(node)) {
+        setMoreOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        setMoreOpen(false);
+      }
+    };
+    const onScroll = () => setMoreOpen(false);
+    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("touchstart", onPointer, { passive: true });
+    document.addEventListener("keydown", onKey, true);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("touchstart", onPointer);
+      document.removeEventListener("keydown", onKey, true);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [moreOpen]);
+  /** Close every popup (used when opening another so sheets never stack). */
+  const closeAllMenus = () => {
+    setSubMenuOpen(false);
+    setAudioMenuOpen(false);
+    setQualityMenuOpen(false);
+    setSourceMenuOpen(false);
+    setMoreOpen(false);
+  };
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-30 bg-gradient-to-b from-black/90 via-black/50 to-transparent pt-[max(0.5rem,env(safe-area-inset-top))]">
       {/*
@@ -207,7 +255,7 @@ export function PlayerTopChrome({
               type="button"
               onClick={onCycleSpeed}
               aria-label="Playback speed"
-              className="flex h-9 items-center rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+              className="hidden h-9 items-center rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80 sm:flex"
             >
               {playbackSpeed}×
             </button>
@@ -217,7 +265,7 @@ export function PlayerTopChrome({
               type="button"
               onClick={onCycleScreenFill}
               aria-label="Screen fill mode"
-              className="flex h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+              className="hidden h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80 sm:flex"
             >
               <Crop className="h-4 w-4" />
               <span className="hidden sm:inline">
@@ -238,6 +286,7 @@ export function PlayerTopChrome({
                 onClick={() => {
                   onKeepChrome();
                   setAudioMenuOpen((v) => !v);
+                  setMoreOpen(false);
                   setSubMenuOpen(false);
                   setQualityMenuOpen(false);
                 }}
@@ -290,6 +339,7 @@ export function PlayerTopChrome({
                 onClick={() => {
                   onKeepChrome();
                   setQualityMenuOpen((v) => !v);
+                  setMoreOpen(false);
                   setSubMenuOpen(false);
                   setAudioMenuOpen(false);
                 }}
@@ -364,6 +414,7 @@ export function PlayerTopChrome({
                 onClick={() => {
                   onKeepChrome();
                   setSubMenuOpen((v) => !v);
+                  setMoreOpen(false);
                   setAudioMenuOpen(false);
                   setQualityMenuOpen(false);
                 }}
@@ -651,6 +702,7 @@ export function PlayerTopChrome({
                 onClick={() => {
                   onKeepChrome();
                   setSourceMenuOpen((v) => !v);
+                  setMoreOpen(false);
                 }}
                 aria-label={`Switch source (currently ${activeSource})`}
                 aria-expanded={sourceMenuOpen}
@@ -721,7 +773,7 @@ export function PlayerTopChrome({
                   : "Autoplay next: off (Up Next still shows)"
               }
               className={cn(
-                "flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-bold ring-1 backdrop-blur transition",
+                "hidden h-9 items-center gap-1.5 rounded-full px-3 text-xs font-bold ring-1 backdrop-blur transition sm:flex",
                 autoplayNext
                   ? "bg-primary/20 text-primary ring-primary/40 hover:bg-primary/30"
                   : "bg-black/60 text-white/50 ring-white/20 hover:bg-black/80 hover:text-white/80"
@@ -750,7 +802,7 @@ export function PlayerTopChrome({
                   : "Auto-rotate: off"
               }
               className={cn(
-                "flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-bold ring-1 backdrop-blur transition",
+                "hidden h-9 items-center gap-1.5 rounded-full px-3 text-xs font-bold ring-1 backdrop-blur transition sm:flex",
                 autoRotate
                   ? "bg-primary/20 text-primary ring-primary/40 hover:bg-primary/30"
                   : "bg-black/60 text-white/50 ring-white/20 hover:bg-black/80 hover:text-white/80"
@@ -762,6 +814,104 @@ export function PlayerTopChrome({
               </span>
             </button>
           )}
+          {/* Mobile overflow: portrait phones can't fit every pill — the four
+              stateless controls above hide on small screens and live here
+              with readable labels instead. Desktop keeps the full row. */}
+          <div className="relative sm:hidden">
+            <button
+              type="button"
+              onClick={() => {
+                onKeepChrome();
+                setMoreOpen((v) => !v);
+                setSubMenuOpen(false);
+                setAudioMenuOpen(false);
+                setQualityMenuOpen(false);
+                setSourceMenuOpen(false);
+              }}
+              aria-label="More player options"
+              aria-expanded={moreOpen}
+              aria-haspopup="menu"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
+            >
+              <MoreHorizontal className="h-5 w-5" />
+            </button>
+            {moreOpen && (
+              <div
+                ref={moreRef}
+                role="menu"
+                aria-label="More player options"
+                className="fixed inset-x-4 bottom-4 top-auto z-50 overflow-hidden rounded-xl border border-white/15 bg-white/[0.06] py-1 shadow-2xl backdrop-blur-2xl"
+              >
+                {(mode === "native" ||
+                  (mode === "iframe" && activeSource === "cinesrc")) && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={onCycleSpeed}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-bold text-white transition hover:bg-white/10"
+                  >
+                    <Gauge className="h-4 w-4 text-white/60" />
+                    Speed
+                    <span className="ml-auto text-white/60">{playbackSpeed}×</span>
+                  </button>
+                )}
+                {(mode === "native" || mode === "iframe") && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={onCycleScreenFill}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-bold text-white transition hover:bg-white/10"
+                  >
+                    <Crop className="h-4 w-4 text-white/60" />
+                    Screen fill
+                    <span className="ml-auto text-white/60">
+                      {mode === "native"
+                        ? videoFit === "fit"
+                          ? "Fit"
+                          : videoFit === "cover"
+                            ? "Cover"
+                            : "Stretch"
+                        : `${Math.round(embedZoom * 100)}%`}
+                    </span>
+                  </button>
+                )}
+                {showAutoplayToggle && onToggleAutoplayNext && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      onKeepChrome();
+                      onToggleAutoplayNext();
+                    }}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-bold text-white transition hover:bg-white/10"
+                  >
+                    <SkipForward className="h-4 w-4 text-white/60" />
+                    Autoplay next
+                    <span className="ml-auto text-white/60">
+                      {autoplayNext ? "On" : "Off"}
+                    </span>
+                  </button>
+                )}
+                {onToggleAutoRotate && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      onKeepChrome();
+                      onToggleAutoRotate();
+                    }}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-bold text-white transition hover:bg-white/10"
+                  >
+                    <Smartphone className="h-4 w-4 text-white/60" />
+                    Auto-rotate
+                    <span className="ml-auto text-white/60">
+                      {autoRotate ? "On" : "Off"}
+                    </span>
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
           <button
             type="button"
             onClick={onLock}
@@ -783,3 +933,4 @@ export function PlayerTopChrome({
     </div>
   );
 }
+

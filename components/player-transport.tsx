@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { formatPlayerClock } from "@/lib/player-progress";
 import { canControlVolume } from "@/lib/player-seek";
+import type { IntroDbSegments } from "@/lib/introdb";
 import { cn } from "@/lib/utils";
 
 type PlayerTransportProps = {
@@ -49,6 +50,8 @@ type PlayerTransportProps = {
    * translucent gradient — solid black buries it.
    */
   opaqueBottom?: boolean;
+  /** IntroDB segments painted as colored ranges behind the scrubber. */
+  segments?: IntroDbSegments | null;
 };
 
 /**
@@ -77,10 +80,32 @@ export function PlayerTransport({
   onPickServer,
   onServerMenuOpenChange,
   opaqueBottom = false,
+  segments = null,
 }: PlayerTransportProps) {
   const safeDur = Number.isFinite(duration) && duration > 0 ? duration : 0;
   const ratio = safeDur > 0 ? Math.min(1, Math.max(0, currentTime / safeDur)) : 0;
   const remaining = safeDur > 0 ? Math.max(0, safeDur - currentTime) : 0;
+  // Colored segment ranges (intro/recap/outro) painted behind the scrubber.
+  // Doubled as the "is IntroDB working?" indicator: markers show whenever
+  // segments load, even outside the skip window.
+  const segMarks =
+    safeDur > 0 && segments
+      ? (
+          [
+            { seg: segments.intro, label: "Intro", cls: "bg-amber-400/80" },
+            { seg: segments.recap, label: "Recap", cls: "bg-sky-400/80" },
+            { seg: segments.outro, label: "Outro", cls: "bg-violet-400/80" },
+          ] as const
+        )
+          .filter((m) => m.seg != null && m.seg.end > m.seg.start)
+          .map((m) => {
+            const s = m.seg!;
+            const left = Math.max(0, Math.min(1, s.start / safeDur));
+            const right = Math.max(0, Math.min(1, s.end / safeDur));
+            return { ...m, seg: s, left, width: Math.max(0, right - left) };
+          })
+          .filter((m) => m.width > 0)
+      : [];
   // UA-based. iOS Safari ignores HTMLMediaElement.volume — mute only.
   // Lazy init: player only mounts client-side after open, so no SSR mismatch.
   const [volumeSupported] = useState(() => canControlVolume(null));
@@ -178,17 +203,38 @@ export function PlayerTransport({
           <label className="sr-only" htmlFor="player-seek">
             Seek
           </label>
-          <input
-            id="player-seek"
-            type="range"
-            min={0}
-            max={1000}
-            step={1}
-            value={Math.round(ratio * 1000)}
-            onChange={(e) => onSeekRatio(Number(e.target.value) / 1000)}
-            onClick={(e) => e.stopPropagation()}
-            className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-white/25 accent-primary [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
-          />
+          <div className="relative h-1.5 w-full">
+            {/* Segment layer behind the native input: track + fill + marks.
+                The input stays fully interactive on top (drag/touch/keys). */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 overflow-hidden rounded-full bg-white/25"
+            >
+              <div
+                className="absolute inset-y-0 left-0 bg-primary"
+                style={{ width: `${ratio * 100}%` }}
+              />
+              {segMarks.map((m) => (
+                <div
+                  key={m.label}
+                  title={`${m.label} ${formatPlayerClock(m.seg.start)} – ${formatPlayerClock(m.seg.end)}`}
+                  className={`absolute inset-y-0 ${m.cls}`}
+                  style={{ left: `${m.left * 100}%`, width: `${m.width * 100}%` }}
+                />
+              ))}
+            </div>
+            <input
+              id="player-seek"
+              type="range"
+              min={0}
+              max={1000}
+              step={1}
+              value={Math.round(ratio * 1000)}
+              onChange={(e) => onSeekRatio(Number(e.target.value) / 1000)}
+              onClick={(e) => e.stopPropagation()}
+              className="absolute inset-0 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-transparent accent-primary [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
+            />
+          </div>
           <div className="flex items-center gap-2 sm:gap-3">
             <span className="min-w-[2.75rem] text-xs font-semibold tabular-nums text-white/90 sm:min-w-[3.25rem]">
               {formatPlayerClock(currentTime)}
