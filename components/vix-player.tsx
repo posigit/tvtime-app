@@ -1068,7 +1068,7 @@ export function VixPlayer({
       const segs = await fetchSegments({ imdbId: imdb, season, episode });
       if (cancelled) return;
       segmentsKeyRef.current = key;
-      console.info(`[player] introdb segments for ${key}:`, segs);
+      console.info(`[player] introdb segments for ${key}:`, JSON.stringify(segs));
       setSegments(segs);
     })();
     return () => {

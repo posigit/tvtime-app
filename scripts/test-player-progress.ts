@@ -212,6 +212,9 @@ assert.equal(parseSegmentSec("nope"), null);
 assert.equal(parseSegmentSec(null), null);
 assert.deepEqual(normalizeSegment({ start_sec: 2, end_sec: 58 }), { start: 2, end: 58 });
 assert.deepEqual(normalizeSegment({ start_ms: 2000, end_ms: 58000 }), { start: 2, end: 58 });
+// Our own proxy returns pre-normalized {start,end} — must survive the client.
+assert.deepEqual(normalizeSegment({ start: 307, end: 386 }), { start: 307, end: 386 });
+assert.deepEqual(normalizeSegment({ start: "05:07", end: "06:26" }), { start: 307, end: 386 });
 assert.equal(normalizeSegment(null), null);
 assert.equal(normalizeSegment({ start_sec: 60, end_sec: 30 }), null);
 

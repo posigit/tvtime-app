@@ -56,11 +56,20 @@ type RawSegment = {
   end_sec?: unknown;
   start_ms?: unknown;
   end_ms?: unknown;
+  /** Already-normalized shape from our own /api/introdb/segments proxy. */
+  start?: unknown;
+  end?: unknown;
 } | null | undefined;
 
-/** Normalize one raw segment ({start_sec,end_sec} or ms) to seconds. */
+/** Normalize one raw segment ({start_sec,end_sec}, ms, or proxy {start,end}). */
 export function normalizeSegment(raw: RawSegment): IntroDbSegment | null {
   if (!raw || typeof raw !== "object") return null;
+  // Our proxy already normalizes — accept its output verbatim (validated).
+  const directStart = parseSegmentSec(raw.start);
+  const directEnd = parseSegmentSec(raw.end);
+  if (directStart != null && directEnd != null && directEnd > directStart) {
+    return { start: directStart, end: directEnd };
+  }
   let start = parseSegmentSec(raw.start_sec);
   let end = parseSegmentSec(raw.end_sec);
   if (start == null || end == null) {
