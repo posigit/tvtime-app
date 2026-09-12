@@ -10,6 +10,7 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  Clapperboard,
   Clock,
 } from "lucide-react";
 
@@ -28,13 +29,25 @@ export type CalendarEpisode = {
   daysUntil: number;
 };
 
+export type CalendarMovie = {
+  tmdbId: number;
+  title: string;
+  posterPath: string | null;
+  releaseDate: string;
+};
+
 export type CalendarDay = {
   /** YYYY-MM-DD */
   date: string;
   day: number;
   inMonth: boolean;
   episodes: CalendarEpisode[];
+  movies: CalendarMovie[];
 };
+
+function movieKey(mv: CalendarMovie) {
+  return `movie:${mv.tmdbId}`;
+}
 
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -59,7 +72,9 @@ export function CalendarMonth({
   prevHref: string;
   nextHref: string;
 }) {
-  const firstWithEps = days.find((d) => d.inMonth && d.episodes.length > 0);
+  const firstWithEps = days.find(
+    (d) => d.inMonth && (d.episodes.length > 0 || d.movies.length > 0)
+  );
   const [selected, setSelected] = useState<string>(
     days.some((d) => d.date === today) ? today : (firstWithEps?.date ?? today)
   );
@@ -111,6 +126,7 @@ export function CalendarMonth({
           const isToday = day.date === today;
           const isSelected = day.date === selected;
           const eps = day.episodes;
+          const mvs = day.movies ?? [];
           const thumbs = eps.slice(0, 2);
           const extra = eps.length - thumbs.length;
           return (
@@ -173,6 +189,12 @@ export function CalendarMonth({
                       +{extra}
                     </span>
                   )}
+                  {day.inMonth && mvs.length > 0 && (
+                    <span className="mt-0.5 flex items-center gap-0.5 text-[8px] font-black leading-none text-primary">
+                      <Clapperboard className="h-2 w-2" />
+                      {mvs.length}
+                    </span>
+                  )}
                 </div>
               )}
             </button>
@@ -180,9 +202,10 @@ export function CalendarMonth({
         })}
       </div>
 
-      {/* Selected day episodes */}
+      {/* Selected day episodes + movie releases */}
       <div className="mt-5">
-        {selectedDay && selectedDay.episodes.length > 0 ? (
+        {selectedDay &&
+        selectedDay.episodes.length + selectedDay.movies.length > 0 ? (
           <div className="space-y-2">
             {selectedDay.episodes.map((ep) => {
               const still = stillUrl(ep.stillPath, "w300");
@@ -286,6 +309,48 @@ export function CalendarMonth({
                       </span>
                     </div>
                   )}
+                </div>
+              );
+            })}
+            {selectedDay.movies.map((mv) => {
+              const poster = posterUrl(mv.posterPath, "w154");
+              return (
+                <div
+                  key={movieKey(mv)}
+                  className="flex items-center gap-3 rounded-xl bg-[#101011] p-2.5"
+                >
+                  <Link
+                    href={`/movie/${mv.tmdbId}`}
+                    className="relative h-[72px] w-[48px] flex-shrink-0 overflow-hidden rounded-lg bg-[#2c2c2e]"
+                  >
+                    {poster ? (
+                      <Image
+                        src={poster}
+                        alt={mv.title}
+                        fill
+                        sizes="48px"
+                        className="object-cover"
+                        unoptimized
+                      />
+                    ) : null}
+                  </Link>
+                  <Link
+                    href={`/movie/${mv.tmdbId}`}
+                    className="min-w-0 flex-1 py-0.5"
+                  >
+                    <div className="mb-1.5 inline-flex max-w-full items-center gap-0.5 rounded-full border border-primary/70 px-2.5 py-[3px]">
+                      <Clapperboard className="h-3 w-3 flex-shrink-0 text-primary" />
+                      <span className="truncate text-[11px] font-bold uppercase tracking-wide text-primary">
+                        Movie
+                      </span>
+                    </div>
+                    <p className="truncate text-[15px] font-bold leading-tight text-white">
+                      {mv.title}
+                    </p>
+                    <p className="text-[13px] leading-tight text-muted-foreground">
+                      {mv.releaseDate}
+                    </p>
+                  </Link>
                 </div>
               );
             })}

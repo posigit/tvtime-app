@@ -1,11 +1,15 @@
 import { requireAuth } from "@/lib/auth";
-import { loadFollowedEpisodeData } from "@/lib/calendar-data";
+import {
+  loadFollowedEpisodeData,
+  loadUnreleasedMovies,
+} from "@/lib/calendar-data";
 import { isEpisodeAired } from "@/lib/show-progress";
 import { appTodayYmd, daysUntilYmd, toYmd, ymdAddDays } from "@/lib/app-time";
 import {
   CalendarMonth,
   type CalendarDay,
   type CalendarEpisode,
+  type CalendarMovie,
 } from "@/components/calendar-month";
 import Link from "next/link";
 import { ChevronLeft, CalendarDays } from "lucide-react";
@@ -36,10 +40,15 @@ function monthLabel(key: string): string {
 export default async function CalendarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ month?: string }>;
+  searchParams: Promise<{ month?: string; back?: string }>;
 }) {
-  const { month } = await searchParams;
+  const { month, back } = await searchParams;
   const userId = await requireAuth();
+  // Back target allowlist: internal tab paths only (default Shows).
+  const backHref =
+    back && /^(\/(shows|movies|explore|profile|library)(\/|$))/.test(back)
+      ? back
+      : "/shows";
 
   const today = appTodayYmd();
   const currentKey = monthKey(today);
@@ -52,6 +61,7 @@ export default async function CalendarPage({
 
   const { following, episodesByShow, watchedByShow } =
     await loadFollowedEpisodeData(userId);
+  const unreleasedMovies = await loadUnreleasedMovies(userId);
 
   // Episodes landing inside this month (watched history included)
   const byDay = new Map<string, CalendarEpisode[]>();
@@ -83,6 +93,14 @@ export default async function CalendarPage({
   // 6-row grid starting on the Sunday of the week containing the 1st
   const firstDow = new Date(Date.UTC(y, m - 1, 1, 12)).getUTCDay(); // 0 = Sun
   const gridStart = ymdAddDays(monthStart, -firstDow);
+  // Movie releases landing in the visible grid (watchlist only).
+  const moviesByDay = new Map<string, CalendarMovie[]>();
+  for (const mv of unreleasedMovies) {
+    if (mv.releaseDate < gridStart || mv.releaseDate > ymdAddDays(gridStart, 41)) continue;
+    const arr = moviesByDay.get(mv.releaseDate);
+    if (arr) arr.push(mv);
+    else moviesByDay.set(mv.releaseDate, [mv]);
+  }
   const days: CalendarDay[] = [];
   for (let i = 0; i < 42; i++) {
     const date = ymdAddDays(gridStart, i);
@@ -93,6 +111,9 @@ export default async function CalendarPage({
       episodes: (byDay.get(date) ?? []).sort((a, b) =>
         a.showTitle.localeCompare(b.showTitle)
       ),
+      movies: (moviesByDay.get(date) ?? []).sort((a, b) =>
+        a.title.localeCompare(b.title)
+      ),
     });
   }
 
@@ -101,8 +122,8 @@ export default async function CalendarPage({
       <div className="sticky top-0 z-40 -mx-4 bg-black/85 px-4 pb-2 pt-safe-float backdrop-blur">
         <div className="flex items-center justify-between">
           <Link
-            href="/shows"
-            aria-label="Back to shows"
+            href={backHref}
+            aria-label="Back"
             className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.06] text-white"
           >
             <ChevronLeft className="h-5 w-5" />
@@ -120,8 +141,8 @@ export default async function CalendarPage({
           monthLabel={monthLabel(key)}
           days={days}
           today={today}
-          prevHref={`/calendar?month=${shiftMonth(key, -1)}`}
-          nextHref={`/calendar?month=${shiftMonth(key, 1)}`}
+          prevHref={`/calendar?month=${shiftMonth(key, -1)}&back=${encodeURIComponent(backHref)}`}
+          nextHref={`/calendar?month=${shiftMonth(key, 1)}&back=${encodeURIComponent(backHref)}`}
         />
       </div>
     </div>

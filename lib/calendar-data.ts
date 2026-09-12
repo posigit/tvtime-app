@@ -5,8 +5,8 @@
  */
 
 import { db, withDbRetry, mapPool } from "./db";
-import { shows, userShows, watchedEpisodes, episodes } from "./schema";
-import { eq, and, inArray } from "drizzle-orm";
+import { movies, shows, userMovies, userShows, watchedEpisodes, episodes } from "./schema";
+import { eq, and, inArray, or } from "drizzle-orm";
 import {
   makeWatchedKey,
   type EpisodeInfo,
@@ -127,4 +127,51 @@ export async function loadFollowedEpisodeData(
   }
 
   return { following, episodesByShow, watchedByShow };
+}
+
+export type UnreleasedMovie = {
+  tmdbId: number;
+  title: string;
+  posterPath: string | null;
+  releaseDate: string;
+};
+
+/**
+ * Unreleased watchlist movies (want_to_watch / for_later) for the calendar.
+ * Undated rows excluded — they live in Watch Next/Later, not on a day.
+ */
+export async function loadUnreleasedMovies(
+  userId: string
+): Promise<UnreleasedMovie[]> {
+  const rows = await withDbRetry(() =>
+    db
+      .select({
+        tmdbId: movies.tmdbId,
+        title: movies.title,
+        posterPath: movies.posterPath,
+        releaseDate: movies.releaseDate,
+      })
+      .from(userMovies)
+      .innerJoin(movies, eq(userMovies.tmdbId, movies.tmdbId))
+      .where(
+        and(
+          eq(userMovies.userId, userId),
+          or(
+            eq(userMovies.status, "want_to_watch"),
+            eq(userMovies.status, "for_later")
+          )
+        )
+      )
+  );
+  return rows
+    .filter(
+      (r): r is typeof r & { releaseDate: string } =>
+        typeof r.releaseDate === "string" && /^\d{4}-\d{2}-\d{2}/.test(r.releaseDate)
+    )
+    .map((r) => ({
+      tmdbId: r.tmdbId,
+      title: r.title,
+      posterPath: r.posterPath,
+      releaseDate: r.releaseDate.slice(0, 10),
+    }));
 }
