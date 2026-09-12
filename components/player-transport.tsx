@@ -108,11 +108,14 @@ export function PlayerTransport({
           .filter((m) => m.width > 0)
       : [];
   // Exact Up Next fire point: outro start when known, else the 96% fallback.
-  // (Was implicit before — the outro block covered it only when data exists.)
+  // The two look different on purpose: a dim tick means "no outro data —
+  // 96% fallback", so nobody mistakes the fallback for real timestamps.
+  const outroValid =
+    segments?.outro != null && segments.outro.end > segments.outro.start;
   const upNextAt =
     safeDur > 0
-      ? segments?.outro && segments.outro.end > segments.outro.start
-        ? Math.max(0, Math.min(1, segments.outro.start / safeDur))
+      ? outroValid
+        ? Math.max(0, Math.min(1, segments!.outro!.start / safeDur))
         : NEXT_FAB_RATIO
       : null;
   // UA-based. iOS Safari ignores HTMLMediaElement.volume — mute only.
@@ -233,8 +236,12 @@ export function PlayerTransport({
               ))}
               {upNextAt != null && (
                 <div
-                  title="Up Next"
-                  className="absolute inset-y-0 w-0.5 bg-white"
+                  title={
+                    outroValid
+                      ? `Up Next (outro ${formatPlayerClock(segments!.outro!.start)})`
+                      : "Up Next (96% fallback — no outro data)"
+                  }
+                  className={`absolute inset-y-0 w-0.5 ${outroValid ? "bg-white" : "bg-white/40"}`}
                   style={{ left: `calc(${upNextAt * 100}% - 1px)` }}
                 />
               )}
