@@ -25,8 +25,9 @@ import { posterUrl, backdropUrl } from "@/lib/tmdb";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronRight, Flame, Heart, Plus } from "lucide-react";
+import { ChevronRight, Flame, Heart } from "lucide-react";
 import { ProfileMenu } from "@/components/profile-menu";
+import { ListCreateForm } from "@/components/list-create-form";
 import { NotificationToggle } from "@/components/notification-toggle";
 import { UserAvatar } from "@/components/user-avatar";
 import { ProfileHeatmap } from "@/components/profile-heatmap";
@@ -1117,7 +1118,15 @@ export default async function ProfilePage() {
   );
 
   // Resolve up to 4 poster previews per list so the Lists section isn't blank text.
-  type ListItemRef = { tmdbId?: number; type?: string };
+  // New shapes carry their own posterPath (used first); legacy refs fall back
+  // to the library tables.
+  type ListItemRef = {
+    tmdbId?: number;
+    type?: string;
+    mediaType?: string;
+    posterPath?: string | null;
+  };
+  const storedPosterByKey = new Map<string, string>();
   const listPreviewIds = {
     movie: new Set<number>(),
     tv: new Set<number>(),
@@ -1126,6 +1135,11 @@ export default async function ProfilePage() {
     const items = (Array.isArray(list.items) ? list.items : []) as ListItemRef[];
     for (const item of items.slice(0, 4)) {
       if (!Number.isFinite(item?.tmdbId)) continue;
+      if (typeof item.posterPath === "string" && item.posterPath) {
+        const mt = item.mediaType === "movie" ? "movie" : "tv";
+        storedPosterByKey.set(`${mt}:${item.tmdbId}`, item.posterPath);
+        continue;
+      }
       if (item.type === "movie" || list.type === "favorite_movies") {
         listPreviewIds.movie.add(item.tmdbId!);
       } else {
@@ -1166,9 +1180,10 @@ export default async function ProfilePage() {
     listShowPosters.map((s) => [s.tmdbId, s.posterPath])
   );
 
-  const listHref = (type: string) => {
+  const listHref = (type: string, id: string) => {
     if (type === "favorite_movies") return "/profile/list/favorite-movies";
     if (type === "favorite_shows") return "/profile/list/favorite-shows";
+    if (type === "custom") return `/profile/list/custom/${id}`;
     return null;
   };
 
@@ -1178,17 +1193,22 @@ export default async function ProfilePage() {
       const id = Number(item?.tmdbId);
       if (!Number.isFinite(id)) return null;
       const isMovie =
-        item.type === "movie" || list.type === "favorite_movies";
-      return isMovie
-        ? (posterByMovie.get(id) ?? null)
-        : (posterByShow.get(id) ?? null);
+        item.mediaType === "movie" ||
+        item.type === "movie" ||
+        list.type === "favorite_movies";
+      const mt = isMovie ? "movie" : "tv";
+      return (
+        storedPosterByKey.get(`${mt}:${id}`) ??
+        (isMovie ? posterByMovie.get(id) : posterByShow.get(id)) ??
+        null
+      );
     });
     return {
       id: list.id,
       name: list.name,
       type: list.type,
       count: items.length,
-      href: listHref(list.type),
+      href: listHref(list.type, list.id),
       previews,
     };
   });
@@ -1412,16 +1432,10 @@ export default async function ProfilePage() {
                   </div>
                 );
               })}
+              <ListCreateForm compact />
             </div>
           ) : (
-            <div className="flex min-h-[120px] items-center justify-center rounded-xl bg-card">
-              <div className="flex flex-col items-center gap-2 text-white">
-                <Plus className="h-7 w-7" strokeWidth={2.5} />
-                <span className="text-xs font-bold uppercase tracking-wide">
-                  Create a new list
-                </span>
-              </div>
-            </div>
+            <ListCreateForm />
           )}
         </section>
 

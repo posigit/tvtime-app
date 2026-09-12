@@ -22,6 +22,7 @@ import { UpNextCard } from "@/components/up-next-card";
 import { EndOfLineCard } from "@/components/end-of-line-card";
 import { NextEpisodeFab } from "@/components/next-episode-fab";
 import { FavoriteButton } from "@/components/favorite-button";
+import { AddToListButton } from "@/components/add-to-list-button";
 import { vixTvUrl } from "@/lib/vixsrc";
 import { loadVixSettings } from "@/lib/vix-settings";
 import { TmdbIcon } from "@/components/rt-icons";
@@ -714,6 +715,12 @@ export function ShowDetailClient({
         </button>
         <div className="absolute right-4 top-safe-float">
           <div className="flex items-center gap-2">
+            <AddToListButton
+              mediaType="show"
+              tmdbId={show.tmdbId}
+              title={show.title}
+              posterPath={show.posterPath}
+            />
             {hasWatchedEpisodes && (
               <FavoriteButton
                 mediaType="tv"

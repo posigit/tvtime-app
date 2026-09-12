@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import { MovieWatchButton } from "@/components/movie-watch-button";
 import { FavoriteButton } from "@/components/favorite-button";
+import { AddToListButton } from "@/components/add-to-list-button";
 import { MovieRewatchButton } from "@/components/movie-rewatch-button";
 import { MovieDiaryLine } from "@/components/movie-diary-line";
 // import { ReactionPicker } from "@/components/reaction-picker"; // hidden for now
@@ -406,13 +407,29 @@ export default async function MovieDetailPage({
               <ChevronLeft className="h-5 w-5" />
             </Link>
             {isWatched ? (
-              <FavoriteButton
-                mediaType="movie"
-                tmdbId={tmdbId}
-                initialFavorite={userMovie?.favorite ?? false}
-              />
+              <div className="flex items-center gap-2">
+                <AddToListButton
+                  mediaType="movie"
+                  tmdbId={tmdbId}
+                  title={movie.title}
+                  posterPath={movie.posterPath}
+                />
+                <FavoriteButton
+                  mediaType="movie"
+                  tmdbId={tmdbId}
+                  initialFavorite={userMovie?.favorite ?? false}
+                />
+              </div>
             ) : (
-              <span className="h-10 w-10" aria-hidden />
+              <div className="flex items-center gap-2">
+                <AddToListButton
+                  mediaType="movie"
+                  tmdbId={tmdbId}
+                  title={movie.title}
+                  posterPath={movie.posterPath}
+                />
+                <span className="h-10 w-10" aria-hidden />
+              </div>
             )}
           </div>
         </div>
