@@ -1029,26 +1029,36 @@ export function VixPlayer({
   }, [mode, playlistUrl]);
 
   // Rebuffer spinner: mid-playback waiting/stalled/seek stalls (the initial
-  // load already has its own pill). Cleared on play/canplay/seek landing.
+  // load already has its own pill). Cleared on play/playing/canplay/seek
+  // landing — plus a timeupdate failsafe: iOS Safari doesn't reliably
+  // re-fire playing/canplay after stall recovery on SW-served offline HLS,
+  // but an advancing currentTime is proof frames are moving.
   useEffect(() => {
     if (mode !== "native") return;
     const v = videoRef.current;
     if (!v) return;
     const onStall = () => setBuffering(true);
     const onGo = () => setBuffering(false);
+    const onTime = () => {
+      if (!v.paused && !v.seeking) setBuffering(false);
+    };
     v.addEventListener("waiting", onStall);
     v.addEventListener("stalled", onStall);
     v.addEventListener("seeking", onStall);
+    v.addEventListener("play", onGo);
     v.addEventListener("playing", onGo);
     v.addEventListener("canplay", onGo);
     v.addEventListener("seeked", onGo);
+    v.addEventListener("timeupdate", onTime);
     return () => {
       v.removeEventListener("waiting", onStall);
       v.removeEventListener("stalled", onStall);
       v.removeEventListener("seeking", onStall);
+      v.removeEventListener("play", onGo);
       v.removeEventListener("playing", onGo);
       v.removeEventListener("canplay", onGo);
       v.removeEventListener("seeked", onGo);
+      v.removeEventListener("timeupdate", onTime);
       setBuffering(false);
     };
   }, [mode, playlistUrl]);
