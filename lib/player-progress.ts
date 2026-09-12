@@ -44,6 +44,22 @@ export function isFinishedPosition(
   return pos >= dur * endRatio;
 }
 
+/**
+ * End-of-content trigger. A known outro start is authoritative (Up Next +
+ * watched-marking fire there); the 92% ratio is fallback ONLY for titles
+ * without outro data (and movies) — it never races the real timestamp.
+ * The outro path needs no duration (time alone suffices); the ratio does.
+ */
+export function shouldFireEnded(
+  pos: number,
+  dur: number,
+  outroStart: number | null | undefined
+): boolean {
+  if (!Number.isFinite(pos) || pos < 0) return false;
+  if (outroStart != null && outroStart > 0) return pos >= outroStart;
+  return isFinishedPosition(pos, dur);
+}
+
 /** True once host near-end UI (sticky Next) may fire. */
 export function isNearEndPosition(
   pos: number,

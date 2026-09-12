@@ -42,14 +42,15 @@ import {
   NEXT_FAB_RATIO,
   RESUME_MIN_SECONDS,
 } from "@/lib/player-constants";
-import {
-  addStartAt,
-  isFinishedPosition,
-  isNearEndPosition,
-  isPreSeekNoise,
-  isResumablePosition,
-  makePlaybackKey,
-} from "@/lib/player-progress";
+  import {
+    addStartAt,
+    isFinishedPosition,
+    isNearEndPosition,
+    isPreSeekNoise,
+    isResumablePosition,
+    makePlaybackKey,
+    shouldFireEnded,
+  } from "@/lib/player-progress";
 import {
   createClearPosition,
   createSavePosition,
@@ -1541,18 +1542,19 @@ export function VixPlayer({
       const dur = Number.isFinite(video.duration) ? video.duration : 0;
       const t = video.currentTime;
 
-      // Real outro start (IntroDB) beats the 96% heuristic; 96% below stays
-      // as the fallback when there is no outro data.
-      const outroNative = segmentsRef.current.outro;
-      if (!nearEndFiredRef.current && outroNative && dur > 0 && t >= outroNative.start) {
+      // End-of-content: a known outro start is authoritative (card + watched
+      // marking fire there); 96%/92% are fallback ONLY without outro data.
+      const outroStartNative = segmentsRef.current.outro?.start ?? null;
+      if (
+        !nearEndFiredRef.current &&
+        (outroStartNative != null
+          ? t >= outroStartNative
+          : isNearEndPosition(t, dur, NEXT_FAB_RATIO))
+      ) {
         nearEndFiredRef.current = true;
         onNearEndRef.current?.();
       }
-      if (!nearEndFiredRef.current && isNearEndPosition(t, dur, NEXT_FAB_RATIO)) {
-        nearEndFiredRef.current = true;
-        onNearEndRef.current?.();
-      }
-      if (!endedRef.current && isFinishedPosition(t, dur)) {
+      if (!endedRef.current && shouldFireEnded(t, dur, outroStartNative)) {
         emit("ended");
         clearPosition();
       }
@@ -2058,39 +2060,33 @@ export function VixPlayer({
         return;
       }
 
-      // Real outro start (IntroDB) beats the 96% heuristic; 96% below stays
-      // as the fallback when there is no outro data.
-      const outroEmbed = segmentsRef.current.outro;
+      // End-of-content: a known outro start is authoritative (card + watched
+      // marking fire there); 96%/92% are fallback ONLY without outro data.
+      const outroStartEmbed = segmentsRef.current.outro?.start ?? null;
       if (
         !nearEndFiredRef.current &&
-        outroEmbed &&
-        remoteDurationRef.current > 0 &&
-        remotePositionRef.current >= outroEmbed.start
-      ) {
-        nearEndFiredRef.current = true;
-        onNearEndRef.current?.();
-      }
-      if (
-        !nearEndFiredRef.current &&
-        isNearEndPosition(
-          remotePositionRef.current,
-          remoteDurationRef.current,
-          NEXT_FAB_RATIO
-        )
+        (outroStartEmbed != null
+          ? remotePositionRef.current >= outroStartEmbed
+          : isNearEndPosition(
+              remotePositionRef.current,
+              remoteDurationRef.current,
+              NEXT_FAB_RATIO
+            ))
       ) {
         nearEndFiredRef.current = true;
         onNearEndRef.current?.();
       }
 
-      // Auto-complete once the embed crosses ~92% (same rationale as the
-      // native path — a vixsrc iframe can stall/drift before firing its own
-      // "ended", leaving an otherwise-finished watch unmarked). emit("ended")
-      // is idempotent, so the dedup guard prevents duplicate marks.
+      // Auto-complete at the outro start when known, else ~92% (a vixsrc
+      // iframe can stall/drift before firing its own "ended", leaving an
+      // otherwise-finished watch unmarked). emit("ended") is idempotent, so
+      // the dedup guard prevents duplicate marks.
       if (
         !endedRef.current &&
-        isFinishedPosition(
+        shouldFireEnded(
           remotePositionRef.current,
-          remoteDurationRef.current
+          remoteDurationRef.current,
+          outroStartEmbed
         )
       ) {
         emit("ended");

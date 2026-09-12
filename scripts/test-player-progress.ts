@@ -10,6 +10,7 @@ import {
   isNearEndPosition,
   isPreSeekNoise,
   isResumablePosition,
+  shouldFireEnded,
   shouldSaveProgress,
 } from "../lib/player-progress";
 import {
@@ -36,6 +37,16 @@ assert.equal(isFinishedPosition(92, 0), false);
 
 assert.equal(isNearEndPosition(95.9, 100, NEXT_FAB_RATIO), false);
 assert.equal(isNearEndPosition(96, 100, NEXT_FAB_RATIO), true);
+
+// Outro start is authoritative; 92% is fallback only (never racing).
+assert.equal(shouldFireEnded(3431, 3500, 3431), true);
+assert.equal(shouldFireEnded(3430, 3500, 3431), false);
+assert.equal(shouldFireEnded(3400, 3500, null), true);
+assert.equal(shouldFireEnded(3000, 3500, null), false);
+assert.equal(shouldFireEnded(3400, 3500, undefined), true);
+assert.equal(shouldFireEnded(3400, 0, null), false);
+assert.equal(shouldFireEnded(3431, 0, 3431), true);
+assert.equal(shouldFireEnded(100, 3500, -5), false);
 
 assert.equal(
   shouldSaveProgress({
