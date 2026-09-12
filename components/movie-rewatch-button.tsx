@@ -86,29 +86,24 @@ export function MovieRewatchButton({
         className={cn(
           "flex h-9 flex-shrink-0 items-center gap-1.5 rounded-full px-3 ring-1 backdrop-blur-xl transition-all active:scale-95 disabled:opacity-50",
           queued
-            ? "bg-gradient-to-b from-white/25 via-white/[0.12] to-white/[0.06] text-white ring-white/45 shadow-[0_8px_24px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.45)]"
-            : "bg-white/[0.1] text-white ring-white/25 shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.25)] hover:bg-white/20"
+            ? "bg-primary/[0.14] text-primary ring-primary/40 shadow-[0_8px_24px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.15)]"
+            : "bg-white/[0.12] text-white ring-white/30 shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.25)] hover:bg-white/20"
         )}
       >
         {queued ? (
-          <Check
-            className="h-4 w-4 text-primary drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]"
-            strokeWidth={3.5}
-          />
+          <Check className="h-4 w-4" strokeWidth={3} />
         ) : (
-          <RotateCcw className="h-4 w-4" strokeWidth={2.5} />
+          <RotateCcw className="h-4 w-4 text-primary" strokeWidth={2.5} />
         )}
         {count >= 2 ? (
-          <span className="text-xs font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+          <span className="text-xs font-black text-primary drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
             ×{count}
           </span>
         ) : (
           <span
             className={cn(
               "text-xs font-bold",
-              queued
-                ? "text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]"
-                : "text-white/60"
+              queued ? "text-primary" : "text-white"
             )}
           >
             {queued ? "Queued" : "Rewatch"}
