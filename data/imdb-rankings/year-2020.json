@@ -1,0 +1,1607 @@
+{
+ "tag": "year-2020",
+ "mean": 6.181,
+ "minVotes": 10000,
+ "items": [
+  {
+   "tconst": "tt10189514",
+   "title": "Soorarai Pottru",
+   "year": 2020,
+   "rating": 8.6,
+   "votes": 132944,
+   "score": 8.43074735005561
+  },
+  {
+   "tconst": "tt11989890",
+   "title": "David Attenborough: A Life on Our Planet",
+   "year": 2020,
+   "rating": 8.9,
+   "votes": 36407,
+   "score": 8.314018342197281
+  },
+  {
+   "tconst": "tt8503618",
+   "title": "Hamilton",
+   "year": 2020,
+   "rating": 8.3,
+   "votes": 142788,
+   "score": 8.161287203225053
+  },
+  {
+   "tconst": "tt8110330",
+   "title": "Dil Bechara",
+   "year": 2020,
+   "rating": 8.3,
+   "votes": 138598,
+   "score": 8.15737593511588
+  },
+  {
+   "tconst": "tt10272386",
+   "title": "The Father",
+   "year": 2020,
+   "rating": 8.2,
+   "votes": 249762,
+   "score": 8.12226095120283
+  },
+  {
+   "tconst": "tt11032374",
+   "title": "Demon Slayer: Kimetsu no Yaiba - The Movie: Mugen Train",
+   "year": 2020,
+   "rating": 8.2,
+   "votes": 103309,
+   "score": 8.021782463937985
+  },
+  {
+   "tconst": "tt2948372",
+   "title": "Soul",
+   "year": 2020,
+   "rating": 8,
+   "votes": 457878,
+   "score": 7.961114540983652
+  },
+  {
+   "tconst": "tt12888462",
+   "title": "My Octopus Teacher",
+   "year": 2020,
+   "rating": 8.1,
+   "votes": 72620,
+   "score": 7.867687596300523
+  },
+  {
+   "tconst": "tt14888874",
+   "title": "Demon Slayer: Kimetsu no Yaiba - Mt. Natagumo Arc",
+   "year": 2020,
+   "rating": 8.7,
+   "votes": 18966,
+   "score": 7.830233694895714
+  },
+  {
+   "tconst": "tt10554232",
+   "title": "Dara of Jasenovac",
+   "year": 2020,
+   "rating": 8,
+   "votes": 82465,
+   "score": 7.803237432610709
+  },
+  {
+   "tconst": "tt5198068",
+   "title": "Wolfwalkers",
+   "year": 2020,
+   "rating": 8,
+   "votes": 46155,
+   "score": 7.676010136343144
+  },
+  {
+   "tconst": "tt8633462",
+   "title": "Quo Vadis, Aida?",
+   "year": 2020,
+   "rating": 8,
+   "votes": 42405,
+   "score": 7.652826051070495
+  },
+  {
+   "tconst": "tt10288566",
+   "title": "Another Round",
+   "year": 2020,
+   "rating": 7.7,
+   "votes": 230791,
+   "score": 7.636901085199818
+  },
+  {
+   "tconst": "tt1070874",
+   "title": "The Trial of the Chicago 7",
+   "year": 2020,
+   "rating": 7.7,
+   "votes": 207212,
+   "score": 7.630051512836994
+  },
+  {
+   "tconst": "tt11464826",
+   "title": "The Social Dilemma",
+   "year": 2020,
+   "rating": 7.6,
+   "votes": 95121,
+   "score": 7.464977970209085
+  },
+  {
+   "tconst": "tt8652818",
+   "title": "Violet Evergarden: The Movie",
+   "year": 2020,
+   "rating": 8.3,
+   "votes": 15223,
+   "score": 7.459749007110544
+  },
+  {
+   "tconst": "tt9620292",
+   "title": "Promising Young Woman",
+   "year": 2020,
+   "rating": 7.5,
+   "votes": 259057,
+   "score": 7.450963361690457
+  },
+  {
+   "tconst": "tt11382384",
+   "title": "The Dissident",
+   "year": 2020,
+   "rating": 7.8,
+   "votes": 31088,
+   "score": 7.405878826089107
+  },
+  {
+   "tconst": "tt12415546",
+   "title": "Attack on Titan: Chronicle",
+   "year": 2020,
+   "rating": 8.3,
+   "votes": 13092,
+   "score": 7.382208089656558
+  },
+  {
+   "tconst": "tt11655202",
+   "title": "Riders of Justice",
+   "year": 2020,
+   "rating": 7.5,
+   "votes": 77677,
+   "score": 7.3495198194093
+  },
+  {
+   "tconst": "tt7212754",
+   "title": "Ludo",
+   "year": 2020,
+   "rating": 7.6,
+   "votes": 46528,
+   "score": 7.348909375996837
+  },
+  {
+   "tconst": "tt9484998",
+   "title": "Palm Springs",
+   "year": 2020,
+   "rating": 7.4,
+   "votes": 219078,
+   "score": 7.346770747109497
+  },
+  {
+   "tconst": "tt10633456",
+   "title": "Minari",
+   "year": 2020,
+   "rating": 7.4,
+   "votes": 127434,
+   "score": 7.31127631595056
+  },
+  {
+   "tconst": "tt6723592",
+   "title": "Tenet",
+   "year": 2020,
+   "rating": 7.3,
+   "votes": 710492,
+   "score": 7.284463879135854
+  },
+  {
+   "tconst": "tt9770150",
+   "title": "Nomadland",
+   "year": 2020,
+   "rating": 7.3,
+   "votes": 222041,
+   "score": 7.251760030366828
+  },
+  {
+   "tconst": "tt7146812",
+   "title": "Onward",
+   "year": 2020,
+   "rating": 7.3,
+   "votes": 189279,
+   "score": 7.243829250479726
+  },
+  {
+   "tconst": "tt8108274",
+   "title": "Tanhaji: The Unsung Warrior",
+   "year": 2020,
+   "rating": 7.5,
+   "votes": 38989,
+   "score": 7.23068136125149
+  },
+  {
+   "tconst": "tt11322920",
+   "title": "Ayyappanum Koshiyum",
+   "year": 2020,
+   "rating": 8,
+   "votes": 12692,
+   "score": 7.198235025839469
+  },
+  {
+   "tconst": "tt8332922",
+   "title": "A Quiet Place Part II",
+   "year": 2020,
+   "rating": 7.2,
+   "votes": 329062,
+   "score": 7.169935732126718
+  },
+  {
+   "tconst": "tt11833648",
+   "title": "The Book of Sun",
+   "year": 2020,
+   "rating": 7.9,
+   "votes": 13014,
+   "score": 7.152904719142663
+  },
+  {
+   "tconst": "tt10717738",
+   "title": "Anjaam Pathiraa",
+   "year": 2020,
+   "rating": 7.9,
+   "votes": 12771,
+   "score": 7.144932115688782
+  },
+  {
+   "tconst": "tt6285944",
+   "title": "The Banker",
+   "year": 2020,
+   "rating": 7.3,
+   "votes": 43707,
+   "score": 7.0915792951821786
+  },
+  {
+   "tconst": "tt8368512",
+   "title": "The Courier",
+   "year": 2020,
+   "rating": 7.2,
+   "votes": 82759,
+   "score": 7.090106072794546
+  },
+  {
+   "tconst": "tt1051906",
+   "title": "The Invisible Man",
+   "year": 2020,
+   "rating": 7.1,
+   "votes": 290602,
+   "score": 7.0694158695096805
+  },
+  {
+   "tconst": "tt11388580",
+   "title": "Miss Americana",
+   "year": 2020,
+   "rating": 7.4,
+   "votes": 26815,
+   "score": 7.068785799439067
+  },
+  {
+   "tconst": "tt10515526",
+   "title": "Lootcase",
+   "year": 2020,
+   "rating": 7.5,
+   "votes": 19799,
+   "score": 7.057245182937322
+  },
+  {
+   "tconst": "tt7395114",
+   "title": "The Devil All the Time",
+   "year": 2020,
+   "rating": 7.1,
+   "votes": 173934,
+   "score": 7.050016577719994
+  },
+  {
+   "tconst": "tt12879624",
+   "title": "Josee, the Tiger and the Fish",
+   "year": 2020,
+   "rating": 7.7,
+   "votes": 13056,
+   "score": 7.041010982232357
+  },
+  {
+   "tconst": "tt7772582",
+   "title": "Never Rarely Sometimes Always",
+   "year": 2020,
+   "rating": 7.3,
+   "votes": 29973,
+   "score": 7.019969709712787
+  },
+  {
+   "tconst": "tt9058654",
+   "title": "Dinner in America",
+   "year": 2020,
+   "rating": 7.5,
+   "votes": 17473,
+   "score": 7.019759371249927
+  },
+  {
+   "tconst": "tt9580138",
+   "title": "Mortal Kombat Legends: Scorpion's Revenge",
+   "year": 2020,
+   "rating": 7.4,
+   "votes": 21558,
+   "score": 7.0136114204432864
+  },
+  {
+   "tconst": "tt9686708",
+   "title": "The King of Staten Island",
+   "year": 2020,
+   "rating": 7.1,
+   "votes": 83008,
+   "score": 7.00115204290329
+  },
+  {
+   "tconst": "tt9537292",
+   "title": "Ala Vaikunthapurramuloo",
+   "year": 2020,
+   "rating": 7.3,
+   "votes": 27149,
+   "score": 6.998682311942427
+  },
+  {
+   "tconst": "tt11905462",
+   "title": "Athlete A",
+   "year": 2020,
+   "rating": 7.6,
+   "votes": 13593,
+   "score": 6.998395676952878
+  },
+  {
+   "tconst": "tt12987894",
+   "title": "American Murder: The Family Next Door",
+   "year": 2020,
+   "rating": 7.2,
+   "votes": 38511,
+   "score": 6.989869291631779
+  },
+  {
+   "tconst": "tt11327514",
+   "title": "Uncle Frank",
+   "year": 2020,
+   "rating": 7.3,
+   "votes": 25089,
+   "score": 6.980992596151194
+  },
+  {
+   "tconst": "tt10530176",
+   "title": "The Call",
+   "year": 2020,
+   "rating": 7.1,
+   "votes": 54723,
+   "score": 6.9579538835707435
+  },
+  {
+   "tconst": "tt6048922",
+   "title": "Greyhound",
+   "year": 2020,
+   "rating": 7,
+   "votes": 136685,
+   "score": 6.944141181486514
+  },
+  {
+   "tconst": "tt9738784",
+   "title": "Persian Lessons",
+   "year": 2020,
+   "rating": 7.4,
+   "votes": 15981,
+   "score": 6.930670459426089
+  },
+  {
+   "tconst": "tt6473066",
+   "title": "Clouds",
+   "year": 2020,
+   "rating": 7.5,
+   "votes": 13065,
+   "score": 6.927979588395805
+  },
+  {
+   "tconst": "tt11317142",
+   "title": "Shiva Baby",
+   "year": 2020,
+   "rating": 7.1,
+   "votes": 43072,
+   "score": 6.926770221705405
+  },
+  {
+   "tconst": "tt10521092",
+   "title": "The Forgotten Battle",
+   "year": 2020,
+   "rating": 7.1,
+   "votes": 42227,
+   "score": 6.9239674728847
+  },
+  {
+   "tconst": "tt11490170",
+   "title": "HIT",
+   "year": 2020,
+   "rating": 7.6,
+   "votes": 10976,
+   "score": 6.92333853958568
+  },
+  {
+   "tconst": "tt9179096",
+   "title": "Minamata",
+   "year": 2020,
+   "rating": 7.2,
+   "votes": 25261,
+   "score": 6.910908630111149
+  },
+  {
+   "tconst": "tt10612922",
+   "title": "One Night in Miami...",
+   "year": 2020,
+   "rating": 7.1,
+   "votes": 36248,
+   "score": 6.901209764883871
+  },
+  {
+   "tconst": "tt12567088",
+   "title": "Raat Akeli Hai",
+   "year": 2020,
+   "rating": 7.2,
+   "votes": 23037,
+   "score": 6.891447443967348
+  },
+  {
+   "tconst": "tt11161474",
+   "title": "Pieces of a Woman",
+   "year": 2020,
+   "rating": 7,
+   "votes": 60706,
+   "score": 6.884116612541358
+  },
+  {
+   "tconst": "tt2222042",
+   "title": "Love and Monsters",
+   "year": 2020,
+   "rating": 6.9,
+   "votes": 162113,
+   "score": 6.858203907934608
+  },
+  {
+   "tconst": "tt11394298",
+   "title": "The Mole Agent",
+   "year": 2020,
+   "rating": 7.5,
+   "votes": 10354,
+   "score": 6.851790763798233
+  },
+  {
+   "tconst": "tt8907986",
+   "title": "Angrezi Medium",
+   "year": 2020,
+   "rating": 7.2,
+   "votes": 19237,
+   "score": 6.851344160014682
+  },
+  {
+   "tconst": "tt7363104",
+   "title": "Khuda Haafiz",
+   "year": 2020,
+   "rating": 7.1,
+   "votes": 23026,
+   "score": 6.821623848069679
+  },
+  {
+   "tconst": "tt10514222",
+   "title": "Ma Rainey's Black Bottom",
+   "year": 2020,
+   "rating": 6.9,
+   "votes": 78705,
+   "score": 6.818903660519128
+  },
+  {
+   "tconst": "tt8045906",
+   "title": "Words on Bathroom Walls",
+   "year": 2020,
+   "rating": 7.2,
+   "votes": 15938,
+   "score": 6.806999352546427
+  },
+  {
+   "tconst": "tt2850386",
+   "title": "The Croods: A New Age",
+   "year": 2020,
+   "rating": 6.9,
+   "votes": 62931,
+   "score": 6.8013636067837995
+  },
+  {
+   "tconst": "tt10287954",
+   "title": "Rose Island",
+   "year": 2020,
+   "rating": 7,
+   "votes": 28089,
+   "score": 6.784881441002632
+  },
+  {
+   "tconst": "tt10964430",
+   "title": "Thappad",
+   "year": 2020,
+   "rating": 7,
+   "votes": 28000,
+   "score": 6.784377610693401
+  },
+  {
+   "tconst": "tt9506474",
+   "title": "The Hater",
+   "year": 2020,
+   "rating": 7.1,
+   "votes": 18844,
+   "score": 6.7812629734554575
+  },
+  {
+   "tconst": "tt8936646",
+   "title": "Extraction",
+   "year": 2020,
+   "rating": 6.8,
+   "votes": 294089,
+   "score": 6.779632111672403
+  },
+  {
+   "tconst": "tt9683478",
+   "title": "The Half of It",
+   "year": 2020,
+   "rating": 6.9,
+   "votes": 48060,
+   "score": 6.776099710753518
+  },
+  {
+   "tconst": "tt4016312",
+   "title": "The Book of Vision",
+   "year": 2020,
+   "rating": 7.1,
+   "votes": 18170,
+   "score": 6.773636819536714
+  },
+  {
+   "tconst": "tt6720802",
+   "title": "Trance",
+   "year": 2020,
+   "rating": 7.3,
+   "votes": 10667,
+   "score": 6.758380471589938
+  },
+  {
+   "tconst": "tt10618286",
+   "title": "Mank",
+   "year": 2020,
+   "rating": 6.8,
+   "votes": 105772,
+   "score": 6.746501306070114
+  },
+  {
+   "tconst": "tt10329134",
+   "title": "Your Name Engraved Herein",
+   "year": 2020,
+   "rating": 7.3,
+   "votes": 10208,
+   "score": 6.746078246553307
+  },
+  {
+   "tconst": "tt6878306",
+   "title": "News of the World",
+   "year": 2020,
+   "rating": 6.8,
+   "votes": 102139,
+   "score": 6.7447680932267025
+  },
+  {
+   "tconst": "tt7638348",
+   "title": "Boss Level",
+   "year": 2020,
+   "rating": 6.8,
+   "votes": 91898,
+   "score": 6.739217150546127
+  },
+  {
+   "tconst": "tt14500584",
+   "title": "Beyond the Infinite Two Minutes",
+   "year": 2020,
+   "rating": 7.2,
+   "votes": 11384,
+   "score": 6.723304770218352
+  },
+  {
+   "tconst": "tt8980602",
+   "title": "The Kid Detective",
+   "year": 2020,
+   "rating": 6.9,
+   "votes": 27168,
+   "score": 6.70645580085959
+  },
+  {
+   "tconst": "tt5797184",
+   "title": "Escape from Pretoria",
+   "year": 2020,
+   "rating": 6.8,
+   "votes": 50915,
+   "score": 6.698323060105872
+  },
+  {
+   "tconst": "tt10948718",
+   "title": "The Heist of the Century",
+   "year": 2020,
+   "rating": 7.1,
+   "votes": 12585,
+   "score": 6.69293111385208
+  },
+  {
+   "tconst": "tt7846844",
+   "title": "Enola Holmes",
+   "year": 2020,
+   "rating": 6.7,
+   "votes": 255355,
+   "score": 6.680427537473759
+  },
+  {
+   "tconst": "tt5144174",
+   "title": "The Dry",
+   "year": 2020,
+   "rating": 6.8,
+   "votes": 41641,
+   "score": 6.68006330641059
+  },
+  {
+   "tconst": "tt7556122",
+   "title": "The Old Guard",
+   "year": 2020,
+   "rating": 6.7,
+   "votes": 212828,
+   "score": 6.676692108740146
+  },
+  {
+   "tconst": "tt6841122",
+   "title": "Summerland",
+   "year": 2020,
+   "rating": 7.1,
+   "votes": 10892,
+   "score": 6.659943959714209
+  },
+  {
+   "tconst": "tt8633478",
+   "title": "Run",
+   "year": 2020,
+   "rating": 6.7,
+   "votes": 115361,
+   "score": 6.658570442213681
+  },
+  {
+   "tconst": "tt9214832",
+   "title": "Emma.",
+   "year": 2020,
+   "rating": 6.7,
+   "votes": 73222,
+   "score": 6.6375928144763305
+  },
+  {
+   "tconst": "tt7504726",
+   "title": "The Call of the Wild",
+   "year": 2020,
+   "rating": 6.7,
+   "votes": 65098,
+   "score": 6.630841689610232
+  },
+  {
+   "tconst": "tt10457128",
+   "title": "Summer of 85",
+   "year": 2020,
+   "rating": 6.9,
+   "votes": 16637,
+   "score": 6.6299376508746946
+  },
+  {
+   "tconst": "tt11204094",
+   "title": "The Duke",
+   "year": 2020,
+   "rating": 6.9,
+   "votes": 16474,
+   "score": 6.628274881255166
+  },
+  {
+   "tconst": "tt6772802",
+   "title": "Hillbilly Elegy",
+   "year": 2020,
+   "rating": 6.7,
+   "votes": 61922,
+   "score": 6.627787731241474
+  },
+  {
+   "tconst": "tt10375470",
+   "title": "Supernova",
+   "year": 2020,
+   "rating": 6.9,
+   "votes": 16257,
+   "score": 6.626029219116777
+  },
+  {
+   "tconst": "tt11651796",
+   "title": "AK vs AK",
+   "year": 2020,
+   "rating": 6.9,
+   "votes": 15986,
+   "score": 6.623172062123807
+  },
+  {
+   "tconst": "tt8544498",
+   "title": "The Way Back",
+   "year": 2020,
+   "rating": 6.7,
+   "votes": 57395,
+   "score": 6.6229371497343905
+  },
+  {
+   "tconst": "tt10404944",
+   "title": "The Stronghold",
+   "year": 2020,
+   "rating": 6.9,
+   "votes": 15886,
+   "score": 6.622102650326402
+  },
+  {
+   "tconst": "tt8009744",
+   "title": "Worth",
+   "year": 2020,
+   "rating": 6.8,
+   "votes": 21038,
+   "score": 6.600449423492146
+  },
+  {
+   "tconst": "tt9340860",
+   "title": "Let Him Go",
+   "year": 2020,
+   "rating": 6.7,
+   "votes": 41714,
+   "score": 6.599569733657216
+  },
+  {
+   "tconst": "tt10199914",
+   "title": "The Boys in the Band",
+   "year": 2020,
+   "rating": 6.8,
+   "votes": 19695,
+   "score": 6.591424455509319
+  },
+  {
+   "tconst": "tt13143964",
+   "title": "Borat Subsequent Moviefilm",
+   "year": 2020,
+   "rating": 6.6,
+   "votes": 166908,
+   "score": 6.5762947362829784
+  },
+  {
+   "tconst": "tt8244784",
+   "title": "The Hunt",
+   "year": 2020,
+   "rating": 6.6,
+   "votes": 158403,
+   "score": 6.575097529179107
+  },
+  {
+   "tconst": "tt10627584",
+   "title": "The Life Ahead",
+   "year": 2020,
+   "rating": 6.8,
+   "votes": 16587,
+   "score": 6.567042133612263
+  },
+  {
+   "tconst": "tt8747450",
+   "title": "Chaman Bahaar",
+   "year": 2020,
+   "rating": 6.9,
+   "votes": 11340,
+   "score": 6.562902961872036
+  },
+  {
+   "tconst": "tt10451852",
+   "title": "Nine Days",
+   "year": 2020,
+   "rating": 6.8,
+   "votes": 13958,
+   "score": 6.541478804839688
+  },
+  {
+   "tconst": "tt6317656",
+   "title": "Penguin Bloom",
+   "year": 2020,
+   "rating": 6.8,
+   "votes": 13822,
+   "score": 6.540002905144371
+  },
+  {
+   "tconst": "tt8522006",
+   "title": "Happiest Season",
+   "year": 2020,
+   "rating": 6.6,
+   "votes": 53731,
+   "score": 6.53419763076602
+  },
+  {
+   "tconst": "tt3907584",
+   "title": "All the Bright Places",
+   "year": 2020,
+   "rating": 6.6,
+   "votes": 45870,
+   "score": 6.524939130237144
+  },
+  {
+   "tconst": "tt11958344",
+   "title": "A Whisker Away",
+   "year": 2020,
+   "rating": 6.7,
+   "votes": 18663,
+   "score": 6.518802958739463
+  },
+  {
+   "tconst": "tt12792418",
+   "title": "Night in Paradise",
+   "year": 2020,
+   "rating": 6.8,
+   "votes": 11064,
+   "score": 6.50596036870249
+  },
+  {
+   "tconst": "tt11385128",
+   "title": "V",
+   "year": 2020,
+   "rating": 6.8,
+   "votes": 10167,
+   "score": 6.492881896481839
+  },
+  {
+   "tconst": "tt1502397",
+   "title": "Bad Boys for Life",
+   "year": 2020,
+   "rating": 6.5,
+   "votes": 199608,
+   "score": 6.4847636979807515
+  },
+  {
+   "tconst": "tt3794354",
+   "title": "Sonic the Hedgehog",
+   "year": 2020,
+   "rating": 6.5,
+   "votes": 196522,
+   "score": 6.484536026216816
+  },
+  {
+   "tconst": "tt7939766",
+   "title": "I'm Thinking of Ending Things",
+   "year": 2020,
+   "rating": 6.5,
+   "votes": 112133,
+   "score": 6.473851041130155
+  },
+  {
+   "tconst": "tt8580274",
+   "title": "Eurovision Song Contest: The Story of Fire Saga",
+   "year": 2020,
+   "rating": 6.5,
+   "votes": 110642,
+   "score": 6.473527869285566
+  },
+  {
+   "tconst": "tt8983164",
+   "title": "Chhalaang",
+   "year": 2020,
+   "rating": 6.6,
+   "votes": 20585,
+   "score": 6.462885375391506
+  },
+  {
+   "tconst": "tt4411584",
+   "title": "The Secret: Dare to Dream",
+   "year": 2020,
+   "rating": 6.6,
+   "votes": 20482,
+   "score": 6.462422059128312
+  },
+  {
+   "tconst": "tt9777644",
+   "title": "Da 5 Bloods",
+   "year": 2020,
+   "rating": 6.5,
+   "votes": 57943,
+   "score": 6.452995146024598
+  },
+  {
+   "tconst": "tt5918982",
+   "title": "Possessor",
+   "year": 2020,
+   "rating": 6.5,
+   "votes": 55058,
+   "score": 6.450910713614762
+  },
+  {
+   "tconst": "tt12749596",
+   "title": "Host",
+   "year": 2020,
+   "rating": 6.5,
+   "votes": 52571,
+   "score": 6.448959569230941
+  },
+  {
+   "tconst": "tt12393526",
+   "title": "Bulbbul",
+   "year": 2020,
+   "rating": 6.6,
+   "votes": 16913,
+   "score": 6.444177505530755
+  },
+  {
+   "tconst": "tt10344522",
+   "title": "Four Good Days",
+   "year": 2020,
+   "rating": 6.6,
+   "votes": 16264,
+   "score": 6.440327033443086
+  },
+  {
+   "tconst": "tt3661394",
+   "title": "The One and Only Ivan",
+   "year": 2020,
+   "rating": 6.6,
+   "votes": 14309,
+   "score": 6.427485672234532
+  },
+  {
+   "tconst": "tt9772374",
+   "title": "Bloody Hell",
+   "year": 2020,
+   "rating": 6.6,
+   "votes": 12730,
+   "score": 6.415501504898778
+  },
+  {
+   "tconst": "tt7983894",
+   "title": "Ammonite",
+   "year": 2020,
+   "rating": 6.5,
+   "votes": 27189,
+   "score": 6.414123778707393
+  },
+  {
+   "tconst": "tt11617052",
+   "title": "Undine",
+   "year": 2020,
+   "rating": 6.6,
+   "votes": 10788,
+   "score": 6.398265788260017
+  },
+  {
+   "tconst": "tt6914122",
+   "title": "Resistance",
+   "year": 2020,
+   "rating": 6.6,
+   "votes": 10262,
+   "score": 6.393028783256797
+  },
+  {
+   "tconst": "tt5774062",
+   "title": "Spontaneous",
+   "year": 2020,
+   "rating": 6.5,
+   "votes": 19439,
+   "score": 6.3915163288953165
+  },
+  {
+   "tconst": "tt7737786",
+   "title": "Greenland",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 176390,
+   "score": 6.388230855766668
+  },
+  {
+   "tconst": "tt9893250",
+   "title": "I Care a Lot",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 160611,
+   "score": 6.387142383588099
+  },
+  {
+   "tconst": "tt9601220",
+   "title": "Black Bear",
+   "year": 2020,
+   "rating": 6.5,
+   "votes": 18284,
+   "score": 6.387086310505913
+  },
+  {
+   "tconst": "tt10919380",
+   "title": "Freaky",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 83123,
+   "score": 6.37644351241207
+  },
+  {
+   "tconst": "tt9731534",
+   "title": "The Night House",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 79717,
+   "score": 6.3755492181676745
+  },
+  {
+   "tconst": "tt9779516",
+   "title": "I Still Believe",
+   "year": 2020,
+   "rating": 6.5,
+   "votes": 15578,
+   "score": 6.375140714924905
+  },
+  {
+   "tconst": "tt8508734",
+   "title": "His House",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 55876,
+   "score": 6.366700303697086
+  },
+  {
+   "tconst": "tt9877170",
+   "title": "Malang: Unleash the Madness",
+   "year": 2020,
+   "rating": 6.5,
+   "votes": 13455,
+   "score": 6.363839232843711
+  },
+  {
+   "tconst": "tt8242084",
+   "title": "My Spy",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 42700,
+   "score": 6.358374747748563
+  },
+  {
+   "tconst": "tt9606374",
+   "title": "On the Rocks",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 40209,
+   "score": 6.356309609957364
+  },
+  {
+   "tconst": "tt10556022",
+   "title": "Unpregnant",
+   "year": 2020,
+   "rating": 6.5,
+   "votes": 11368,
+   "score": 6.350540490750152
+  },
+  {
+   "tconst": "tt12474056",
+   "title": "New Order",
+   "year": 2020,
+   "rating": 6.5,
+   "votes": 11292,
+   "score": 6.3500070076248925
+  },
+  {
+   "tconst": "tt11905962",
+   "title": "Sputnik",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 30590,
+   "score": 6.3459558809152306
+  },
+  {
+   "tconst": "tt6882604",
+   "title": "Archive",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 30341,
+   "score": 6.345622300050799
+  },
+  {
+   "tconst": "tt11416594",
+   "title": "Karakomik Filmler: Deli",
+   "year": 2020,
+   "rating": 6.5,
+   "votes": 10313,
+   "score": 6.342777984854489
+  },
+  {
+   "tconst": "tt8143990",
+   "title": "Kajillionaire",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 24268,
+   "score": 6.335985444331424
+  },
+  {
+   "tconst": "tt5206260",
+   "title": "The Willoughbys",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 23891,
+   "score": 6.335273352994873
+  },
+  {
+   "tconst": "tt7736496",
+   "title": "Jingle Jangle: A Christmas Journey",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 22300,
+   "score": 6.332085114747654
+  },
+  {
+   "tconst": "tt9345754",
+   "title": "The Occupant",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 21880,
+   "score": 6.331190376610704
+  },
+  {
+   "tconst": "tt5439812",
+   "title": "Zola",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 20850,
+   "score": 6.328893005068046
+  },
+  {
+   "tconst": "tt10456740",
+   "title": "Lost Bullet",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 17007,
+   "score": 6.31877473271186
+  },
+  {
+   "tconst": "tt2226162",
+   "title": "Hunter Hunter",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 15245,
+   "score": 6.313105534020568
+  },
+  {
+   "tconst": "tt9308382",
+   "title": "The High Note",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 14752,
+   "score": 6.3113748063327915
+  },
+  {
+   "tconst": "tt9738716",
+   "title": "The World to Come",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 13318,
+   "score": 6.305924573563309
+  },
+  {
+   "tconst": "tt9148706",
+   "title": "Misbehaviour",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 11902,
+   "score": 6.299842443902348
+  },
+  {
+   "tconst": "tt9806322",
+   "title": "Isi & Ossi",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 11826,
+   "score": 6.299493686719932
+  },
+  {
+   "tconst": "tt2140571",
+   "title": "The Broken Hearts Gallery",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 11318,
+   "score": 6.297098658708567
+  },
+  {
+   "tconst": "tt8760280",
+   "title": "Finding You",
+   "year": 2020,
+   "rating": 6.4,
+   "votes": 10520,
+   "score": 6.293096939880567
+  },
+  {
+   "tconst": "tt10620868",
+   "title": "#Alive",
+   "year": 2020,
+   "rating": 6.3,
+   "votes": 56350,
+   "score": 6.282009784571955
+  },
+  {
+   "tconst": "tt7149730",
+   "title": "The Silencing",
+   "year": 2020,
+   "rating": 6.3,
+   "votes": 38946,
+   "score": 6.27561290414639
+  },
+  {
+   "tconst": "tt11456054",
+   "title": "Run Hide Fight",
+   "year": 2020,
+   "rating": 6.3,
+   "votes": 30717,
+   "score": 6.270684215594204
+  },
+  {
+   "tconst": "tt7488208",
+   "title": "Over the Moon",
+   "year": 2020,
+   "rating": 6.3,
+   "votes": 27433,
+   "score": 6.268112339549307
+  },
+  {
+   "tconst": "tt9076562",
+   "title": "Irresistible",
+   "year": 2020,
+   "rating": 6.3,
+   "votes": 25007,
+   "score": 6.265902511107756
+  },
+  {
+   "tconst": "tt5843876",
+   "title": "Chemical Hearts",
+   "year": 2020,
+   "rating": 6.3,
+   "votes": 18685,
+   "score": 6.258387631387458
+  },
+  {
+   "tconst": "tt11252440",
+   "title": "Psycho Goreman",
+   "year": 2020,
+   "rating": 6.3,
+   "votes": 17285,
+   "score": 6.25625249061203
+  },
+  {
+   "tconst": "tt10714856",
+   "title": "Feel the Beat",
+   "year": 2020,
+   "rating": 6.3,
+   "votes": 15605,
+   "score": 6.253382120927522
+  },
+  {
+   "tconst": "tt10333912",
+   "title": "Gulabo Sitabo",
+   "year": 2020,
+   "rating": 6.3,
+   "votes": 14220,
+   "score": 6.25071631735546
+  },
+  {
+   "tconst": "tt12137964",
+   "title": "Anything for Jackson",
+   "year": 2020,
+   "rating": 6.3,
+   "votes": 13771,
+   "score": 6.249785419475379
+  },
+  {
+   "tconst": "tt5616176",
+   "title": "2 Hearts",
+   "year": 2020,
+   "rating": 6.3,
+   "votes": 12364,
+   "score": 6.2466262388816505
+  },
+  {
+   "tconst": "tt6598238",
+   "title": "Life in a Year",
+   "year": 2020,
+   "rating": 6.3,
+   "votes": 12156,
+   "score": 6.246125167284222
+  },
+  {
+   "tconst": "tt8846176",
+   "title": "Concrete Cowboy",
+   "year": 2020,
+   "rating": 6.3,
+   "votes": 10621,
+   "score": 6.242114795904623
+  },
+  {
+   "tconst": "tt4651466",
+   "title": "Joe Bell",
+   "year": 2020,
+   "rating": 6.3,
+   "votes": 10614,
+   "score": 6.242095139533775
+  },
+  {
+   "tconst": "tt8629748",
+   "title": "Spenser Confidential",
+   "year": 2020,
+   "rating": 6.2,
+   "votes": 107682,
+   "score": 6.198354456980246
+  },
+  {
+   "tconst": "tt9866072",
+   "title": "Holidate",
+   "year": 2020,
+   "rating": 6.2,
+   "votes": 88879,
+   "score": 6.198041537701122
+  },
+  {
+   "tconst": "tt5867314",
+   "title": "The Empty Man",
+   "year": 2020,
+   "rating": 6.2,
+   "votes": 51534,
+   "score": 6.196852946441792
+  },
+  {
+   "tconst": "tt7711170",
+   "title": "Alone",
+   "year": 2020,
+   "rating": 6.2,
+   "votes": 36810,
+   "score": 6.195863046493254
+  },
+  {
+   "tconst": "tt11140488",
+   "title": "The Wolf of Snow Hollow",
+   "year": 2020,
+   "rating": 6.2,
+   "votes": 29866,
+   "score": 6.195142457390991
+  },
+  {
+   "tconst": "tt3111426",
+   "title": "Lost Girls",
+   "year": 2020,
+   "rating": 6.2,
+   "votes": 27565,
+   "score": 6.194844914317828
+  },
+  {
+   "tconst": "tt8338762",
+   "title": "The Nest",
+   "year": 2020,
+   "rating": 6.2,
+   "votes": 20942,
+   "score": 6.193741490735868
+  },
+  {
+   "tconst": "tt12298506",
+   "title": "Black Box",
+   "year": 2020,
+   "rating": 6.2,
+   "votes": 19679,
+   "score": 6.193475157732715
+  },
+  {
+   "tconst": "tt8310474",
+   "title": "Bruised",
+   "year": 2020,
+   "rating": 6.2,
+   "votes": 17013,
+   "score": 6.192831200027737
+  },
+  {
+   "tconst": "tt8750570",
+   "title": "Sergio",
+   "year": 2020,
+   "rating": 6.2,
+   "votes": 12200,
+   "score": 6.191276991276993
+  },
+  {
+   "tconst": "tt10243992",
+   "title": "I'm Your Woman",
+   "year": 2020,
+   "rating": 6.2,
+   "votes": 10712,
+   "score": 6.190650309306163
+  },
+  {
+   "tconst": "tt10964468",
+   "title": "Shakuntala Devi",
+   "year": 2020,
+   "rating": 6.2,
+   "votes": 10157,
+   "score": 6.1903928762389855
+  },
+  {
+   "tconst": "tt10127684",
+   "title": "Rogue City",
+   "year": 2020,
+   "rating": 6.1,
+   "votes": 10954,
+   "score": 6.138481874885427
+  },
+  {
+   "tconst": "tt8593904",
+   "title": "Rifkin's Festival",
+   "year": 2020,
+   "rating": 6.1,
+   "votes": 10959,
+   "score": 6.13847269461087
+  },
+  {
+   "tconst": "tt10993566",
+   "title": "Miami Bici",
+   "year": 2020,
+   "rating": 6.1,
+   "votes": 12715,
+   "score": 6.135498534287882
+  },
+  {
+   "tconst": "tt8430598",
+   "title": "Shirley",
+   "year": 2020,
+   "rating": 6.1,
+   "votes": 14405,
+   "score": 6.133040328061842
+  },
+  {
+   "tconst": "tt10808832",
+   "title": "Let Them All Talk",
+   "year": 2020,
+   "rating": 6.1,
+   "votes": 14722,
+   "score": 6.132616665575165
+  },
+  {
+   "tconst": "tt11681250",
+   "title": "Godmothered",
+   "year": 2020,
+   "rating": 6.1,
+   "votes": 15085,
+   "score": 6.132144676354364
+  },
+  {
+   "tconst": "tt9139586",
+   "title": "Arkansas",
+   "year": 2020,
+   "rating": 6.1,
+   "votes": 16942,
+   "score": 6.129929077512777
+  },
+  {
+   "tconst": "tt10276470",
+   "title": "Work It",
+   "year": 2020,
+   "rating": 6.1,
+   "votes": 18294,
+   "score": 6.12849894699757
+  },
+  {
+   "tconst": "tt11750282",
+   "title": "Don't Listen",
+   "year": 2020,
+   "rating": 6.1,
+   "votes": 19619,
+   "score": 6.127224052343064
+  },
+  {
+   "tconst": "tt8851668",
+   "title": "The Lovebirds",
+   "year": 2020,
+   "rating": 6.1,
+   "votes": 29448,
+   "score": 6.120440813383421
+  },
+  {
+   "tconst": "tt10229558",
+   "title": "The Dark and the Wicked",
+   "year": 2020,
+   "rating": 6.1,
+   "votes": 30456,
+   "score": 6.119931510934083
+  },
+  {
+   "tconst": "tt10314450",
+   "title": "Becky",
+   "year": 2020,
+   "rating": 6.1,
+   "votes": 32117,
+   "score": 6.119145456854696
+  },
+  {
+   "tconst": "tt6587640",
+   "title": "Trolls World Tour",
+   "year": 2020,
+   "rating": 6.1,
+   "votes": 33638,
+   "score": 6.118478143048472
+  },
+  {
+   "tconst": "tt2235695",
+   "title": "Rebecca",
+   "year": 2020,
+   "rating": 6.1,
+   "votes": 51043,
+   "score": 6.1132095278139875
+  },
+  {
+   "tconst": "tt9354842",
+   "title": "To All the Boys: P.S. I Still Love You",
+   "year": 2020,
+   "rating": 6.1,
+   "votes": 55109,
+   "score": 6.112384604376495
+  },
+  {
+   "tconst": "tt7713068",
+   "title": "Birds of Prey and the Fantabulous Emancipation of One Harley Quinn",
+   "year": 2020,
+   "rating": 6.1,
+   "votes": 285562,
+   "score": 6.1027281897075705
+  },
+  {
+   "tconst": "tt12607910",
+   "title": "Black Is King",
+   "year": 2020,
+   "rating": 6,
+   "votes": 10005,
+   "score": 6.090294886595813
+  },
+  {
+   "tconst": "tt10307440",
+   "title": "The Decline",
+   "year": 2020,
+   "rating": 6,
+   "votes": 10770,
+   "score": 6.086969148115033
+  },
+  {
+   "tconst": "tt9207700",
+   "title": "Made in Italy",
+   "year": 2020,
+   "rating": 6,
+   "votes": 12986,
+   "score": 6.078584756214619
+  },
+  {
+   "tconst": "tt7917178",
+   "title": "Caveat",
+   "year": 2020,
+   "rating": 6,
+   "votes": 16373,
+   "score": 6.068492367434468
+  },
+  {
+   "tconst": "tt11388406",
+   "title": "Horse Girl",
+   "year": 2020,
+   "rating": 6,
+   "votes": 22141,
+   "score": 6.056200778020261
+  },
+  {
+   "tconst": "tt9072352",
+   "title": "Relic",
+   "year": 2020,
+   "rating": 6,
+   "votes": 33550,
+   "score": 6.041477593716401
+  }
+ ]
+}

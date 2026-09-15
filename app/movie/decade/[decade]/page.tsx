@@ -4,6 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import { requireAuth } from "@/lib/auth";
 import { getLibraryState } from "@/lib/explore-digest";
 import { discoverMoviesByDecade } from "@/lib/tmdb";
+import { getImdbDecadePage } from "@/lib/imdb-rankings";
 import { RankedGrid } from "@/components/ranked-grid";
 import { StickyChrome } from "@/components/sticky-chrome";
 
@@ -27,14 +28,21 @@ export default async function DecadePage({
   if (start == null) notFound();
 
   const userId = await requireAuth();
-  const [{ items, totalPages, totalResults }, library] = await Promise.all([
-    discoverMoviesByDecade(start, 1).catch(() => ({
-      items: [],
-      totalPages: 1,
-      totalResults: 0,
-    })),
+  // IMDb order first (merged year files, Bayesian-weighted) — TMDB when incomplete.
+  const [imdb, library] = await Promise.all([
+    getImdbDecadePage(start, 1).catch(() => null),
     getLibraryState(userId),
   ]);
+  const tmdb =
+    imdb == null
+      ? await discoverMoviesByDecade(start, 1).catch(() => ({
+          items: [],
+          totalPages: 1,
+          totalResults: 0,
+        }))
+      : null;
+  const data = imdb ?? tmdb!;
+  const source: "imdb" | "tmdb" = imdb != null ? "imdb" : "tmdb";
 
   return (
     <div className="min-h-dvh bg-black pb-nav-page">
@@ -60,18 +68,18 @@ export default async function DecadePage({
 
       <div className="px-4 pt-3">
         <p className="mb-3 text-xs font-semibold text-white/40">
-          {totalResults > 0
-            ? `${totalResults} films ranked by TMDB score`
+          {data.totalResults > 0
+            ? `${data.totalResults} films ranked by ${source === "imdb" ? "IMDb" : "TMDB"} score`
             : "Top-rated films from this decade"}
         </p>
 
         <RankedGrid
           kind="decade"
           value={`${start}s`}
-          initialItems={items}
+          initialItems={data.items}
           initialStatuses={Object.fromEntries(library.movieStatusById)}
-          totalPages={totalPages}
-          totalResults={totalResults}
+          totalPages={data.totalPages}
+          totalResults={data.totalResults}
           showYear
           emptyLabel={`Nothing ranked for the ${start}s yet — check back later.`}
         />

@@ -5,6 +5,7 @@ import {
   discoverMoviesByDecade,
   discoverMoviesByYear,
 } from "@/lib/tmdb";
+import { getImdbDecadePage, getImdbYearPage } from "@/lib/imdb-rankings";
 
 function parseDecadeStart(raw: string): number | null {
   const m = raw.match(/^(\d{4})s$/);
@@ -15,7 +16,11 @@ function parseDecadeStart(raw: string): number | null {
   return start;
 }
 
-/** Paginated ranked slices for year/decade Show More. No ownership filtering — rankings stay complete. */
+/**
+ * Paginated ranked slices for year/decade Show More.
+ * IMDb order first (cached /find resolution), TMDB discover when no file.
+ * No ownership filtering — rankings stay complete.
+ */
 export async function GET(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -34,14 +39,16 @@ export async function GET(request: Request) {
       if (!Number.isInteger(year) || year < 1900 || year > now + 1) {
         return NextResponse.json({ error: "Bad year", items: [] }, { status: 400 });
       }
-      const [{ items, totalPages, totalResults }, library] = await Promise.all([
-        discoverMoviesByYear(year, page),
+      const [imdb, library] = await Promise.all([
+        getImdbYearPage(year, page).catch(() => null),
         getLibraryState(session.user.id),
       ]);
+      const data =
+        imdb ?? (await discoverMoviesByYear(year, page));
       return NextResponse.json({
-        items,
-        totalPages,
-        totalResults,
+        items: data.items,
+        totalPages: data.totalPages,
+        totalResults: data.totalResults,
         statuses: Object.fromEntries(library.movieStatusById),
       });
     }
@@ -51,20 +58,22 @@ export async function GET(request: Request) {
       if (start == null) {
         return NextResponse.json({ error: "Bad decade", items: [] }, { status: 400 });
       }
-      const [{ items, totalPages, totalResults }, library] = await Promise.all([
-        discoverMoviesByDecade(start, page),
+      const [imdb, library] = await Promise.all([
+        getImdbDecadePage(start, page).catch(() => null),
         getLibraryState(session.user.id),
       ]);
+      const data =
+        imdb ?? (await discoverMoviesByDecade(start, page));
       return NextResponse.json({
-        items,
-        totalPages,
-        totalResults,
+        items: data.items,
+        totalPages: data.totalPages,
+        totalResults: data.totalResults,
         statuses: Object.fromEntries(library.movieStatusById),
       });
     }
 
     return NextResponse.json({ error: "Bad kind", items: [] }, { status: 400 });
   } catch {
-    return NextResponse.json({ error: "TMDB failed", items: [] }, { status: 502 });
+    return NextResponse.json({ error: "Rank failed", items: [] }, { status: 502 });
   }
 }

@@ -9,7 +9,7 @@ function getApiKey() {
   return key;
 }
 
-async function tmdbFetch<T>(
+export async function tmdbFetch<T>(
   path: string,
   params: Record<string, string> = {},
   opts?: { revalidate?: number }
