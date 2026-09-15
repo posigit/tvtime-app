@@ -355,6 +355,7 @@ type TmdbListItem = {
   backdrop_path?: string | null;
   overview?: string | null;
   vote_average?: number;
+  vote_count?: number;
 };
 
 function mapList(
@@ -472,6 +473,7 @@ export async function getTopRatedMovies() {
 export type TmdbMovieCard = TmdbMediaCard & {
   release_date?: string | null;
   overview?: string | null;
+  vote_count?: number;
 };
 
 function mapMovieCards(
@@ -483,8 +485,10 @@ function mapMovieCards(
     id: r.id,
     title: r.title || r.name || "Untitled",
     poster_path: r.poster_path,
+    backdrop_path: r.backdrop_path,
     mediaType: "movie" as const,
     vote_average: r.vote_average,
+    vote_count: r.vote_count,
     release_date: r.release_date ?? null,
     overview: r.overview ?? null,
   }));
