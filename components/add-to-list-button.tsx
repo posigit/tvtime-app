@@ -244,7 +244,7 @@ export function AddToListButton({
                       maxLength={60}
                       placeholder="List name"
                       aria-label="New list name"
-                      className="h-9 min-w-0 flex-1 rounded-full bg-white/10 px-3.5 text-sm text-white placeholder:text-white/35 focus:outline-none focus:ring-1 focus:ring-primary/60"
+                      className="h-9 min-w-0 flex-1 rounded-full bg-white/10 px-3.5 text-base text-white placeholder:text-white/35 focus:outline-none focus:ring-1 focus:ring-primary/60"
                     />
                     <button
                       type="button"

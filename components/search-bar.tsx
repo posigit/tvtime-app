@@ -190,7 +190,7 @@ export function SearchBar() {
             }
           }}
           onBlur={() => setTimeout(() => setFocused(false), 200)}
-          className="w-full bg-transparent text-[15px] text-white placeholder:text-muted-foreground focus:outline-none"
+          className="w-full bg-transparent text-base text-white placeholder:text-muted-foreground focus:outline-none"
         />
       </div>
 
@@ -231,7 +231,7 @@ export function SearchBar() {
               placeholder="Year"
               inputMode="numeric"
               aria-label="Filter by year"
-              className="ml-auto h-7 w-16 rounded-full bg-white/10 px-2.5 text-center text-xs font-semibold text-white placeholder:text-white/35 focus:outline-none focus:ring-1 focus:ring-primary/60"
+              className="ml-auto h-8 w-20 rounded-full bg-white/10 px-2.5 text-center text-base font-semibold text-white placeholder:text-white/35 focus:outline-none focus:ring-1 focus:ring-primary/60"
             />
           </div>
           {query.trim().length < 2 && recents.length > 0 && (

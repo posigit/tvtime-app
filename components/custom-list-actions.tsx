@@ -69,7 +69,7 @@ export function CustomListHeader({ id, name }: { id: string; name: string }) {
           }}
           maxLength={60}
           aria-label="List name"
-          className="h-9 min-w-0 flex-1 rounded-full bg-white/10 px-3.5 text-sm font-bold text-white focus:outline-none focus:ring-1 focus:ring-primary/60"
+          className="h-9 min-w-0 flex-1 rounded-full bg-white/10 px-3.5 text-base font-bold text-white focus:outline-none focus:ring-1 focus:ring-primary/60"
         />
         <button
           type="button"
