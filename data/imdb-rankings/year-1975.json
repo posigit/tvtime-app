@@ -1,0 +1,1608 @@
+{
+ "tag": "year-1975",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.546,
+ "minVotes": 1000,
+ "items": [
+  {
+   "tconst": "tt0252487",
+   "title": "The Chaos Class",
+   "year": 1975,
+   "rating": 9.1,
+   "votes": 46752,
+   "score": 9.046519233554154
+  },
+  {
+   "tconst": "tt0073486",
+   "title": "One Flew Over the Cuckoo's Nest",
+   "year": 1975,
+   "rating": 8.6,
+   "votes": 1166887,
+   "score": 8.598241427844199
+  },
+  {
+   "tconst": "tt0252488",
+   "title": "The Chaos Class Failed the Class",
+   "year": 1975,
+   "rating": 8.4,
+   "votes": 31483,
+   "score": 8.3429297306492
+  },
+  {
+   "tconst": "tt0073000",
+   "title": "The Pinchcliffe Grand Prix",
+   "year": 1975,
+   "rating": 8.4,
+   "votes": 15517,
+   "score": 8.287763300882604
+  },
+  {
+   "tconst": "tt0456047",
+   "title": "Our Family",
+   "year": 1975,
+   "rating": 8.4,
+   "votes": 8173,
+   "score": 8.197905422509317
+  },
+  {
+   "tconst": "tt0072783",
+   "title": "Chupke Chupke",
+   "year": 1975,
+   "rating": 8.3,
+   "votes": 14110,
+   "score": 8.183930274035603
+  },
+  {
+   "tconst": "tt0071411",
+   "title": "Dersu Uzala",
+   "year": 1975,
+   "rating": 8.2,
+   "votes": 36885,
+   "score": 8.156346481210978
+  },
+  {
+   "tconst": "tt0073195",
+   "title": "Jaws",
+   "year": 1975,
+   "rating": 8.1,
+   "votes": 749875,
+   "score": 8.097930662814287
+  },
+  {
+   "tconst": "tt0071853",
+   "title": "Monty Python and the Holy Grail",
+   "year": 1975,
+   "rating": 8.1,
+   "votes": 607921,
+   "score": 8.097448250989338
+  },
+  {
+   "tconst": "tt0072684",
+   "title": "Barry Lyndon",
+   "year": 1975,
+   "rating": 8.1,
+   "votes": 208269,
+   "score": 8.092575041887129
+  },
+  {
+   "tconst": "tt0073707",
+   "title": "Sholay",
+   "year": 1975,
+   "rating": 8.1,
+   "votes": 63934,
+   "score": 8.076070878748853
+  },
+  {
+   "tconst": "tt0072890",
+   "title": "Dog Day Afternoon",
+   "year": 1975,
+   "rating": 8,
+   "votes": 294554,
+   "score": 7.995081056052965
+  },
+  {
+   "tconst": "tt0072860",
+   "title": "Deewaar",
+   "year": 1975,
+   "rating": 8,
+   "votes": 13296,
+   "score": 7.898306270332818
+  },
+  {
+   "tconst": "tt0072443",
+   "title": "The Mirror",
+   "year": 1975,
+   "rating": 7.9,
+   "votes": 58469,
+   "score": 7.877234970163917
+  },
+  {
+   "tconst": "tt0072637",
+   "title": "My Friends",
+   "year": 1975,
+   "rating": 7.9,
+   "votes": 8813,
+   "score": 7.762038769049013
+  },
+  {
+   "tconst": "tt0074710",
+   "title": "The Middleman",
+   "year": 1975,
+   "rating": 8.3,
+   "votes": 2013,
+   "score": 7.717917836268823
+  },
+  {
+   "tconst": "tt0073341",
+   "title": "The Man Who Would Be King",
+   "year": 1975,
+   "rating": 7.7,
+   "votes": 55981,
+   "score": 7.679750907156384
+  },
+  {
+   "tconst": "tt0071486",
+   "title": "White Collar Blues",
+   "year": 1975,
+   "rating": 7.8,
+   "votes": 8073,
+   "score": 7.661808270767989
+  },
+  {
+   "tconst": "tt0073800",
+   "title": "The Travelling Players",
+   "year": 1975,
+   "rating": 7.8,
+   "votes": 4910,
+   "score": 7.5878488055292665
+  },
+  {
+   "tconst": "tt0072446",
+   "title": "The Promised Land",
+   "year": 1975,
+   "rating": 7.8,
+   "votes": 4647,
+   "score": 7.5779682027055015
+  },
+  {
+   "tconst": "tt0073312",
+   "title": "Love and Death",
+   "year": 1975,
+   "rating": 7.6,
+   "votes": 44199,
+   "score": 7.57668502490493
+  },
+  {
+   "tconst": "tt0073440",
+   "title": "Nashville",
+   "year": 1975,
+   "rating": 7.6,
+   "votes": 31843,
+   "score": 7.567913602310323
+  },
+  {
+   "tconst": "tt0072685",
+   "title": "The Battle of Chile: Part I",
+   "year": 1975,
+   "rating": 8.1,
+   "votes": 1897,
+   "score": 7.563647373378656
+  },
+  {
+   "tconst": "tt0075040",
+   "title": "Seven Beauties",
+   "year": 1975,
+   "rating": 7.7,
+   "votes": 7171,
+   "score": 7.558791633909921
+  },
+  {
+   "tconst": "tt0072613",
+   "title": "Afonya",
+   "year": 1975,
+   "rating": 7.7,
+   "votes": 5796,
+   "score": 7.530221665785458
+  },
+  {
+   "tconst": "tt0073363",
+   "title": "Manila in the Claws of Light",
+   "year": 1975,
+   "rating": 7.8,
+   "votes": 3329,
+   "score": 7.510368778165388
+  },
+  {
+   "tconst": "tt0073582",
+   "title": "Deep Red",
+   "year": 1975,
+   "rating": 7.5,
+   "votes": 46782,
+   "score": 7.480038224450169
+  },
+  {
+   "tconst": "tt0073488",
+   "title": "They Fought for Their Country",
+   "year": 1975,
+   "rating": 7.7,
+   "votes": 3678,
+   "score": 7.453353236570749
+  },
+  {
+   "tconst": "tt0073198",
+   "title": "Jeanne Dielman, 23, quai du Commerce, 1080 Bruxelles",
+   "year": 1975,
+   "rating": 7.5,
+   "votes": 17864,
+   "score": 7.4494373643277125
+  },
+  {
+   "tconst": "tt0073076",
+   "title": "Grey Gardens",
+   "year": 1975,
+   "rating": 7.5,
+   "votes": 17101,
+   "score": 7.447306029538587
+  },
+  {
+   "tconst": "tt0499291",
+   "title": "Oh Where",
+   "year": 1975,
+   "rating": 7.6,
+   "votes": 5224,
+   "score": 7.430685482114069
+  },
+  {
+   "tconst": "tt0131335",
+   "title": "Canoa: A Shameful Memory",
+   "year": 1975,
+   "rating": 7.8,
+   "votes": 2238,
+   "score": 7.4127814826059195
+  },
+  {
+   "tconst": "tt0178186",
+   "title": "Aandhi",
+   "year": 1975,
+   "rating": 7.9,
+   "votes": 1758,
+   "score": 7.409132139477145
+  },
+  {
+   "tconst": "tt0073629",
+   "title": "The Rocky Horror Picture Show",
+   "year": 1975,
+   "rating": 7.4,
+   "votes": 187896,
+   "score": 7.395479980733727
+  },
+  {
+   "tconst": "tt0072976",
+   "title": "Fox and His Friends",
+   "year": 1975,
+   "rating": 7.5,
+   "votes": 7691,
+   "score": 7.390252725886315
+  },
+  {
+   "tconst": "tt0073802",
+   "title": "Three Days of the Condor",
+   "year": 1975,
+   "rating": 7.4,
+   "votes": 70083,
+   "score": 7.387988498525358
+  },
+  {
+   "tconst": "tt0073580",
+   "title": "The Passenger",
+   "year": 1975,
+   "rating": 7.4,
+   "votes": 29214,
+   "score": 7.371741127976367
+  },
+  {
+   "tconst": "tt0073864",
+   "title": "The Old Gun",
+   "year": 1975,
+   "rating": 7.5,
+   "votes": 5971,
+   "score": 7.363174069814655
+  },
+  {
+   "tconst": "tt0151511",
+   "title": "The Season",
+   "year": 1975,
+   "rating": 8,
+   "votes": 1125,
+   "score": 7.315852442671984
+  },
+  {
+   "tconst": "tt0073442",
+   "title": "It Can't Be!",
+   "year": 1975,
+   "rating": 7.6,
+   "votes": 2646,
+   "score": 7.310967208085014
+  },
+  {
+   "tconst": "tt0073540",
+   "title": "Picnic at Hanging Rock",
+   "year": 1975,
+   "rating": 7.3,
+   "votes": 46576,
+   "score": 7.2841555919093235
+  },
+  {
+   "tconst": "tt0071384",
+   "title": "Daguerreotypes",
+   "year": 1975,
+   "rating": 7.6,
+   "votes": 2335,
+   "score": 7.284013925240769
+  },
+  {
+   "tconst": "tt0073822",
+   "title": "The Magic Flute",
+   "year": 1975,
+   "rating": 7.4,
+   "votes": 5817,
+   "score": 7.2747523016983955
+  },
+  {
+   "tconst": "tt0073679",
+   "title": "Special Section",
+   "year": 1975,
+   "rating": 7.6,
+   "votes": 1919,
+   "score": 7.238981308899611
+  },
+  {
+   "tconst": "tt0073424",
+   "title": "Mother Kusters Goes to Heaven",
+   "year": 1975,
+   "rating": 7.5,
+   "votes": 2532,
+   "score": 7.229950860894101
+  },
+  {
+   "tconst": "tt0073858",
+   "title": "The Lost Honor of Katharina Blum",
+   "year": 1975,
+   "rating": 7.3,
+   "votes": 5358,
+   "score": 7.181438571984581
+  },
+  {
+   "tconst": "tt0073109",
+   "title": "The Hiding Place",
+   "year": 1975,
+   "rating": 7.4,
+   "votes": 2660,
+   "score": 7.166717606742614
+  },
+  {
+   "tconst": "tt0073092",
+   "title": "Hard Times",
+   "year": 1975,
+   "rating": 7.2,
+   "votes": 14824,
+   "score": 7.158682156261246
+  },
+  {
+   "tconst": "tt0073114",
+   "title": "The Story of Adele H",
+   "year": 1975,
+   "rating": 7.2,
+   "votes": 10040,
+   "score": 7.140777757307788
+  },
+  {
+   "tconst": "tt0072208",
+   "title": "One Hundred Days After Childhood",
+   "year": 1975,
+   "rating": 7.6,
+   "votes": 1170,
+   "score": 7.114371631648831
+  },
+  {
+   "tconst": "tt0071687",
+   "title": "How to Drown Dr. Mracek, the Lawyer",
+   "year": 1975,
+   "rating": 7.5,
+   "votes": 1461,
+   "score": 7.1124284602511025
+  },
+  {
+   "tconst": "tt0212408",
+   "title": "The Bus",
+   "year": 1975,
+   "rating": 7.3,
+   "votes": 2487,
+   "score": 7.083821749549172
+  },
+  {
+   "tconst": "tt0073482",
+   "title": "The Olsen Gang on the Track",
+   "year": 1975,
+   "rating": 7.3,
+   "votes": 2419,
+   "score": 7.079522211371151
+  },
+  {
+   "tconst": "tt0073453",
+   "title": "Night Moves",
+   "year": 1975,
+   "rating": 7.1,
+   "votes": 21694,
+   "score": 7.075596476631619
+  },
+  {
+   "tconst": "tt0073391",
+   "title": "Mili",
+   "year": 1975,
+   "rating": 7.4,
+   "votes": 1568,
+   "score": 7.067518084376154
+  },
+  {
+   "tconst": "tt0276793",
+   "title": "Dad, Make Me Marry",
+   "year": 1975,
+   "rating": 7.3,
+   "votes": 2011,
+   "score": 7.049646775382916
+  },
+  {
+   "tconst": "tt0239096",
+   "title": "The Humpbacked Horse",
+   "year": 1975,
+   "rating": 7.4,
+   "votes": 1369,
+   "score": 7.039589042075967
+  },
+  {
+   "tconst": "tt0073766",
+   "title": "The Sunshine Boys",
+   "year": 1975,
+   "rating": 7.1,
+   "votes": 7384,
+   "score": 7.033943993401476
+  },
+  {
+   "tconst": "tt0072820",
+   "title": "Cooley High",
+   "year": 1975,
+   "rating": 7.1,
+   "votes": 6308,
+   "score": 7.0242181774326715
+  },
+  {
+   "tconst": "tt0071449",
+   "title": "The Common Man",
+   "year": 1975,
+   "rating": 7.4,
+   "votes": 1210,
+   "score": 7.013659022931206
+  },
+  {
+   "tconst": "tt0072081",
+   "title": "The Return of the Pink Panther",
+   "year": 1975,
+   "rating": 7,
+   "votes": 32742,
+   "score": 6.986550484283029
+  },
+  {
+   "tconst": "tt0073028",
+   "title": "Poachers",
+   "year": 1975,
+   "rating": 7.4,
+   "votes": 1062,
+   "score": 6.985929408670207
+  },
+  {
+   "tconst": "tt0073502",
+   "title": "Overlord",
+   "year": 1975,
+   "rating": 7.1,
+   "votes": 3799,
+   "score": 6.984598133085635
+  },
+  {
+   "tconst": "tt0073841",
+   "title": "Under the Blossoming Cherry Trees",
+   "year": 1975,
+   "rating": 7.3,
+   "votes": 1317,
+   "score": 6.974659663650394
+  },
+  {
+   "tconst": "tt0072973",
+   "title": "Farewell, My Lovely",
+   "year": 1975,
+   "rating": 7,
+   "votes": 11131,
+   "score": 6.962590589454948
+  },
+  {
+   "tconst": "tt0073948",
+   "title": "Adoption",
+   "year": 1975,
+   "rating": 7.2,
+   "votes": 1730,
+   "score": 6.960507853728192
+  },
+  {
+   "tconst": "tt0073722",
+   "title": "Smile",
+   "year": 1975,
+   "rating": 7.1,
+   "votes": 2804,
+   "score": 6.9544128392949425
+  },
+  {
+   "tconst": "tt0319640",
+   "title": "Beehive",
+   "year": 1975,
+   "rating": 7.3,
+   "votes": 1122,
+   "score": 6.94476269588971
+  },
+  {
+   "tconst": "tt0073155",
+   "title": "That Most Important Thing: Love",
+   "year": 1975,
+   "rating": 7,
+   "votes": 5367,
+   "score": 6.928724115074283
+  },
+  {
+   "tconst": "tt0073207",
+   "title": "Graveyard of Honor",
+   "year": 1975,
+   "rating": 7.1,
+   "votes": 2198,
+   "score": 6.926825028354585
+  },
+  {
+   "tconst": "tt0072782",
+   "title": "Chronicle of the Years of Fire",
+   "year": 1975,
+   "rating": 7.3,
+   "votes": 1012,
+   "score": 6.925341173299188
+  },
+  {
+   "tconst": "tt0070326",
+   "title": "The Little Mermaid",
+   "year": 1975,
+   "rating": 7.2,
+   "votes": 1328,
+   "score": 6.919152251150328
+  },
+  {
+   "tconst": "tt0075454",
+   "title": "Hotel Pacific",
+   "year": 1975,
+   "rating": 7.2,
+   "votes": 1263,
+   "score": 6.911085479751641
+  },
+  {
+   "tconst": "tt0073234",
+   "title": "Cops vs. Thugs",
+   "year": 1975,
+   "rating": 7.2,
+   "votes": 1117,
+   "score": 6.891160340424169
+  },
+  {
+   "tconst": "tt0073747",
+   "title": "The Stepford Wives",
+   "year": 1975,
+   "rating": 6.9,
+   "votes": 22035,
+   "score": 6.884640175414716
+  },
+  {
+   "tconst": "tt0075019",
+   "title": "Operation Daybreak",
+   "year": 1975,
+   "rating": 7,
+   "votes": 2671,
+   "score": 6.876378763464442
+  },
+  {
+   "tconst": "tt0073107",
+   "title": "Hester Street",
+   "year": 1975,
+   "rating": 7,
+   "votes": 2486,
+   "score": 6.869818256075147
+  },
+  {
+   "tconst": "tt0499305",
+   "title": "Firefly",
+   "year": 1975,
+   "rating": 7,
+   "votes": 2194,
+   "score": 6.857916856818399
+  },
+  {
+   "tconst": "tt0072848",
+   "title": "The Day of the Locust",
+   "year": 1975,
+   "rating": 6.9,
+   "votes": 7089,
+   "score": 6.856259913546541
+  },
+  {
+   "tconst": "tt0072053",
+   "title": "Let Joy Reign Supreme",
+   "year": 1975,
+   "rating": 7,
+   "votes": 1993,
+   "score": 6.848375021943857
+  },
+  {
+   "tconst": "tt0073535",
+   "title": "The Night Caller",
+   "year": 1975,
+   "rating": 6.9,
+   "votes": 4985,
+   "score": 6.840883281650454
+  },
+  {
+   "tconst": "tt0073345",
+   "title": "The Man in the Glass Booth",
+   "year": 1975,
+   "rating": 7,
+   "votes": 1837,
+   "score": 6.840037518744436
+  },
+  {
+   "tconst": "tt0072996",
+   "title": "Flic Story",
+   "year": 1975,
+   "rating": 6.9,
+   "votes": 3528,
+   "score": 6.8218609630472535
+  },
+  {
+   "tconst": "tt0976030",
+   "title": "You're Crazy",
+   "year": 1975,
+   "rating": 6.9,
+   "votes": 2660,
+   "score": 6.803329628600538
+  },
+  {
+   "tconst": "tt0072822",
+   "title": "Cornbread, Earl and Me",
+   "year": 1975,
+   "rating": 7,
+   "votes": 1193,
+   "score": 6.793062672447773
+  },
+  {
+   "tconst": "tt0073636",
+   "title": "Rooster Cogburn",
+   "year": 1975,
+   "rating": 6.8,
+   "votes": 14629,
+   "score": 6.783760089620447
+  },
+  {
+   "tconst": "tt0073906",
+   "title": "The Wind and the Lion",
+   "year": 1975,
+   "rating": 6.8,
+   "votes": 11239,
+   "score": 6.7792619038057005
+  },
+  {
+   "tconst": "tt0073075",
+   "title": "The Great Waldo Pepper",
+   "year": 1975,
+   "rating": 6.8,
+   "votes": 7721,
+   "score": 6.770896278027516
+  },
+  {
+   "tconst": "tt0071483",
+   "title": "Wrong Move",
+   "year": 1975,
+   "rating": 6.8,
+   "votes": 4658,
+   "score": 6.755140763640503
+  },
+  {
+   "tconst": "tt0073169",
+   "title": "Dirty Hands",
+   "year": 1975,
+   "rating": 6.8,
+   "votes": 2683,
+   "score": 6.731085104718426
+  },
+  {
+   "tconst": "tt0073765",
+   "title": "Sunday Too Far Away",
+   "year": 1975,
+   "rating": 6.9,
+   "votes": 1073,
+   "score": 6.729322933274464
+  },
+  {
+   "tconst": "tt0080479",
+   "title": "Bullet Train",
+   "year": 1975,
+   "rating": 6.8,
+   "votes": 2256,
+   "score": 6.722047432640652
+  },
+  {
+   "tconst": "tt0072603",
+   "title": "The French Detective",
+   "year": 1975,
+   "rating": 6.8,
+   "votes": 2166,
+   "score": 6.719831472102957
+  },
+  {
+   "tconst": "tt0073018",
+   "title": "French Connection II",
+   "year": 1975,
+   "rating": 6.7,
+   "votes": 23394,
+   "score": 6.693694615097072
+  },
+  {
+   "tconst": "tt0072735",
+   "title": "Breakheart Pass",
+   "year": 1975,
+   "rating": 6.7,
+   "votes": 10502,
+   "score": 6.686627233583548
+  },
+  {
+   "tconst": "tt0071897",
+   "title": "Nazareno Cruz and the Wolf",
+   "year": 1975,
+   "rating": 6.8,
+   "votes": 1027,
+   "score": 6.674783641183011
+  },
+  {
+   "tconst": "tt0072034",
+   "title": "The Prisoner of Second Avenue",
+   "year": 1975,
+   "rating": 6.7,
+   "votes": 4324,
+   "score": 6.671109399075501
+  },
+  {
+   "tconst": "tt0073282",
+   "title": "Let's Do It Again",
+   "year": 1975,
+   "rating": 6.7,
+   "votes": 3646,
+   "score": 6.66689333634911
+  },
+  {
+   "tconst": "tt0253639",
+   "title": "The Confused Groom",
+   "year": 1975,
+   "rating": 6.7,
+   "votes": 3090,
+   "score": 6.662392772781899
+  },
+  {
+   "tconst": "tt0073233",
+   "title": "Katie Tippel",
+   "year": 1975,
+   "rating": 6.7,
+   "votes": 2963,
+   "score": 6.661187595427193
+  },
+  {
+   "tconst": "tt0073915",
+   "title": "Xala",
+   "year": 1975,
+   "rating": 6.7,
+   "votes": 2219,
+   "score": 6.652216974426208
+  },
+  {
+   "tconst": "tt0075007",
+   "title": "The Seventh Company Has Been Found",
+   "year": 1975,
+   "rating": 6.7,
+   "votes": 2163,
+   "score": 6.65137098978121
+  },
+  {
+   "tconst": "tt0072826",
+   "title": "Cousin, Cousine",
+   "year": 1975,
+   "rating": 6.7,
+   "votes": 1978,
+   "score": 6.648350047239075
+  },
+  {
+   "tconst": "tt0223777",
+   "title": "Darker Than Night",
+   "year": 1975,
+   "rating": 6.7,
+   "votes": 1848,
+   "score": 6.64599243001333
+  },
+  {
+   "tconst": "tt0073620",
+   "title": "Report to the Commissioner",
+   "year": 1975,
+   "rating": 6.7,
+   "votes": 1566,
+   "score": 6.640057069632878
+  },
+  {
+   "tconst": "tt0073812",
+   "title": "Tommy",
+   "year": 1975,
+   "rating": 6.6,
+   "votes": 24710,
+   "score": 6.59790690162108
+  },
+  {
+   "tconst": "tt0073600",
+   "title": "Race with the Devil",
+   "year": 1975,
+   "rating": 6.6,
+   "votes": 8386,
+   "score": 6.5942666141783475
+  },
+  {
+   "tconst": "tt0072705",
+   "title": "Bite the Bullet",
+   "year": 1975,
+   "rating": 6.6,
+   "votes": 6605,
+   "score": 6.592923923823532
+  },
+  {
+   "tconst": "tt0071950",
+   "title": "Footprints on the Moon",
+   "year": 1975,
+   "rating": 6.6,
+   "votes": 2964,
+   "score": 6.586424430039849
+  },
+  {
+   "tconst": "tt0073343",
+   "title": "The Man from Hong Kong",
+   "year": 1975,
+   "rating": 6.6,
+   "votes": 2214,
+   "score": 6.583256515456741
+  },
+  {
+   "tconst": "tt0071512",
+   "title": "The Flying Guillotine",
+   "year": 1975,
+   "rating": 6.6,
+   "votes": 1785,
+   "score": 6.58067735751453
+  },
+  {
+   "tconst": "tt0074423",
+   "title": "The Sunday Woman",
+   "year": 1975,
+   "rating": 6.6,
+   "votes": 1567,
+   "score": 6.57903640073158
+  },
+  {
+   "tconst": "tt1104069",
+   "title": "Fellow Traveler",
+   "year": 1975,
+   "rating": 6.6,
+   "votes": 1333,
+   "score": 6.576933750826388
+  },
+  {
+   "tconst": "tt0187044",
+   "title": "Cookies",
+   "year": 1975,
+   "rating": 6.6,
+   "votes": 1280,
+   "score": 6.576397561700861
+  },
+  {
+   "tconst": "tt0072812",
+   "title": "Conduct Unbecoming",
+   "year": 1975,
+   "rating": 6.6,
+   "votes": 1244,
+   "score": 6.576018912958094
+  },
+  {
+   "tconst": "tt0285589",
+   "title": "Gülermisin Aglarmisin",
+   "year": 1975,
+   "rating": 6.6,
+   "votes": 1125,
+   "score": 6.574675972083748
+  },
+  {
+   "tconst": "tt0071118",
+   "title": "All Creatures Great and Small",
+   "year": 1975,
+   "rating": 6.5,
+   "votes": 1008,
+   "score": 6.523001215477073
+  },
+  {
+   "tconst": "tt0072786",
+   "title": "Kidnap Syndicate",
+   "year": 1975,
+   "rating": 6.5,
+   "votes": 1042,
+   "score": 6.522618237354537
+  },
+  {
+   "tconst": "tt0282788",
+   "title": "Nereden Çikti Bu Velet",
+   "year": 1975,
+   "rating": 6.5,
+   "votes": 1224,
+   "score": 6.520767284477502
+  },
+  {
+   "tconst": "tt0073096",
+   "title": "Hearts of the West",
+   "year": 1975,
+   "rating": 6.5,
+   "votes": 1987,
+   "score": 6.515462484324728
+  },
+  {
+   "tconst": "tt0073406",
+   "title": "The Suspicious Death of a Minor",
+   "year": 1975,
+   "rating": 6.5,
+   "votes": 2076,
+   "score": 6.5150150977496635
+  },
+  {
+   "tconst": "tt0073663",
+   "title": "Le Sauvage",
+   "year": 1975,
+   "rating": 6.5,
+   "votes": 2462,
+   "score": 6.513340970733092
+  },
+  {
+   "tconst": "tt0073559",
+   "title": "Posse",
+   "year": 1975,
+   "rating": 6.5,
+   "votes": 2808,
+   "score": 6.512128792194844
+  },
+  {
+   "tconst": "tt0073349",
+   "title": "Mandingo",
+   "year": 1975,
+   "rating": 6.5,
+   "votes": 4742,
+   "score": 6.508043615583066
+  },
+  {
+   "tconst": "tt0073778",
+   "title": "Switchblade Sisters",
+   "year": 1975,
+   "rating": 6.5,
+   "votes": 4893,
+   "score": 6.50783750902392
+  },
+  {
+   "tconst": "tt0072912",
+   "title": "The Drowning Pool",
+   "year": 1975,
+   "rating": 6.5,
+   "votes": 7058,
+   "score": 6.505731749897985
+  },
+  {
+   "tconst": "tt0073631",
+   "title": "Rollerball",
+   "year": 1975,
+   "rating": 6.5,
+   "votes": 32791,
+   "score": 6.501366826689886
+  },
+  {
+   "tconst": "tt0073051",
+   "title": "Syndicate Sadists",
+   "year": 1975,
+   "rating": 6.4,
+   "votes": 1139,
+   "score": 6.468343357025697
+  },
+  {
+   "tconst": "tt0073496",
+   "title": "The Other Side of the Mountain",
+   "year": 1975,
+   "rating": 6.4,
+   "votes": 1467,
+   "score": 6.4592567655768
+  },
+  {
+   "tconst": "tt0072662",
+   "title": "L'assassino è costretto ad uccidere ancora",
+   "year": 1975,
+   "rating": 6.4,
+   "votes": 1577,
+   "score": 6.4567273731773245
+  },
+  {
+   "tconst": "tt0072610",
+   "title": "The Adventures of the Wilderness Family",
+   "year": 1975,
+   "rating": 6.4,
+   "votes": 2049,
+   "score": 6.44794570045194
+  },
+  {
+   "tconst": "tt0073163",
+   "title": "Incorrigible",
+   "year": 1975,
+   "rating": 6.4,
+   "votes": 2152,
+   "score": 6.4463789469155985
+  },
+  {
+   "tconst": "tt0073615",
+   "title": "The Reincarnation of Peter Proud",
+   "year": 1975,
+   "rating": 6.4,
+   "votes": 2615,
+   "score": 6.440438849426823
+  },
+  {
+   "tconst": "tt0073901",
+   "title": "The Wilby Conspiracy",
+   "year": 1975,
+   "rating": 6.4,
+   "votes": 2675,
+   "score": 6.439778623313732
+  },
+  {
+   "tconst": "tt0073541",
+   "title": "Flatfoot in Hong Kong",
+   "year": 1975,
+   "rating": 6.4,
+   "votes": 3967,
+   "score": 6.4294315362750085
+  },
+  {
+   "tconst": "tt0072448",
+   "title": "Zorro",
+   "year": 1975,
+   "rating": 6.4,
+   "votes": 5145,
+   "score": 6.423789494007806
+  },
+  {
+   "tconst": "tt0073045",
+   "title": "\"Giliap\"",
+   "year": 1975,
+   "rating": 6.3,
+   "votes": 1027,
+   "score": 6.421453596782419
+  },
+  {
+   "tconst": "tt0072653",
+   "title": "The Apple Dumpling Gang",
+   "year": 1975,
+   "rating": 6.4,
+   "votes": 7286,
+   "score": 6.417642582751384
+  },
+  {
+   "tconst": "tt0073692",
+   "title": "Shampoo",
+   "year": 1975,
+   "rating": 6.4,
+   "votes": 16126,
+   "score": 6.408535936043324
+  },
+  {
+   "tconst": "tt0072730",
+   "title": "A Boy and His Dog",
+   "year": 1975,
+   "rating": 6.4,
+   "votes": 21043,
+   "score": 6.40663187590972
+  },
+  {
+   "tconst": "tt0202114",
+   "title": "Wolf Guy",
+   "year": 1975,
+   "rating": 6.3,
+   "votes": 1311,
+   "score": 6.406528100682806
+  },
+  {
+   "tconst": "tt0072926",
+   "title": "The Eiger Sanction",
+   "year": 1975,
+   "rating": 6.4,
+   "votes": 25034,
+   "score": 6.405615212440577
+  },
+  {
+   "tconst": "tt0071557",
+   "title": "The Gypsy",
+   "year": 1975,
+   "rating": 6.3,
+   "votes": 1520,
+   "score": 6.397693032015065
+  },
+  {
+   "tconst": "tt0073639",
+   "title": "Royal Flash",
+   "year": 1975,
+   "rating": 6.3,
+   "votes": 2301,
+   "score": 6.374579351916984
+  },
+  {
+   "tconst": "tt0073605",
+   "title": "Rancho Deluxe",
+   "year": 1975,
+   "rating": 6.3,
+   "votes": 2477,
+   "score": 6.370804268242153
+  },
+  {
+   "tconst": "tt0073168",
+   "title": "Infra-Man",
+   "year": 1975,
+   "rating": 6.3,
+   "votes": 2540,
+   "score": 6.369544192281911
+  },
+  {
+   "tconst": "tt0073206",
+   "title": "Black Magic",
+   "year": 1975,
+   "rating": 6.2,
+   "votes": 1042,
+   "score": 6.369533026776672
+  },
+  {
+   "tconst": "tt0073172",
+   "title": "Inserts",
+   "year": 1975,
+   "rating": 6.3,
+   "votes": 2794,
+   "score": 6.364888360748014
+  },
+  {
+   "tconst": "tt0073471",
+   "title": "Number Two",
+   "year": 1975,
+   "rating": 6.2,
+   "votes": 1158,
+   "score": 6.360420037385526
+  },
+  {
+   "tconst": "tt0074849",
+   "title": "Man Friday",
+   "year": 1975,
+   "rating": 6.2,
+   "votes": 1181,
+   "score": 6.358728308426393
+  },
+  {
+   "tconst": "tt0073594",
+   "title": "Four of the Apocalypse",
+   "year": 1975,
+   "rating": 6.3,
+   "votes": 3376,
+   "score": 6.356258327394416
+  },
+  {
+   "tconst": "tt9270362",
+   "title": "The Amusement Park",
+   "year": 1975,
+   "rating": 6.3,
+   "votes": 3974,
+   "score": 6.349494660369514
+  },
+  {
+   "tconst": "tt0073720",
+   "title": "Release the Prisoners to Spring",
+   "year": 1975,
+   "rating": 6.2,
+   "votes": 1426,
+   "score": 6.342698450403118
+  },
+  {
+   "tconst": "tt0252496",
+   "title": "Hanzo",
+   "year": 1975,
+   "rating": 6.3,
+   "votes": 4914,
+   "score": 6.3416277376865
+  },
+  {
+   "tconst": "tt0072825",
+   "title": "La Course à l'échalote",
+   "year": 1975,
+   "rating": 6.2,
+   "votes": 1473,
+   "score": 6.339986429712076
+  },
+  {
+   "tconst": "tt0073113",
+   "title": "The Hindenburg",
+   "year": 1975,
+   "rating": 6.3,
+   "votes": 7351,
+   "score": 6.3294798755452
+  },
+  {
+   "tconst": "tt0072951",
+   "title": "Escape to Witch Mountain",
+   "year": 1975,
+   "rating": 6.3,
+   "votes": 12535,
+   "score": 6.318188876296858
+  },
+  {
+   "tconst": "tt0072747",
+   "title": "Bucktown",
+   "year": 1975,
+   "rating": 6.2,
+   "votes": 1988,
+   "score": 6.315858915889546
+  },
+  {
+   "tconst": "tt3285576",
+   "title": "Kara Murat: Kara Sövalyeye Karsi",
+   "year": 1975,
+   "rating": 6.1,
+   "votes": 1077,
+   "score": 6.314822552083758
+  },
+  {
+   "tconst": "tt0073589",
+   "title": "The Image",
+   "year": 1975,
+   "rating": 6.2,
+   "votes": 2085,
+   "score": 6.312216026151691
+  },
+  {
+   "tconst": "tt0073705",
+   "title": "Shivers",
+   "year": 1975,
+   "rating": 6.3,
+   "votes": 26538,
+   "score": 6.308939880916477
+  },
+  {
+   "tconst": "tt0073946",
+   "title": "The Softening of the Egg",
+   "year": 1975,
+   "rating": 6.1,
+   "votes": 1261,
+   "score": 6.297340309897374
+  },
+  {
+   "tconst": "tt0073335",
+   "title": "Mahogany",
+   "year": 1975,
+   "rating": 6.2,
+   "votes": 2616,
+   "score": 6.295737400629968
+  },
+  {
+   "tconst": "tt0073133",
+   "title": "Hustle",
+   "year": 1975,
+   "rating": 6.2,
+   "votes": 3280,
+   "score": 6.2808846824013935
+  },
+  {
+   "tconst": "tt0073806",
+   "title": "Thundercrack!",
+   "year": 1975,
+   "rating": 6,
+   "votes": 1007,
+   "score": 6.272140727791712
+  },
+  {
+   "tconst": "tt0073634",
+   "title": "The Romantic Englishwoman",
+   "year": 1975,
+   "rating": 6.1,
+   "votes": 1641,
+   "score": 6.268946020703508
+  },
+  {
+   "tconst": "tt0073026",
+   "title": "Funny Lady",
+   "year": 1975,
+   "rating": 6.2,
+   "votes": 6242,
+   "score": 6.247802601584917
+  },
+  {
+   "tconst": "tt0073036",
+   "title": "A Genius, Two Partners and a Dupe",
+   "year": 1975,
+   "rating": 6.2,
+   "votes": 6465,
+   "score": 6.246374606922702
+  },
+  {
+   "tconst": "tt0073896",
+   "title": "White Line Fever",
+   "year": 1975,
+   "rating": 6.1,
+   "votes": 2685,
+   "score": 6.221081802083572
+  },
+  {
+   "tconst": "tt0073166",
+   "title": "India Song",
+   "year": 1975,
+   "rating": 6.1,
+   "votes": 2972,
+   "score": 6.212332940754774
+  },
+  {
+   "tconst": "tt0072856",
+   "title": "Death Race 2000",
+   "year": 1975,
+   "rating": 6.2,
+   "votes": 33200,
+   "score": 6.210122410546139
+  },
+  {
+   "tconst": "tt0181966",
+   "title": "Kiliç Aslan",
+   "year": 1975,
+   "rating": 5.9,
+   "votes": 1097,
+   "score": 6.208148040380527
+  },
+  {
+   "tconst": "tt0073880",
+   "title": "Part 2: Walking Tall",
+   "year": 1975,
+   "rating": 6,
+   "votes": 1692,
+   "score": 6.20289243710177
+  },
+  {
+   "tconst": "tt0073298",
+   "title": "Lisztomania",
+   "year": 1975,
+   "rating": 6.1,
+   "votes": 3440,
+   "score": 6.200492441594136
+  },
+  {
+   "tconst": "tt0073878",
+   "title": "W.W. and the Dixie Dancekings",
+   "year": 1975,
+   "rating": 5.9,
+   "votes": 1158,
+   "score": 6.199437646282654
+  },
+  {
+   "tconst": "tt0070636",
+   "title": "Satanic Pandemonium",
+   "year": 1975,
+   "rating": 6,
+   "votes": 1842,
+   "score": 6.1921838285284885
+  },
+  {
+   "tconst": "tt0075140",
+   "title": "End of the Game",
+   "year": 1975,
+   "rating": 5.9,
+   "votes": 1237,
+   "score": 6.188862959623588
+  },
+  {
+   "tconst": "tt0073836",
+   "title": "Last Stop on the Night Train",
+   "year": 1975,
+   "rating": 6.1,
+   "votes": 4045,
+   "score": 6.1884413162889915
+  },
+  {
+   "tconst": "tt0072737",
+   "title": "Breakout",
+   "year": 1975,
+   "rating": 6.1,
+   "votes": 5268,
+   "score": 6.171184818231966
+  },
+  {
+   "tconst": "tt0072709",
+   "title": "Black Moon",
+   "year": 1975,
+   "rating": 6.1,
+   "votes": 6748,
+   "score": 6.157587305198498
+  },
+  {
+   "tconst": "tt0073373",
+   "title": "Terror of Mechagodzilla",
+   "year": 1975,
+   "rating": 6.1,
+   "votes": 6767,
+   "score": 6.157446432429246
+  },
+  {
+   "tconst": "tt0072732",
+   "title": "Brannigan",
+   "year": 1975,
+   "rating": 6.1,
+   "votes": 7375,
+   "score": 6.153275992916772
+  },
+  {
+   "tconst": "tt0074539",
+   "title": "The Smurfs and the Magic Flute",
+   "year": 1975,
+   "rating": 5.9,
+   "votes": 1659,
+   "score": 6.143018593711156
+  },
+  {
+   "tconst": "tt0073019",
+   "title": "Friday Foster",
+   "year": 1975,
+   "rating": 6,
+   "votes": 3074,
+   "score": 6.134066382100629
+  },
+  {
+   "tconst": "tt0075016",
+   "title": "One of Our Dinosaurs Is Missing",
+   "year": 1975,
+   "rating": 5.9,
+   "votes": 2120,
+   "score": 6.107111038678835
+  },
+  {
+   "tconst": "tt0073327",
+   "title": "Autopsy",
+   "year": 1975,
+   "rating": 5.9,
+   "votes": 2361,
+   "score": 6.092260172769404
+  },
+  {
+   "tconst": "tt0071537",
+   "title": "Eyeball",
+   "year": 1975,
+   "rating": 5.9,
+   "votes": 2410,
+   "score": 6.089497489934887
+  },
+  {
+   "tconst": "tt0073324",
+   "title": "Lips of Blood",
+   "year": 1975,
+   "rating": 5.9,
+   "votes": 2683,
+   "score": 6.075451110691818
+  },
+  {
+   "tconst": "tt0072608",
+   "title": "The Adventure of Sherlock Holmes' Smarter Brother",
+   "year": 1975,
+   "rating": 6,
+   "votes": 7944,
+   "score": 6.0610673569630995
+  },
+  {
+   "tconst": "tt0073526",
+   "title": "Peeper",
+   "year": 1975,
+   "rating": 5.6,
+   "votes": 1066,
+   "score": 6.057979884161648
+  },
+  {
+   "tconst": "tt0073275",
+   "title": "Legend of the Werewolf",
+   "year": 1975,
+   "rating": 5.6,
+   "votes": 1068,
+   "score": 6.057536963577352
+  },
+  {
+   "tconst": "tt0073760",
+   "title": "The Strongest Man in the World",
+   "year": 1975,
+   "rating": 5.9,
+   "votes": 4165,
+   "score": 6.025108701002511
+  },
+  {
+   "tconst": "tt0070556",
+   "title": "Poor Pretty Eddie",
+   "year": 1975,
+   "rating": 5.5,
+   "votes": 1030,
+   "score": 6.015362778659096
+  },
+  {
+   "tconst": "tt0073784",
+   "title": "Take a Hard Ride",
+   "year": 1975,
+   "rating": 5.7,
+   "votes": 1697,
+   "score": 6.013750997655901
+  },
+  {
+   "tconst": "tt0072791",
+   "title": "Cleopatra Jones and the Casino of Gold",
+   "year": 1975,
+   "rating": 5.6,
+   "votes": 1320,
+   "score": 6.007838983050847
+  },
+  {
+   "tconst": "tt0073586",
+   "title": "Psychic Killer",
+   "year": 1975,
+   "rating": 5.5,
+   "votes": 1136,
+   "score": 5.9897876594934285
+  },
+  {
+   "tconst": "tt0073240",
+   "title": "The Killer Elite",
+   "year": 1975,
+   "rating": 5.9,
+   "votes": 8461,
+   "score": 5.968300014869249
+  },
+  {
+   "tconst": "tt0073697",
+   "title": "'Sheba, Baby'",
+   "year": 1975,
+   "rating": 5.7,
+   "votes": 2297,
+   "score": 5.956653454861379
+  },
+  {
+   "tconst": "tt0073461",
+   "title": "Night of the Seagulls",
+   "year": 1975,
+   "rating": 5.7,
+   "votes": 2503,
+   "score": 5.94156050262003
+  },
+  {
+   "tconst": "tt0073903",
+   "title": "The Wild Party",
+   "year": 1975,
+   "rating": 5.3,
+   "votes": 1024,
+   "score": 5.915704763180813
+  }
+ ]
+}

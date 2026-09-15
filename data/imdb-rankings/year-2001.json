@@ -1,0 +1,1608 @@
+{
+ "tag": "year-2001",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.546,
+ "minVotes": 10000,
+ "items": [
+  {
+   "tconst": "tt0120737",
+   "title": "The Lord of the Rings: The Fellowship of the Ring",
+   "year": 2001,
+   "rating": 8.9,
+   "votes": 2236430,
+   "score": 8.88951982192842
+  },
+  {
+   "tconst": "tt0245429",
+   "title": "Spirited Away",
+   "year": 2001,
+   "rating": 8.6,
+   "votes": 984673,
+   "score": 8.579346995017117
+  },
+  {
+   "tconst": "tt0268978",
+   "title": "A Beautiful Mind",
+   "year": 2001,
+   "rating": 8.2,
+   "votes": 1063867,
+   "score": 8.184594939200721
+  },
+  {
+   "tconst": "tt0211915",
+   "title": "Amélie",
+   "year": 2001,
+   "rating": 8.2,
+   "votes": 847135,
+   "score": 8.180699672250766
+  },
+  {
+   "tconst": "tt0198781",
+   "title": "Monsters, Inc.",
+   "year": 2001,
+   "rating": 8.1,
+   "votes": 1091484,
+   "score": 8.085889049295913
+  },
+  {
+   "tconst": "tt0169102",
+   "title": "Lagaan: Once Upon a Time in India",
+   "year": 2001,
+   "rating": 8.1,
+   "votes": 130559,
+   "score": 7.989420197743727
+  },
+  {
+   "tconst": "tt0246578",
+   "title": "Donnie Darko",
+   "year": 2001,
+   "rating": 8,
+   "votes": 920236,
+   "score": 7.984366347437274
+  },
+  {
+   "tconst": "tt0126029",
+   "title": "Shrek",
+   "year": 2001,
+   "rating": 7.9,
+   "votes": 821562,
+   "score": 7.883713798339343
+  },
+  {
+   "tconst": "tt0166924",
+   "title": "Mulholland Drive",
+   "year": 2001,
+   "rating": 7.9,
+   "votes": 434262,
+   "score": 7.869515766765243
+  },
+  {
+   "tconst": "tt0292490",
+   "title": "Dil Chahta Hai",
+   "year": 2001,
+   "rating": 8,
+   "votes": 80542,
+   "score": 7.839378559946331
+  },
+  {
+   "tconst": "tt0139654",
+   "title": "Training Day",
+   "year": 2001,
+   "rating": 7.8,
+   "votes": 525506,
+   "score": 7.776577318600838
+  },
+  {
+   "tconst": "tt0270053",
+   "title": "Vizontele",
+   "year": 2001,
+   "rating": 8,
+   "votes": 41628,
+   "score": 7.718312031739766
+  },
+  {
+   "tconst": "tt0241527",
+   "title": "Harry Potter and the Sorcerer's Stone",
+   "year": 2001,
+   "rating": 7.7,
+   "votes": 966597,
+   "score": 7.688180399463301
+  },
+  {
+   "tconst": "tt0293715",
+   "title": "My Sassy Girl",
+   "year": 2001,
+   "rating": 7.9,
+   "votes": 53430,
+   "score": 7.686489257049672
+  },
+  {
+   "tconst": "tt0240772",
+   "title": "Ocean's Eleven",
+   "year": 2001,
+   "rating": 7.7,
+   "votes": 683422,
+   "score": 7.68335359070618
+  },
+  {
+   "tconst": "tt0283509",
+   "title": "No Man's Land",
+   "year": 2001,
+   "rating": 7.9,
+   "votes": 50907,
+   "score": 7.67764482858556
+  },
+  {
+   "tconst": "tt0265086",
+   "title": "Black Hawk Down",
+   "year": 2001,
+   "rating": 7.7,
+   "votes": 459707,
+   "score": 7.675425134338344
+  },
+  {
+   "tconst": "tt0245574",
+   "title": "Y tu mamá también",
+   "year": 2001,
+   "rating": 7.7,
+   "votes": 143073,
+   "score": 7.624591623438887
+  },
+  {
+   "tconst": "tt0275277",
+   "title": "Cowboy Bebop: The Movie",
+   "year": 2001,
+   "rating": 7.8,
+   "votes": 57854,
+   "score": 7.615147427928503
+  },
+  {
+   "tconst": "tt0250258",
+   "title": "The Experiment",
+   "year": 2001,
+   "rating": 7.7,
+   "votes": 99212,
+   "score": 7.594306610763109
+  },
+  {
+   "tconst": "tt0230600",
+   "title": "The Others",
+   "year": 2001,
+   "rating": 7.6,
+   "votes": 432124,
+   "score": 7.576153779425366
+  },
+  {
+   "tconst": "tt0265666",
+   "title": "The Royal Tenenbaums",
+   "year": 2001,
+   "rating": 7.6,
+   "votes": 338936,
+   "score": 7.569785329042175
+  },
+  {
+   "tconst": "tt0277027",
+   "title": "I Am Sam",
+   "year": 2001,
+   "rating": 7.6,
+   "votes": 163580,
+   "score": 7.539261513853327
+  },
+  {
+   "tconst": "tt0291350",
+   "title": "Millennium Actress",
+   "year": 2001,
+   "rating": 7.8,
+   "votes": 37632,
+   "score": 7.536668911124047
+  },
+  {
+   "tconst": "tt0203009",
+   "title": "Moulin Rouge!",
+   "year": 2001,
+   "rating": 7.5,
+   "votes": 316945,
+   "score": 7.470811645918
+  },
+  {
+   "tconst": "tt0215750",
+   "title": "Enemy at the Gates",
+   "year": 2001,
+   "rating": 7.5,
+   "votes": 295865,
+   "score": 7.46880000514822
+  },
+  {
+   "tconst": "tt0221027",
+   "title": "Blow",
+   "year": 2001,
+   "rating": 7.5,
+   "votes": 289127,
+   "score": 7.468097208124511
+  },
+  {
+   "tconst": "tt0243017",
+   "title": "Waking Life",
+   "year": 2001,
+   "rating": 7.6,
+   "votes": 69916,
+   "score": 7.468074147538173
+  },
+  {
+   "tconst": "tt0248845",
+   "title": "Hedwig and the Angry Inch",
+   "year": 2001,
+   "rating": 7.7,
+   "votes": 38235,
+   "score": 7.460692724674213
+  },
+  {
+   "tconst": "tt0243133",
+   "title": "The Man Who Wasn't There",
+   "year": 2001,
+   "rating": 7.5,
+   "votes": 121264,
+   "score": 7.427299286740162
+  },
+  {
+   "tconst": "tt0254686",
+   "title": "The Piano Teacher",
+   "year": 2001,
+   "rating": 7.5,
+   "votes": 82878,
+   "score": 7.397252455637079
+  },
+  {
+   "tconst": "tt0291376",
+   "title": "Nayak: The Real Hero",
+   "year": 2001,
+   "rating": 7.8,
+   "votes": 19424,
+   "score": 7.373715795767422
+  },
+  {
+   "tconst": "tt0248126",
+   "title": "Kabhi Khushi Kabhie Gham...",
+   "year": 2001,
+   "rating": 7.5,
+   "votes": 63850,
+   "score": 7.37077878909493
+  },
+  {
+   "tconst": "tt0272152",
+   "title": "K-PAX",
+   "year": 2001,
+   "rating": 7.4,
+   "votes": 204136,
+   "score": 7.360104856608234
+  },
+  {
+   "tconst": "tt0292542",
+   "title": "Son of the Bride",
+   "year": 2001,
+   "rating": 7.8,
+   "votes": 18071,
+   "score": 7.3531692342510295
+  },
+  {
+   "tconst": "tt0278736",
+   "title": "Stanley Kubrick: A Life in Pictures",
+   "year": 2001,
+   "rating": 8,
+   "votes": 11289,
+   "score": 7.316877898194403
+  },
+  {
+   "tconst": "tt0301727",
+   "title": "Winged Migration",
+   "year": 2001,
+   "rating": 7.9,
+   "votes": 12727,
+   "score": 7.304101446502425
+  },
+  {
+   "tconst": "tt0264796",
+   "title": "Life as a House",
+   "year": 2001,
+   "rating": 7.4,
+   "votes": 47596,
+   "score": 7.251673963029735
+  },
+  {
+   "tconst": "tt0162346",
+   "title": "Ghost World",
+   "year": 2001,
+   "rating": 7.3,
+   "votes": 131826,
+   "score": 7.246815207188108
+  },
+  {
+   "tconst": "tt0247425",
+   "title": "In the Bedroom",
+   "year": 2001,
+   "rating": 7.4,
+   "votes": 44716,
+   "score": 7.2438667588029215
+  },
+  {
+   "tconst": "tt0286112",
+   "title": "Shaolin Soccer",
+   "year": 2001,
+   "rating": 7.3,
+   "votes": 98713,
+   "score": 7.2306155986373355
+  },
+  {
+   "tconst": "tt0256009",
+   "title": "The Devil's Backbone",
+   "year": 2001,
+   "rating": 7.3,
+   "votes": 76184,
+   "score": 7.212478111652518
+  },
+  {
+   "tconst": "tt0212720",
+   "title": "A.I. Artificial Intelligence",
+   "year": 2001,
+   "rating": 7.2,
+   "votes": 342990,
+   "score": 7.181464102594013
+  },
+  {
+   "tconst": "tt0275309",
+   "title": "Dogtown and Z-Boys",
+   "year": 2001,
+   "rating": 7.6,
+   "votes": 13905,
+   "score": 7.1589631279924975
+  },
+  {
+   "tconst": "tt0280707",
+   "title": "Gosford Park",
+   "year": 2001,
+   "rating": 7.2,
+   "votes": 103471,
+   "score": 7.142337809437307
+  },
+  {
+   "tconst": "tt0264616",
+   "title": "Frailty",
+   "year": 2001,
+   "rating": 7.2,
+   "votes": 101952,
+   "score": 7.141555430672615
+  },
+  {
+   "tconst": "tt0161860",
+   "title": "Nowhere in Africa",
+   "year": 2001,
+   "rating": 7.5,
+   "votes": 14888,
+   "score": 7.1165627440799035
+  },
+  {
+   "tconst": "tt0297721",
+   "title": "All About Lily Chou-Chou",
+   "year": 2001,
+   "rating": 7.5,
+   "votes": 14582,
+   "score": 7.11178966620538
+  },
+  {
+   "tconst": "tt0265343",
+   "title": "Monsoon Wedding",
+   "year": 2001,
+   "rating": 7.3,
+   "votes": 26762,
+   "score": 7.094815667663909
+  },
+  {
+   "tconst": "tt0284137",
+   "title": "Gadar: Ek Prem Katha",
+   "year": 2001,
+   "rating": 7.4,
+   "votes": 16906,
+   "score": 7.082487682102901
+  },
+  {
+   "tconst": "tt0279064",
+   "title": "Elling",
+   "year": 2001,
+   "rating": 7.4,
+   "votes": 16800,
+   "score": 7.081231849800771
+  },
+  {
+   "tconst": "tt0266987",
+   "title": "Spy Game",
+   "year": 2001,
+   "rating": 7.1,
+   "votes": 178549,
+   "score": 7.0706018784223765
+  },
+  {
+   "tconst": "tt0208990",
+   "title": "The Son's Room",
+   "year": 2001,
+   "rating": 7.3,
+   "votes": 21486,
+   "score": 7.0604336395433105
+  },
+  {
+   "tconst": "tt0299108",
+   "title": "Rehnaa Hai Terre Dil Mein",
+   "year": 2001,
+   "rating": 7.5,
+   "votes": 10256,
+   "score": 7.028881001908601
+  },
+  {
+   "tconst": "tt0274117",
+   "title": "Read My Lips",
+   "year": 2001,
+   "rating": 7.3,
+   "votes": 16252,
+   "score": 7.01267002798494
+  },
+  {
+   "tconst": "tt0293416",
+   "title": "Metropolis",
+   "year": 2001,
+   "rating": 7.2,
+   "votes": 24168,
+   "score": 7.008505431241532
+  },
+  {
+   "tconst": "tt0275719",
+   "title": "Tape",
+   "year": 2001,
+   "rating": 7.2,
+   "votes": 22414,
+   "score": 6.998143196602105
+  },
+  {
+   "tconst": "tt0247199",
+   "title": "The Believer",
+   "year": 2001,
+   "rating": 7.1,
+   "votes": 44059,
+   "score": 6.997464133163037
+  },
+  {
+   "tconst": "tt0259393",
+   "title": "Lantana",
+   "year": 2001,
+   "rating": 7.2,
+   "votes": 20983,
+   "score": 6.988820113438358
+  },
+  {
+   "tconst": "tt0183790",
+   "title": "A Knight's Tale",
+   "year": 2001,
+   "rating": 7,
+   "votes": 222856,
+   "score": 6.980490146591287
+  },
+  {
+   "tconst": "tt0247745",
+   "title": "Super Troopers",
+   "year": 2001,
+   "rating": 7,
+   "votes": 120545,
+   "score": 6.965199843537942
+  },
+  {
+   "tconst": "tt0285742",
+   "title": "Monster's Ball",
+   "year": 2001,
+   "rating": 7,
+   "votes": 97906,
+   "score": 6.957898667123798
+  },
+  {
+   "tconst": "tt0272020",
+   "title": "The Last Castle",
+   "year": 2001,
+   "rating": 7,
+   "votes": 92315,
+   "score": 6.955598041095252
+  },
+  {
+   "tconst": "tt0237534",
+   "title": "Brotherhood of the Wolf",
+   "year": 2001,
+   "rating": 7,
+   "votes": 77626,
+   "score": 6.948154812209397
+  },
+  {
+   "tconst": "tt0274497",
+   "title": "The Ignorant Fairies",
+   "year": 2001,
+   "rating": 7.3,
+   "votes": 10888,
+   "score": 6.938884219392026
+  },
+  {
+   "tconst": "tt0254455",
+   "title": "Sex and Lucía",
+   "year": 2001,
+   "rating": 7,
+   "votes": 40868,
+   "score": 6.910690681266427
+  },
+  {
+   "tconst": "tt0258760",
+   "title": "Lammbock",
+   "year": 2001,
+   "rating": 7.2,
+   "votes": 12469,
+   "score": 6.908799393593869
+  },
+  {
+   "tconst": "tt0259711",
+   "title": "Vanilla Sky",
+   "year": 2001,
+   "rating": 6.9,
+   "votes": 312079,
+   "score": 6.888999635414481
+  },
+  {
+   "tconst": "tt0230011",
+   "title": "Atlantis: The Lost Empire",
+   "year": 2001,
+   "rating": 6.9,
+   "votes": 150236,
+   "score": 6.877888948642382
+  },
+  {
+   "tconst": "tt0296042",
+   "title": "Ichi the Killer",
+   "year": 2001,
+   "rating": 6.9,
+   "votes": 64533,
+   "score": 6.852464191360346
+  },
+  {
+   "tconst": "tt0268995",
+   "title": "The Majestic",
+   "year": 2001,
+   "rating": 6.9,
+   "votes": 61284,
+   "score": 6.850297592372211
+  },
+  {
+   "tconst": "tt0280778",
+   "title": "Iris",
+   "year": 2001,
+   "rating": 7,
+   "votes": 19975,
+   "score": 6.848440819838553
+  },
+  {
+   "tconst": "tt0243493",
+   "title": "The Closet",
+   "year": 2001,
+   "rating": 7,
+   "votes": 19206,
+   "score": 6.844450235385217
+  },
+  {
+   "tconst": "tt0275083",
+   "title": "The Warrior",
+   "year": 2001,
+   "rating": 7.1,
+   "votes": 11521,
+   "score": 6.842438249833216
+  },
+  {
+   "tconst": "tt0242587",
+   "title": "L.I.E.",
+   "year": 2001,
+   "rating": 7.1,
+   "votes": 11275,
+   "score": 6.839460097516364
+  },
+  {
+   "tconst": "tt0252684",
+   "title": "Manic",
+   "year": 2001,
+   "rating": 7.1,
+   "votes": 11106,
+   "score": 6.8373739019549244
+  },
+  {
+   "tconst": "tt0252501",
+   "title": "Hearts in Atlantis",
+   "year": 2001,
+   "rating": 6.9,
+   "votes": 43747,
+   "score": 6.834080294242669
+  },
+  {
+   "tconst": "tt0242193",
+   "title": "Bully",
+   "year": 2001,
+   "rating": 6.9,
+   "votes": 42484,
+   "score": 6.832493971013274
+  },
+  {
+   "tconst": "tt0252480",
+   "title": "The Grey Zone",
+   "year": 2001,
+   "rating": 7,
+   "votes": 12212,
+   "score": 6.7954715277624995
+  },
+  {
+   "tconst": "tt0232500",
+   "title": "The Fast and the Furious",
+   "year": 2001,
+   "rating": 6.8,
+   "votes": 466630,
+   "score": 6.794664653032039
+  },
+  {
+   "tconst": "tt0212985",
+   "title": "Hannibal",
+   "year": 2001,
+   "rating": 6.8,
+   "votes": 316757,
+   "score": 6.792217499777084
+  },
+  {
+   "tconst": "tt0243155",
+   "title": "Bridget Jones's Diary",
+   "year": 2001,
+   "rating": 6.8,
+   "votes": 289274,
+   "score": 6.791502815395458
+  },
+  {
+   "tconst": "tt0261392",
+   "title": "Jay and Silent Bob Strike Back",
+   "year": 2001,
+   "rating": 6.8,
+   "votes": 167373,
+   "score": 6.785663057932496
+  },
+  {
+   "tconst": "tt0227445",
+   "title": "The Score",
+   "year": 2001,
+   "rating": 6.8,
+   "votes": 145549,
+   "score": 6.783651541152052
+  },
+  {
+   "tconst": "tt0240890",
+   "title": "Serendipity",
+   "year": 2001,
+   "rating": 6.8,
+   "votes": 132916,
+   "score": 6.782206425975122
+  },
+  {
+   "tconst": "tt0268690",
+   "title": "13 Conversations About One Thing",
+   "year": 2001,
+   "rating": 7,
+   "votes": 10670,
+   "score": 6.780213525624608
+  },
+  {
+   "tconst": "tt0243609",
+   "title": "To End All Wars",
+   "year": 2001,
+   "rating": 6.9,
+   "votes": 12379,
+   "score": 6.741682540536246
+  },
+  {
+   "tconst": "tt0304262",
+   "title": "The Happiness of the Katakuris",
+   "year": 2001,
+   "rating": 6.9,
+   "votes": 10685,
+   "score": 6.728717117460027
+  },
+  {
+   "tconst": "tt0245238",
+   "title": "Lost and Delirious",
+   "year": 2001,
+   "rating": 6.8,
+   "votes": 23564,
+   "score": 6.724234703094406
+  },
+  {
+   "tconst": "tt0250081",
+   "title": "Storytelling",
+   "year": 2001,
+   "rating": 6.8,
+   "votes": 18989,
+   "score": 6.712277538882356
+  },
+  {
+   "tconst": "tt0220580",
+   "title": "Intacto",
+   "year": 2001,
+   "rating": 6.8,
+   "votes": 14275,
+   "score": 6.6952425777409115
+  },
+  {
+   "tconst": "tt0266915",
+   "title": "Rush Hour 2",
+   "year": 2001,
+   "rating": 6.7,
+   "votes": 264055,
+   "score": 6.694369792832317
+  },
+  {
+   "tconst": "tt0120681",
+   "title": "From Hell",
+   "year": 2001,
+   "rating": 6.7,
+   "votes": 173053,
+   "score": 6.691570821426913
+  },
+  {
+   "tconst": "tt0248667",
+   "title": "Ali",
+   "year": 2001,
+   "rating": 6.7,
+   "votes": 111042,
+   "score": 6.687252470833765
+  },
+  {
+   "tconst": "tt0230838",
+   "title": "Sweet November",
+   "year": 2001,
+   "rating": 6.7,
+   "votes": 99679,
+   "score": 6.68593179710483
+  },
+  {
+   "tconst": "tt0237572",
+   "title": "The Pledge",
+   "year": 2001,
+   "rating": 6.7,
+   "votes": 78173,
+   "score": 6.682500465841706
+  },
+  {
+   "tconst": "tt0256524",
+   "title": "The Curse of the Jade Scorpion",
+   "year": 2001,
+   "rating": 6.7,
+   "votes": 43183,
+   "score": 6.670987224764692
+  },
+  {
+   "tconst": "tt0120824",
+   "title": "The Shipping News",
+   "year": 2001,
+   "rating": 6.7,
+   "votes": 34985,
+   "score": 6.665699979430046
+  },
+  {
+   "tconst": "tt0252299",
+   "title": "Buffalo Soldiers",
+   "year": 2001,
+   "rating": 6.7,
+   "votes": 26489,
+   "score": 6.657713655475915
+  },
+  {
+   "tconst": "tt0248408",
+   "title": "Manitou's Shoe",
+   "year": 2001,
+   "rating": 6.7,
+   "votes": 23439,
+   "score": 6.653856681559277
+  },
+  {
+   "tconst": "tt0206314",
+   "title": "Joy Ride",
+   "year": 2001,
+   "rating": 6.6,
+   "votes": 84909,
+   "score": 6.594278873180211
+  },
+  {
+   "tconst": "tt0271027",
+   "title": "Kiss of the Dragon",
+   "year": 2001,
+   "rating": 6.6,
+   "votes": 70170,
+   "score": 6.593227062176133
+  },
+  {
+   "tconst": "tt0281364",
+   "title": "Wasabi",
+   "year": 2001,
+   "rating": 6.6,
+   "votes": 46307,
+   "score": 6.590356679891677
+  },
+  {
+   "tconst": "tt0286751",
+   "title": "Pulse",
+   "year": 2001,
+   "rating": 6.6,
+   "votes": 32346,
+   "score": 6.587177385695476
+  },
+  {
+   "tconst": "tt0307213",
+   "title": "Bad Guy",
+   "year": 2001,
+   "rating": 6.6,
+   "votes": 11278,
+   "score": 6.574481322241782
+  },
+  {
+   "tconst": "tt0250323",
+   "title": "The Deep End",
+   "year": 2001,
+   "rating": 6.5,
+   "votes": 12547,
+   "score": 6.520269373959314
+  },
+  {
+   "tconst": "tt0265632",
+   "title": "Recess: School's Out",
+   "year": 2001,
+   "rating": 6.5,
+   "votes": 12697,
+   "score": 6.520135417661393
+  },
+  {
+   "tconst": "tt0264761",
+   "title": "Kissing Jessica Stein",
+   "year": 2001,
+   "rating": 6.5,
+   "votes": 18086,
+   "score": 6.516271935293764
+  },
+  {
+   "tconst": "tt0290329",
+   "title": "Visitor Q",
+   "year": 2001,
+   "rating": 6.5,
+   "votes": 18426,
+   "score": 6.516077308613967
+  },
+  {
+   "tconst": "tt0255819",
+   "title": "Baby Boy",
+   "year": 2001,
+   "rating": 6.5,
+   "votes": 18893,
+   "score": 6.515817449716563
+  },
+  {
+   "tconst": "tt0312843",
+   "title": "Suicide Club",
+   "year": 2001,
+   "rating": 6.5,
+   "votes": 24234,
+   "score": 6.513349698389339
+  },
+  {
+   "tconst": "tt0200027",
+   "title": "Riding in Cars with Boys",
+   "year": 2001,
+   "rating": 6.5,
+   "votes": 32151,
+   "score": 6.510842294955295
+  },
+  {
+   "tconst": "tt0252503",
+   "title": "Heist",
+   "year": 2001,
+   "rating": 6.5,
+   "votes": 41594,
+   "score": 6.508857882208409
+  },
+  {
+   "tconst": "tt0243655",
+   "title": "Wet Hot American Summer",
+   "year": 2001,
+   "rating": 6.5,
+   "votes": 64943,
+   "score": 6.506098148921989
+  },
+  {
+   "tconst": "tt0219965",
+   "title": "Bandits",
+   "year": 2001,
+   "rating": 6.5,
+   "votes": 74924,
+   "score": 6.5053814419323235
+  },
+  {
+   "tconst": "tt0250687",
+   "title": "Rat Race",
+   "year": 2001,
+   "rating": 6.5,
+   "votes": 131775,
+   "score": 6.5032235131346185
+  },
+  {
+   "tconst": "tt0244244",
+   "title": "Swordfish",
+   "year": 2001,
+   "rating": 6.5,
+   "votes": 204606,
+   "score": 6.502129547052089
+  },
+  {
+   "tconst": "tt0252866",
+   "title": "American Pie 2",
+   "year": 2001,
+   "rating": 6.5,
+   "votes": 289346,
+   "score": 6.501526706803032
+  },
+  {
+   "tconst": "tt0250494",
+   "title": "Legally Blonde",
+   "year": 2001,
+   "rating": 6.5,
+   "votes": 293264,
+   "score": 6.50150698261139
+  },
+  {
+   "tconst": "tt0196229",
+   "title": "Zoolander",
+   "year": 2001,
+   "rating": 6.5,
+   "votes": 320689,
+   "score": 6.501382004163006
+  },
+  {
+   "tconst": "tt0245046",
+   "title": "Charlotte Gray",
+   "year": 2001,
+   "rating": 6.4,
+   "votes": 12508,
+   "score": 6.464733142645311
+  },
+  {
+   "tconst": "tt0267287",
+   "title": "Avalon",
+   "year": 2001,
+   "rating": 6.4,
+   "votes": 14121,
+   "score": 6.460404360294376
+  },
+  {
+   "tconst": "tt0243255",
+   "title": "Fat Girl",
+   "year": 2001,
+   "rating": 6.4,
+   "votes": 14253,
+   "score": 6.46007560197339
+  },
+  {
+   "tconst": "tt0249371",
+   "title": "Asoka",
+   "year": 2001,
+   "rating": 6.4,
+   "votes": 16382,
+   "score": 6.455227563287872
+  },
+  {
+   "tconst": "tt0219822",
+   "title": "Human Nature",
+   "year": 2001,
+   "rating": 6.4,
+   "votes": 19628,
+   "score": 6.449176912875005
+  },
+  {
+   "tconst": "tt0157583",
+   "title": "Enigma",
+   "year": 2001,
+   "rating": 6.4,
+   "votes": 22861,
+   "score": 6.444338686426483
+  },
+  {
+   "tconst": "tt0164961",
+   "title": "Vidocq",
+   "year": 2001,
+   "rating": 6.4,
+   "votes": 24110,
+   "score": 6.442715144375862
+  },
+  {
+   "tconst": "tt0250224",
+   "title": "Crazy/Beautiful",
+   "year": 2001,
+   "rating": 6.4,
+   "votes": 27825,
+   "score": 6.438519856567367
+  },
+  {
+   "tconst": "tt0180734",
+   "title": "Hardball",
+   "year": 2001,
+   "rating": 6.4,
+   "votes": 36542,
+   "score": 6.431305349462006
+  },
+  {
+   "tconst": "tt0291341",
+   "title": "Mean Machine",
+   "year": 2001,
+   "rating": 6.4,
+   "votes": 43207,
+   "score": 6.427383870067109
+  },
+  {
+   "tconst": "tt0173840",
+   "title": "Final Fantasy: The Spirits Within",
+   "year": 2001,
+   "rating": 6.4,
+   "votes": 86736,
+   "score": 6.415061751309344
+  },
+  {
+   "tconst": "tt0035423",
+   "title": "Kate & Leopold",
+   "year": 2001,
+   "rating": 6.4,
+   "votes": 94750,
+   "score": 6.413909437466927
+  },
+  {
+   "tconst": "tt0164334",
+   "title": "Along Came a Spider",
+   "year": 2001,
+   "rating": 6.4,
+   "votes": 104982,
+   "score": 6.41267166664922
+  },
+  {
+   "tconst": "tt0159273",
+   "title": "Behind Enemy Lines",
+   "year": 2001,
+   "rating": 6.4,
+   "votes": 120134,
+   "score": 6.411196255972004
+  },
+  {
+   "tconst": "tt0247638",
+   "title": "The Princess Diaries",
+   "year": 2001,
+   "rating": 6.4,
+   "votes": 185957,
+   "score": 6.407435373957862
+  },
+  {
+   "tconst": "tt0209163",
+   "title": "The Mummy Returns",
+   "year": 2001,
+   "rating": 6.4,
+   "votes": 371169,
+   "score": 6.403822487071774
+  },
+  {
+   "tconst": "tt0253798",
+   "title": "Out Cold",
+   "year": 2001,
+   "rating": 6.3,
+   "votes": 19594,
+   "score": 6.383024044558377
+  },
+  {
+   "tconst": "tt0227005",
+   "title": "Made",
+   "year": 2001,
+   "rating": 6.3,
+   "votes": 20536,
+   "score": 6.380462849576258
+  },
+  {
+   "tconst": "tt0181739",
+   "title": "Osmosis Jones",
+   "year": 2001,
+   "rating": 6.3,
+   "votes": 41869,
+   "score": 6.347369595994922
+  },
+  {
+   "tconst": "tt0202470",
+   "title": "Rock Star",
+   "year": 2001,
+   "rating": 6.3,
+   "votes": 47430,
+   "score": 6.342782754216622
+  },
+  {
+   "tconst": "tt0267129",
+   "title": "Yamakasi",
+   "year": 2001,
+   "rating": 6.2,
+   "votes": 14212,
+   "score": 6.342781000109889
+  },
+  {
+   "tconst": "tt0227984",
+   "title": "Formula 51",
+   "year": 2001,
+   "rating": 6.3,
+   "votes": 52985,
+   "score": 6.339009503447815
+  },
+  {
+   "tconst": "tt0125022",
+   "title": "Heartbreakers",
+   "year": 2001,
+   "rating": 6.3,
+   "votes": 62694,
+   "score": 6.333799399877028
+  },
+  {
+   "tconst": "tt0261983",
+   "title": "Session 9",
+   "year": 2001,
+   "rating": 6.3,
+   "votes": 67935,
+   "score": 6.3315264460725045
+  },
+  {
+   "tconst": "tt0260866",
+   "title": "Don't Say a Word",
+   "year": 2001,
+   "rating": 6.3,
+   "votes": 68333,
+   "score": 6.331366264213813
+  },
+  {
+   "tconst": "tt0263488",
+   "title": "Jeepers Creepers",
+   "year": 2001,
+   "rating": 6.3,
+   "votes": 158969,
+   "score": 6.314541209184291
+  },
+  {
+   "tconst": "tt0236640",
+   "title": "Prozac Nation",
+   "year": 2001,
+   "rating": 6.2,
+   "votes": 20440,
+   "score": 6.313568120061125
+  },
+  {
+   "tconst": "tt0213149",
+   "title": "Pearl Harbor",
+   "year": 2001,
+   "rating": 6.3,
+   "votes": 372839,
+   "score": 6.30641787690037
+  },
+  {
+   "tconst": "tt0264508",
+   "title": "Dagon",
+   "year": 2001,
+   "rating": 6.2,
+   "votes": 23625,
+   "score": 6.302810812629313
+  },
+  {
+   "tconst": "tt0160399",
+   "title": "Impostor",
+   "year": 2001,
+   "rating": 6.2,
+   "votes": 25556,
+   "score": 6.297227291446188
+  },
+  {
+   "tconst": "tt0203755",
+   "title": "One Night at McCool's",
+   "year": 2001,
+   "rating": 6.2,
+   "votes": 30772,
+   "score": 6.284788913339072
+  },
+  {
+   "tconst": "tt0242527",
+   "title": "The Hole",
+   "year": 2001,
+   "rating": 6.2,
+   "votes": 50287,
+   "score": 6.257342604121297
+  },
+  {
+   "tconst": "tt0278488",
+   "title": "How High",
+   "year": 2001,
+   "rating": 6.2,
+   "votes": 65825,
+   "score": 6.245592002303471
+  },
+  {
+   "tconst": "tt0206275",
+   "title": "Save the Last Dance",
+   "year": 2001,
+   "rating": 6.2,
+   "votes": 69557,
+   "score": 6.243453292289311
+  },
+  {
+   "tconst": "tt0184791",
+   "title": "O",
+   "year": 2001,
+   "rating": 6.1,
+   "votes": 21472,
+   "score": 6.241618377435836
+  },
+  {
+   "tconst": "tt0236493",
+   "title": "The Mexican",
+   "year": 2001,
+   "rating": 6.2,
+   "votes": 122236,
+   "score": 6.226142756697576
+  },
+  {
+   "tconst": "tt0256103",
+   "title": "Intimacy",
+   "year": 2001,
+   "rating": 6,
+   "votes": 14256,
+   "score": 6.224975823493596
+  },
+  {
+   "tconst": "tt0211465",
+   "title": "Knockaround Guys",
+   "year": 2001,
+   "rating": 6.1,
+   "votes": 25931,
+   "score": 6.22404368302192
+  },
+  {
+   "tconst": "tt0244970",
+   "title": "Someone Like You",
+   "year": 2001,
+   "rating": 6.1,
+   "votes": 27916,
+   "score": 6.217549677567798
+  },
+  {
+   "tconst": "tt0218817",
+   "title": "Antitrust",
+   "year": 2001,
+   "rating": 6.1,
+   "votes": 31622,
+   "score": 6.207083118895311
+  },
+  {
+   "tconst": "tt0204700",
+   "title": "Trouble Every Day",
+   "year": 2001,
+   "rating": 5.9,
+   "votes": 11130,
+   "score": 6.205585119482284
+  },
+  {
+   "tconst": "tt0236784",
+   "title": "The Tailor of Panama",
+   "year": 2001,
+   "rating": 6.1,
+   "votes": 33763,
+   "score": 6.20184433367595
+  },
+  {
+   "tconst": "tt0268397",
+   "title": "Jimmy Neutron: Boy Genius",
+   "year": 2001,
+   "rating": 6.1,
+   "votes": 40970,
+   "score": 6.187443860597618
+  },
+  {
+   "tconst": "tt0179626",
+   "title": "15 Minutes",
+   "year": 2001,
+   "rating": 6.1,
+   "votes": 53973,
+   "score": 6.169670229232029
+  },
+  {
+   "tconst": "tt0287635",
+   "title": "Pokemon 4Ever: Celebi - Voice of the Forest",
+   "year": 2001,
+   "rating": 5.8,
+   "votes": 10610,
+   "score": 6.161815311725407
+  },
+  {
+   "tconst": "tt0188453",
+   "title": "Birthday Girl",
+   "year": 2001,
+   "rating": 6,
+   "votes": 27275,
+   "score": 6.146398754518059
+  },
+  {
+   "tconst": "tt0244000",
+   "title": "American Outlaws",
+   "year": 2001,
+   "rating": 5.9,
+   "votes": 17389,
+   "score": 6.1357520747256435
+  },
+  {
+   "tconst": "tt0234354",
+   "title": "Novocaine",
+   "year": 2001,
+   "rating": 5.8,
+   "votes": 12507,
+   "score": 6.131319748285451
+  },
+  {
+   "tconst": "tt0251075",
+   "title": "Evolution",
+   "year": 2001,
+   "rating": 6.1,
+   "votes": 143084,
+   "score": 6.129114823068777
+  },
+  {
+   "tconst": "tt0233142",
+   "title": "3000 Miles to Graceland",
+   "year": 2001,
+   "rating": 6,
+   "votes": 51458,
+   "score": 6.088792566869417
+  },
+  {
+   "tconst": "tt0186589",
+   "title": "Sugar & Spice",
+   "year": 2001,
+   "rating": 5.8,
+   "votes": 16520,
+   "score": 6.081184523931396
+  },
+  {
+   "tconst": "tt0218922",
+   "title": "Original Sin",
+   "year": 2001,
+   "rating": 6,
+   "votes": 63992,
+   "score": 6.0737513998089065
+  },
+  {
+   "tconst": "tt0245686",
+   "title": "Joe Dirt",
+   "year": 2001,
+   "rating": 6,
+   "votes": 66193,
+   "score": 6.071620930724091
+  },
+  {
+   "tconst": "tt0271946",
+   "title": "The Accidental Spy",
+   "year": 2001,
+   "rating": 5.8,
+   "votes": 20226,
+   "score": 6.046708581177153
+  },
+  {
+   "tconst": "tt0238112",
+   "title": "Captain Corelli's Mandolin",
+   "year": 2001,
+   "rating": 5.9,
+   "votes": 37633,
+   "score": 6.035557566700831
+  },
+  {
+   "tconst": "tt0256380",
+   "title": "Shallow Hal",
+   "year": 2001,
+   "rating": 6,
+   "votes": 155736,
+   "score": 6.032925939896345
+  },
+  {
+   "tconst": "tt0279889",
+   "title": "Joe Somebody",
+   "year": 2001,
+   "rating": 5.6,
+   "votes": 11858,
+   "score": 6.032656856741726
+  },
+  {
+   "tconst": "tt0163025",
+   "title": "Jurassic Park III",
+   "year": 2001,
+   "rating": 6,
+   "votes": 376026,
+   "score": 6.014136388675014
+  },
+  {
+   "tconst": "tt0239948",
+   "title": "Saving Silverman",
+   "year": 2001,
+   "rating": 5.9,
+   "votes": 46637,
+   "score": 6.014006984385838
+  },
+  {
+   "tconst": "tt0192071",
+   "title": "Get Over It",
+   "year": 2001,
+   "rating": 5.7,
+   "votes": 21099,
+   "score": 5.971938440935743
+  },
+  {
+   "tconst": "tt0189192",
+   "title": "Just Visiting",
+   "year": 2001,
+   "rating": 5.7,
+   "votes": 21371,
+   "score": 5.969580618235334
+  },
+  {
+   "tconst": "tt0250720",
+   "title": "See Spot Run",
+   "year": 2001,
+   "rating": 5.4,
+   "votes": 10208,
+   "score": 5.966954353457078
+  },
+  {
+   "tconst": "tt0267804",
+   "title": "The One",
+   "year": 2001,
+   "rating": 5.9,
+   "votes": 100502,
+   "score": 5.958433454368795
+  },
+  {
+   "tconst": "tt0221218",
+   "title": "The Glass House",
+   "year": 2001,
+   "rating": 5.8,
+   "votes": 43634,
+   "score": 5.93903519362085
+  },
+  {
+   "tconst": "tt0236348",
+   "title": "Josie and the Pussycats",
+   "year": 2001,
+   "rating": 5.7,
+   "votes": 27246,
+   "score": 5.927058303567112
+  },
+  {
+   "tconst": "tt0225071",
+   "title": "Angel Eyes",
+   "year": 2001,
+   "rating": 5.7,
+   "votes": 27249,
+   "score": 5.927040016501399
+  },
+  {
+   "tconst": "tt0192111",
+   "title": "Head Over Heels",
+   "year": 2001,
+   "rating": 5.5,
+   "votes": 16230,
+   "score": 5.898666167543295
+  },
+  {
+   "tconst": "tt0258470",
+   "title": "Bubble Boy",
+   "year": 2001,
+   "rating": 5.7,
+   "votes": 36533,
+   "score": 5.881742281276956
+  },
+  {
+   "tconst": "tt0161083",
+   "title": "What's the Worst That Could Happen?",
+   "year": 2001,
+   "rating": 5.5,
+   "votes": 18288,
+   "score": 5.869662527384779
+  },
+  {
+   "tconst": "tt0277371",
+   "title": "Not Another Teen Movie",
+   "year": 2001,
+   "rating": 5.8,
+   "votes": 128477,
+   "score": 5.853850195878454
+  },
+  {
+   "tconst": "tt0249478",
+   "title": "Domestic Disturbance",
+   "year": 2001,
+   "rating": 5.6,
+   "votes": 29929,
+   "score": 5.836845740556003
+  },
+  {
+   "tconst": "tt0146316",
+   "title": "Lara Croft: Tomb Raider",
+   "year": 2001,
+   "rating": 5.8,
+   "votes": 231939,
+   "score": 5.830821874830684
+  },
+  {
+   "tconst": "tt0238552",
+   "title": "Replicant",
+   "year": 2001,
+   "rating": 5.4,
+   "votes": 16745,
+   "score": 5.8283796438459765
+  },
+  {
+   "tconst": "tt0265029",
+   "title": "America's Sweethearts",
+   "year": 2001,
+   "rating": 5.7,
+   "votes": 61972,
+   "score": 5.817504217955047
+  },
+  {
+   "tconst": "tt0242445",
+   "title": "Exit Wounds",
+   "year": 2001,
+   "rating": 5.6,
+   "votes": 37651,
+   "score": 5.798464115646275
+  },
+  {
+   "tconst": "tt0258038",
+   "title": "Pootie Tang",
+   "year": 2001,
+   "rating": 5.3,
+   "votes": 15912,
+   "score": 5.780743036996784
+  },
+  {
+   "tconst": "tt0245674",
+   "title": "Thir13en Ghosts",
+   "year": 2001,
+   "rating": 5.7,
+   "votes": 102654,
+   "score": 5.775070690562791
+  },
+  {
+   "tconst": "tt0227538",
+   "title": "Spy Kids",
+   "year": 2001,
+   "rating": 5.7,
+   "votes": 137503,
+   "score": 5.757334519126124
+  },
+  {
+   "tconst": "tt0133152",
+   "title": "Planet of the Apes",
+   "year": 2001,
+   "rating": 5.7,
+   "votes": 243217,
+   "score": 5.733398285165137
+  },
+  {
+   "tconst": "tt0231775",
+   "title": "Down to Earth",
+   "year": 2001,
+   "rating": 5.4,
+   "votes": 24644,
+   "score": 5.730707007697166
+  }
+ ]
+}

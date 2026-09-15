@@ -1,0 +1,1608 @@
+{
+ "tag": "year-2004",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.607,
+ "minVotes": 10000,
+ "items": [
+  {
+   "tconst": "tt6019206",
+   "title": "Kill Bill: The Whole Bloody Affair",
+   "year": 2004,
+   "rating": 8.7,
+   "votes": 58182,
+   "score": 8.393025328403047
+  },
+  {
+   "tconst": "tt0338013",
+   "title": "Eternal Sunshine of the Spotless Mind",
+   "year": 2004,
+   "rating": 8.3,
+   "votes": 1196141,
+   "score": 8.285963376538213
+  },
+  {
+   "tconst": "tt0347149",
+   "title": "Howl's Moving Castle",
+   "year": 2004,
+   "rating": 8.2,
+   "votes": 521601,
+   "score": 8.170033639780918
+  },
+  {
+   "tconst": "tt0363163",
+   "title": "Downfall",
+   "year": 2004,
+   "rating": 8.2,
+   "votes": 403959,
+   "score": 8.161517572854258
+  },
+  {
+   "tconst": "tt0405159",
+   "title": "Million Dollar Baby",
+   "year": 2004,
+   "rating": 8.1,
+   "votes": 773604,
+   "score": 8.080946821278575
+  },
+  {
+   "tconst": "tt0367110",
+   "title": "Swades",
+   "year": 2004,
+   "rating": 8.2,
+   "votes": 107307,
+   "score": 8.064201223636923
+  },
+  {
+   "tconst": "tt0395169",
+   "title": "Hotel Rwanda",
+   "year": 2004,
+   "rating": 8.1,
+   "votes": 394850,
+   "score": 8.063121780761211
+  },
+  {
+   "tconst": "tt0381681",
+   "title": "Before Sunset",
+   "year": 2004,
+   "rating": 8.1,
+   "votes": 319635,
+   "score": 8.054707033358644
+  },
+  {
+   "tconst": "tt0317705",
+   "title": "The Incredibles",
+   "year": 2004,
+   "rating": 8,
+   "votes": 917034,
+   "score": 7.9849734237807635
+  },
+  {
+   "tconst": "tt0378194",
+   "title": "Kill Bill: Vol. 2",
+   "year": 2004,
+   "rating": 8,
+   "votes": 880286,
+   "score": 7.984353177452163
+  },
+  {
+   "tconst": "tt0400234",
+   "title": "Black Friday",
+   "year": 2004,
+   "rating": 8.4,
+   "votes": 26562,
+   "score": 7.9095961091071745
+  },
+  {
+   "tconst": "tt0416960",
+   "title": "The Lizard",
+   "year": 2004,
+   "rating": 8.4,
+   "votes": 24730,
+   "score": 7.883727409766096
+  },
+  {
+   "tconst": "tt0304141",
+   "title": "Harry Potter and the Prisoner of Azkaban",
+   "year": 2004,
+   "rating": 7.9,
+   "votes": 778696,
+   "score": 7.8836056642117835
+  },
+  {
+   "tconst": "tt0384116",
+   "title": "G.O.R.A.",
+   "year": 2004,
+   "rating": 8,
+   "votes": 72464,
+   "score": 7.831076020338287
+  },
+  {
+   "tconst": "tt0332280",
+   "title": "The Notebook",
+   "year": 2004,
+   "rating": 7.8,
+   "votes": 702091,
+   "score": 7.783246316750494
+  },
+  {
+   "tconst": "tt0365748",
+   "title": "Shaun of the Dead",
+   "year": 2004,
+   "rating": 7.8,
+   "votes": 644741,
+   "score": 7.781778830012443
+  },
+  {
+   "tconst": "tt0369702",
+   "title": "The Sea Inside",
+   "year": 2004,
+   "rating": 7.9,
+   "votes": 89459,
+   "score": 7.769995203462498
+  },
+  {
+   "tconst": "tt0372824",
+   "title": "The Chorus",
+   "year": 2004,
+   "rating": 7.9,
+   "votes": 72894,
+   "score": 7.744015887050649
+  },
+  {
+   "tconst": "tt0386064",
+   "title": "Tae Guk Gi: The Brotherhood of War",
+   "year": 2004,
+   "rating": 8,
+   "votes": 42548,
+   "score": 7.7349062369866886
+  },
+  {
+   "tconst": "tt0423866",
+   "title": "3-Iron",
+   "year": 2004,
+   "rating": 7.9,
+   "votes": 61803,
+   "score": 7.719921910521518
+  },
+  {
+   "tconst": "tt0428870",
+   "title": "A Moment to Remember",
+   "year": 2004,
+   "rating": 8.1,
+   "votes": 27555,
+   "score": 7.70244582455536
+  },
+  {
+   "tconst": "tt0408664",
+   "title": "Nobody Knows",
+   "year": 2004,
+   "rating": 8,
+   "votes": 36044,
+   "score": 7.697460102101827
+  },
+  {
+   "tconst": "tt0372183",
+   "title": "The Bourne Supremacy",
+   "year": 2004,
+   "rating": 7.7,
+   "votes": 518040,
+   "score": 7.679300532045255
+  },
+  {
+   "tconst": "tt0375679",
+   "title": "Crash",
+   "year": 2004,
+   "rating": 7.7,
+   "votes": 464360,
+   "score": 7.676958118182765
+  },
+  {
+   "tconst": "tt0328107",
+   "title": "Man on Fire",
+   "year": 2004,
+   "rating": 7.7,
+   "votes": 426253,
+   "score": 7.67494539393695
+  },
+  {
+   "tconst": "tt0422320",
+   "title": "Ghilli",
+   "year": 2004,
+   "rating": 8.2,
+   "votes": 19334,
+   "score": 7.656939147104946
+  },
+  {
+   "tconst": "tt0420332",
+   "title": "Veer Zaara",
+   "year": 2004,
+   "rating": 7.8,
+   "votes": 67332,
+   "score": 7.645728197139302
+  },
+  {
+   "tconst": "tt0350258",
+   "title": "Ray",
+   "year": 2004,
+   "rating": 7.7,
+   "votes": 167248,
+   "score": 7.638334158586706
+  },
+  {
+   "tconst": "tt0373074",
+   "title": "Kung Fu Hustle",
+   "year": 2004,
+   "rating": 7.7,
+   "votes": 166475,
+   "score": 7.638064048398791
+  },
+  {
+   "tconst": "tt0347048",
+   "title": "Head-On",
+   "year": 2004,
+   "rating": 7.8,
+   "votes": 61329,
+   "score": 7.632744787410122
+  },
+  {
+   "tconst": "tt0318462",
+   "title": "The Motorcycle Diaries",
+   "year": 2004,
+   "rating": 7.7,
+   "votes": 109878,
+   "score": 7.608822744299843
+  },
+  {
+   "tconst": "tt0383846",
+   "title": "When I Grow Up, I'll Be a Kangaroo",
+   "year": 2004,
+   "rating": 8.4,
+   "votes": 12617,
+   "score": 7.607226994790491
+  },
+  {
+   "tconst": "tt0289879",
+   "title": "The Butterfly Effect",
+   "year": 2004,
+   "rating": 7.6,
+   "votes": 560693,
+   "score": 7.582599844296629
+  },
+  {
+   "tconst": "tt0387564",
+   "title": "Saw",
+   "year": 2004,
+   "rating": 7.6,
+   "votes": 516898,
+   "score": 7.581153568510749
+  },
+  {
+   "tconst": "tt0361862",
+   "title": "The Machinist",
+   "year": 2004,
+   "rating": 7.6,
+   "votes": 446491,
+   "score": 7.578246784583215
+  },
+  {
+   "tconst": "tt0424227",
+   "title": "Turtles Can Fly",
+   "year": 2004,
+   "rating": 8,
+   "votes": 23022,
+   "score": 7.578155561176685
+  },
+  {
+   "tconst": "tt0308644",
+   "title": "Finding Neverland",
+   "year": 2004,
+   "rating": 7.6,
+   "votes": 218168,
+   "score": 7.556478791684971
+  },
+  {
+   "tconst": "tt0370986",
+   "title": "Mysterious Skin",
+   "year": 2004,
+   "rating": 7.6,
+   "votes": 86937,
+   "score": 7.497560817243947
+  },
+  {
+   "tconst": "tt0323013",
+   "title": "Lakshya",
+   "year": 2004,
+   "rating": 7.8,
+   "votes": 28391,
+   "score": 7.48924625410061
+  },
+  {
+   "tconst": "tt0316654",
+   "title": "Spider-Man 2",
+   "year": 2004,
+   "rating": 7.5,
+   "votes": 808555,
+   "score": 7.489090351828742
+  },
+  {
+   "tconst": "tt0344510",
+   "title": "A Very Long Engagement",
+   "year": 2004,
+   "rating": 7.6,
+   "votes": 78278,
+   "score": 7.487512777149194
+  },
+  {
+   "tconst": "tt0369339",
+   "title": "Collateral",
+   "year": 2004,
+   "rating": 7.5,
+   "votes": 473996,
+   "score": 7.48154913044979
+  },
+  {
+   "tconst": "tt0338751",
+   "title": "The Aviator",
+   "year": 2004,
+   "rating": 7.5,
+   "votes": 412983,
+   "score": 7.478887692746934
+  },
+  {
+   "tconst": "tt0375063",
+   "title": "Sideways",
+   "year": 2004,
+   "rating": 7.5,
+   "votes": 218664,
+   "score": 7.460946423316203
+  },
+  {
+   "tconst": "tt0361596",
+   "title": "Fahrenheit 9/11",
+   "year": 2004,
+   "rating": 7.5,
+   "votes": 135451,
+   "score": 7.43860374243681
+  },
+  {
+   "tconst": "tt0385004",
+   "title": "House of Flying Daggers",
+   "year": 2004,
+   "rating": 7.5,
+   "votes": 120374,
+   "score": 7.431503619902561
+  },
+  {
+   "tconst": "tt0298148",
+   "title": "Shrek 2",
+   "year": 2004,
+   "rating": 7.4,
+   "votes": 563641,
+   "score": 7.386175766622638
+  },
+  {
+   "tconst": "tt0362227",
+   "title": "The Terminal",
+   "year": 2004,
+   "rating": 7.4,
+   "votes": 541976,
+   "score": 7.385633166915187
+  },
+  {
+   "tconst": "tt0349825",
+   "title": "Miracle",
+   "year": 2004,
+   "rating": 7.5,
+   "votes": 64434,
+   "score": 7.380025968524821
+  },
+  {
+   "tconst": "tt0419677",
+   "title": "Dead Man's Shoes",
+   "year": 2004,
+   "rating": 7.5,
+   "votes": 63961,
+   "score": 7.379258703116189
+  },
+  {
+   "tconst": "tt0333766",
+   "title": "Garden State",
+   "year": 2004,
+   "rating": 7.4,
+   "votes": 228576,
+   "score": 7.366760499552246
+  },
+  {
+   "tconst": "tt0383694",
+   "title": "Vera Drake",
+   "year": 2004,
+   "rating": 7.6,
+   "votes": 28998,
+   "score": 7.345367786583325
+  },
+  {
+   "tconst": "tt0377752",
+   "title": "Dear Frankie",
+   "year": 2004,
+   "rating": 7.6,
+   "votes": 23180,
+   "score": 7.300718895152999
+  },
+  {
+   "tconst": "tt0275491",
+   "title": "Bad Education",
+   "year": 2004,
+   "rating": 7.4,
+   "votes": 66400,
+   "score": 7.296202263627966
+  },
+  {
+   "tconst": "tt0212712",
+   "title": "2046",
+   "year": 2004,
+   "rating": 7.4,
+   "votes": 64990,
+   "score": 7.294250605963149
+  },
+  {
+   "tconst": "tt0417791",
+   "title": "Rory O'Shea Was Here",
+   "year": 2004,
+   "rating": 7.7,
+   "votes": 16795,
+   "score": 7.292082587840138
+  },
+  {
+   "tconst": "tt0332452",
+   "title": "Troy",
+   "year": 2004,
+   "rating": 7.3,
+   "votes": 649058,
+   "score": 7.289484769081289
+  },
+  {
+   "tconst": "tt0335345",
+   "title": "The Passion of the Christ",
+   "year": 2004,
+   "rating": 7.3,
+   "votes": 277071,
+   "score": 7.275859118271008
+  },
+  {
+   "tconst": "tt0347246",
+   "title": "Ghost in the Shell 2: Innocence",
+   "year": 2004,
+   "rating": 7.4,
+   "votes": 43122,
+   "score": 7.250718213568325
+  },
+  {
+   "tconst": "tt0390221",
+   "title": "Maria Full of Grace",
+   "year": 2004,
+   "rating": 7.4,
+   "votes": 37778,
+   "score": 7.234020949834161
+  },
+  {
+   "tconst": "tt0378284",
+   "title": "Machuca",
+   "year": 2004,
+   "rating": 7.7,
+   "votes": 13294,
+   "score": 7.230774145323968
+  },
+  {
+   "tconst": "tt0408777",
+   "title": "The Edukators",
+   "year": 2004,
+   "rating": 7.4,
+   "votes": 33174,
+   "score": 7.216321233640073
+  },
+  {
+   "tconst": "tt0387412",
+   "title": "Metallica: Some Kind of Monster",
+   "year": 2004,
+   "rating": 7.5,
+   "votes": 21196,
+   "score": 7.213740637940009
+  },
+  {
+   "tconst": "tt0452039",
+   "title": "Mind Game",
+   "year": 2004,
+   "rating": 7.7,
+   "votes": 12313,
+   "score": 7.210144442306124
+  },
+  {
+   "tconst": "tt0402014",
+   "title": "Ab Tak Chhappan",
+   "year": 2004,
+   "rating": 7.8,
+   "votes": 10128,
+   "score": 7.207286016552887
+  },
+  {
+   "tconst": "tt0382330",
+   "title": "As It Is in Heaven",
+   "year": 2004,
+   "rating": 7.5,
+   "votes": 19401,
+   "score": 7.19626383256272
+  },
+  {
+   "tconst": "tt0363547",
+   "title": "Dawn of the Dead",
+   "year": 2004,
+   "rating": 7.2,
+   "votes": 290752,
+   "score": 7.180282268916505
+  },
+  {
+   "tconst": "tt0362270",
+   "title": "The Life Aquatic with Steve Zissou",
+   "year": 2004,
+   "rating": 7.2,
+   "votes": 222346,
+   "score": 7.174477085644584
+  },
+  {
+   "tconst": "tt0375912",
+   "title": "Layer Cake",
+   "year": 2004,
+   "rating": 7.2,
+   "votes": 209405,
+   "score": 7.172971686794633
+  },
+  {
+   "tconst": "tt0372588",
+   "title": "Team America: World Police",
+   "year": 2004,
+   "rating": 7.2,
+   "votes": 186162,
+   "score": 7.1697691343949215
+  },
+  {
+   "tconst": "tt0293508",
+   "title": "The Phantom of the Opera",
+   "year": 2004,
+   "rating": 7.2,
+   "votes": 139944,
+   "score": 7.160450921285124
+  },
+  {
+   "tconst": "tt0390521",
+   "title": "Super Size Me",
+   "year": 2004,
+   "rating": 7.2,
+   "votes": 115566,
+   "score": 7.152772668884703
+  },
+  {
+   "tconst": "tt0345950",
+   "title": "The SpongeBob SquarePants Movie",
+   "year": 2004,
+   "rating": 7.2,
+   "votes": 113013,
+   "score": 7.151792517385776
+  },
+  {
+   "tconst": "tt0398883",
+   "title": "The Consequences of Love",
+   "year": 2004,
+   "rating": 7.4,
+   "votes": 20927,
+   "score": 7.1435849885593985
+  },
+  {
+   "tconst": "tt0384369",
+   "title": "Before the Fall",
+   "year": 2004,
+   "rating": 7.4,
+   "votes": 19897,
+   "score": 7.134751076736011
+  },
+  {
+   "tconst": "tt0396184",
+   "title": "Pusher II",
+   "year": 2004,
+   "rating": 7.3,
+   "votes": 30274,
+   "score": 7.127925037025786
+  },
+  {
+   "tconst": "tt0322420",
+   "title": "Life Is a Miracle",
+   "year": 2004,
+   "rating": 7.5,
+   "votes": 13970,
+   "score": 7.127444845272279
+  },
+  {
+   "tconst": "tt0390022",
+   "title": "Friday Night Lights",
+   "year": 2004,
+   "rating": 7.2,
+   "votes": 71433,
+   "score": 7.127177593127804
+  },
+  {
+   "tconst": "tt0347332",
+   "title": "Khakee",
+   "year": 2004,
+   "rating": 7.4,
+   "votes": 17647,
+   "score": 7.113164283328265
+  },
+  {
+   "tconst": "tt0386342",
+   "title": "Brothers",
+   "year": 2004,
+   "rating": 7.5,
+   "votes": 12473,
+   "score": 7.102627728437525
+  },
+  {
+   "tconst": "tt0343818",
+   "title": "I, Robot",
+   "year": 2004,
+   "rating": 7.1,
+   "votes": 621280,
+   "score": 7.092190237202472
+  },
+  {
+   "tconst": "tt0377092",
+   "title": "Mean Girls",
+   "year": 2004,
+   "rating": 7.1,
+   "votes": 493077,
+   "score": 7.090200014990104
+  },
+  {
+   "tconst": "tt0384504",
+   "title": "Saving Face",
+   "year": 2004,
+   "rating": 7.4,
+   "votes": 15547,
+   "score": 7.089585976481644
+  },
+  {
+   "tconst": "tt0357413",
+   "title": "Anchorman: The Legend of Ron Burgundy",
+   "year": 2004,
+   "rating": 7.1,
+   "votes": 404971,
+   "score": 7.088119297351325
+  },
+  {
+   "tconst": "tt0376541",
+   "title": "Closer",
+   "year": 2004,
+   "rating": 7.1,
+   "votes": 252597,
+   "score": 7.081225425047417
+  },
+  {
+   "tconst": "tt0410369",
+   "title": "Where's Firuze?",
+   "year": 2004,
+   "rating": 7.4,
+   "votes": 13669,
+   "score": 7.064956396179666
+  },
+  {
+   "tconst": "tt0378793",
+   "title": "Speak",
+   "year": 2004,
+   "rating": 7.2,
+   "votes": 32848,
+   "score": 7.061600376707816
+  },
+  {
+   "tconst": "tt0408017",
+   "title": "Everything About Mustafa",
+   "year": 2004,
+   "rating": 7.5,
+   "votes": 10235,
+   "score": 7.058678178461898
+  },
+  {
+   "tconst": "tt0414852",
+   "title": "District B13",
+   "year": 2004,
+   "rating": 7.1,
+   "votes": 78219,
+   "score": 7.0441146798442125
+  },
+  {
+   "tconst": "tt0430651",
+   "title": "Survive Style 5+",
+   "year": 2004,
+   "rating": 7.4,
+   "votes": 10575,
+   "score": 7.0145736544921755
+  },
+  {
+   "tconst": "tt0347473",
+   "title": "Main Hoon Na",
+   "year": 2004,
+   "rating": 7.1,
+   "votes": 45504,
+   "score": 7.011174923269971
+  },
+  {
+   "tconst": "tt0388139",
+   "title": "It's All Gone Pete Tong",
+   "year": 2004,
+   "rating": 7.2,
+   "votes": 21382,
+   "score": 7.011033488661543
+  },
+  {
+   "tconst": "tt0361127",
+   "title": "The Woodsman",
+   "year": 2004,
+   "rating": 7.1,
+   "votes": 37102,
+   "score": 6.995330409349423
+  },
+  {
+   "tconst": "tt0377091",
+   "title": "Mean Creek",
+   "year": 2004,
+   "rating": 7.1,
+   "votes": 35025,
+   "score": 6.990502008687984
+  },
+  {
+   "tconst": "tt0374900",
+   "title": "Napoleon Dynamite",
+   "year": 2004,
+   "rating": 7,
+   "votes": 259418,
+   "score": 6.9854124555195884
+  },
+  {
+   "tconst": "tt0366551",
+   "title": "Harold & Kumar Go to White Castle",
+   "year": 2004,
+   "rating": 7,
+   "votes": 216522,
+   "score": 6.982650042561767
+  },
+  {
+   "tconst": "tt0369672",
+   "title": "A Love Song for Bobby Long",
+   "year": 2004,
+   "rating": 7.1,
+   "votes": 28329,
+   "score": 6.971372927579027
+  },
+  {
+   "tconst": "tt0420206",
+   "title": "Summer Storm",
+   "year": 2004,
+   "rating": 7.2,
+   "votes": 15086,
+   "score": 6.963607308505801
+  },
+  {
+   "tconst": "tt0440803",
+   "title": "Shutter",
+   "year": 2004,
+   "rating": 7,
+   "votes": 54570,
+   "score": 6.9391335440789295
+  },
+  {
+   "tconst": "tt0362269",
+   "title": "Kinsey",
+   "year": 2004,
+   "rating": 7,
+   "votes": 52826,
+   "score": 6.937443939470546
+  },
+  {
+   "tconst": "tt0390808",
+   "title": "36th Precinct",
+   "year": 2004,
+   "rating": 7.1,
+   "votes": 19623,
+   "score": 6.933570298118912
+  },
+  {
+   "tconst": "tt0388789",
+   "title": "Born Into Brothels: Calcutta's Red Light Kids",
+   "year": 2004,
+   "rating": 7.1,
+   "votes": 19005,
+   "score": 6.930024235172436
+  },
+  {
+   "tconst": "tt0379889",
+   "title": "The Merchant of Venice",
+   "year": 2004,
+   "rating": 7,
+   "votes": 40270,
+   "score": 6.921819234954775
+  },
+  {
+   "tconst": "tt0332136",
+   "title": "If Only",
+   "year": 2004,
+   "rating": 7,
+   "votes": 35442,
+   "score": 6.9135128942647
+  },
+  {
+   "tconst": "tt0368891",
+   "title": "National Treasure",
+   "year": 2004,
+   "rating": 6.9,
+   "votes": 381545,
+   "score": 6.892516448789224
+  },
+  {
+   "tconst": "tt0167190",
+   "title": "Hellboy",
+   "year": 2004,
+   "rating": 6.9,
+   "votes": 373150,
+   "score": 6.892352480598138
+  },
+  {
+   "tconst": "tt0386820",
+   "title": "Terkel in Trouble",
+   "year": 2004,
+   "rating": 7.1,
+   "votes": 13405,
+   "score": 6.88935496437413
+  },
+  {
+   "tconst": "tt0367188",
+   "title": "Modigliani",
+   "year": 2004,
+   "rating": 7.1,
+   "votes": 13216,
+   "score": 6.887640116349781
+  },
+  {
+   "tconst": "tt0437238",
+   "title": "Hulchul",
+   "year": 2004,
+   "rating": 7.1,
+   "votes": 11207,
+   "score": 6.867522654839275
+  },
+  {
+   "tconst": "tt0368658",
+   "title": "Stage Beauty",
+   "year": 2004,
+   "rating": 7.1,
+   "votes": 11198,
+   "score": 6.867423952315149
+  },
+  {
+   "tconst": "tt0324554",
+   "title": "Wicker Park",
+   "year": 2004,
+   "rating": 6.9,
+   "votes": 60302,
+   "score": 6.858320573257895
+  },
+  {
+   "tconst": "tt0338512",
+   "title": "Two Brothers",
+   "year": 2004,
+   "rating": 7,
+   "votes": 16696,
+   "score": 6.852781425725821
+  },
+  {
+   "tconst": "tt0378072",
+   "title": "Hum Tum",
+   "year": 2004,
+   "rating": 7,
+   "votes": 16347,
+   "score": 6.850831325812294
+  },
+  {
+   "tconst": "tt0397619",
+   "title": "Samaritan Girl",
+   "year": 2004,
+   "rating": 7,
+   "votes": 14541,
+   "score": 6.839853834040035
+  },
+  {
+   "tconst": "tt0377084",
+   "title": "Ladies in Lavender",
+   "year": 2004,
+   "rating": 7,
+   "votes": 13811,
+   "score": 6.834944056997879
+  },
+  {
+   "tconst": "tt0395125",
+   "title": "The Ferpect Crime",
+   "year": 2004,
+   "rating": 7,
+   "votes": 13748,
+   "score": 6.8345061875179605
+  },
+  {
+   "tconst": "tt0340012",
+   "title": "Being Julia",
+   "year": 2004,
+   "rating": 7,
+   "votes": 13446,
+   "score": 6.832374517665125
+  },
+  {
+   "tconst": "tt0386005",
+   "title": "New Police Story",
+   "year": 2004,
+   "rating": 6.9,
+   "votes": 31224,
+   "score": 6.828921330806728
+  },
+  {
+   "tconst": "tt0364961",
+   "title": "The Assassination of Richard Nixon",
+   "year": 2004,
+   "rating": 6.9,
+   "votes": 26613,
+   "score": 6.819969763230998
+  },
+  {
+   "tconst": "tt0420251",
+   "title": "Three... Extremes",
+   "year": 2004,
+   "rating": 6.9,
+   "votes": 22101,
+   "score": 6.808721003743701
+  },
+  {
+   "tconst": "tt0373024",
+   "title": "Imaginary Heroes",
+   "year": 2004,
+   "rating": 7,
+   "votes": 10453,
+   "score": 6.80784495874329
+  },
+  {
+   "tconst": "tt0401233",
+   "title": "Appleseed",
+   "year": 2004,
+   "rating": 6.9,
+   "votes": 19062,
+   "score": 6.799176001003941
+  },
+  {
+   "tconst": "tt0343660",
+   "title": "50 First Dates",
+   "year": 2004,
+   "rating": 6.8,
+   "votes": 420638,
+   "score": 6.7955179360418185
+  },
+  {
+   "tconst": "tt0339291",
+   "title": "A Series of Unfortunate Events",
+   "year": 2004,
+   "rating": 6.8,
+   "votes": 232985,
+   "score": 6.792056517649963
+  },
+  {
+   "tconst": "tt0352520",
+   "title": "The Life and Death of Peter Sellers",
+   "year": 2004,
+   "rating": 6.9,
+   "votes": 15975,
+   "score": 6.787193568476479
+  },
+  {
+   "tconst": "tt0366777",
+   "title": "Millions",
+   "year": 2004,
+   "rating": 6.8,
+   "votes": 27355,
+   "score": 6.748329619627266
+  },
+  {
+   "tconst": "tt0348121",
+   "title": "Steamboy",
+   "year": 2004,
+   "rating": 6.8,
+   "votes": 19894,
+   "score": 6.735433630199255
+  },
+  {
+   "tconst": "tt0418362",
+   "title": "Mujhse Shaadi Karogi",
+   "year": 2004,
+   "rating": 6.8,
+   "votes": 19225,
+   "score": 6.733955618175416
+  },
+  {
+   "tconst": "tt0381348",
+   "title": "The Place Promised in Our Early Days",
+   "year": 2004,
+   "rating": 6.8,
+   "votes": 16349,
+   "score": 6.726746857230882
+  },
+  {
+   "tconst": "tt0372334",
+   "title": "House of D",
+   "year": 2004,
+   "rating": 6.8,
+   "votes": 10311,
+   "score": 6.704970357992049
+  },
+  {
+   "tconst": "tt0364725",
+   "title": "Dodgeball: A True Underdog Story",
+   "year": 2004,
+   "rating": 6.7,
+   "votes": 289225,
+   "score": 6.696891479459191
+  },
+  {
+   "tconst": "tt0265208",
+   "title": "The Girl Next Door",
+   "year": 2004,
+   "rating": 6.7,
+   "votes": 266979,
+   "score": 6.696641813787965
+  },
+  {
+   "tconst": "tt0390384",
+   "title": "Primer",
+   "year": 2004,
+   "rating": 6.7,
+   "votes": 123085,
+   "score": 6.693010879822494
+  },
+  {
+   "tconst": "tt0317648",
+   "title": "Hidalgo",
+   "year": 2004,
+   "rating": 6.7,
+   "votes": 89172,
+   "score": 6.690620870217163
+  },
+  {
+   "tconst": "tt0332375",
+   "title": "Saved!",
+   "year": 2004,
+   "rating": 6.7,
+   "votes": 51565,
+   "score": 6.684891625780501
+  },
+  {
+   "tconst": "tt0385705",
+   "title": "The Football Factory",
+   "year": 2004,
+   "rating": 6.7,
+   "votes": 35186,
+   "score": 6.679415149408589
+  },
+  {
+   "tconst": "tt0422091",
+   "title": "Dhoom",
+   "year": 2004,
+   "rating": 6.7,
+   "votes": 25051,
+   "score": 6.673463037892686
+  },
+  {
+   "tconst": "tt0382189",
+   "title": "My Summer of Love",
+   "year": 2004,
+   "rating": 6.7,
+   "votes": 23187,
+   "score": 6.671972547719785
+  },
+  {
+   "tconst": "tt0363473",
+   "title": "Beyond the Sea",
+   "year": 2004,
+   "rating": 6.7,
+   "votes": 16139,
+   "score": 6.664415354113643
+  },
+  {
+   "tconst": "tt0362004",
+   "title": "Palindromes",
+   "year": 2004,
+   "rating": 6.7,
+   "votes": 13547,
+   "score": 6.660498277537543
+  },
+  {
+   "tconst": "tt0472458",
+   "title": "Dumplings",
+   "year": 2004,
+   "rating": 6.7,
+   "votes": 11332,
+   "score": 6.656396631407112
+  },
+  {
+   "tconst": "tt0354356",
+   "title": "Five Times Two",
+   "year": 2004,
+   "rating": 6.6,
+   "votes": 10869,
+   "score": 6.603347210751665
+  },
+  {
+   "tconst": "tt0418460",
+   "title": "Aitraaz",
+   "year": 2004,
+   "rating": 6.6,
+   "votes": 11835,
+   "score": 6.603199127143418
+  },
+  {
+   "tconst": "tt0352277",
+   "title": "De-Lovely",
+   "year": 2004,
+   "rating": 6.6,
+   "votes": 12415,
+   "score": 6.603116348033751
+  },
+  {
+   "tconst": "tt0359423",
+   "title": "A Home at the End of the World",
+   "year": 2004,
+   "rating": 6.6,
+   "votes": 14398,
+   "score": 6.602863060135114
+  },
+  {
+   "tconst": "tt0348593",
+   "title": "The Door in the Floor",
+   "year": 2004,
+   "rating": 6.6,
+   "votes": 16720,
+   "score": 6.602614256780558
+  },
+  {
+   "tconst": "tt0368008",
+   "title": "The Manchurian Candidate",
+   "year": 2004,
+   "rating": 6.6,
+   "votes": 123805,
+   "score": 6.600522050305866
+  },
+  {
+   "tconst": "tt0356150",
+   "title": "EuroTrip",
+   "year": 2004,
+   "rating": 6.6,
+   "votes": 247626,
+   "score": 6.600271140883204
+  },
+  {
+   "tconst": "tt0296572",
+   "title": "The Chronicles of Riddick",
+   "year": 2004,
+   "rating": 6.6,
+   "votes": 253558,
+   "score": 6.600265038212372
+  },
+  {
+   "tconst": "tt0338348",
+   "title": "The Polar Express",
+   "year": 2004,
+   "rating": 6.6,
+   "votes": 274039,
+   "score": 6.600245927288775
+  },
+  {
+   "tconst": "tt0368447",
+   "title": "The Village",
+   "year": 2004,
+   "rating": 6.6,
+   "votes": 299338,
+   "score": 6.600225814291087
+  },
+  {
+   "tconst": "tt0338097",
+   "title": "Head in the Clouds",
+   "year": 2004,
+   "rating": 6.5,
+   "votes": 16534,
+   "score": 6.54032007768058
+  },
+  {
+   "tconst": "tt0360009",
+   "title": "Spartan",
+   "year": 2004,
+   "rating": 6.5,
+   "votes": 33340,
+   "score": 6.524685116316948
+  },
+  {
+   "tconst": "tt0349710",
+   "title": "Ladder 49",
+   "year": 2004,
+   "rating": 6.5,
+   "votes": 60493,
+   "score": 6.515176725932738
+  },
+  {
+   "tconst": "tt0356721",
+   "title": "I Heart Huckabees",
+   "year": 2004,
+   "rating": 6.5,
+   "votes": 67816,
+   "score": 6.513748495697241
+  },
+  {
+   "tconst": "tt0337921",
+   "title": "Cellular",
+   "year": 2004,
+   "rating": 6.5,
+   "votes": 110035,
+   "score": 6.508912841597671
+  },
+  {
+   "tconst": "tt0363988",
+   "title": "Secret Window",
+   "year": 2004,
+   "rating": 6.5,
+   "votes": 223630,
+   "score": 6.504579261829289
+  },
+  {
+   "tconst": "tt0349903",
+   "title": "Ocean's Twelve",
+   "year": 2004,
+   "rating": 6.5,
+   "votes": 441800,
+   "score": 6.502367979064136
+  },
+  {
+   "tconst": "tt0319262",
+   "title": "The Day After Tomorrow",
+   "year": 2004,
+   "rating": 6.5,
+   "votes": 517579,
+   "score": 6.502027853536962
+  },
+  {
+   "tconst": "tt0362526",
+   "title": "Criminal",
+   "year": 2004,
+   "rating": 6.4,
+   "votes": 11481,
+   "score": 6.496357382858179
+  },
+  {
+   "tconst": "tt0379306",
+   "title": "A Good Woman",
+   "year": 2004,
+   "rating": 6.4,
+   "votes": 13619,
+   "score": 6.487635079435053
+  },
+  {
+   "tconst": "tt0378947",
+   "title": "Melinda and Melinda",
+   "year": 2004,
+   "rating": 6.4,
+   "votes": 34247,
+   "score": 6.446779509145852
+  },
+  {
+   "tconst": "tt0399102",
+   "title": "Godzilla: Final Wars",
+   "year": 2004,
+   "rating": 6.3,
+   "votes": 10964,
+   "score": 6.446434503967588
+  },
+  {
+   "tconst": "tt0375735",
+   "title": "Enduring Love",
+   "year": 2004,
+   "rating": 6.3,
+   "votes": 11444,
+   "score": 6.443156731075197
+  },
+  {
+   "tconst": "tt0403358",
+   "title": "Night Watch",
+   "year": 2004,
+   "rating": 6.4,
+   "votes": 57353,
+   "score": 6.430731414208372
+  },
+  {
+   "tconst": "tt0385267",
+   "title": "In Good Company",
+   "year": 2004,
+   "rating": 6.4,
+   "votes": 58162,
+   "score": 6.43036666971592
+  },
+  {
+   "tconst": "tt0360201",
+   "title": "Wimbledon",
+   "year": 2004,
+   "rating": 6.4,
+   "votes": 68502,
+   "score": 6.4263668816231
+  },
+  {
+   "tconst": "tt0371246",
+   "title": "Spanglish",
+   "year": 2004,
+   "rating": 6.4,
+   "votes": 93367,
+   "score": 6.420024310864942
+  },
+  {
+   "tconst": "tt0353489",
+   "title": "Ginger Snaps II: Unleashed",
+   "year": 2004,
+   "rating": 6.3,
+   "votes": 16828,
+   "score": 6.414427200729705
+  },
+  {
+   "tconst": "tt0330793",
+   "title": "The Punisher",
+   "year": 2004,
+   "rating": 6.4,
+   "votes": 183037,
+   "score": 6.410722571015798
+  },
+  {
+   "tconst": "tt0337563",
+   "title": "13 Going on 30",
+   "year": 2004,
+   "rating": 6.4,
+   "votes": 253144,
+   "score": 6.407865856493693
+  },
+  {
+   "tconst": "tt0290002",
+   "title": "Meet the Fockers",
+   "year": 2004,
+   "rating": 6.4,
+   "votes": 303742,
+   "score": 6.406597309066611
+  },
+  {
+   "tconst": "tt0361309",
+   "title": "We Don't Live Here Anymore",
+   "year": 2004,
+   "rating": 6.2,
+   "votes": 10649,
+   "score": 6.397096854141921
+  },
+  {
+   "tconst": "tt0337876",
+   "title": "Birth",
+   "year": 2004,
+   "rating": 6.3,
+   "votes": 45344,
+   "score": 6.355468577283473
+  },
+  {
+   "tconst": "tt0362590",
+   "title": "Employee of the Month",
+   "year": 2004,
+   "rating": 6.1,
+   "votes": 10919,
+   "score": 6.342356371775731
+  },
+  {
+   "tconst": "tt0297284",
+   "title": "Mindhunters",
+   "year": 2004,
+   "rating": 6.3,
+   "votes": 69234,
+   "score": 6.338744136875287
+  },
+  {
+   "tconst": "tt0327679",
+   "title": "Ella Enchanted",
+   "year": 2004,
+   "rating": 6.3,
+   "votes": 81895,
+   "score": 6.333406093271413
+  },
+  {
+   "tconst": "tt0383534",
+   "title": "Noel",
+   "year": 2004,
+   "rating": 6.1,
+   "votes": 11874,
+   "score": 6.331775301324701
+  },
+  {
+   "tconst": "tt0361411",
+   "title": "Bride & Prejudice",
+   "year": 2004,
+   "rating": 6.2,
+   "votes": 22803,
+   "score": 6.324069534529662
+  },
+  {
+   "tconst": "tt0241025",
+   "title": "Vanity Fair",
+   "year": 2004,
+   "rating": 6.2,
+   "votes": 24347,
+   "score": 6.3184922392400065
+  },
+  {
+   "tconst": "tt0349683",
+   "title": "King Arthur",
+   "year": 2004,
+   "rating": 6.3,
+   "votes": 183975,
+   "score": 6.315826023668909
+  },
+  {
+   "tconst": "tt0407621",
+   "title": "Calvaire",
+   "year": 2004,
+   "rating": 6.1,
+   "votes": 15577,
+   "score": 6.298219218093463
+  },
+  {
+   "tconst": "tt0375920",
+   "title": "The Libertine",
+   "year": 2004,
+   "rating": 6.2,
+   "votes": 38976,
+   "score": 6.283098924803506
+  },
+  {
+   "tconst": "tt0325596",
+   "title": "The I Inside",
+   "year": 2004,
+   "rating": 6,
+   "votes": 11839,
+   "score": 6.277936395493224
+  },
+  {
+   "tconst": "tt0358135",
+   "title": "Shall We Dance?",
+   "year": 2004,
+   "rating": 6.2,
+   "votes": 53112,
+   "score": 6.264486198205992
+  },
+  {
+   "tconst": "tt0367479",
+   "title": "After the Sunset",
+   "year": 2004,
+   "rating": 6.2,
+   "votes": 53940,
+   "score": 6.263651125135698
+  },
+  {
+   "tconst": "tt0375173",
+   "title": "Alfie",
+   "year": 2004,
+   "rating": 6.2,
+   "votes": 56851,
+   "score": 6.260879462404101
+  },
+  {
+   "tconst": "tt0405821",
+   "title": "Casshern",
+   "year": 2004,
+   "rating": 6,
+   "votes": 14147,
+   "score": 6.25137089249913
+  },
+  {
+   "tconst": "tt0318974",
+   "title": "The Alamo",
+   "year": 2004,
+   "rating": 6.1,
+   "votes": 23839,
+   "score": 6.249822776712566
+  },
+  {
+   "tconst": "tt0300051",
+   "title": "Jersey Girl",
+   "year": 2004,
+   "rating": 6.2,
+   "votes": 75072,
+   "score": 6.2478400994590055
+  },
+  {
+   "tconst": "tt0364045",
+   "title": "Taking Lives",
+   "year": 2004,
+   "rating": 6.2,
+   "votes": 101648,
+   "score": 6.2364525378079
+  },
+  {
+   "tconst": "tt0335245",
+   "title": "The Ladykillers",
+   "year": 2004,
+   "rating": 6.2,
+   "votes": 113141,
+   "score": 6.233050348309471
+  },
+  {
+   "tconst": "tt0351977",
+   "title": "Walking Tall",
+   "year": 2004,
+   "rating": 6.2,
+   "votes": 114039,
+   "score": 6.2328110750745855
+  },
+  {
+   "tconst": "tt0364343",
+   "title": "The Final Cut",
+   "year": 2004,
+   "rating": 6.1,
+   "votes": 36165,
+   "score": 6.209820273825984
+  },
+  {
+   "tconst": "tt0360139",
+   "title": "Chasing Liberty",
+   "year": 2004,
+   "rating": 6.1,
+   "votes": 41355,
+   "score": 6.198721700733648
+  },
+  {
+   "tconst": "tt0377062",
+   "title": "Flight of the Phoenix",
+   "year": 2004,
+   "rating": 6.1,
+   "votes": 59361,
+   "score": 6.173093711756989
+  },
+  {
+   "tconst": "tt0357111",
+   "title": "RRRrrrr!!!",
+   "year": 2004,
+   "rating": 5.9,
+   "votes": 16435,
+   "score": 6.167442895448327
+  },
+  {
+   "tconst": "tt0365265",
+   "title": "Ginger Snaps Back: The Beginning",
+   "year": 2004,
+   "rating": 5.8,
+   "votes": 12670,
+   "score": 6.155970575261426
+  },
+  {
+   "tconst": "tt0339147",
+   "title": "Highwaymen",
+   "year": 2004,
+   "rating": 5.7,
+   "votes": 10114,
+   "score": 6.150922389439023
+  },
+  {
+   "tconst": "tt0346156",
+   "title": "Sky Captain and the World of Tomorrow",
+   "year": 2004,
+   "rating": 6.1,
+   "votes": 90706,
+   "score": 6.15034310707581
+  }
+ ]
+}

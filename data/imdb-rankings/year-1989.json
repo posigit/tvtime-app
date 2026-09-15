@@ -1,0 +1,1608 @@
+{
+ "tag": "year-1989",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.392,
+ "minVotes": 2000,
+ "items": [
+  {
+   "tconst": "tt0237376",
+   "title": "Kireedam",
+   "year": 1989,
+   "rating": 8.9,
+   "votes": 9929,
+   "score": 8.479554182665643
+  },
+  {
+   "tconst": "tt0097576",
+   "title": "Indiana Jones and the Last Crusade",
+   "year": 1989,
+   "rating": 8.2,
+   "votes": 871491,
+   "score": 8.195860863872687
+  },
+  {
+   "tconst": "tt0230597",
+   "title": "A Northern Story of Valor",
+   "year": 1989,
+   "rating": 8.7,
+   "votes": 6758,
+   "score": 8.172996328501764
+  },
+  {
+   "tconst": "tt0097165",
+   "title": "Dead Poets Society",
+   "year": 1989,
+   "rating": 8.1,
+   "votes": 668932,
+   "score": 8.094909322919488
+  },
+  {
+   "tconst": "tt0097216",
+   "title": "Do the Right Thing",
+   "year": 1989,
+   "rating": 7.9,
+   "votes": 126235,
+   "score": 7.876484593480864
+  },
+  {
+   "tconst": "tt0098573",
+   "title": "Don't Let Them Shoot the Kite",
+   "year": 1989,
+   "rating": 8.2,
+   "votes": 8428,
+   "score": 7.853289398256468
+  },
+  {
+   "tconst": "tt0353935",
+   "title": "Ramji Rao Speaking",
+   "year": 1989,
+   "rating": 8.5,
+   "votes": 4039,
+   "score": 7.801954271405605
+  },
+  {
+   "tconst": "tt0096874",
+   "title": "Back to the Future Part II",
+   "year": 1989,
+   "rating": 7.8,
+   "votes": 629359,
+   "score": 7.795540574926497
+  },
+  {
+   "tconst": "tt0097814",
+   "title": "Kiki's Delivery Service",
+   "year": 1989,
+   "rating": 7.8,
+   "votes": 191904,
+   "score": 7.785479937727011
+  },
+  {
+   "tconst": "tt0097441",
+   "title": "Glory",
+   "year": 1989,
+   "rating": 7.8,
+   "votes": 154229,
+   "score": 7.781978389703695
+  },
+  {
+   "tconst": "tt0097937",
+   "title": "My Left Foot",
+   "year": 1989,
+   "rating": 7.8,
+   "votes": 85983,
+   "score": 7.767999520873561
+  },
+  {
+   "tconst": "tt0096827",
+   "title": "Apoorva Sagodharargal",
+   "year": 1989,
+   "rating": 8.3,
+   "votes": 5154,
+   "score": 7.76666226516892
+  },
+  {
+   "tconst": "tt0097123",
+   "title": "Crimes and Misdemeanors",
+   "year": 1989,
+   "rating": 7.8,
+   "votes": 63772,
+   "score": 7.757193058520623
+  },
+  {
+   "tconst": "tt0097372",
+   "title": "For All Mankind",
+   "year": 1989,
+   "rating": 8.1,
+   "votes": 7373,
+   "score": 7.735602458659816
+  },
+  {
+   "tconst": "tt0263065",
+   "title": "Arabesque",
+   "year": 1989,
+   "rating": 8,
+   "votes": 9033,
+   "score": 7.708556316959888
+  },
+  {
+   "tconst": "tt0098635",
+   "title": "When Harry Met Sally...",
+   "year": 1989,
+   "rating": 7.7,
+   "votes": 275122,
+   "score": 7.690561925235162
+  },
+  {
+   "tconst": "tt0097202",
+   "title": "The Killer",
+   "year": 1989,
+   "rating": 7.7,
+   "votes": 56233,
+   "score": 7.655085636065778
+  },
+  {
+   "tconst": "tt0122227",
+   "title": "Treasure Island. Captain Flint's Map",
+   "year": 1989,
+   "rating": 8.1,
+   "votes": 5343,
+   "score": 7.63486338622068
+  },
+  {
+   "tconst": "tt0237138",
+   "title": "Dasharatham",
+   "year": 1989,
+   "rating": 8.5,
+   "votes": 2731,
+   "score": 7.608962554432139
+  },
+  {
+   "tconst": "tt0097757",
+   "title": "The Little Mermaid",
+   "year": 1989,
+   "rating": 7.6,
+   "votes": 315461,
+   "score": 7.592391197170734
+  },
+  {
+   "tconst": "tt0122234",
+   "title": "The Meeting Point",
+   "year": 1989,
+   "rating": 8.2,
+   "votes": 3898,
+   "score": 7.586995904547042
+  },
+  {
+   "tconst": "tt0097437",
+   "title": "Geethanjali",
+   "year": 1989,
+   "rating": 8.3,
+   "votes": 3235,
+   "score": 7.571156035342588
+  },
+  {
+   "tconst": "tt0248428",
+   "title": "Shiva",
+   "year": 1989,
+   "rating": 8,
+   "votes": 4452,
+   "score": 7.50162768831656
+  },
+  {
+   "tconst": "tt0096895",
+   "title": "Batman",
+   "year": 1989,
+   "rating": 7.5,
+   "votes": 436021,
+   "score": 7.4949420275398175
+  },
+  {
+   "tconst": "tt0097958",
+   "title": "National Lampoon's Christmas Vacation",
+   "year": 1989,
+   "rating": 7.5,
+   "votes": 248980,
+   "score": 7.4911726107459495
+  },
+  {
+   "tconst": "tt0096754",
+   "title": "The Abyss",
+   "year": 1989,
+   "rating": 7.5,
+   "votes": 210713,
+   "score": 7.489584566270132
+  },
+  {
+   "tconst": "tt0098327",
+   "title": "The Seventh Continent",
+   "year": 1989,
+   "rating": 7.6,
+   "votes": 19386,
+   "score": 7.48705236346294
+  },
+  {
+   "tconst": "tt0097351",
+   "title": "Field of Dreams",
+   "year": 1989,
+   "rating": 7.5,
+   "votes": 142368,
+   "score": 7.4846538141764
+  },
+  {
+   "tconst": "tt0097108",
+   "title": "The Cook, the Thief, His Wife & Her Lover",
+   "year": 1989,
+   "rating": 7.5,
+   "votes": 45489,
+   "score": 7.453347129756753
+  },
+  {
+   "tconst": "tt0354148",
+   "title": "Vadakkunokkiyantram",
+   "year": 1989,
+   "rating": 8.3,
+   "votes": 2494,
+   "score": 7.450979493773577
+  },
+  {
+   "tconst": "tt0158610",
+   "title": "The Fall of Rock & Roll",
+   "year": 1989,
+   "rating": 8,
+   "votes": 3809,
+   "score": 7.446462703566612
+  },
+  {
+   "tconst": "tt0097940",
+   "title": "Mystery Train",
+   "year": 1989,
+   "rating": 7.5,
+   "votes": 33305,
+   "score": 7.4372469011476685
+  },
+  {
+   "tconst": "tt0098213",
+   "title": "Roger & Me",
+   "year": 1989,
+   "rating": 7.5,
+   "votes": 28323,
+   "score": 7.426936709593987
+  },
+  {
+   "tconst": "tt0096908",
+   "title": "A City of Sadness",
+   "year": 1989,
+   "rating": 7.7,
+   "votes": 7142,
+   "score": 7.413903067711491
+  },
+  {
+   "tconst": "tt0084548",
+   "title": "Interrogation",
+   "year": 1989,
+   "rating": 7.9,
+   "votes": 4116,
+   "score": 7.406949287936307
+  },
+  {
+   "tconst": "tt0096894",
+   "title": "Bashu, the Little Stranger",
+   "year": 1989,
+   "rating": 7.9,
+   "votes": 3908,
+   "score": 7.389590698208947
+  },
+  {
+   "tconst": "tt0097694",
+   "title": "Black Rain",
+   "year": 1989,
+   "rating": 7.8,
+   "votes": 4426,
+   "score": 7.361858363681676
+  },
+  {
+   "tconst": "tt0102636",
+   "title": "Parinda",
+   "year": 1989,
+   "rating": 7.8,
+   "votes": 4175,
+   "score": 7.3440488817843645
+  },
+  {
+   "tconst": "tt0097499",
+   "title": "Henry V",
+   "year": 1989,
+   "rating": 7.4,
+   "votes": 33589,
+   "score": 7.34336738444515
+  },
+  {
+   "tconst": "tt0098253",
+   "title": "Santa Sangre",
+   "year": 1989,
+   "rating": 7.4,
+   "votes": 25915,
+   "score": 7.327798740641893
+  },
+  {
+   "tconst": "tt0097722",
+   "title": "Lean on Me",
+   "year": 1989,
+   "rating": 7.4,
+   "votes": 25074,
+   "score": 7.3255559520210705
+  },
+  {
+   "tconst": "tt0100049",
+   "title": "Longtime Companion",
+   "year": 1989,
+   "rating": 7.6,
+   "votes": 6571,
+   "score": 7.31817779080836
+  },
+  {
+   "tconst": "tt0094590",
+   "title": "Depeche Mode: 101",
+   "year": 1989,
+   "rating": 8.1,
+   "votes": 2316,
+   "score": 7.308642688836526
+  },
+  {
+   "tconst": "tt0098437",
+   "title": "The Winter War",
+   "year": 1989,
+   "rating": 7.5,
+   "votes": 9264,
+   "score": 7.303311598456894
+  },
+  {
+   "tconst": "tt0097733",
+   "title": "Lethal Weapon 2",
+   "year": 1989,
+   "rating": 7.3,
+   "votes": 203192,
+   "score": 7.2911521981608365
+  },
+  {
+   "tconst": "tt0292319",
+   "title": "Varavelpu",
+   "year": 1989,
+   "rating": 8.1,
+   "votes": 2205,
+   "score": 7.287753114154208
+  },
+  {
+   "tconst": "tt0097239",
+   "title": "Driving Miss Daisy",
+   "year": 1989,
+   "rating": 7.3,
+   "votes": 124642,
+   "score": 7.285664328145627
+  },
+  {
+   "tconst": "tt0098258",
+   "title": "Say Anything",
+   "year": 1989,
+   "rating": 7.3,
+   "votes": 103985,
+   "score": 7.282870234891903
+  },
+  {
+   "tconst": "tt0097815",
+   "title": "Major League",
+   "year": 1989,
+   "rating": 7.3,
+   "votes": 84127,
+   "score": 7.2789206850931585
+  },
+  {
+   "tconst": "tt0097635",
+   "title": "Jesus of Montreal",
+   "year": 1989,
+   "rating": 7.5,
+   "votes": 7926,
+   "score": 7.276798493352654
+  },
+  {
+   "tconst": "tt0098384",
+   "title": "Steel Magnolias",
+   "year": 1989,
+   "rating": 7.3,
+   "votes": 72250,
+   "score": 7.275548846397554
+  },
+  {
+   "tconst": "tt0097904",
+   "title": "Monsieur Hire",
+   "year": 1989,
+   "rating": 7.5,
+   "votes": 7711,
+   "score": 7.271856847391458
+  },
+  {
+   "tconst": "tt0100211",
+   "title": "Music Box",
+   "year": 1989,
+   "rating": 7.4,
+   "votes": 9848,
+   "score": 7.229887056466783
+  },
+  {
+   "tconst": "tt0096969",
+   "title": "Born on the Fourth of July",
+   "year": 1989,
+   "rating": 7.2,
+   "votes": 126052,
+   "score": 7.187384045895561
+  },
+  {
+   "tconst": "tt0100095",
+   "title": "Maine Pyar Kiya",
+   "year": 1989,
+   "rating": 7.3,
+   "votes": 14117,
+   "score": 7.187355081281781
+  },
+  {
+   "tconst": "tt0098724",
+   "title": "Sex, Lies, and Videotape",
+   "year": 1989,
+   "rating": 7.2,
+   "votes": 65273,
+   "score": 7.175985935591076
+  },
+  {
+   "tconst": "tt0097843",
+   "title": "Homework",
+   "year": 1989,
+   "rating": 7.8,
+   "votes": 2480,
+   "score": 7.171540590405904
+  },
+  {
+   "tconst": "tt0097240",
+   "title": "Drugstore Cowboy",
+   "year": 1989,
+   "rating": 7.2,
+   "votes": 43422,
+   "score": 7.164433575030127
+  },
+  {
+   "tconst": "tt0098319",
+   "title": "Shirley Valentine",
+   "year": 1989,
+   "rating": 7.3,
+   "votes": 10008,
+   "score": 7.148809280897606
+  },
+  {
+   "tconst": "tt0096966",
+   "title": "The Battle of Kosovo",
+   "year": 1989,
+   "rating": 7.6,
+   "votes": 3083,
+   "score": 7.1247888737002665
+  },
+  {
+   "tconst": "tt0094641",
+   "title": "Amanece, que no es poco",
+   "year": 1989,
+   "rating": 7.4,
+   "votes": 4681,
+   "score": 7.098323880409886
+  },
+  {
+   "tconst": "tt0097493",
+   "title": "Heathers",
+   "year": 1989,
+   "rating": 7.1,
+   "votes": 127502,
+   "score": 7.089069681124758
+  },
+  {
+   "tconst": "tt0098554",
+   "title": "Uncle Buck",
+   "year": 1989,
+   "rating": 7.1,
+   "votes": 122942,
+   "score": 7.0886707579918555
+  },
+  {
+   "tconst": "tt0098238",
+   "title": "The French Revolution",
+   "year": 1989,
+   "rating": 7.7,
+   "votes": 2260,
+   "score": 7.086033296952688
+  },
+  {
+   "tconst": "tt0098067",
+   "title": "Parenthood",
+   "year": 1989,
+   "rating": 7.1,
+   "votes": 59625,
+   "score": 7.0770304559029364
+  },
+  {
+   "tconst": "tt0097027",
+   "title": "Casualties of War",
+   "year": 1989,
+   "rating": 7.1,
+   "votes": 52354,
+   "score": 7.073957792343129
+  },
+  {
+   "tconst": "tt0097244",
+   "title": "God of Gamblers",
+   "year": 1989,
+   "rating": 7.2,
+   "votes": 7392,
+   "score": 7.02799210445256
+  },
+  {
+   "tconst": "tt0100842",
+   "title": "The Unbelievable Truth",
+   "year": 1989,
+   "rating": 7.2,
+   "votes": 6887,
+   "score": 7.018217828853207
+  },
+  {
+   "tconst": "tt0098360",
+   "title": "Violent Cop",
+   "year": 1989,
+   "rating": 7.1,
+   "votes": 14333,
+   "score": 7.013335078982333
+  },
+  {
+   "tconst": "tt0098596",
+   "title": "Life and Nothing But",
+   "year": 1989,
+   "rating": 7.5,
+   "votes": 2311,
+   "score": 6.986082543497669
+  },
+  {
+   "tconst": "tt0104740",
+   "title": "Little Nemo: Adventures in Slumberland",
+   "year": 1989,
+   "rating": 7.1,
+   "votes": 8961,
+   "score": 6.970860491288974
+  },
+  {
+   "tconst": "tt0101026",
+   "title": "Tie Me Up! Tie Me Down!",
+   "year": 1989,
+   "rating": 7,
+   "votes": 33899,
+   "score": 6.966141169531698
+  },
+  {
+   "tconst": "tt0098575",
+   "title": "Valmont",
+   "year": 1989,
+   "rating": 7,
+   "votes": 15541,
+   "score": 6.930705310131603
+  },
+  {
+   "tconst": "tt0097841",
+   "title": "Marrakech Express",
+   "year": 1989,
+   "rating": 7.3,
+   "votes": 2623,
+   "score": 6.907290037858198
+  },
+  {
+   "tconst": "tt0097728",
+   "title": "Leningrad Cowboys Go America",
+   "year": 1989,
+   "rating": 7,
+   "votes": 9607,
+   "score": 6.8952788700799905
+  },
+  {
+   "tconst": "tt0096928",
+   "title": "Bill & Ted's Excellent Adventure",
+   "year": 1989,
+   "rating": 6.9,
+   "votes": 150932,
+   "score": 6.893359805959633
+  },
+  {
+   "tconst": "tt0098621",
+   "title": "The War of the Roses",
+   "year": 1989,
+   "rating": 6.9,
+   "votes": 63409,
+   "score": 6.884474641792696
+  },
+  {
+   "tconst": "tt0098282",
+   "title": "See No Evil, Hear No Evil",
+   "year": 1989,
+   "rating": 6.9,
+   "votes": 62914,
+   "score": 6.884356253581947
+  },
+  {
+   "tconst": "tt0098546",
+   "title": "UHF",
+   "year": 1989,
+   "rating": 6.9,
+   "votes": 34719,
+   "score": 6.872344068330251
+  },
+  {
+   "tconst": "tt0096251",
+   "title": "Tetsuo: The Iron Man",
+   "year": 1989,
+   "rating": 6.9,
+   "votes": 29521,
+   "score": 6.867783441039893
+  },
+  {
+   "tconst": "tt0097322",
+   "title": "The Fabulous Baker Boys",
+   "year": 1989,
+   "rating": 6.9,
+   "votes": 28055,
+   "score": 6.866212006155996
+  },
+  {
+   "tconst": "tt0097243",
+   "title": "A Dry White Season",
+   "year": 1989,
+   "rating": 7,
+   "votes": 6969,
+   "score": 6.864477850933041
+  },
+  {
+   "tconst": "tt0100339",
+   "title": "Patlabor: The Movie",
+   "year": 1989,
+   "rating": 7,
+   "votes": 6407,
+   "score": 6.855418323423153
+  },
+  {
+   "tconst": "tt0098219",
+   "title": "Romero",
+   "year": 1989,
+   "rating": 7.2,
+   "votes": 2640,
+   "score": 6.851832294185011
+  },
+  {
+   "tconst": "tt0092651",
+   "title": "The Cyclist",
+   "year": 1989,
+   "rating": 7.2,
+   "votes": 2550,
+   "score": 6.844945460443615
+  },
+  {
+   "tconst": "tt0098055",
+   "title": "Red Wood Pigeon",
+   "year": 1989,
+   "rating": 7.1,
+   "votes": 3468,
+   "score": 6.841130549564458
+  },
+  {
+   "tconst": "tt0098112",
+   "title": "Powwow Highway",
+   "year": 1989,
+   "rating": 7.2,
+   "votes": 2308,
+   "score": 6.825000428277264
+  },
+  {
+   "tconst": "tt0096734",
+   "title": "The 'Burbs",
+   "year": 1989,
+   "rating": 6.8,
+   "votes": 93471,
+   "score": 6.791458158446213
+  },
+  {
+   "tconst": "tt0096787",
+   "title": "All Dogs Go to Heaven",
+   "year": 1989,
+   "rating": 6.8,
+   "votes": 50145,
+   "score": 6.784360952057119
+  },
+  {
+   "tconst": "tt0098273",
+   "title": "Sea of Love",
+   "year": 1989,
+   "rating": 6.8,
+   "votes": 49204,
+   "score": 6.784073545914742
+  },
+  {
+   "tconst": "tt0097162",
+   "title": "Dead Calm",
+   "year": 1989,
+   "rating": 6.8,
+   "votes": 49124,
+   "score": 6.784048623836525
+  },
+  {
+   "tconst": "tt0098019",
+   "title": "Miracles: The Canton Godfather",
+   "year": 1989,
+   "rating": 6.9,
+   "votes": 6166,
+   "score": 6.775643135564346
+  },
+  {
+   "tconst": "tt0253782",
+   "title": "Bird of Fortune",
+   "year": 1989,
+   "rating": 7,
+   "votes": 3228,
+   "score": 6.767502265688304
+  },
+  {
+   "tconst": "tt0103099",
+   "title": "Tongues Untied",
+   "year": 1989,
+   "rating": 7.1,
+   "votes": 2189,
+   "score": 6.762091631658737
+  },
+  {
+   "tconst": "tt0097443",
+   "title": "The Gods Must Be Crazy II",
+   "year": 1989,
+   "rating": 6.8,
+   "votes": 19259,
+   "score": 6.761639862882471
+  },
+  {
+   "tconst": "tt0097539",
+   "title": "In the Line of Duty IV",
+   "year": 1989,
+   "rating": 7.1,
+   "votes": 2115,
+   "score": 6.756015029166087
+  },
+  {
+   "tconst": "tt0096863",
+   "title": "My Twentieth Century",
+   "year": 1989,
+   "rating": 7,
+   "votes": 2319,
+   "score": 6.7185695404071435
+  },
+  {
+   "tconst": "tt0097714",
+   "title": "Last Exit to Brooklyn",
+   "year": 1989,
+   "rating": 6.8,
+   "votes": 7738,
+   "score": 6.716256094169075
+  },
+  {
+   "tconst": "tt0097731",
+   "title": "Let It Ride",
+   "year": 1989,
+   "rating": 6.8,
+   "votes": 7406,
+   "score": 6.713300217416378
+  },
+  {
+   "tconst": "tt0097531",
+   "title": "How to Get Ahead in Advertising",
+   "year": 1989,
+   "rating": 6.8,
+   "votes": 7191,
+   "score": 6.711272097162273
+  },
+  {
+   "tconst": "tt0097095",
+   "title": "Coming Out",
+   "year": 1989,
+   "rating": 7,
+   "votes": 2131,
+   "score": 6.7057617634999875
+  },
+  {
+   "tconst": "tt0202152",
+   "title": "Zatoichi",
+   "year": 1989,
+   "rating": 7,
+   "votes": 2099,
+   "score": 6.70346470968979
+  },
+  {
+   "tconst": "tt0097742",
+   "title": "Licence to Kill",
+   "year": 1989,
+   "rating": 6.7,
+   "votes": 121754,
+   "score": 6.695026438297093
+  },
+  {
+   "tconst": "tt0098206",
+   "title": "Road House",
+   "year": 1989,
+   "rating": 6.7,
+   "votes": 113806,
+   "score": 6.694685092698292
+  },
+  {
+   "tconst": "tt0098168",
+   "title": "Ram Lakhan",
+   "year": 1989,
+   "rating": 6.8,
+   "votes": 3304,
+   "score": 6.646248462484625
+  },
+  {
+   "tconst": "tt0098513",
+   "title": "Triumph of the Spirit",
+   "year": 1989,
+   "rating": 6.8,
+   "votes": 3148,
+   "score": 6.641589324984158
+  },
+  {
+   "tconst": "tt0097995",
+   "title": "White Wedding",
+   "year": 1989,
+   "rating": 6.8,
+   "votes": 3114,
+   "score": 6.64053614489997
+  },
+  {
+   "tconst": "tt0096866",
+   "title": "The BFG",
+   "year": 1989,
+   "rating": 6.7,
+   "votes": 8056,
+   "score": 6.638792944015359
+  },
+  {
+   "tconst": "tt0098524",
+   "title": "True Believer",
+   "year": 1989,
+   "rating": 6.7,
+   "votes": 6089,
+   "score": 6.62390924032865
+  },
+  {
+   "tconst": "tt0098725",
+   "title": "Sweetie",
+   "year": 1989,
+   "rating": 6.7,
+   "votes": 5938,
+   "score": 6.62246180965211
+  },
+  {
+   "tconst": "tt0098220",
+   "title": "Mama, There's a Man in Your Bed",
+   "year": 1989,
+   "rating": 6.8,
+   "votes": 2087,
+   "score": 6.600465340107279
+  },
+  {
+   "tconst": "tt0122427",
+   "title": "Chaalbaaz",
+   "year": 1989,
+   "rating": 6.8,
+   "votes": 2068,
+   "score": 6.599533393564024
+  },
+  {
+   "tconst": "tt0097428",
+   "title": "Ghostbusters II",
+   "year": 1989,
+   "rating": 6.6,
+   "votes": 241646,
+   "score": 6.598294664574909
+  },
+  {
+   "tconst": "tt0096933",
+   "title": "Black Rain",
+   "year": 1989,
+   "rating": 6.6,
+   "votes": 65464,
+   "score": 6.5938411870778255
+  },
+  {
+   "tconst": "tt0097858",
+   "title": "Meet the Feebles",
+   "year": 1989,
+   "rating": 6.6,
+   "votes": 22025,
+   "score": 6.582705591884222
+  },
+  {
+   "tconst": "tt0094713",
+   "title": "Baxter",
+   "year": 1989,
+   "rating": 6.7,
+   "votes": 3187,
+   "score": 6.581338315985821
+  },
+  {
+   "tconst": "tt0097045",
+   "title": "Chandni",
+   "year": 1989,
+   "rating": 6.7,
+   "votes": 2398,
+   "score": 6.560050442250671
+  },
+  {
+   "tconst": "tt0096744",
+   "title": "84C MoPic",
+   "year": 1989,
+   "rating": 6.7,
+   "votes": 2249,
+   "score": 6.555142820668028
+  },
+  {
+   "tconst": "tt0098520",
+   "title": "Too Beautiful for You",
+   "year": 1989,
+   "rating": 6.6,
+   "votes": 3284,
+   "score": 6.521366738269957
+  },
+  {
+   "tconst": "tt0097276",
+   "title": "Enemies, a Love Story",
+   "year": 1989,
+   "rating": 6.6,
+   "votes": 2849,
+   "score": 6.514312609820262
+  },
+  {
+   "tconst": "tt0135037",
+   "title": "Venus Wars",
+   "year": 1989,
+   "rating": 6.6,
+   "votes": 2335,
+   "score": 6.50415267474474
+  },
+  {
+   "tconst": "tt0097523",
+   "title": "Honey, I Shrunk the Kids",
+   "year": 1989,
+   "rating": 6.5,
+   "votes": 179083,
+   "score": 6.498809948173039
+  },
+  {
+   "tconst": "tt0098084",
+   "title": "Pet Sematary",
+   "year": 1989,
+   "rating": 6.5,
+   "votes": 125437,
+   "score": 6.498308982830877
+  },
+  {
+   "tconst": "tt0098627",
+   "title": "Weekend at Bernie's",
+   "year": 1989,
+   "rating": 6.5,
+   "votes": 69043,
+   "score": 6.4969666518167655
+  },
+  {
+   "tconst": "tt0098442",
+   "title": "Tap",
+   "year": 1989,
+   "rating": 6.6,
+   "votes": 2006,
+   "score": 6.49628103969507
+  },
+  {
+   "tconst": "tt0098354",
+   "title": "Society",
+   "year": 1989,
+   "rating": 6.5,
+   "votes": 25408,
+   "score": 6.492137399482576
+  },
+  {
+   "tconst": "tt0097235",
+   "title": "The Dream Team",
+   "year": 1989,
+   "rating": 6.5,
+   "votes": 16260,
+   "score": 6.488198348577133
+  },
+  {
+   "tconst": "tt0097044",
+   "title": "Chances Are",
+   "year": 1989,
+   "rating": 6.5,
+   "votes": 13846,
+   "score": 6.486400469835822
+  },
+  {
+   "tconst": "tt0097336",
+   "title": "Fat Man and Little Boy",
+   "year": 1989,
+   "rating": 6.5,
+   "votes": 9921,
+   "score": 6.481922812265619
+  },
+  {
+   "tconst": "tt0097444",
+   "title": "Godzilla vs. Biollante",
+   "year": 1989,
+   "rating": 6.5,
+   "votes": 8632,
+   "score": 6.479731174286912
+  },
+  {
+   "tconst": "tt0097579",
+   "title": "An Innocent Man",
+   "year": 1989,
+   "rating": 6.5,
+   "votes": 8361,
+   "score": 6.4792010274122624
+  },
+  {
+   "tconst": "tt0098115",
+   "title": "Prancer",
+   "year": 1989,
+   "rating": 6.5,
+   "votes": 7294,
+   "score": 6.4768131961500375
+  },
+  {
+   "tconst": "tt0098260",
+   "title": "Scandal",
+   "year": 1989,
+   "rating": 6.5,
+   "votes": 6058,
+   "score": 6.473256620131354
+  },
+  {
+   "tconst": "tt0100816",
+   "title": "Tridev",
+   "year": 1989,
+   "rating": 6.5,
+   "votes": 2546,
+   "score": 6.452596094372734
+  },
+  {
+   "tconst": "tt0098439",
+   "title": "Tango & Cash",
+   "year": 1989,
+   "rating": 6.4,
+   "votes": 120897,
+   "score": 6.399873893138307
+  },
+  {
+   "tconst": "tt0097659",
+   "title": "Kickboxer",
+   "year": 1989,
+   "rating": 6.4,
+   "votes": 67277,
+   "score": 6.399776287151847
+  },
+  {
+   "tconst": "tt0097770",
+   "title": "Lock Up",
+   "year": 1989,
+   "rating": 6.4,
+   "votes": 48907,
+   "score": 6.399695559451912
+  },
+  {
+   "tconst": "tt0096794",
+   "title": "Always",
+   "year": 1989,
+   "rating": 6.4,
+   "votes": 35947,
+   "score": 6.39959158418369
+  },
+  {
+   "tconst": "tt0097965",
+   "title": "New York Stories",
+   "year": 1989,
+   "rating": 6.4,
+   "votes": 21089,
+   "score": 6.399328764564011
+  },
+  {
+   "tconst": "tt0096913",
+   "title": "Best of the Best",
+   "year": 1989,
+   "rating": 6.4,
+   "votes": 16898,
+   "score": 6.39917990501738
+  },
+  {
+   "tconst": "tt0098051",
+   "title": "The Package",
+   "year": 1989,
+   "rating": 6.4,
+   "votes": 14548,
+   "score": 6.399063442411074
+  },
+  {
+   "tconst": "tt0096842",
+   "title": "Asterix and the Big Fight",
+   "year": 1989,
+   "rating": 6.4,
+   "votes": 9697,
+   "score": 6.39867503163362
+  },
+  {
+   "tconst": "tt0094764",
+   "title": "The Blood of Heroes",
+   "year": 1989,
+   "rating": 6.4,
+   "votes": 8384,
+   "score": 6.398507496631208
+  },
+  {
+   "tconst": "tt0097607",
+   "title": "Jacknife",
+   "year": 1989,
+   "rating": 6.4,
+   "votes": 7133,
+   "score": 6.398303059785225
+  },
+  {
+   "tconst": "tt0097116",
+   "title": "Cousins",
+   "year": 1989,
+   "rating": 6.4,
+   "votes": 5431,
+   "score": 6.3979143917398
+  },
+  {
+   "tconst": "tt0108461",
+   "title": "Urotsukidoji: Legend of the Overfiend",
+   "year": 1989,
+   "rating": 6.4,
+   "votes": 4221,
+   "score": 6.397508735736771
+  },
+  {
+   "tconst": "tt0096741",
+   "title": "Deadly Games",
+   "year": 1989,
+   "rating": 6.4,
+   "votes": 3372,
+   "score": 6.397115012103211
+  },
+  {
+   "tconst": "tt0098165",
+   "title": "The Rainbow",
+   "year": 1989,
+   "rating": 6.3,
+   "votes": 2017,
+   "score": 6.3459302576595595
+  },
+  {
+   "tconst": "tt0099242",
+   "title": "Chattahoochee",
+   "year": 1989,
+   "rating": 6.3,
+   "votes": 2750,
+   "score": 6.3388424936880945
+  },
+  {
+   "tconst": "tt0097211",
+   "title": "Disorganized Crime",
+   "year": 1989,
+   "rating": 6.3,
+   "votes": 2907,
+   "score": 6.337599723867628
+  },
+  {
+   "tconst": "tt0097262",
+   "title": "Eddie and the Cruisers II: Eddie Lives!",
+   "year": 1989,
+   "rating": 6.3,
+   "votes": 3560,
+   "score": 6.33318378507526
+  },
+  {
+   "tconst": "tt0097142",
+   "title": "Dad",
+   "year": 1989,
+   "rating": 6.3,
+   "votes": 5603,
+   "score": 6.324266979484211
+  },
+  {
+   "tconst": "tt0097662",
+   "title": "Kill Me Again",
+   "year": 1989,
+   "rating": 6.3,
+   "votes": 6945,
+   "score": 6.320626254334091
+  },
+  {
+   "tconst": "tt0097438",
+   "title": "Gleaming the Cube",
+   "year": 1989,
+   "rating": 6.3,
+   "votes": 10037,
+   "score": 6.315327892748895
+  },
+  {
+   "tconst": "tt0097457",
+   "title": "Great Balls of Fire!",
+   "year": 1989,
+   "rating": 6.3,
+   "votes": 18698,
+   "score": 6.3089139938650325
+  },
+  {
+   "tconst": "tt0096945",
+   "title": "Blind Fury",
+   "year": 1989,
+   "rating": 6.3,
+   "votes": 20550,
+   "score": 6.308181900000818
+  },
+  {
+   "tconst": "tt0097334",
+   "title": "Farewell to the King",
+   "year": 1989,
+   "rating": 6.2,
+   "votes": 3376,
+   "score": 6.271521920576349
+  },
+  {
+   "tconst": "tt0097458",
+   "title": "Gross Anatomy",
+   "year": 1989,
+   "rating": 6.2,
+   "votes": 4353,
+   "score": 6.2605228781707
+  },
+  {
+   "tconst": "tt0098436",
+   "title": "The Tall Guy",
+   "year": 1989,
+   "rating": 6.2,
+   "votes": 5275,
+   "score": 6.252852487287759
+  },
+  {
+   "tconst": "tt0096926",
+   "title": "The Big Picture",
+   "year": 1989,
+   "rating": 6.2,
+   "votes": 6166,
+   "score": 6.247085702304489
+  },
+  {
+   "tconst": "tt0094860",
+   "title": "The Church",
+   "year": 1989,
+   "rating": 6.2,
+   "votes": 10424,
+   "score": 6.230948313346623
+  },
+  {
+   "tconst": "tt0097892",
+   "title": "Miss Firecracker",
+   "year": 1989,
+   "rating": 6.1,
+   "votes": 2543,
+   "score": 6.228659882240468
+  },
+  {
+   "tconst": "tt0098471",
+   "title": "Three Fugitives",
+   "year": 1989,
+   "rating": 6.2,
+   "votes": 13672,
+   "score": 6.22453431885008
+  },
+  {
+   "tconst": "tt0097289",
+   "title": "Erik the Viking",
+   "year": 1989,
+   "rating": 6.2,
+   "votes": 15357,
+   "score": 6.222152551997376
+  },
+  {
+   "tconst": "tt0098622",
+   "title": "Warlock",
+   "year": 1989,
+   "rating": 6.2,
+   "votes": 21137,
+   "score": 6.21661848316629
+  },
+  {
+   "tconst": "tt0098536",
+   "title": "Turner & Hooch",
+   "year": 1989,
+   "rating": 6.2,
+   "votes": 81764,
+   "score": 6.204590299472548
+  },
+  {
+   "tconst": "tt0097228",
+   "title": "Dr. Caligari",
+   "year": 1989,
+   "rating": 6,
+   "votes": 2022,
+   "score": 6.195052671561028
+  },
+  {
+   "tconst": "tt0097166",
+   "title": "Dead Bang",
+   "year": 1989,
+   "rating": 6.1,
+   "votes": 5054,
+   "score": 6.182861049761617
+  },
+  {
+   "tconst": "tt0099143",
+   "title": "Black Rainbow",
+   "year": 1989,
+   "rating": 6,
+   "votes": 2352,
+   "score": 6.180262372476665
+  },
+  {
+   "tconst": "tt0097503",
+   "title": "Hider in the House",
+   "year": 1989,
+   "rating": 6,
+   "votes": 2392,
+   "score": 6.178620638665404
+  },
+  {
+   "tconst": "tt0098343",
+   "title": "Skin Deep",
+   "year": 1989,
+   "rating": 6.1,
+   "votes": 5679,
+   "score": 6.1761169221276795
+  },
+  {
+   "tconst": "tt0097872",
+   "title": "My Nights Are More Beautiful Than Your Days",
+   "year": 1989,
+   "rating": 6,
+   "votes": 2546,
+   "score": 6.172569697540354
+  },
+  {
+   "tconst": "tt0097790",
+   "title": "Loverboy",
+   "year": 1989,
+   "rating": 6.1,
+   "votes": 9691,
+   "score": 6.149995881021166
+  },
+  {
+   "tconst": "tt0097626",
+   "title": "Johnny Handsome",
+   "year": 1989,
+   "rating": 6.1,
+   "votes": 12102,
+   "score": 6.141448152391041
+  },
+  {
+   "tconst": "tt0098184",
+   "title": "Relentless",
+   "year": 1989,
+   "rating": 5.9,
+   "votes": 2092,
+   "score": 6.140591848733737
+  },
+  {
+   "tconst": "tt0095379",
+   "title": "Intruder",
+   "year": 1989,
+   "rating": 6.1,
+   "votes": 13703,
+   "score": 6.137222304337926
+  },
+  {
+   "tconst": "tt0097758",
+   "title": "Little Monsters",
+   "year": 1989,
+   "rating": 6.1,
+   "votes": 15587,
+   "score": 6.13323488059467
+  },
+  {
+   "tconst": "tt0098663",
+   "title": "The Wizard",
+   "year": 1989,
+   "rating": 6.1,
+   "votes": 17815,
+   "score": 6.129497948272442
+  },
+  {
+   "tconst": "tt0098412",
+   "title": "Sundown: The Vampire in Retreat",
+   "year": 1989,
+   "rating": 6,
+   "votes": 4258,
+   "score": 6.125359834614645
+  },
+  {
+   "tconst": "tt0098160",
+   "title": "The Rachel Papers",
+   "year": 1989,
+   "rating": 5.9,
+   "votes": 2430,
+   "score": 6.122235179462405
+  },
+  {
+   "tconst": "tt0097366",
+   "title": "Fletch Lives",
+   "year": 1989,
+   "rating": 6.1,
+   "votes": 24701,
+   "score": 6.121890634995634
+  },
+  {
+   "tconst": "tt0096943",
+   "title": "Blaze",
+   "year": 1989,
+   "rating": 6,
+   "votes": 4482,
+   "score": 6.121027745297509
+  },
+  {
+   "tconst": "tt0097636",
+   "title": "The Jönsson Gang in Mallorca",
+   "year": 1989,
+   "rating": 6,
+   "votes": 4506,
+   "score": 6.120581285739079
+  },
+  {
+   "tconst": "tt0098625",
+   "title": "We're No Angels",
+   "year": 1989,
+   "rating": 6.1,
+   "votes": 26503,
+   "score": 6.1205066780696225
+  },
+  {
+   "tconst": "tt0097481",
+   "title": "Harlem Nights",
+   "year": 1989,
+   "rating": 6.1,
+   "votes": 27624,
+   "score": 6.119730686099731
+  },
+  {
+   "tconst": "tt0097637",
+   "title": "K-9",
+   "year": 1989,
+   "rating": 6.1,
+   "votes": 37977,
+   "score": 6.114620953173536
+  },
+  {
+   "tconst": "tt0097478",
+   "title": "Happy Together",
+   "year": 1989,
+   "rating": 5.8,
+   "votes": 2156,
+   "score": 6.085010068579993
+  },
+  {
+   "tconst": "tt0097570",
+   "title": "In Country",
+   "year": 1989,
+   "rating": 5.9,
+   "votes": 3431,
+   "score": 6.0812745065399465
+  },
+  {
+   "tconst": "tt0097880",
+   "title": "The Mighty Quinn",
+   "year": 1989,
+   "rating": 6,
+   "votes": 7782,
+   "score": 6.080198512064859
+  },
+  {
+   "tconst": "tt0097530",
+   "title": "How I Got Into College",
+   "year": 1989,
+   "rating": 5.8,
+   "votes": 2521,
+   "score": 6.061999965719631
+  },
+  {
+   "tconst": "tt0098194",
+   "title": "The Return of the Musketeers",
+   "year": 1989,
+   "rating": 5.9,
+   "votes": 4216,
+   "score": 6.058381892699236
+  },
+  {
+   "tconst": "tt0098453",
+   "title": "Teen Witch",
+   "year": 1989,
+   "rating": 6,
+   "votes": 11927,
+   "score": 6.056329564516296
+  },
+  {
+   "tconst": "tt0098691",
+   "title": "A Better Tomorrow III: Love and Death in Saigon",
+   "year": 1989,
+   "rating": 5.9,
+   "votes": 4356,
+   "score": 6.054893304754319
+  },
+  {
+   "tconst": "tt0098519",
+   "title": "Troop Beverly Hills",
+   "year": 1989,
+   "rating": 6,
+   "votes": 12798,
+   "score": 6.053014045480365
+  },
+  {
+   "tconst": "tt0097557",
+   "title": "I, Madman",
+   "year": 1989,
+   "rating": 5.9,
+   "votes": 4680,
+   "score": 6.047380515721324
+  },
+  {
+   "tconst": "tt0098678",
+   "title": "Worth Winning",
+   "year": 1989,
+   "rating": 5.7,
+   "votes": 2042,
+   "score": 6.042528907723516
+  },
+  {
+   "tconst": "tt0098040",
+   "title": "Otto - Der Außerfriesische",
+   "year": 1989,
+   "rating": 5.8,
+   "votes": 3019,
+   "score": 6.036003555492817
+  },
+  {
+   "tconst": "tt0098073",
+   "title": "Penn & Teller Get Killed",
+   "year": 1989,
+   "rating": 5.7,
+   "votes": 2161,
+   "score": 6.0327329596295245
+  },
+  {
+   "tconst": "tt0098022",
+   "title": "Old Gringo",
+   "year": 1989,
+   "rating": 5.7,
+   "votes": 2261,
+   "score": 6.024924159825968
+  },
+  {
+   "tconst": "tt0097778",
+   "title": "Look Who's Talking",
+   "year": 1989,
+   "rating": 6,
+   "votes": 90614,
+   "score": 6.008470661509259
+  }
+ ]
+}

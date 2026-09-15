@@ -1,0 +1,1608 @@
+{
+ "tag": "year-2019",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.515,
+ "minVotes": 10000,
+ "items": [
+  {
+   "tconst": "tt6751668",
+   "title": "Parasite",
+   "year": 2019,
+   "rating": 8.5,
+   "votes": 1195534,
+   "score": 8.483531951916602
+  },
+  {
+   "tconst": "tt4154796",
+   "title": "Avengers: Endgame",
+   "year": 2019,
+   "rating": 8.4,
+   "votes": 1487311,
+   "score": 8.387408900436736
+  },
+  {
+   "tconst": "tt7286456",
+   "title": "Joker",
+   "year": 2019,
+   "rating": 8.3,
+   "votes": 1725482,
+   "score": 8.289713064221829
+  },
+  {
+   "tconst": "tt8579674",
+   "title": "1917",
+   "year": 2019,
+   "rating": 8.2,
+   "votes": 785993,
+   "score": 8.178827964720577
+  },
+  {
+   "tconst": "tt4729430",
+   "title": "Klaus",
+   "year": 2019,
+   "rating": 8.2,
+   "votes": 242508,
+   "score": 8.133258384375257
+  },
+  {
+   "tconst": "tt9900782",
+   "title": "Kaithi",
+   "year": 2019,
+   "rating": 8.4,
+   "votes": 52752,
+   "score": 8.099566677107141
+  },
+  {
+   "tconst": "tt9052870",
+   "title": "Chhichhore",
+   "year": 2019,
+   "rating": 8.3,
+   "votes": 74409,
+   "score": 8.08849658356132
+  },
+  {
+   "tconst": "tt1950186",
+   "title": "Ford v Ferrari",
+   "year": 2019,
+   "rating": 8.1,
+   "votes": 586698,
+   "score": 8.073432470230882
+  },
+  {
+   "tconst": "tt8291224",
+   "title": "Uri: The Surgical Strike",
+   "year": 2019,
+   "rating": 8.2,
+   "votes": 85522,
+   "score": 8.023571618285079
+  },
+  {
+   "tconst": "tt8948790",
+   "title": "Jersey",
+   "year": 2019,
+   "rating": 8.5,
+   "votes": 30428,
+   "score": 8.008934602795769
+  },
+  {
+   "tconst": "tt9477520",
+   "title": "Asuran",
+   "year": 2019,
+   "rating": 8.4,
+   "votes": 37772,
+   "score": 8.005358957586607
+  },
+  {
+   "tconst": "tt10431500",
+   "title": "Miracle in Cell No. 7",
+   "year": 2019,
+   "rating": 8.2,
+   "votes": 64095,
+   "score": 7.972551563827887
+  },
+  {
+   "tconst": "tt8613070",
+   "title": "Portrait of a Lady on Fire",
+   "year": 2019,
+   "rating": 8,
+   "votes": 130197,
+   "score": 7.8940577053847605
+  },
+  {
+   "tconst": "tt8946378",
+   "title": "Knives Out",
+   "year": 2019,
+   "rating": 7.9,
+   "votes": 890944,
+   "score": 7.884624136596534
+  },
+  {
+   "tconst": "tt8413338",
+   "title": "Kumbalangi Nights",
+   "year": 2019,
+   "rating": 8.5,
+   "votes": 22195,
+   "score": 7.883357916503411
+  },
+  {
+   "tconst": "tt2584384",
+   "title": "Jojo Rabbit",
+   "year": 2019,
+   "rating": 7.9,
+   "votes": 494443,
+   "score": 7.872538439668759
+  },
+  {
+   "tconst": "tt7653254",
+   "title": "Marriage Story",
+   "year": 2019,
+   "rating": 7.9,
+   "votes": 375413,
+   "score": 7.864057279131289
+  },
+  {
+   "tconst": "tt10324144",
+   "title": "Article 15",
+   "year": 2019,
+   "rating": 8.1,
+   "votes": 41969,
+   "score": 7.794956765029678
+  },
+  {
+   "tconst": "tt1302006",
+   "title": "The Irishman",
+   "year": 2019,
+   "rating": 7.8,
+   "votes": 479641,
+   "score": 7.773750580776175
+  },
+  {
+   "tconst": "tt8367814",
+   "title": "The Gentlemen",
+   "year": 2019,
+   "rating": 7.8,
+   "votes": 466250,
+   "score": 7.773012510492026
+  },
+  {
+   "tconst": "tt10214826",
+   "title": "Agent Sai Srinivasa Athreya",
+   "year": 2019,
+   "rating": 8.3,
+   "votes": 22513,
+   "score": 7.7509029656392014
+  },
+  {
+   "tconst": "tt5116302",
+   "title": "Togo",
+   "year": 2019,
+   "rating": 7.9,
+   "votes": 63189,
+   "score": 7.710725766465279
+  },
+  {
+   "tconst": "tt8108268",
+   "title": "The Tashkent Files",
+   "year": 2019,
+   "rating": 8,
+   "votes": 39530,
+   "score": 7.700125340638549
+  },
+  {
+   "tconst": "tt8760684",
+   "title": "Apollo 11",
+   "year": 2019,
+   "rating": 8.1,
+   "votes": 29083,
+   "score": 7.694381396561863
+  },
+  {
+   "tconst": "tt9617456",
+   "title": "For Sama",
+   "year": 2019,
+   "rating": 8.5,
+   "votes": 13894,
+   "score": 7.6691306655155
+  },
+  {
+   "tconst": "tt2395469",
+   "title": "Gully Boy",
+   "year": 2019,
+   "rating": 7.9,
+   "votes": 47977,
+   "score": 7.661064010242464
+  },
+  {
+   "tconst": "tt3281548",
+   "title": "Little Women",
+   "year": 2019,
+   "rating": 7.7,
+   "votes": 288672,
+   "score": 7.660315021568233
+  },
+  {
+   "tconst": "tt7019942",
+   "title": "Super Deluxe",
+   "year": 2019,
+   "rating": 8.2,
+   "votes": 20332,
+   "score": 7.644389032105608
+  },
+  {
+   "tconst": "tt5363618",
+   "title": "Sound of Metal",
+   "year": 2019,
+   "rating": 7.7,
+   "votes": 188947,
+   "score": 7.640422364357479
+  },
+  {
+   "tconst": "tt7485048",
+   "title": "Super 30",
+   "year": 2019,
+   "rating": 7.9,
+   "votes": 42942,
+   "score": 7.638340223675482
+  },
+  {
+   "tconst": "tt8144834",
+   "title": "Section 375",
+   "year": 2019,
+   "rating": 8.1,
+   "votes": 21776,
+   "score": 7.6011080098762385
+  },
+  {
+   "tconst": "tt7131622",
+   "title": "Once Upon a Time in... Hollywood",
+   "year": 2019,
+   "rating": 7.6,
+   "votes": 978318,
+   "score": 7.589018927229724
+  },
+  {
+   "tconst": "tt1979376",
+   "title": "Toy Story 4",
+   "year": 2019,
+   "rating": 7.6,
+   "votes": 329612,
+   "score": 7.568043555945689
+  },
+  {
+   "tconst": "tt9500372",
+   "title": "Pocket Hercules: Naim Süleymanoglu",
+   "year": 2019,
+   "rating": 8.2,
+   "votes": 15873,
+   "score": 7.548634024729537
+  },
+  {
+   "tconst": "tt8404614",
+   "title": "The Two Popes",
+   "year": 2019,
+   "rating": 7.6,
+   "votes": 148067,
+   "score": 7.531340558888492
+  },
+  {
+   "tconst": "tt9071322",
+   "title": "Dark Waters",
+   "year": 2019,
+   "rating": 7.6,
+   "votes": 123441,
+   "score": 7.518669735102609
+  },
+  {
+   "tconst": "tt4364194",
+   "title": "The Peanut Butter Falcon",
+   "year": 2019,
+   "rating": 7.6,
+   "votes": 121397,
+   "score": 7.517404568763574
+  },
+  {
+   "tconst": "tt8130968",
+   "title": "Badla",
+   "year": 2019,
+   "rating": 7.8,
+   "votes": 35277,
+   "score": 7.516129781607159
+  },
+  {
+   "tconst": "tt8991268",
+   "title": "Honeyland",
+   "year": 2019,
+   "rating": 8,
+   "votes": 20654,
+   "score": 7.515469697978317
+  },
+  {
+   "tconst": "tt4916630",
+   "title": "Just Mercy",
+   "year": 2019,
+   "rating": 7.6,
+   "votes": 85908,
+   "score": 7.486841641175161
+  },
+  {
+   "tconst": "tt10706602",
+   "title": "Collective",
+   "year": 2019,
+   "rating": 8.1,
+   "votes": 14355,
+   "score": 7.449094975234134
+  },
+  {
+   "tconst": "tt9881586",
+   "title": "Rascal Does Not Dream of a Dreaming Girl",
+   "year": 2019,
+   "rating": 8.3,
+   "votes": 10911,
+   "score": 7.446248774416688
+  },
+  {
+   "tconst": "tt7533152",
+   "title": "The Boy Who Harnessed the Wind",
+   "year": 2019,
+   "rating": 7.6,
+   "votes": 53606,
+   "score": 7.429374714992726
+  },
+  {
+   "tconst": "tt1478839",
+   "title": "The Art of Racing in the Rain",
+   "year": 2019,
+   "rating": 7.6,
+   "votes": 50058,
+   "score": 7.419294817040649
+  },
+  {
+   "tconst": "tt3513548",
+   "title": "Richard Jewell",
+   "year": 2019,
+   "rating": 7.5,
+   "votes": 108514,
+   "score": 7.416863898964066
+  },
+  {
+   "tconst": "tt8637428",
+   "title": "The Farewell",
+   "year": 2019,
+   "rating": 7.5,
+   "votes": 76131,
+   "score": 7.385606902530185
+  },
+  {
+   "tconst": "tt6146586",
+   "title": "John Wick: Chapter 3 - Parabellum",
+   "year": 2019,
+   "rating": 7.4,
+   "votes": 488244,
+   "score": 7.382232015080618
+  },
+  {
+   "tconst": "tt9426210",
+   "title": "Weathering with You",
+   "year": 2019,
+   "rating": 7.5,
+   "votes": 72400,
+   "score": 7.380427283031885
+  },
+  {
+   "tconst": "tt5727208",
+   "title": "Uncut Gems",
+   "year": 2019,
+   "rating": 7.4,
+   "votes": 361997,
+   "score": 7.3762019804509915
+  },
+  {
+   "tconst": "tt8291806",
+   "title": "Pain and Glory",
+   "year": 2019,
+   "rating": 7.5,
+   "votes": 67738,
+   "score": 7.373256426996159
+  },
+  {
+   "tconst": "tt8649186",
+   "title": "Corpus Christi",
+   "year": 2019,
+   "rating": 7.7,
+   "votes": 24415,
+   "score": 7.3555922743520945
+  },
+  {
+   "tconst": "tt2386490",
+   "title": "How to Train Your Dragon: The Hidden World",
+   "year": 2019,
+   "rating": 7.4,
+   "votes": 183132,
+   "score": 7.354161962397881
+  },
+  {
+   "tconst": "tt10199590",
+   "title": "Les Misérables",
+   "year": 2019,
+   "rating": 7.6,
+   "votes": 30858,
+   "score": 7.334377799251733
+  },
+  {
+   "tconst": "tt10515086",
+   "title": "The Blue Elephant 2",
+   "year": 2019,
+   "rating": 8,
+   "votes": 12138,
+   "score": 7.329081584688199
+  },
+  {
+   "tconst": "tt9817070",
+   "title": "Law of Tehran",
+   "year": 2019,
+   "rating": 7.7,
+   "votes": 21404,
+   "score": 7.322570631824842
+  },
+  {
+   "tconst": "tt8535968",
+   "title": "System Crasher",
+   "year": 2019,
+   "rating": 7.8,
+   "votes": 16842,
+   "score": 7.321168620886198
+  },
+  {
+   "tconst": "tt8359816",
+   "title": "Sorry We Missed You",
+   "year": 2019,
+   "rating": 7.6,
+   "votes": 28511,
+   "score": 7.3181898190601995
+  },
+  {
+   "tconst": "tt8108200",
+   "title": "Sonchiriya",
+   "year": 2019,
+   "rating": 7.9,
+   "votes": 13700,
+   "score": 7.3154940135792135
+  },
+  {
+   "tconst": "tt10545484",
+   "title": "Evaru",
+   "year": 2019,
+   "rating": 8.1,
+   "votes": 10185,
+   "score": 7.3146251236971676
+  },
+  {
+   "tconst": "tt7822438",
+   "title": "Thadam",
+   "year": 2019,
+   "rating": 8.1,
+   "votes": 10101,
+   "score": 7.311343123318608
+  },
+  {
+   "tconst": "tt5433114",
+   "title": "Diego Maradona",
+   "year": 2019,
+   "rating": 7.7,
+   "votes": 19616,
+   "score": 7.299784174832096
+  },
+  {
+   "tconst": "tt8652728",
+   "title": "Waves",
+   "year": 2019,
+   "rating": 7.5,
+   "votes": 39196,
+   "score": 7.299723719851762
+  },
+  {
+   "tconst": "tt9806192",
+   "title": "I Lost My Body",
+   "year": 2019,
+   "rating": 7.5,
+   "votes": 39070,
+   "score": 7.299209458362082
+  },
+  {
+   "tconst": "tt6398184",
+   "title": "Downton Abbey",
+   "year": 2019,
+   "rating": 7.4,
+   "votes": 72192,
+   "score": 7.292291319372048
+  },
+  {
+   "tconst": "tt6320628",
+   "title": "Spider-Man: Far from Home",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 675556,
+   "score": 7.2885453677333825
+  },
+  {
+   "tconst": "tt9243946",
+   "title": "El Camino",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 352505,
+   "score": 7.278337424647459
+  },
+  {
+   "tconst": "tt0437086",
+   "title": "Alita: Battle Angel",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 327284,
+   "score": 7.276717567752479
+  },
+  {
+   "tconst": "tt7984734",
+   "title": "The Lighthouse",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 309574,
+   "score": 7.2754273129911295
+  },
+  {
+   "tconst": "tt8385474",
+   "title": "A Dog's Journey",
+   "year": 2019,
+   "rating": 7.5,
+   "votes": 33701,
+   "score": 7.274540814210827
+  },
+  {
+   "tconst": "tt5606664",
+   "title": "Doctor Sleep",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 248166,
+   "score": 7.2695823931959564
+  },
+  {
+   "tconst": "tt2066051",
+   "title": "Rocketman",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 212064,
+   "score": 7.264637258276116
+  },
+  {
+   "tconst": "tt7984766",
+   "title": "The King",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 182880,
+   "score": 7.259286645177453
+  },
+  {
+   "tconst": "tt11107074",
+   "title": "My Hero Academia: Heroes Rising",
+   "year": 2019,
+   "rating": 7.8,
+   "votes": 13297,
+   "score": 7.248306997545921
+  },
+  {
+   "tconst": "tt10915286",
+   "title": "Tell Me Who I Am",
+   "year": 2019,
+   "rating": 7.6,
+   "votes": 20477,
+   "score": 7.243902225344598
+  },
+  {
+   "tconst": "tt9586294",
+   "title": "Better Days",
+   "year": 2019,
+   "rating": 7.6,
+   "votes": 17590,
+   "score": 7.206640381363803
+  },
+  {
+   "tconst": "tt5827916",
+   "title": "A Hidden Life",
+   "year": 2019,
+   "rating": 7.4,
+   "votes": 32753,
+   "score": 7.1929316801587575
+  },
+  {
+   "tconst": "tt5431890",
+   "title": "Official Secrets",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 61555,
+   "score": 7.190255162068721
+  },
+  {
+   "tconst": "tt8963708",
+   "title": "And Then We Danced",
+   "year": 2019,
+   "rating": 7.6,
+   "votes": 15833,
+   "score": 7.179886506477271
+  },
+  {
+   "tconst": "tt6264938",
+   "title": "Kesari",
+   "year": 2019,
+   "rating": 7.4,
+   "votes": 26620,
+   "score": 7.158252542922647
+  },
+  {
+   "tconst": "tt9351980",
+   "title": "American Factory",
+   "year": 2019,
+   "rating": 7.4,
+   "votes": 25221,
+   "score": 7.148650183749108
+  },
+  {
+   "tconst": "tt9675716",
+   "title": "Nerkonda Paarvai",
+   "year": 2019,
+   "rating": 7.7,
+   "votes": 11436,
+   "score": 7.147061397734062
+  },
+  {
+   "tconst": "tt6472976",
+   "title": "Five Feet Apart",
+   "year": 2019,
+   "rating": 7.2,
+   "votes": 99048,
+   "score": 7.137158023272572
+  },
+  {
+   "tconst": "tt3224458",
+   "title": "A Beautiful Day in the Neighborhood",
+   "year": 2019,
+   "rating": 7.2,
+   "votes": 95744,
+   "score": 7.1351945086418835
+  },
+  {
+   "tconst": "tt6390668",
+   "title": "Invisible Life",
+   "year": 2019,
+   "rating": 7.7,
+   "votes": 10920,
+   "score": 7.133422950374156
+  },
+  {
+   "tconst": "tt2762506",
+   "title": "Bacurau",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 35421,
+   "score": 7.1271109865883036
+  },
+  {
+   "tconst": "tt6067752",
+   "title": "Lucifer",
+   "year": 2019,
+   "rating": 7.5,
+   "votes": 16300,
+   "score": 7.125369130107503
+  },
+  {
+   "tconst": "tt9172422",
+   "title": "La belle époque",
+   "year": 2019,
+   "rating": 7.4,
+   "votes": 22142,
+   "score": 7.124572463500321
+  },
+  {
+   "tconst": "tt8526872",
+   "title": "Dolemite Is My Name",
+   "year": 2019,
+   "rating": 7.2,
+   "votes": 68593,
+   "score": 7.112806587378358
+  },
+  {
+   "tconst": "tt10883506",
+   "title": "A Sun",
+   "year": 2019,
+   "rating": 7.6,
+   "votes": 11703,
+   "score": 7.099940474672962
+  },
+  {
+   "tconst": "tt8236336",
+   "title": "The Report",
+   "year": 2019,
+   "rating": 7.2,
+   "votes": 57691,
+   "score": 7.098763618824176
+  },
+  {
+   "tconst": "tt5932728",
+   "title": "The Professor and the Madman",
+   "year": 2019,
+   "rating": 7.2,
+   "votes": 55612,
+   "score": 7.095555814817828
+  },
+  {
+   "tconst": "tt9412098",
+   "title": "Fyre",
+   "year": 2019,
+   "rating": 7.2,
+   "votes": 54938,
+   "score": 7.094471774951913
+  },
+  {
+   "tconst": "tt8772262",
+   "title": "Midsommar",
+   "year": 2019,
+   "rating": 7.1,
+   "votes": 497712,
+   "score": 7.088472220711402
+  },
+  {
+   "tconst": "tt8902990",
+   "title": "The Sky Is Pink",
+   "year": 2019,
+   "rating": 7.6,
+   "votes": 10894,
+   "score": 7.08057854512431
+  },
+  {
+   "tconst": "tt8151874",
+   "title": "Honey Boy",
+   "year": 2019,
+   "rating": 7.2,
+   "votes": 43331,
+   "score": 7.071504530607477
+  },
+  {
+   "tconst": "tt10627720",
+   "title": "Ne Zha",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 24140,
+   "score": 7.069982663205252
+  },
+  {
+   "tconst": "tt8258074",
+   "title": "Fantastic Fungi",
+   "year": 2019,
+   "rating": 7.5,
+   "votes": 12663,
+   "score": 7.065247677793202
+  },
+  {
+   "tconst": "tt1489887",
+   "title": "Booksmart",
+   "year": 2019,
+   "rating": 7.1,
+   "votes": 141964,
+   "score": 7.061485668459814
+  },
+  {
+   "tconst": "tt4807408",
+   "title": "The Best of Enemies",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 22458,
+   "score": 7.058062977442459
+  },
+  {
+   "tconst": "tt9608818",
+   "title": "Our Friend",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 18421,
+   "score": 7.023697551874577
+  },
+  {
+   "tconst": "tt9420648",
+   "title": "Bala",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 18349,
+   "score": 7.022995806618482
+  },
+  {
+   "tconst": "tt9430698",
+   "title": "One Piece: Stampede",
+   "year": 2019,
+   "rating": 7.5,
+   "votes": 10109,
+   "score": 7.010030738566181
+  },
+  {
+   "tconst": "tt8655470",
+   "title": "The Specials",
+   "year": 2019,
+   "rating": 7.4,
+   "votes": 12583,
+   "score": 7.007988669433969
+  },
+  {
+   "tconst": "tt6016744",
+   "title": "The Edge of Democracy",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 16675,
+   "score": 7.0056123007245485
+  },
+  {
+   "tconst": "tt7825208",
+   "title": "Marighella",
+   "year": 2019,
+   "rating": 7.1,
+   "votes": 48431,
+   "score": 6.999834131228753
+  },
+  {
+   "tconst": "tt8206668",
+   "title": "Bad Education",
+   "year": 2019,
+   "rating": 7.1,
+   "votes": 46543,
+   "score": 6.9964895410895656
+  },
+  {
+   "tconst": "tt2398149",
+   "title": "An Officer and a Spy",
+   "year": 2019,
+   "rating": 7.2,
+   "votes": 23540,
+   "score": 6.995683008999026
+  },
+  {
+   "tconst": "tt8739752",
+   "title": "The Collini Case",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 15736,
+   "score": 6.994871313406408
+  },
+  {
+   "tconst": "tt4353250",
+   "title": "The Last Black Man in San Francisco",
+   "year": 2019,
+   "rating": 7.2,
+   "votes": 23250,
+   "score": 6.993900996145183
+  },
+  {
+   "tconst": "tt0448115",
+   "title": "Shazam!",
+   "year": 2019,
+   "rating": 7,
+   "votes": 418459,
+   "score": 6.98867384772365
+  },
+  {
+   "tconst": "tt8228288",
+   "title": "The Platform",
+   "year": 2019,
+   "rating": 7,
+   "votes": 330091,
+   "score": 6.985730901793424
+  },
+  {
+   "tconst": "tt8399664",
+   "title": "Babyteeth",
+   "year": 2019,
+   "rating": 7.2,
+   "votes": 20874,
+   "score": 6.978040037631255
+  },
+  {
+   "tconst": "tt8722346",
+   "title": "Queen & Slim",
+   "year": 2019,
+   "rating": 7.1,
+   "votes": 37645,
+   "score": 6.97715831927437
+  },
+  {
+   "tconst": "tt9358052",
+   "title": "Knock Down the House",
+   "year": 2019,
+   "rating": 7.4,
+   "votes": 10581,
+   "score": 6.969856086770679
+  },
+  {
+   "tconst": "tt9252468",
+   "title": "Mosul",
+   "year": 2019,
+   "rating": 7.1,
+   "votes": 33683,
+   "score": 6.966016714095353
+  },
+  {
+   "tconst": "tt6513120",
+   "title": "Fighting with My Family",
+   "year": 2019,
+   "rating": 7,
+   "votes": 94168,
+   "score": 6.953413794272976
+  },
+  {
+   "tconst": "tt5668770",
+   "title": "Mardaani 2",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 12340,
+   "score": 6.9484873823557445
+  },
+  {
+   "tconst": "tt8488126",
+   "title": "The Inventor: Out for Blood in Silicon Valley",
+   "year": 2019,
+   "rating": 7.2,
+   "votes": 16717,
+   "score": 6.943504439938142
+  },
+  {
+   "tconst": "tt8041276",
+   "title": "Paddleton",
+   "year": 2019,
+   "rating": 7.2,
+   "votes": 16659,
+   "score": 6.942946401659002
+  },
+  {
+   "tconst": "tt8388508",
+   "title": "Dear Comrade",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 11814,
+   "score": 6.940011374430519
+  },
+  {
+   "tconst": "tt0800325",
+   "title": "The Dirt",
+   "year": 2019,
+   "rating": 7,
+   "votes": 61455,
+   "score": 6.9320860418700905
+  },
+  {
+   "tconst": "tt9231040",
+   "title": "First Cow",
+   "year": 2019,
+   "rating": 7.1,
+   "votes": 24847,
+   "score": 6.932043163595929
+  },
+  {
+   "tconst": "tt10384744",
+   "title": "Heroic Losers",
+   "year": 2019,
+   "rating": 7.2,
+   "votes": 15539,
+   "score": 6.931673445390475
+  },
+  {
+   "tconst": "tt8959820",
+   "title": "Petta",
+   "year": 2019,
+   "rating": 7.2,
+   "votes": 15292,
+   "score": 6.929052985996653
+  },
+  {
+   "tconst": "tt4323594",
+   "title": "I'm No Longer Here",
+   "year": 2019,
+   "rating": 7.3,
+   "votes": 10588,
+   "score": 6.918574321052425
+  },
+  {
+   "tconst": "tt6324278",
+   "title": "Abominable",
+   "year": 2019,
+   "rating": 7,
+   "votes": 47413,
+   "score": 6.915475730615494
+  },
+  {
+   "tconst": "tt8983202",
+   "title": "Kabir Singh",
+   "year": 2019,
+   "rating": 7,
+   "votes": 46353,
+   "score": 6.913885829003377
+  },
+  {
+   "tconst": "tt8869978",
+   "title": "Batla House",
+   "year": 2019,
+   "rating": 7.2,
+   "votes": 13419,
+   "score": 6.907383241036225
+  },
+  {
+   "tconst": "tt2076298",
+   "title": "Ip Man 4: The Finale",
+   "year": 2019,
+   "rating": 7,
+   "votes": 41612,
+   "score": 6.905975511931864
+  },
+  {
+   "tconst": "tt10199640",
+   "title": "Beanpole",
+   "year": 2019,
+   "rating": 7.2,
+   "votes": 13282,
+   "score": 6.905661374530853
+  },
+  {
+   "tconst": "tt10208198",
+   "title": "The Gangster, the Cop, the Devil",
+   "year": 2019,
+   "rating": 7,
+   "votes": 35210,
+   "score": 6.89266109537331
+  },
+  {
+   "tconst": "tt6139732",
+   "title": "Aladdin",
+   "year": 2019,
+   "rating": 6.9,
+   "votes": 319388,
+   "score": 6.888303180813592
+  },
+  {
+   "tconst": "tt7798634",
+   "title": "Ready or Not",
+   "year": 2019,
+   "rating": 6.9,
+   "votes": 265687,
+   "score": 6.8860247604051965
+  },
+  {
+   "tconst": "tt9541602",
+   "title": "Extreme Job",
+   "year": 2019,
+   "rating": 7.1,
+   "votes": 15967,
+   "score": 6.8746065437604384
+  },
+  {
+   "tconst": "tt1860242",
+   "title": "The Highwaymen",
+   "year": 2019,
+   "rating": 6.9,
+   "votes": 115083,
+   "score": 6.8691981174246495
+  },
+  {
+   "tconst": "tt7725626",
+   "title": "Viswasam",
+   "year": 2019,
+   "rating": 7.1,
+   "votes": 15330,
+   "score": 6.86893833880092
+  },
+  {
+   "tconst": "tt4736550",
+   "title": "The Great Hack",
+   "year": 2019,
+   "rating": 7,
+   "votes": 25932,
+   "score": 6.864945121947771
+  },
+  {
+   "tconst": "tt7736478",
+   "title": "The Traitor",
+   "year": 2019,
+   "rating": 7.1,
+   "votes": 14756,
+   "score": 6.863580874205337
+  },
+  {
+   "tconst": "tt3833480",
+   "title": "The Outpost",
+   "year": 2019,
+   "rating": 6.9,
+   "votes": 48731,
+   "score": 6.834399348245856
+  },
+  {
+   "tconst": "tt9248940",
+   "title": "Dream Girl",
+   "year": 2019,
+   "rating": 7,
+   "votes": 18852,
+   "score": 6.8318039692855725
+  },
+  {
+   "tconst": "tt8333978",
+   "title": "Maharshi",
+   "year": 2019,
+   "rating": 7.1,
+   "votes": 11460,
+   "score": 6.82726971676735
+  },
+  {
+   "tconst": "tt8378126",
+   "title": "Queen of Hearts",
+   "year": 2019,
+   "rating": 7,
+   "votes": 17370,
+   "score": 6.8226966796429425
+  },
+  {
+   "tconst": "tt8266310",
+   "title": "Blinded by the Light",
+   "year": 2019,
+   "rating": 6.9,
+   "votes": 28798,
+   "score": 6.800696121496658
+  },
+  {
+   "tconst": "tt6857112",
+   "title": "Us",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 399969,
+   "score": 6.793041444894193
+  },
+  {
+   "tconst": "tt6105098",
+   "title": "The Lion King",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 295665,
+   "score": 6.790666933151742
+  },
+  {
+   "tconst": "tt1648186",
+   "title": "Fisherman's Friends",
+   "year": 2019,
+   "rating": 7,
+   "votes": 13150,
+   "score": 6.790376160770079
+  },
+  {
+   "tconst": "tt7458762",
+   "title": "The Wolf's Call",
+   "year": 2019,
+   "rating": 6.9,
+   "votes": 24563,
+   "score": 6.78852842987667
+  },
+  {
+   "tconst": "tt4520988",
+   "title": "Frozen II",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 223649,
+   "score": 6.787790267117888
+  },
+  {
+   "tconst": "tt8079248",
+   "title": "Yesterday",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 187244,
+   "score": 6.785536736842831
+  },
+  {
+   "tconst": "tt6394270",
+   "title": "Bombshell",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 137529,
+   "score": 6.780662839996389
+  },
+  {
+   "tconst": "tt2139881",
+   "title": "Long Shot",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 129729,
+   "score": 6.779583394440863
+  },
+  {
+   "tconst": "tt6079516",
+   "title": "I See You",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 77659,
+   "score": 6.767455801706925
+  },
+  {
+   "tconst": "tt6828390",
+   "title": "Mr. Jones",
+   "year": 2019,
+   "rating": 6.9,
+   "votes": 18795,
+   "score": 6.766199274937571
+  },
+  {
+   "tconst": "tt0385887",
+   "title": "Motherless Brooklyn",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 66768,
+   "score": 6.762838788581536
+  },
+  {
+   "tconst": "tt3824648",
+   "title": "Big Time Adolescence",
+   "year": 2019,
+   "rating": 6.9,
+   "votes": 17887,
+   "score": 6.761842726784069
+  },
+  {
+   "tconst": "tt5814534",
+   "title": "Spies in Disguise",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 63867,
+   "score": 6.761379345605309
+  },
+  {
+   "tconst": "tt7549996",
+   "title": "Judy",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 58945,
+   "score": 6.758622207873338
+  },
+  {
+   "tconst": "tt13491678",
+   "title": "72 Hoorain",
+   "year": 2019,
+   "rating": 6.9,
+   "votes": 16490,
+   "score": 6.754556742990839
+  },
+  {
+   "tconst": "tt3361792",
+   "title": "Tolkien",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 51930,
+   "score": 6.753935219147866
+  },
+  {
+   "tconst": "tt4648786",
+   "title": "Harriet",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 37018,
+   "score": 6.739325537492605
+  },
+  {
+   "tconst": "tt2404465",
+   "title": "Troop Zero",
+   "year": 2019,
+   "rating": 6.9,
+   "votes": 13183,
+   "score": 6.733809607118463
+  },
+  {
+   "tconst": "tt7671064",
+   "title": "Brittany Runs a Marathon",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 24132,
+   "score": 6.716418848055412
+  },
+  {
+   "tconst": "tt8504014",
+   "title": "Good Newwz",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 23878,
+   "score": 6.7157921991211795
+  },
+  {
+   "tconst": "tt6062774",
+   "title": "Monos",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 20016,
+   "score": 6.7049576266600255
+  },
+  {
+   "tconst": "tt4154664",
+   "title": "Captain Marvel",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 672810,
+   "score": 6.697286519122197
+  },
+  {
+   "tconst": "tt6193408",
+   "title": "A Shaun the Sheep Movie: Farmageddon",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 17666,
+   "score": 6.696884555838478
+  },
+  {
+   "tconst": "tt0441881",
+   "title": "Danger Close",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 16900,
+   "score": 6.693948257317
+  },
+  {
+   "tconst": "tt0783640",
+   "title": "The Last Full Measure",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 15600,
+   "score": 6.68856281725888
+  },
+  {
+   "tconst": "tt5952594",
+   "title": "The Mustang",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 15419,
+   "score": 6.687769311217094
+  },
+  {
+   "tconst": "tt2481498",
+   "title": "Extremely Wicked, Shockingly Evil and Vile",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 113578,
+   "score": 6.685007105810317
+  },
+  {
+   "tconst": "tt7456310",
+   "title": "Anna",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 109659,
+   "score": 6.68451606750706
+  },
+  {
+   "tconst": "tt6292852",
+   "title": "I Am Mother",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 107265,
+   "score": 6.684199958400438
+  },
+  {
+   "tconst": "tt6924650",
+   "title": "Midway",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 106881,
+   "score": 6.684148049056967
+  },
+  {
+   "tconst": "tt6977338",
+   "title": "Good Boys",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 90990,
+   "score": 6.68165370949428
+  },
+  {
+   "tconst": "tt8688634",
+   "title": "21 Bridges",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 81818,
+   "score": 6.679821038596216
+  },
+  {
+   "tconst": "tt7374948",
+   "title": "Always Be My Maybe",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 67159,
+   "score": 6.675987352374024
+  },
+  {
+   "tconst": "tt5563334",
+   "title": "The Good Liar",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 54863,
+   "score": 6.671435303976494
+  },
+  {
+   "tconst": "tt6803046",
+   "title": "The Vast of Night",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 51135,
+   "score": 6.6696934345600285
+  },
+  {
+   "tconst": "tt8767908",
+   "title": "Matthias & Maxime",
+   "year": 2019,
+   "rating": 6.8,
+   "votes": 10453,
+   "score": 6.660519636328525
+  },
+  {
+   "tconst": "tt6348138",
+   "title": "Missing Link",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 31245,
+   "score": 6.6550783882125675
+  },
+  {
+   "tconst": "tt9260636",
+   "title": "Bigil",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 27592,
+   "score": 6.650713133694066
+  },
+  {
+   "tconst": "tt7616798",
+   "title": "A Dog's Way Home",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 23067,
+   "score": 6.643968552388403
+  },
+  {
+   "tconst": "tt7670212",
+   "title": "The Golden Glove",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 22658,
+   "score": 6.643266829622982
+  },
+  {
+   "tconst": "tt9675274",
+   "title": "Cinayet Süsü",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 21688,
+   "score": 6.641530172993793
+  },
+  {
+   "tconst": "tt8858104",
+   "title": "Guava Island",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 12266,
+   "score": 6.616788292545914
+  },
+  {
+   "tconst": "tt10199586",
+   "title": "Atlantics",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 11290,
+   "score": 6.612973608352622
+  },
+  {
+   "tconst": "tt9793334",
+   "title": "Athiran",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 10544,
+   "score": 6.6098134794503185
+  },
+  {
+   "tconst": "tt8800266",
+   "title": "Ema",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 10071,
+   "score": 6.60768811328919
+  },
+  {
+   "tconst": "tt7698468",
+   "title": "A Call to Spy",
+   "year": 2019,
+   "rating": 6.7,
+   "votes": 10067,
+   "score": 6.60766971255431
+  },
+  {
+   "tconst": "tt7975244",
+   "title": "Jumanji: The Next Level",
+   "year": 2019,
+   "rating": 6.6,
+   "votes": 325220,
+   "score": 6.597456023273752
+  },
+  {
+   "tconst": "tt6823368",
+   "title": "Glass",
+   "year": 2019,
+   "rating": 6.6,
+   "votes": 307602,
+   "score": 6.597314903942126
+  },
+  {
+   "tconst": "tt1560220",
+   "title": "Zombieland: Double Tap",
+   "year": 2019,
+   "rating": 6.6,
+   "votes": 229654,
+   "score": 6.596441570438328
+  },
+  {
+   "tconst": "tt4777008",
+   "title": "Maleficent: Mistress of Evil",
+   "year": 2019,
+   "rating": 6.6,
+   "votes": 134264,
+   "score": 6.594088671614729
+  },
+  {
+   "tconst": "tt7557108",
+   "title": "Saint Maud",
+   "year": 2019,
+   "rating": 6.6,
+   "votes": 56889,
+   "score": 6.5872506409398754
+  },
+  {
+   "tconst": "tt1833116",
+   "title": "The Informer",
+   "year": 2019,
+   "rating": 6.6,
+   "votes": 46806,
+   "score": 6.584987644295097
+  },
+  {
+   "tconst": "tt7339248",
+   "title": "The Art of Self-Defense",
+   "year": 2019,
+   "rating": 6.6,
+   "votes": 44176,
+   "score": 6.584258862260546
+  },
+  {
+   "tconst": "tt7430722",
+   "title": "War",
+   "year": 2019,
+   "rating": 6.6,
+   "votes": 40811,
+   "score": 6.583216392549396
+  },
+  {
+   "tconst": "tt6141246",
+   "title": "The Aeronauts",
+   "year": 2019,
+   "rating": 6.6,
+   "votes": 40509,
+   "score": 6.583116041137764
+  },
+  {
+   "tconst": "tt4995776",
+   "title": "The Red Sea Diving Resort",
+   "year": 2019,
+   "rating": 6.6,
+   "votes": 35518,
+   "score": 6.581264733112775
+  },
+  {
+   "tconst": "tt8836988",
+   "title": "Avengement",
+   "year": 2019,
+   "rating": 6.6,
+   "votes": 24735,
+   "score": 6.5754486288132235
+  }
+ ]
+}

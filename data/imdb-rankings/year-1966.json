@@ -1,0 +1,1608 @@
+{
+ "tag": "year-1966",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.457,
+ "minVotes": 1000,
+ "items": [
+  {
+   "tconst": "tt0060196",
+   "title": "The Good, the Bad and the Ugly",
+   "year": 1966,
+   "rating": 8.8,
+   "votes": 900903,
+   "score": 8.79740245760627
+  },
+  {
+   "tconst": "tt0366505",
+   "title": "Galpa Holeo Satyi",
+   "year": 1966,
+   "rating": 8.7,
+   "votes": 3980,
+   "score": 8.249652353909028
+  },
+  {
+   "tconst": "tt0058946",
+   "title": "The Battle of Algiers",
+   "year": 1966,
+   "rating": 8.1,
+   "votes": 76981,
+   "score": 8.078934211185635
+  },
+  {
+   "tconst": "tt0060742",
+   "title": "The Hero",
+   "year": 1966,
+   "rating": 8.3,
+   "votes": 6272,
+   "score": 8.046599109250133
+  },
+  {
+   "tconst": "tt0060827",
+   "title": "Persona",
+   "year": 1966,
+   "rating": 8,
+   "votes": 142155,
+   "score": 7.989223350371744
+  },
+  {
+   "tconst": "tt0061184",
+   "title": "Who's Afraid of Virginia Woolf?",
+   "year": 1966,
+   "rating": 8,
+   "votes": 83764,
+   "score": 7.981799687632331
+  },
+  {
+   "tconst": "tt0060107",
+   "title": "Andrei Rublev",
+   "year": 1966,
+   "rating": 8,
+   "votes": 61203,
+   "score": 7.97519844255851
+  },
+  {
+   "tconst": "tt0060474",
+   "title": "Don't Look Now... We're Being Shot At!",
+   "year": 1966,
+   "rating": 7.9,
+   "votes": 22712,
+   "score": 7.839156069604713
+  },
+  {
+   "tconst": "tt0060161",
+   "title": "Watch Out for the Automobile",
+   "year": 1966,
+   "rating": 8,
+   "votes": 6857,
+   "score": 7.803648812837846
+  },
+  {
+   "tconst": "tt0060277",
+   "title": "The Sword of Doom",
+   "year": 1966,
+   "rating": 7.9,
+   "votes": 13415,
+   "score": 7.799914583591187
+  },
+  {
+   "tconst": "tt0059894",
+   "title": "The War Game",
+   "year": 1966,
+   "rating": 7.9,
+   "votes": 8271,
+   "score": 7.744382345212702
+  },
+  {
+   "tconst": "tt0060305",
+   "title": "Second Wind",
+   "year": 1966,
+   "rating": 7.9,
+   "votes": 7536,
+   "score": 7.730982746305877
+  },
+  {
+   "tconst": "tt0061065",
+   "title": "The Face of Another",
+   "year": 1966,
+   "rating": 7.8,
+   "votes": 12330,
+   "score": 7.699269971677941
+  },
+  {
+   "tconst": "tt0060665",
+   "title": "A Man for All Seasons",
+   "year": 1966,
+   "rating": 7.7,
+   "votes": 40786,
+   "score": 7.670259625770999
+  },
+  {
+   "tconst": "tt0060138",
+   "title": "Au hasard Balthazar",
+   "year": 1966,
+   "rating": 7.7,
+   "votes": 25176,
+   "score": 7.6525240190429
+  },
+  {
+   "tconst": "tt0060955",
+   "title": "Seconds",
+   "year": 1966,
+   "rating": 7.6,
+   "votes": 24073,
+   "score": 7.55442383131125
+  },
+  {
+   "tconst": "tt0060802",
+   "title": "Closely Watched Trains",
+   "year": 1966,
+   "rating": 7.6,
+   "votes": 15202,
+   "score": 7.52946973969059
+  },
+  {
+   "tconst": "tt0060125",
+   "title": "For Love and Gold",
+   "year": 1966,
+   "rating": 7.7,
+   "votes": 5936,
+   "score": 7.520828823885087
+  },
+  {
+   "tconst": "tt0062060",
+   "title": "Oh, Beautiful Istanbul",
+   "year": 1966,
+   "rating": 7.9,
+   "votes": 2753,
+   "score": 7.5155791959677485
+  },
+  {
+   "tconst": "tt0061619",
+   "title": "El Dorado",
+   "year": 1966,
+   "rating": 7.5,
+   "votes": 33914,
+   "score": 7.470134293477314
+  },
+  {
+   "tconst": "tt0060522",
+   "title": "How to Steal a Million",
+   "year": 1966,
+   "rating": 7.5,
+   "votes": 32623,
+   "score": 7.468987559779524
+  },
+  {
+   "tconst": "tt0060371",
+   "title": "The Endless Summer",
+   "year": 1966,
+   "rating": 7.6,
+   "votes": 7008,
+   "score": 7.457301289019351
+  },
+  {
+   "tconst": "tt0060934",
+   "title": "The Sand Pebbles",
+   "year": 1966,
+   "rating": 7.5,
+   "votes": 18012,
+   "score": 7.445154045995527
+  },
+  {
+   "tconst": "tt0061042",
+   "title": "Hunger",
+   "year": 1966,
+   "rating": 7.7,
+   "votes": 3612,
+   "score": 7.43054395543516
+  },
+  {
+   "tconst": "tt0061138",
+   "title": "A Man and a Woman",
+   "year": 1966,
+   "rating": 7.5,
+   "votes": 13863,
+   "score": 7.4298438217363225
+  },
+  {
+   "tconst": "tt0060176",
+   "title": "Blow-Up",
+   "year": 1966,
+   "rating": 7.4,
+   "votes": 73397,
+   "score": 7.387328369725486
+  },
+  {
+   "tconst": "tt0139820",
+   "title": "The Red Angel",
+   "year": 1966,
+   "rating": 7.7,
+   "votes": 2274,
+   "score": 7.3204241669111045
+  },
+  {
+   "tconst": "tt0060758",
+   "title": "Black Girl",
+   "year": 1966,
+   "rating": 7.4,
+   "votes": 7626,
+   "score": 7.290710494141775
+  },
+  {
+   "tconst": "tt0059776",
+   "title": "The Round-Up",
+   "year": 1966,
+   "rating": 7.5,
+   "votes": 3781,
+   "score": 7.281901008673282
+  },
+  {
+   "tconst": "tt0060891",
+   "title": "The Nun",
+   "year": 1966,
+   "rating": 7.5,
+   "votes": 3597,
+   "score": 7.273171355768318
+  },
+  {
+   "tconst": "tt0060862",
+   "title": "The Professionals",
+   "year": 1966,
+   "rating": 7.3,
+   "votes": 21188,
+   "score": 7.262018601156795
+  },
+  {
+   "tconst": "tt0060675",
+   "title": "Masculine Feminine",
+   "year": 1966,
+   "rating": 7.3,
+   "votes": 19268,
+   "score": 7.258420600082245
+  },
+  {
+   "tconst": "tt0060482",
+   "title": "The Dacians",
+   "year": 1966,
+   "rating": 7.6,
+   "votes": 2196,
+   "score": 7.242449537693041
+  },
+  {
+   "tconst": "tt0060223",
+   "title": "The Hunt",
+   "year": 1966,
+   "rating": 7.5,
+   "votes": 2729,
+   "score": 7.220372411495564
+  },
+  {
+   "tconst": "tt0061196",
+   "title": "Wings",
+   "year": 1966,
+   "rating": 7.5,
+   "votes": 2643,
+   "score": 7.213771266117749
+  },
+  {
+   "tconst": "tt0059221",
+   "title": "The Ghost and Mr. Chicken",
+   "year": 1966,
+   "rating": 7.3,
+   "votes": 8514,
+   "score": 7.211421980498945
+  },
+  {
+   "tconst": "tt0061122",
+   "title": "The Trouble with Angels",
+   "year": 1966,
+   "rating": 7.3,
+   "votes": 6537,
+   "score": 7.188187438299981
+  },
+  {
+   "tconst": "tt0060390",
+   "title": "Fahrenheit 451",
+   "year": 1966,
+   "rating": 7.2,
+   "votes": 47864,
+   "score": 7.1848000311572315
+  },
+  {
+   "tconst": "tt0145300",
+   "title": "O papatrehas",
+   "year": 1966,
+   "rating": 7.9,
+   "votes": 1005,
+   "score": 7.180433278038384
+  },
+  {
+   "tconst": "tt0060315",
+   "title": "Django",
+   "year": 1966,
+   "rating": 7.2,
+   "votes": 34600,
+   "score": 7.179136761867049
+  },
+  {
+   "tconst": "tt0060722",
+   "title": "Death of a Bureaucrat",
+   "year": 1966,
+   "rating": 7.6,
+   "votes": 1682,
+   "score": 7.173925698160685
+  },
+  {
+   "tconst": "tt0135625",
+   "title": "The Republic of ShKID",
+   "year": 1966,
+   "rating": 7.7,
+   "votes": 1346,
+   "score": 7.17027652279069
+  },
+  {
+   "tconst": "tt0060165",
+   "title": "A Big Hand for the Little Lady",
+   "year": 1966,
+   "rating": 7.3,
+   "votes": 5355,
+   "score": 7.167390829656485
+  },
+  {
+   "tconst": "tt0060597",
+   "title": "Carriage to Vienna",
+   "year": 1966,
+   "rating": 7.7,
+   "votes": 1329,
+   "score": 7.1664099280665345
+  },
+  {
+   "tconst": "tt0060538",
+   "title": "Misunderstood",
+   "year": 1966,
+   "rating": 7.6,
+   "votes": 1621,
+   "score": 7.164009432455918
+  },
+  {
+   "tconst": "tt0060959",
+   "title": "Daisies",
+   "year": 1966,
+   "rating": 7.2,
+   "votes": 18000,
+   "score": 7.16090888012984
+  },
+  {
+   "tconst": "tt0060424",
+   "title": "The Fortune Cookie",
+   "year": 1966,
+   "rating": 7.2,
+   "votes": 17484,
+   "score": 7.159817611040195
+  },
+  {
+   "tconst": "tt0062271",
+   "title": "The Birds, the Bees and the Italians",
+   "year": 1966,
+   "rating": 7.5,
+   "votes": 2002,
+   "score": 7.15265447117487
+  },
+  {
+   "tconst": "tt0060908",
+   "title": "King of Hearts",
+   "year": 1966,
+   "rating": 7.3,
+   "votes": 4710,
+   "score": 7.152411334932918
+  },
+  {
+   "tconst": "tt0060472",
+   "title": "Grand Prix",
+   "year": 1966,
+   "rating": 7.2,
+   "votes": 12267,
+   "score": 7.144016636953868
+  },
+  {
+   "tconst": "tt0061073",
+   "title": "Teesri Manzil",
+   "year": 1966,
+   "rating": 7.6,
+   "votes": 1413,
+   "score": 7.126427153944036
+  },
+  {
+   "tconst": "tt0060182",
+   "title": "Born Free",
+   "year": 1966,
+   "rating": 7.2,
+   "votes": 7640,
+   "score": 7.11403573176701
+  },
+  {
+   "tconst": "tt0060798",
+   "title": "Orlovi rano lete",
+   "year": 1966,
+   "rating": 7.7,
+   "votes": 1096,
+   "score": 7.107093856138817
+  },
+  {
+   "tconst": "tt0061132",
+   "title": "The Hawks and the Sparrows",
+   "year": 1966,
+   "rating": 7.2,
+   "votes": 6389,
+   "score": 7.099481489033288
+  },
+  {
+   "tconst": "tt0060401",
+   "title": "Pharaoh",
+   "year": 1966,
+   "rating": 7.3,
+   "votes": 2752,
+   "score": 7.075391450550895
+  },
+  {
+   "tconst": "tt0171343",
+   "title": "Falling Leaves",
+   "year": 1966,
+   "rating": 7.6,
+   "votes": 1140,
+   "score": 7.0660134217135315
+  },
+  {
+   "tconst": "tt0060232",
+   "title": "The Chase",
+   "year": 1966,
+   "rating": 7.1,
+   "votes": 15473,
+   "score": 7.060982742819581
+  },
+  {
+   "tconst": "tt0060689",
+   "title": "Mera Saaya",
+   "year": 1966,
+   "rating": 7.6,
+   "votes": 1099,
+   "score": 7.055583002604553
+  },
+  {
+   "tconst": "tt0061101",
+   "title": "Tokyo Drifter",
+   "year": 1966,
+   "rating": 7.1,
+   "votes": 10710,
+   "score": 7.045112615069765
+  },
+  {
+   "tconst": "tt0060395",
+   "title": "The Family Way",
+   "year": 1966,
+   "rating": 7.3,
+   "votes": 2192,
+   "score": 7.035986441875613
+  },
+  {
+   "tconst": "tt0060116",
+   "title": "Father",
+   "year": 1966,
+   "rating": 7.5,
+   "votes": 1227,
+   "score": 7.031777603263116
+  },
+  {
+   "tconst": "tt0060177",
+   "title": "The Blue Max",
+   "year": 1966,
+   "rating": 7.1,
+   "votes": 8299,
+   "score": 7.030881677865034
+  },
+  {
+   "tconst": "tt0145006",
+   "title": "Jenny Jenny",
+   "year": 1966,
+   "rating": 7.4,
+   "votes": 1515,
+   "score": 7.025156549688652
+  },
+  {
+   "tconst": "tt0060445",
+   "title": "Gambit",
+   "year": 1966,
+   "rating": 7.1,
+   "votes": 7559,
+   "score": 7.024905797694468
+  },
+  {
+   "tconst": "tt0060574",
+   "title": "Young Törless",
+   "year": 1966,
+   "rating": 7.2,
+   "votes": 2966,
+   "score": 7.012725346058235
+  },
+  {
+   "tconst": "tt0060560",
+   "title": "The Pornographers",
+   "year": 1966,
+   "rating": 7.2,
+   "votes": 2792,
+   "score": 7.004132047064071
+  },
+  {
+   "tconst": "tt0060481",
+   "title": "The War Is Over",
+   "year": 1966,
+   "rating": 7.2,
+   "votes": 2759,
+   "score": 7.002412535905017
+  },
+  {
+   "tconst": "tt0060086",
+   "title": "Alfie",
+   "year": 1966,
+   "rating": 7,
+   "votes": 16999,
+   "score": 6.969846587169673
+  },
+  {
+   "tconst": "tt0060268",
+   "title": "Cul-de-sac",
+   "year": 1966,
+   "rating": 7,
+   "votes": 15108,
+   "score": 6.966306724762041
+  },
+  {
+   "tconst": "tt0060529",
+   "title": "Here Is Your Life",
+   "year": 1966,
+   "rating": 7.3,
+   "votes": 1463,
+   "score": 6.95784357388021
+  },
+  {
+   "tconst": "tt0060921",
+   "title": "The Russians Are Coming the Russians Are Coming",
+   "year": 1966,
+   "rating": 7,
+   "votes": 11348,
+   "score": 6.956047029678245
+  },
+  {
+   "tconst": "tt0061017",
+   "title": "Trace of Stones",
+   "year": 1966,
+   "rating": 7.4,
+   "votes": 1094,
+   "score": 6.949794041292722
+  },
+  {
+   "tconst": "tt0061089",
+   "title": "This Property Is Condemned",
+   "year": 1966,
+   "rating": 7,
+   "votes": 7244,
+   "score": 6.934166511701474
+  },
+  {
+   "tconst": "tt0060420",
+   "title": "Follow Me, Boys!",
+   "year": 1966,
+   "rating": 7.1,
+   "votes": 2820,
+   "score": 6.931745738865695
+  },
+  {
+   "tconst": "tt0061115",
+   "title": "The Trap",
+   "year": 1966,
+   "rating": 7.1,
+   "votes": 2448,
+   "score": 6.913593016956775
+  },
+  {
+   "tconst": "tt0143012",
+   "title": "Zatoichi's Vengeance",
+   "year": 1966,
+   "rating": 7.2,
+   "votes": 1460,
+   "score": 6.898076716449983
+  },
+  {
+   "tconst": "tt0199905",
+   "title": "Zatoichi's Pilgrimage",
+   "year": 1966,
+   "rating": 7.2,
+   "votes": 1379,
+   "score": 6.887796856858747
+  },
+  {
+   "tconst": "tt0060648",
+   "title": "Mademoiselle",
+   "year": 1966,
+   "rating": 7.1,
+   "votes": 1948,
+   "score": 6.88197717858445
+  },
+  {
+   "tconst": "tt0125301",
+   "title": "Who Wants to Kill Jessie?",
+   "year": 1966,
+   "rating": 7.2,
+   "votes": 1302,
+   "score": 6.877353919403545
+  },
+  {
+   "tconst": "tt0200740",
+   "title": "Irezumi",
+   "year": 1966,
+   "rating": 7.1,
+   "votes": 1690,
+   "score": 6.861066439578795
+  },
+  {
+   "tconst": "tt0060748",
+   "title": "Nevada Smith",
+   "year": 1966,
+   "rating": 6.9,
+   "votes": 10007,
+   "score": 6.859777298307165
+  },
+  {
+   "tconst": "tt0061113",
+   "title": "Trans-Europ-Express",
+   "year": 1966,
+   "rating": 7,
+   "votes": 2362,
+   "score": 6.838568923993741
+  },
+  {
+   "tconst": "tt0059079",
+   "title": "Come Drink with Me",
+   "year": 1966,
+   "rating": 6.9,
+   "votes": 5732,
+   "score": 6.834234807258907
+  },
+  {
+   "tconst": "tt0060073",
+   "title": "Africa Addio",
+   "year": 1966,
+   "rating": 7,
+   "votes": 2273,
+   "score": 6.834179261370902
+  },
+  {
+   "tconst": "tt0060486",
+   "title": "Violence at Noon",
+   "year": 1966,
+   "rating": 7.1,
+   "votes": 1336,
+   "score": 6.824858185987567
+  },
+  {
+   "tconst": "tt0060453",
+   "title": "Georgy Girl",
+   "year": 1966,
+   "rating": 6.9,
+   "votes": 4644,
+   "score": 6.821557179742552
+  },
+  {
+   "tconst": "tt0063371",
+   "title": "A Report on the Party and Guests",
+   "year": 1966,
+   "rating": 7,
+   "votes": 2017,
+   "score": 6.82010895673416
+  },
+  {
+   "tconst": "tt0199680",
+   "title": "Samurai Wolf",
+   "year": 1966,
+   "rating": 7.1,
+   "votes": 1082,
+   "score": 6.791291413288645
+  },
+  {
+   "tconst": "tt0207145",
+   "title": "As Long as You've Got Your Health",
+   "year": 1966,
+   "rating": 7.1,
+   "votes": 1075,
+   "score": 6.790249986731064
+  },
+  {
+   "tconst": "tt0060630",
+   "title": "Line of Demarcation",
+   "year": 1966,
+   "rating": 7.1,
+   "votes": 1061,
+   "score": 6.788145910949519
+  },
+  {
+   "tconst": "tt0060397",
+   "title": "Fantastic Voyage",
+   "year": 1966,
+   "rating": 6.8,
+   "votes": 22731,
+   "score": 6.785557655491424
+  },
+  {
+   "tconst": "tt0060645",
+   "title": "Madame X",
+   "year": 1966,
+   "rating": 6.9,
+   "votes": 2809,
+   "score": 6.783767057618
+  },
+  {
+   "tconst": "tt0060490",
+   "title": "Harper",
+   "year": 1966,
+   "rating": 6.8,
+   "votes": 12395,
+   "score": 6.7744134917855146
+  },
+  {
+   "tconst": "tt0060438",
+   "title": "A Funny Thing Happened on the Way to the Forum",
+   "year": 1966,
+   "rating": 6.8,
+   "votes": 10803,
+   "score": 6.770962358931369
+  },
+  {
+   "tconst": "tt0060588",
+   "title": "Khartoum",
+   "year": 1966,
+   "rating": 6.8,
+   "votes": 9326,
+   "score": 6.766808902040186
+  },
+  {
+   "tconst": "tt0060437",
+   "title": "Funeral in Berlin",
+   "year": 1966,
+   "rating": 6.8,
+   "votes": 8821,
+   "score": 6.765102201656344
+  },
+  {
+   "tconst": "tt0060794",
+   "title": "Kill, Baby... Kill!",
+   "year": 1966,
+   "rating": 6.8,
+   "votes": 8757,
+   "score": 6.764873293273235
+  },
+  {
+   "tconst": "tt0062080",
+   "title": "The Treasure of San Gennaro",
+   "year": 1966,
+   "rating": 6.9,
+   "votes": 2090,
+   "score": 6.756721269406782
+  },
+  {
+   "tconst": "tt0060814",
+   "title": "Is Paris Burning?",
+   "year": 1966,
+   "rating": 6.8,
+   "votes": 5600,
+   "score": 6.7480710185556
+  },
+  {
+   "tconst": "tt0060586",
+   "title": "Fighting Elegy",
+   "year": 1966,
+   "rating": 6.9,
+   "votes": 1723,
+   "score": 6.737410474648167
+  },
+  {
+   "tconst": "tt2530824",
+   "title": "Too Young for Love",
+   "year": 1966,
+   "rating": 7,
+   "votes": 1009,
+   "score": 6.729850036071159
+  },
+  {
+   "tconst": "tt0060063",
+   "title": "Yesterday Girl",
+   "year": 1966,
+   "rating": 6.9,
+   "votes": 1218,
+   "score": 6.7003916692817675
+  },
+  {
+   "tconst": "tt0061728",
+   "title": "What's Cooking in Paris",
+   "year": 1966,
+   "rating": 6.7,
+   "votes": 7549,
+   "score": 6.671607056084566
+  },
+  {
+   "tconst": "tt0060214",
+   "title": "Carry on Screaming!",
+   "year": 1966,
+   "rating": 6.7,
+   "votes": 6679,
+   "score": 6.668390249051565
+  },
+  {
+   "tconst": "tt0060879",
+   "title": "Who Are You, Polly Maggoo?",
+   "year": 1966,
+   "rating": 6.8,
+   "votes": 1387,
+   "score": 6.656417562826544
+  },
+  {
+   "tconst": "tt0061204",
+   "title": "The Wrong Box",
+   "year": 1966,
+   "rating": 6.7,
+   "votes": 4432,
+   "score": 6.655314565991708
+  },
+  {
+   "tconst": "tt0059872",
+   "title": "A Matter of Resistance",
+   "year": 1966,
+   "rating": 6.8,
+   "votes": 1260,
+   "score": 6.648348992242017
+  },
+  {
+   "tconst": "tt0061059",
+   "title": "The Embryo Hunts in Secret",
+   "year": 1966,
+   "rating": 6.8,
+   "votes": 1002,
+   "score": 6.628805555677802
+  },
+  {
+   "tconst": "tt0062851",
+   "title": "Daimajin",
+   "year": 1966,
+   "rating": 6.7,
+   "votes": 2154,
+   "score": 6.623040178334483
+  },
+  {
+   "tconst": "tt0061107",
+   "title": "Torn Curtain",
+   "year": 1966,
+   "rating": 6.6,
+   "votes": 31961,
+   "score": 6.595669692135159
+  },
+  {
+   "tconst": "tt0059127",
+   "title": "Dracula: Prince of Darkness",
+   "year": 1966,
+   "rating": 6.6,
+   "votes": 12087,
+   "score": 6.589093659545118
+  },
+  {
+   "tconst": "tt0062473",
+   "title": "Warning Shot",
+   "year": 1966,
+   "rating": 6.7,
+   "votes": 1175,
+   "score": 6.588399412628487
+  },
+  {
+   "tconst": "tt0060841",
+   "title": "The Plague of the Zombies",
+   "year": 1966,
+   "rating": 6.6,
+   "votes": 6330,
+   "score": 6.580527792969571
+  },
+  {
+   "tconst": "tt0061170",
+   "title": "Walk Don't Run",
+   "year": 1966,
+   "rating": 6.6,
+   "votes": 5172,
+   "score": 6.576874387956409
+  },
+  {
+   "tconst": "tt0061176",
+   "title": "What Did You Do in the War, Daddy?",
+   "year": 1966,
+   "rating": 6.6,
+   "votes": 2507,
+   "score": 6.55930103292471
+  },
+  {
+   "tconst": "tt0060479",
+   "title": "The Group",
+   "year": 1966,
+   "rating": 6.6,
+   "votes": 2359,
+   "score": 6.557507806629044
+  },
+  {
+   "tconst": "tt0058909",
+   "title": "Angelique and the King",
+   "year": 1966,
+   "rating": 6.6,
+   "votes": 2014,
+   "score": 6.552643902610139
+  },
+  {
+   "tconst": "tt0059499",
+   "title": "Let's Not Get Angry",
+   "year": 1966,
+   "rating": 6.6,
+   "votes": 1585,
+   "score": 6.544784805596503
+  },
+  {
+   "tconst": "tt0060701",
+   "title": "The Diabolical Dr. Z",
+   "year": 1966,
+   "rating": 6.6,
+   "votes": 1413,
+   "score": 6.540849035419378
+  },
+  {
+   "tconst": "tt0060153",
+   "title": "Batman: The Movie",
+   "year": 1966,
+   "rating": 6.5,
+   "votes": 38491,
+   "score": 6.498917948962218
+  },
+  {
+   "tconst": "tt0060463",
+   "title": "The Glass Bottom Boat",
+   "year": 1966,
+   "rating": 6.5,
+   "votes": 5750,
+   "score": 6.493669440365475
+  },
+  {
+   "tconst": "tt0061135",
+   "title": "The Ugly Dachshund",
+   "year": 1966,
+   "rating": 6.5,
+   "votes": 5127,
+   "score": 6.493025742201233
+  },
+  {
+   "tconst": "tt0060355",
+   "title": "Duel at Diablo",
+   "year": 1966,
+   "rating": 6.5,
+   "votes": 4963,
+   "score": 6.4928339296439646
+  },
+  {
+   "tconst": "tt0060491",
+   "title": "Hawaii",
+   "year": 1966,
+   "rating": 6.5,
+   "votes": 4248,
+   "score": 6.491857607177393
+  },
+  {
+   "tconst": "tt0061074",
+   "title": "Massacre Time",
+   "year": 1966,
+   "rating": 6.5,
+   "votes": 2768,
+   "score": 6.488659427406305
+  },
+  {
+   "tconst": "tt0060714",
+   "title": "Morgan!",
+   "year": 1966,
+   "rating": 6.5,
+   "votes": 2253,
+   "score": 6.486864040106658
+  },
+  {
+   "tconst": "tt0060661",
+   "title": "The Man Called Flintstone",
+   "year": 1966,
+   "rating": 6.5,
+   "votes": 2147,
+   "score": 6.486421583243393
+  },
+  {
+   "tconst": "tt0060754",
+   "title": "The Night of the Grizzly",
+   "year": 1966,
+   "rating": 6.5,
+   "votes": 1761,
+   "score": 6.484523260582021
+  },
+  {
+   "tconst": "tt0392393",
+   "title": "Malkoçoglu",
+   "year": 1966,
+   "rating": 6.5,
+   "votes": 1207,
+   "score": 6.480638297447648
+  },
+  {
+   "tconst": "tt0062853",
+   "title": "Return of Daimajin",
+   "year": 1966,
+   "rating": 6.4,
+   "votes": 1128,
+   "score": 6.426911993640489
+  },
+  {
+   "tconst": "tt0061087",
+   "title": "They're a Weird Mob",
+   "year": 1966,
+   "rating": 6.4,
+   "votes": 1294,
+   "score": 6.424964569514804
+  },
+  {
+   "tconst": "tt0060109",
+   "title": "An Angel for Satan",
+   "year": 1966,
+   "rating": 6.4,
+   "votes": 1453,
+   "score": 6.4233464013318216
+  },
+  {
+   "tconst": "tt0060263",
+   "title": "The Creatures",
+   "year": 1966,
+   "rating": 6.4,
+   "votes": 1576,
+   "score": 6.4222316469204035
+  },
+  {
+   "tconst": "tt0061094",
+   "title": "Thunderbirds Are Go",
+   "year": 1966,
+   "rating": 6.4,
+   "votes": 2858,
+   "score": 6.414844147865982
+  },
+  {
+   "tconst": "tt0060726",
+   "title": "Munster, Go Home!",
+   "year": 1966,
+   "rating": 6.4,
+   "votes": 3397,
+   "score": 6.413024499082775
+  },
+  {
+   "tconst": "tt0060884",
+   "title": "The Rare Breed",
+   "year": 1966,
+   "rating": 6.4,
+   "votes": 4433,
+   "score": 6.410540902349892
+  },
+  {
+   "tconst": "tt0059653",
+   "title": "Ride in the Whirlwind",
+   "year": 1966,
+   "rating": 6.4,
+   "votes": 5138,
+   "score": 6.409330192646948
+  },
+  {
+   "tconst": "tt0060200",
+   "title": "After the Fox",
+   "year": 1966,
+   "rating": 6.4,
+   "votes": 5331,
+   "score": 6.409045762512551
+  },
+  {
+   "tconst": "tt0062262",
+   "title": "The Shooting",
+   "year": 1966,
+   "rating": 6.4,
+   "votes": 7551,
+   "score": 6.406697312883518
+  },
+  {
+   "tconst": "tt0059557",
+   "title": "Our Man Flint",
+   "year": 1966,
+   "rating": 6.4,
+   "votes": 7711,
+   "score": 6.40657429944518
+  },
+  {
+   "tconst": "tt0060121",
+   "title": "Arabesque",
+   "year": 1966,
+   "rating": 6.4,
+   "votes": 9153,
+   "score": 6.405640571502706
+  },
+  {
+   "tconst": "tt0060637",
+   "title": "Lost Command",
+   "year": 1966,
+   "rating": 6.3,
+   "votes": 2646,
+   "score": 6.343134592009587
+  },
+  {
+   "tconst": "tt0060095",
+   "title": "Alvarez Kelly",
+   "year": 1966,
+   "rating": 6.3,
+   "votes": 3020,
+   "score": 6.339121572752975
+  },
+  {
+   "tconst": "tt0061647",
+   "title": "Triple Cross",
+   "year": 1966,
+   "rating": 6.3,
+   "votes": 3760,
+   "score": 6.333039647577092
+  },
+  {
+   "tconst": "tt0060120",
+   "title": "The Appaloosa",
+   "year": 1966,
+   "rating": 6.3,
+   "votes": 3904,
+   "score": 6.332069478480212
+  },
+  {
+   "tconst": "tt0060218",
+   "title": "Cast a Giant Shadow",
+   "year": 1966,
+   "rating": 6.3,
+   "votes": 4480,
+   "score": 6.328698671983022
+  },
+  {
+   "tconst": "tt0060880",
+   "title": "The Quiller Memorandum",
+   "year": 1966,
+   "rating": 6.3,
+   "votes": 4828,
+   "score": 6.326985024445257
+  },
+  {
+   "tconst": "tt0061587",
+   "title": "Navajo Joe",
+   "year": 1966,
+   "rating": 6.3,
+   "votes": 5193,
+   "score": 6.325394594294681
+  },
+  {
+   "tconst": "tt0058977",
+   "title": "Blindfold",
+   "year": 1966,
+   "rating": 6.2,
+   "votes": 1225,
+   "score": 6.315626392119982
+  },
+  {
+   "tconst": "tt0060636",
+   "title": "Lord Love a Duck",
+   "year": 1966,
+   "rating": 6.2,
+   "votes": 1981,
+   "score": 6.28630282538308
+  },
+  {
+   "tconst": "tt0061080",
+   "title": "Texas Across the River",
+   "year": 1966,
+   "rating": 6.2,
+   "votes": 2169,
+   "score": 6.281182935458176
+  },
+  {
+   "tconst": "tt0060818",
+   "title": "Penelope",
+   "year": 1966,
+   "rating": 6.2,
+   "votes": 2529,
+   "score": 6.272901309851788
+  },
+  {
+   "tconst": "tt0060483",
+   "title": "Gunpoint",
+   "year": 1966,
+   "rating": 6.1,
+   "votes": 1073,
+   "score": 6.272343812092117
+  },
+  {
+   "tconst": "tt0059635",
+   "title": "Rasputin: The Mad Monk",
+   "year": 1966,
+   "rating": 6.2,
+   "votes": 3852,
+   "score": 6.253023232165491
+  },
+  {
+   "tconst": "tt0060647",
+   "title": "Made in U.S.A",
+   "year": 1966,
+   "rating": 6.2,
+   "votes": 4951,
+   "score": 6.24323117500705
+  },
+  {
+   "tconst": "tt0060164",
+   "title": "The Bible in the Beginning...",
+   "year": 1966,
+   "rating": 6.2,
+   "votes": 7018,
+   "score": 6.232086395917555
+  },
+  {
+   "tconst": "tt0060983",
+   "title": "The Singing Nun",
+   "year": 1966,
+   "rating": 6.1,
+   "votes": 1722,
+   "score": 6.2312522859908
+  },
+  {
+   "tconst": "tt0060143",
+   "title": "Texas, Adios",
+   "year": 1966,
+   "rating": 6.1,
+   "votes": 2102,
+   "score": 6.215173669396183
+  },
+  {
+   "tconst": "tt0059311",
+   "title": "Incubus",
+   "year": 1966,
+   "rating": 6.1,
+   "votes": 2484,
+   "score": 6.202545557539311
+  },
+  {
+   "tconst": "tt0060112",
+   "title": "Any Wednesday",
+   "year": 1966,
+   "rating": 6,
+   "votes": 1265,
+   "score": 6.201884645680776
+  },
+  {
+   "tconst": "tt0061024",
+   "title": "Stagecoach",
+   "year": 1966,
+   "rating": 6.1,
+   "votes": 2575,
+   "score": 6.199935306983765
+  },
+  {
+   "tconst": "tt0060866",
+   "title": "The Psychopath",
+   "year": 1966,
+   "rating": 6,
+   "votes": 1388,
+   "score": 6.191486064684657
+  },
+  {
+   "tconst": "tt0060416",
+   "title": "The Hills Run Red",
+   "year": 1966,
+   "rating": 5.9,
+   "votes": 1020,
+   "score": 6.1758756051816635
+  },
+  {
+   "tconst": "tt0059453",
+   "title": "Mister Buddwing",
+   "year": 1966,
+   "rating": 6,
+   "votes": 1607,
+   "score": 6.175400353842331
+  },
+  {
+   "tconst": "tt0135509",
+   "title": "My Daughter, the Socialist",
+   "year": 1966,
+   "rating": 6,
+   "votes": 1618,
+   "score": 6.1746633775656825
+  },
+  {
+   "tconst": "tt0061634",
+   "title": "Eye of the Devil",
+   "year": 1966,
+   "rating": 6.1,
+   "votes": 3803,
+   "score": 6.17438449353882
+  },
+  {
+   "tconst": "tt0060228",
+   "title": "Chamber of Horrors",
+   "year": 1966,
+   "rating": 6,
+   "votes": 1657,
+   "score": 6.172099632091442
+  },
+  {
+   "tconst": "tt0060440",
+   "title": "The War of the Gargantuas",
+   "year": 1966,
+   "rating": 6.1,
+   "votes": 4145,
+   "score": 6.16943998493041
+  },
+  {
+   "tconst": "tt0060893",
+   "title": "The Reptile",
+   "year": 1966,
+   "rating": 6.1,
+   "votes": 4479,
+   "score": 6.1652069214212375
+  },
+  {
+   "tconst": "tt0060548",
+   "title": "Island of Terror",
+   "year": 1966,
+   "rating": 6.1,
+   "votes": 4971,
+   "score": 6.159833984670399
+  },
+  {
+   "tconst": "tt0061209",
+   "title": "You're a Big Boy Now",
+   "year": 1966,
+   "rating": 6,
+   "votes": 2440,
+   "score": 6.132926954205512
+  },
+  {
+   "tconst": "tt0060287",
+   "title": "Dead Heat on a Merry-Go-Round",
+   "year": 1966,
+   "rating": 5.9,
+   "votes": 1551,
+   "score": 6.1184510868157425
+  },
+  {
+   "tconst": "tt0061081",
+   "title": "The Texican",
+   "year": 1966,
+   "rating": 5.8,
+   "votes": 1106,
+   "score": 6.112093410478138
+  },
+  {
+   "tconst": "tt0060640",
+   "title": "Lt. Robin Crusoe, U.S.N.",
+   "year": 1966,
+   "rating": 5.9,
+   "votes": 1714,
+   "score": 6.105331143134473
+  },
+  {
+   "tconst": "tt0060476",
+   "title": "The Great St. Trinian's Train Robbery",
+   "year": 1966,
+   "rating": 5.8,
+   "votes": 1272,
+   "score": 6.089290810944965
+  },
+  {
+   "tconst": "tt0061093",
+   "title": "Three on a Couch",
+   "year": 1966,
+   "rating": 5.8,
+   "votes": 1327,
+   "score": 6.082453254175745
+  },
+  {
+   "tconst": "tt0059045",
+   "title": "Knives of the Avenger",
+   "year": 1966,
+   "rating": 5.7,
+   "votes": 1009,
+   "score": 6.0769381396052555
+  },
+  {
+   "tconst": "tt0060148",
+   "title": "Bang! Bang! You're Dead!",
+   "year": 1966,
+   "rating": 5.7,
+   "votes": 1072,
+   "score": 6.065477182657799
+  },
+  {
+   "tconst": "tt0060760",
+   "title": "Not with My Wife, You Don't!",
+   "year": 1966,
+   "rating": 5.7,
+   "votes": 1089,
+   "score": 6.062502978682126
+  },
+  {
+   "tconst": "tt0060980",
+   "title": "The Silencers",
+   "year": 1966,
+   "rating": 5.9,
+   "votes": 4210,
+   "score": 6.006961367076192
+  },
+  {
+   "tconst": "tt0060278",
+   "title": "Daleks' Invasion Earth 2150 A.D.",
+   "year": 1966,
+   "rating": 5.9,
+   "votes": 5094,
+   "score": 5.991445474641773
+  },
+  {
+   "tconst": "tt0061015",
+   "title": "Spinout",
+   "year": 1966,
+   "rating": 5.8,
+   "votes": 2597,
+   "score": 5.982726917561012
+  },
+  {
+   "tconst": "tt0060728",
+   "title": "Murderers' Row",
+   "year": 1966,
+   "rating": 5.8,
+   "votes": 2771,
+   "score": 5.974295603942445
+  },
+  {
+   "tconst": "tt0060135",
+   "title": "Assault on a Queen",
+   "year": 1966,
+   "rating": 5.6,
+   "votes": 1361,
+   "score": 5.963095604602693
+  },
+  {
+   "tconst": "tt0061197",
+   "title": "Winnetou and the Crossbreed",
+   "year": 1966,
+   "rating": 5.7,
+   "votes": 1985,
+   "score": 5.95369136431054
+  },
+  {
+   "tconst": "tt0060307",
+   "title": "The Witches",
+   "year": 1966,
+   "rating": 5.8,
+   "votes": 3667,
+   "score": 5.940833238154481
+  },
+  {
+   "tconst": "tt0061465",
+   "title": "Chelsea Girls",
+   "year": 1966,
+   "rating": 5.6,
+   "votes": 1836,
+   "score": 5.9022809317584475
+  },
+  {
+   "tconst": "tt0060186",
+   "title": "Boy, Did I Get a Wrong Number!",
+   "year": 1966,
+   "rating": 5.5,
+   "votes": 1435,
+   "score": 5.893128838795466
+  },
+  {
+   "tconst": "tt0061784",
+   "title": "Hot Rods to Hell",
+   "year": 1966,
+   "rating": 5.4,
+   "votes": 1184,
+   "score": 5.884097400396959
+  },
+  {
+   "tconst": "tt0060188",
+   "title": "The Brides of Fu Manchu",
+   "year": 1966,
+   "rating": 5.5,
+   "votes": 1542,
+   "score": 5.876580929373311
+  },
+  {
+   "tconst": "tt0061177",
+   "title": "What's Up, Tiger Lily?",
+   "year": 1966,
+   "rating": 5.8,
+   "votes": 10384,
+   "score": 5.857736184334764
+  },
+  {
+   "tconst": "tt0060865",
+   "title": "Psycho-Circus",
+   "year": 1966,
+   "rating": 5.5,
+   "votes": 1693,
+   "score": 5.855465548632365
+  },
+  {
+   "tconst": "tt0060414",
+   "title": "A Fine Madness",
+   "year": 1966,
+   "rating": 5.5,
+   "votes": 1705,
+   "score": 5.853888621984089
+  },
+  {
+   "tconst": "tt0060126",
+   "title": "Around the World Under the Sea",
+   "year": 1966,
+   "rating": 5.3,
+   "votes": 1151,
+   "score": 5.838014282876317
+  },
+  {
+   "tconst": "tt0060429",
+   "title": "Frankie and Johnny",
+   "year": 1966,
+   "rating": 5.6,
+   "votes": 2740,
+   "score": 5.829216235953732
+  },
+  {
+   "tconst": "tt0061173",
+   "title": "Way... Way Out",
+   "year": 1966,
+   "rating": 5.3,
+   "votes": 1233,
+   "score": 5.818257376832494
+  },
+  {
+   "tconst": "tt0061189",
+   "title": "The Wild Angels",
+   "year": 1966,
+   "rating": 5.6,
+   "votes": 3905,
+   "score": 5.774774459218544
+  },
+  {
+   "tconst": "tt0060782",
+   "title": "One Million Years B.C.",
+   "year": 1966,
+   "rating": 5.7,
+   "votes": 10647,
+   "score": 5.765018350001456
+  },
+  {
+   "tconst": "tt0059563",
+   "title": "Paradise, Hawaiian Style",
+   "year": 1966,
+   "rating": 5.5,
+   "votes": 2718,
+   "score": 5.757468725784551
+  },
+  {
+   "tconst": "tt0060801",
+   "title": "The Oscar",
+   "year": 1966,
+   "rating": 5.3,
+   "votes": 1621,
+   "score": 5.741537093653934
+  }
+ ]
+}

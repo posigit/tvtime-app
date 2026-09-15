@@ -1,0 +1,1608 @@
+{
+ "tag": "year-1987",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.346,
+ "minVotes": 2000,
+ "items": [
+  {
+   "tconst": "tt0093603",
+   "title": "Nayakan",
+   "year": 1987,
+   "rating": 8.6,
+   "votes": 28215,
+   "score": 8.450775325851009
+  },
+  {
+   "tconst": "tt0282778",
+   "title": "Nadodikkattu",
+   "year": 1987,
+   "rating": 8.8,
+   "votes": 6802,
+   "score": 8.242305893045698
+  },
+  {
+   "tconst": "tt0093058",
+   "title": "Full Metal Jacket",
+   "year": 1987,
+   "rating": 8.2,
+   "votes": 859396,
+   "score": 8.195694403585096
+  },
+  {
+   "tconst": "tt0184756",
+   "title": "Mr. Muhsin",
+   "year": 1987,
+   "rating": 8.4,
+   "votes": 13015,
+   "score": 8.126352079293255
+  },
+  {
+   "tconst": "tt0095657",
+   "title": "The Moromete Family",
+   "year": 1987,
+   "rating": 8.8,
+   "votes": 4612,
+   "score": 8.057588697911106
+  },
+  {
+   "tconst": "tt0237820",
+   "title": "Thaniyavartanam",
+   "year": 1987,
+   "rating": 8.9,
+   "votes": 3724,
+   "score": 8.007473177950425
+  },
+  {
+   "tconst": "tt0249188",
+   "title": "Thoovanathumbikal",
+   "year": 1987,
+   "rating": 8.6,
+   "votes": 5564,
+   "score": 8.003910162690142
+  },
+  {
+   "tconst": "tt0093779",
+   "title": "The Princess Bride",
+   "year": 1987,
+   "rating": 8,
+   "votes": 491050,
+   "score": 7.993289071028472
+  },
+  {
+   "tconst": "tt0249336",
+   "title": "Aha Naa Pellanta",
+   "year": 1987,
+   "rating": 8.9,
+   "votes": 3594,
+   "score": 7.986731582157353
+  },
+  {
+   "tconst": "tt0093342",
+   "title": "Where Is the Friend's House?",
+   "year": 1987,
+   "rating": 8.1,
+   "votes": 23682,
+   "score": 7.963374210364777
+  },
+  {
+   "tconst": "tt0092593",
+   "title": "Au Revoir Les Enfants",
+   "year": 1987,
+   "rating": 8,
+   "votes": 38937,
+   "score": 7.919172789178206
+  },
+  {
+   "tconst": "tt0251355",
+   "title": "Pushpaka Vimana",
+   "year": 1987,
+   "rating": 8.6,
+   "votes": 4468,
+   "score": 7.902902979373567
+  },
+  {
+   "tconst": "tt0093191",
+   "title": "Wings of Desire",
+   "year": 1987,
+   "rating": 7.9,
+   "votes": 84849,
+   "score": 7.864204267989134
+  },
+  {
+   "tconst": "tt0093773",
+   "title": "Predator",
+   "year": 1987,
+   "rating": 7.8,
+   "votes": 506598,
+   "score": 7.79428070198976
+  },
+  {
+   "tconst": "tt0094226",
+   "title": "The Untouchables",
+   "year": 1987,
+   "rating": 7.8,
+   "votes": 357066,
+   "score": 7.7918989168302994
+  },
+  {
+   "tconst": "tt0092965",
+   "title": "Empire of the Sun",
+   "year": 1987,
+   "rating": 7.7,
+   "votes": 144889,
+   "score": 7.681558703991369
+  },
+  {
+   "tconst": "tt0093389",
+   "title": "The Last Emperor",
+   "year": 1987,
+   "rating": 7.7,
+   "votes": 120971,
+   "score": 7.677971850847665
+  },
+  {
+   "tconst": "tt0093509",
+   "title": "Matewan",
+   "year": 1987,
+   "rating": 7.9,
+   "votes": 10744,
+   "score": 7.656055906355009
+  },
+  {
+   "tconst": "tt0092603",
+   "title": "Babette's Feast",
+   "year": 1987,
+   "rating": 7.7,
+   "votes": 24229,
+   "score": 7.596724101970652
+  },
+  {
+   "tconst": "tt0093870",
+   "title": "RoboCop",
+   "year": 1987,
+   "rating": 7.6,
+   "votes": 312385,
+   "score": 7.59201990066507
+  },
+  {
+   "tconst": "tt0093409",
+   "title": "Lethal Weapon",
+   "year": 1987,
+   "rating": 7.6,
+   "votes": 298791,
+   "score": 7.5916592466881925
+  },
+  {
+   "tconst": "tt0092991",
+   "title": "Evil Dead II",
+   "year": 1987,
+   "rating": 7.6,
+   "votes": 200312,
+   "score": 7.587599235194097
+  },
+  {
+   "tconst": "tt0093748",
+   "title": "Planes, Trains & Automobiles",
+   "year": 1987,
+   "rating": 7.6,
+   "votes": 182160,
+   "score": 7.586376935656974
+  },
+  {
+   "tconst": "tt0093578",
+   "title": "Mr. India",
+   "year": 1987,
+   "rating": 7.7,
+   "votes": 20754,
+   "score": 7.580951765429736
+  },
+  {
+   "tconst": "tt0093132",
+   "title": "The Story of Hachikō",
+   "year": 1987,
+   "rating": 7.9,
+   "votes": 6464,
+   "score": 7.532700433670632
+  },
+  {
+   "tconst": "tt0093713",
+   "title": "Pelle the Conqueror",
+   "year": 1987,
+   "rating": 7.7,
+   "votes": 12795,
+   "score": 7.516909528258752
+  },
+  {
+   "tconst": "tt0093512",
+   "title": "Maurice",
+   "year": 1987,
+   "rating": 7.6,
+   "votes": 27627,
+   "score": 7.515319690504885
+  },
+  {
+   "tconst": "tt0084549",
+   "title": "Blind Chance",
+   "year": 1987,
+   "rating": 7.7,
+   "votes": 12430,
+   "score": 7.512278341690106
+  },
+  {
+   "tconst": "tt0092948",
+   "title": "Eddie Murphy: Raw",
+   "year": 1987,
+   "rating": 7.6,
+   "votes": 21981,
+   "score": 7.495382864375473
+  },
+  {
+   "tconst": "tt0094336",
+   "title": "Withnail and I",
+   "year": 1987,
+   "rating": 7.5,
+   "votes": 53005,
+   "score": 7.458025206264671
+  },
+  {
+   "tconst": "tt0093818",
+   "title": "Radio Days",
+   "year": 1987,
+   "rating": 7.4,
+   "votes": 39132,
+   "score": 7.348730343056215
+  },
+  {
+   "tconst": "tt0093970",
+   "title": "Sign 'o' the Times",
+   "year": 1987,
+   "rating": 8,
+   "votes": 3031,
+   "score": 7.342312953804061
+  },
+  {
+   "tconst": "tt0092963",
+   "title": "The Emperor's Naked Army Marches On",
+   "year": 1987,
+   "rating": 8.1,
+   "votes": 2455,
+   "score": 7.312385290816663
+  },
+  {
+   "tconst": "tt0094291",
+   "title": "Wall Street",
+   "year": 1987,
+   "rating": 7.3,
+   "votes": 175994,
+   "score": 7.289275910820523
+  },
+  {
+   "tconst": "tt0093105",
+   "title": "Good Morning, Vietnam",
+   "year": 1987,
+   "rating": 7.3,
+   "votes": 167466,
+   "score": 7.288736244854945
+  },
+  {
+   "tconst": "tt0093822",
+   "title": "Raising Arizona",
+   "year": 1987,
+   "rating": 7.3,
+   "votes": 162251,
+   "score": 7.288378618520364
+  },
+  {
+   "tconst": "tt0095801",
+   "title": "Bagdad Cafe",
+   "year": 1987,
+   "rating": 7.4,
+   "votes": 16749,
+   "score": 7.287523413013401
+  },
+  {
+   "tconst": "tt0092804",
+   "title": "Cry Freedom",
+   "year": 1987,
+   "rating": 7.4,
+   "votes": 15468,
+   "score": 7.279275044114279
+  },
+  {
+   "tconst": "tt0313573",
+   "title": "Selamsiz's Band",
+   "year": 1987,
+   "rating": 7.7,
+   "votes": 4251,
+   "score": 7.266657570082904
+  },
+  {
+   "tconst": "tt0090570",
+   "title": "84 Charing Cross Road",
+   "year": 1987,
+   "rating": 7.4,
+   "votes": 12477,
+   "score": 7.254332836263607
+  },
+  {
+   "tconst": "tt0092699",
+   "title": "Broadcast News",
+   "year": 1987,
+   "rating": 7.3,
+   "votes": 37196,
+   "score": 7.251300552877543
+  },
+  {
+   "tconst": "tt0092550",
+   "title": "Boyfriends and Girlfriends",
+   "year": 1987,
+   "rating": 7.5,
+   "votes": 6437,
+   "score": 7.226345439206855
+  },
+  {
+   "tconst": "tt0092879",
+   "title": "Ten Little Indians",
+   "year": 1987,
+   "rating": 7.7,
+   "votes": 3636,
+   "score": 7.219371268734605
+  },
+  {
+   "tconst": "tt0093209",
+   "title": "Hope and Glory",
+   "year": 1987,
+   "rating": 7.3,
+   "votes": 16066,
+   "score": 7.194341662271018
+  },
+  {
+   "tconst": "tt0093437",
+   "title": "The Lost Boys",
+   "year": 1987,
+   "rating": 7.2,
+   "votes": 180253,
+   "score": 7.190623893546818
+  },
+  {
+   "tconst": "tt0092745",
+   "title": "A Man from Boulevard des Capucines",
+   "year": 1987,
+   "rating": 7.6,
+   "votes": 4063,
+   "score": 7.186207565658623
+  },
+  {
+   "tconst": "tt0092563",
+   "title": "Angel Heart",
+   "year": 1987,
+   "rating": 7.2,
+   "votes": 105590,
+   "score": 7.1841172643423015
+  },
+  {
+   "tconst": "tt0092558",
+   "title": "Motherland Hotel",
+   "year": 1987,
+   "rating": 7.5,
+   "votes": 5248,
+   "score": 7.181453707310739
+  },
+  {
+   "tconst": "tt0093565",
+   "title": "Moonstruck",
+   "year": 1987,
+   "rating": 7.2,
+   "votes": 79408,
+   "score": 7.179009144931558
+  },
+  {
+   "tconst": "tt0263743",
+   "title": "Billionaire",
+   "year": 1987,
+   "rating": 7.5,
+   "votes": 5075,
+   "score": 7.173664518811058
+  },
+  {
+   "tconst": "tt0093978",
+   "title": "A Chinese Ghost Story",
+   "year": 1987,
+   "rating": 7.3,
+   "votes": 12925,
+   "score": 7.172105626170065
+  },
+  {
+   "tconst": "tt0171922",
+   "title": "The Wife of an Important Man",
+   "year": 1987,
+   "rating": 7.9,
+   "votes": 2209,
+   "score": 7.161386664430561
+  },
+  {
+   "tconst": "tt0094683",
+   "title": "Assa",
+   "year": 1987,
+   "rating": 7.6,
+   "votes": 3569,
+   "score": 7.14950196993863
+  },
+  {
+   "tconst": "tt0092695",
+   "title": "The Brave Little Toaster",
+   "year": 1987,
+   "rating": 7.2,
+   "votes": 29835,
+   "score": 7.146322490045177
+  },
+  {
+   "tconst": "tt0093223",
+   "title": "House of Games",
+   "year": 1987,
+   "rating": 7.2,
+   "votes": 26160,
+   "score": 7.139317346256684
+  },
+  {
+   "tconst": "tt0099492",
+   "title": "The Tenants",
+   "year": 1987,
+   "rating": 7.6,
+   "votes": 3172,
+   "score": 7.114921978071971
+  },
+  {
+   "tconst": "tt0092890",
+   "title": "Dirty Dancing",
+   "year": 1987,
+   "rating": 7.1,
+   "votes": 284513,
+   "score": 7.094733839199575
+  },
+  {
+   "tconst": "tt0094012",
+   "title": "Spaceballs",
+   "year": 1987,
+   "rating": 7.1,
+   "votes": 228851,
+   "score": 7.093464080599989
+  },
+  {
+   "tconst": "tt0093640",
+   "title": "No Way Out",
+   "year": 1987,
+   "rating": 7.1,
+   "votes": 56505,
+   "score": 7.074210349040052
+  },
+  {
+   "tconst": "tt0181049",
+   "title": "Tight Skin 2",
+   "year": 1987,
+   "rating": 7.7,
+   "votes": 2243,
+   "score": 7.061578239591853
+  },
+  {
+   "tconst": "tt0092843",
+   "title": "The Dead",
+   "year": 1987,
+   "rating": 7.2,
+   "votes": 10165,
+   "score": 7.059529508474165
+  },
+  {
+   "tconst": "tt0090565",
+   "title": "Four Adventures of Reinette and Mirabelle",
+   "year": 1987,
+   "rating": 7.4,
+   "votes": 4162,
+   "score": 7.057769631708574
+  },
+  {
+   "tconst": "tt0094089",
+   "title": "Swimming to Cambodia",
+   "year": 1987,
+   "rating": 7.6,
+   "votes": 2587,
+   "score": 7.053057874555969
+  },
+  {
+   "tconst": "tt0092618",
+   "title": "Barfly",
+   "year": 1987,
+   "rating": 7.1,
+   "votes": 23744,
+   "score": 7.041391255072569
+  },
+  {
+   "tconst": "tt0093412",
+   "title": "Law of Desire",
+   "year": 1987,
+   "rating": 7.1,
+   "votes": 15608,
+   "score": 7.014310340219685
+  },
+  {
+   "tconst": "tt0094138",
+   "title": "Three O'Clock High",
+   "year": 1987,
+   "rating": 7.1,
+   "votes": 14575,
+   "score": 7.008969922810752
+  },
+  {
+   "tconst": "tt0092752",
+   "title": "The Chipmunk Adventure",
+   "year": 1987,
+   "rating": 7.2,
+   "votes": 6575,
+   "score": 7.000720288115246
+  },
+  {
+   "tconst": "tt0094357",
+   "title": "A Better Tomorrow II",
+   "year": 1987,
+   "rating": 7.1,
+   "votes": 12989,
+   "score": 6.999337945866183
+  },
+  {
+   "tconst": "tt0093258",
+   "title": "Rouge",
+   "year": 1987,
+   "rating": 7.3,
+   "votes": 4274,
+   "score": 6.995756530218079
+  },
+  {
+   "tconst": "tt0093207",
+   "title": "Royal Space Force: The Wings of Honneamise",
+   "year": 1987,
+   "rating": 7.2,
+   "votes": 6346,
+   "score": 6.995252392833481
+  },
+  {
+   "tconst": "tt0092513",
+   "title": "Adventures in Babysitting",
+   "year": 1987,
+   "rating": 7,
+   "votes": 54922,
+   "score": 6.977006719205021
+  },
+  {
+   "tconst": "tt0093664",
+   "title": "Dark Eyes",
+   "year": 1987,
+   "rating": 7.3,
+   "votes": 3862,
+   "score": 6.974373331727778
+  },
+  {
+   "tconst": "tt0093378",
+   "title": "La Bamba",
+   "year": 1987,
+   "rating": 7,
+   "votes": 38952,
+   "score": 6.968040058375372
+  },
+  {
+   "tconst": "tt0094006",
+   "title": "Some Kind of Wonderful",
+   "year": 1987,
+   "rating": 7,
+   "votes": 38035,
+   "score": 6.9673080172496125
+  },
+  {
+   "tconst": "tt0093435",
+   "title": "City on Fire",
+   "year": 1987,
+   "rating": 7.1,
+   "votes": 9196,
+   "score": 6.965235483260827
+  },
+  {
+   "tconst": "tt0093426",
+   "title": "An Autumn's Tale",
+   "year": 1987,
+   "rating": 7.4,
+   "votes": 2837,
+   "score": 6.964022425178465
+  },
+  {
+   "tconst": "tt0093004",
+   "title": "The Family",
+   "year": 1987,
+   "rating": 7.4,
+   "votes": 2836,
+   "score": 6.963932272660925
+  },
+  {
+   "tconst": "tt0093185",
+   "title": "The Hidden",
+   "year": 1987,
+   "rating": 7,
+   "votes": 26047,
+   "score": 6.953334633671631
+  },
+  {
+   "tconst": "tt0093776",
+   "title": "Prick Up Your Ears",
+   "year": 1987,
+   "rating": 7.1,
+   "votes": 7024,
+   "score": 6.932798811013766
+  },
+  {
+   "tconst": "tt0093304",
+   "title": "Prison on Fire",
+   "year": 1987,
+   "rating": 7.2,
+   "votes": 3937,
+   "score": 6.912173904427865
+  },
+  {
+   "tconst": "tt0093668",
+   "title": "Pathfinder",
+   "year": 1987,
+   "rating": 7.1,
+   "votes": 6015,
+   "score": 6.911750027521926
+  },
+  {
+   "tconst": "tt0092501",
+   "title": "Project A 2",
+   "year": 1987,
+   "rating": 7,
+   "votes": 12755,
+   "score": 6.911296270456674
+  },
+  {
+   "tconst": "tt0094315",
+   "title": "The Whales of August",
+   "year": 1987,
+   "rating": 7.1,
+   "votes": 5885,
+   "score": 6.908646350106307
+  },
+  {
+   "tconst": "tt0093177",
+   "title": "Hellraiser",
+   "year": 1987,
+   "rating": 6.9,
+   "votes": 155855,
+   "score": 6.892975683193996
+  },
+  {
+   "tconst": "tt0093010",
+   "title": "Fatal Attraction",
+   "year": 1987,
+   "rating": 6.9,
+   "votes": 112951,
+   "score": 6.890353946208283
+  },
+  {
+   "tconst": "tt0093693",
+   "title": "Overboard",
+   "year": 1987,
+   "rating": 6.9,
+   "votes": 77765,
+   "score": 6.886098871316847
+  },
+  {
+   "tconst": "tt0093260",
+   "title": "Innerspace",
+   "year": 1987,
+   "rating": 6.9,
+   "votes": 70817,
+   "score": 6.884772463443815
+  },
+  {
+   "tconst": "tt0093605",
+   "title": "Near Dark",
+   "year": 1987,
+   "rating": 6.9,
+   "votes": 50172,
+   "score": 6.878746769734498
+  },
+  {
+   "tconst": "tt0093560",
+   "title": "The Monster Squad",
+   "year": 1987,
+   "rating": 6.9,
+   "votes": 39765,
+   "score": 6.873450891190908
+  },
+  {
+   "tconst": "tt0094347",
+   "title": "The Year My Voice Broke",
+   "year": 1987,
+   "rating": 7.3,
+   "votes": 2462,
+   "score": 6.872204498114799
+  },
+  {
+   "tconst": "tt0093677",
+   "title": "Opera",
+   "year": 1987,
+   "rating": 6.9,
+   "votes": 22025,
+   "score": 6.853847095549979
+  },
+  {
+   "tconst": "tt0252360",
+   "title": "Plaintiff",
+   "year": 1987,
+   "rating": 7.1,
+   "votes": 3886,
+   "score": 6.8436589314624925
+  },
+  {
+   "tconst": "tt0090956",
+   "title": "Eastern Condors",
+   "year": 1987,
+   "rating": 7.1,
+   "votes": 3707,
+   "score": 6.835618796318246
+  },
+  {
+   "tconst": "tt0093502",
+   "title": "A Taxing Woman",
+   "year": 1987,
+   "rating": 7.2,
+   "votes": 2519,
+   "score": 6.821858037306535
+  },
+  {
+   "tconst": "tt0093225",
+   "title": "Housekeeping",
+   "year": 1987,
+   "rating": 7.1,
+   "votes": 3344,
+   "score": 6.817660267699893
+  },
+  {
+   "tconst": "tt0185481",
+   "title": "Neo Tokyo",
+   "year": 1987,
+   "rating": 7,
+   "votes": 5048,
+   "score": 6.814298591173131
+  },
+  {
+   "tconst": "tt0094888",
+   "title": "Cobra Verde",
+   "year": 1987,
+   "rating": 6.9,
+   "votes": 9317,
+   "score": 6.802021425341365
+  },
+  {
+   "tconst": "tt0092718",
+   "title": "Can't Buy Me Love",
+   "year": 1987,
+   "rating": 6.8,
+   "votes": 46659,
+   "score": 6.781322601586309
+  },
+  {
+   "tconst": "tt0093200",
+   "title": "Hollywood Shuffle",
+   "year": 1987,
+   "rating": 6.9,
+   "votes": 7274,
+   "score": 6.780437402478783
+  },
+  {
+   "tconst": "tt0092637",
+   "title": "The Belly of an Architect",
+   "year": 1987,
+   "rating": 6.9,
+   "votes": 6732,
+   "score": 6.773016086874511
+  },
+  {
+   "tconst": "tt0095525",
+   "title": "Gandahar",
+   "year": 1987,
+   "rating": 6.9,
+   "votes": 6566,
+   "score": 6.77055527324168
+  },
+  {
+   "tconst": "tt0093267",
+   "title": "Intervista",
+   "year": 1987,
+   "rating": 7,
+   "votes": 3633,
+   "score": 6.7676507137561215
+  },
+  {
+   "tconst": "tt0093093",
+   "title": "The Glass Menagerie",
+   "year": 1987,
+   "rating": 7.1,
+   "votes": 2455,
+   "score": 6.761319073083778
+  },
+  {
+   "tconst": "tt0093428",
+   "title": "The Living Daylights",
+   "year": 1987,
+   "rating": 6.7,
+   "votes": 115834,
+   "score": 6.693984558536486
+  },
+  {
+   "tconst": "tt0093629",
+   "title": "A Nightmare on Elm Street 3: Dream Warriors",
+   "year": 1987,
+   "rating": 6.7,
+   "votes": 101065,
+   "score": 6.693122558294166
+  },
+  {
+   "tconst": "tt0094349",
+   "title": "Yeelen",
+   "year": 1987,
+   "rating": 6.9,
+   "votes": 3048,
+   "score": 6.680343991796402
+  },
+  {
+   "tconst": "tt0094025",
+   "title": "Stakeout",
+   "year": 1987,
+   "rating": 6.7,
+   "votes": 30787,
+   "score": 6.678380958019589
+  },
+  {
+   "tconst": "tt0093137",
+   "title": "Hamburger Hill",
+   "year": 1987,
+   "rating": 6.7,
+   "votes": 30314,
+   "score": 6.678064506733559
+  },
+  {
+   "tconst": "tt0094035",
+   "title": "The Stepfather",
+   "year": 1987,
+   "rating": 6.7,
+   "votes": 21081,
+   "score": 6.669289739204897
+  },
+  {
+   "tconst": "tt0098692",
+   "title": "Wicked City",
+   "year": 1987,
+   "rating": 6.7,
+   "votes": 12094,
+   "score": 6.649707426606232
+  },
+  {
+   "tconst": "tt0093277",
+   "title": "Ironweed",
+   "year": 1987,
+   "rating": 6.7,
+   "votes": 10814,
+   "score": 6.644683664007198
+  },
+  {
+   "tconst": "tt0094331",
+   "title": "Wish You Were Here",
+   "year": 1987,
+   "rating": 6.8,
+   "votes": 3765,
+   "score": 6.642354981888678
+  },
+  {
+   "tconst": "tt0092997",
+   "title": "Extreme Prejudice",
+   "year": 1987,
+   "rating": 6.7,
+   "votes": 10083,
+   "score": 6.641337124107277
+  },
+  {
+   "tconst": "tt0093660",
+   "title": "Nuts",
+   "year": 1987,
+   "rating": 6.7,
+   "votes": 8065,
+   "score": 6.629575406913883
+  },
+  {
+   "tconst": "tt0093139",
+   "title": "Hamlet Goes Business",
+   "year": 1987,
+   "rating": 6.8,
+   "votes": 2774,
+   "score": 6.609630597106877
+  },
+  {
+   "tconst": "tt0096409",
+   "title": "Walker",
+   "year": 1987,
+   "rating": 6.7,
+   "votes": 5056,
+   "score": 6.59954315059357
+  },
+  {
+   "tconst": "tt0093894",
+   "title": "The Running Man",
+   "year": 1987,
+   "rating": 6.6,
+   "votes": 193388,
+   "score": 6.59739583019729
+  },
+  {
+   "tconst": "tt0090644",
+   "title": "Anguish",
+   "year": 1987,
+   "rating": 6.7,
+   "votes": 4867,
+   "score": 6.596778283178715
+  },
+  {
+   "tconst": "tt0092644",
+   "title": "Beverly Hills Cop II",
+   "year": 1987,
+   "rating": 6.6,
+   "votes": 148295,
+   "score": 6.596614501284728
+  },
+  {
+   "tconst": "tt0094332",
+   "title": "The Witches of Eastwick",
+   "year": 1987,
+   "rating": 6.6,
+   "votes": 85290,
+   "score": 6.59417088407135
+  },
+  {
+   "tconst": "tt0093777",
+   "title": "Prince of Darkness",
+   "year": 1987,
+   "rating": 6.6,
+   "votes": 56313,
+   "score": 6.591274269383983
+  },
+  {
+   "tconst": "tt0093562",
+   "title": "A Month in the Country",
+   "year": 1987,
+   "rating": 6.8,
+   "votes": 2353,
+   "score": 6.591219037580572
+  },
+  {
+   "tconst": "tt0093886",
+   "title": "Roxanne",
+   "year": 1987,
+   "rating": 6.6,
+   "votes": 50355,
+   "score": 6.590281281073215
+  },
+  {
+   "tconst": "tt0093169",
+   "title": "Hector",
+   "year": 1987,
+   "rating": 6.8,
+   "votes": 2314,
+   "score": 6.589331587989854
+  },
+  {
+   "tconst": "tt0092494",
+   "title": "*batteries not included",
+   "year": 1987,
+   "rating": 6.6,
+   "votes": 39510,
+   "score": 6.587742145762182
+  },
+  {
+   "tconst": "tt0093416",
+   "title": "The Lighthorsemen",
+   "year": 1987,
+   "rating": 6.8,
+   "votes": 2275,
+   "score": 6.587409700722393
+  },
+  {
+   "tconst": "tt0094011",
+   "title": "Under the Sun of Satan",
+   "year": 1987,
+   "rating": 6.7,
+   "votes": 4201,
+   "score": 6.585692061052772
+  },
+  {
+   "tconst": "tt0094072",
+   "title": "Summer School",
+   "year": 1987,
+   "rating": 6.6,
+   "votes": 24380,
+   "score": 6.580711769165589
+  },
+  {
+   "tconst": "tt0093505",
+   "title": "Masks",
+   "year": 1987,
+   "rating": 6.8,
+   "votes": 2040,
+   "score": 6.575043680838672
+  },
+  {
+   "tconst": "tt0094082",
+   "title": "Suspect",
+   "year": 1987,
+   "rating": 6.6,
+   "votes": 13206,
+   "score": 6.566537976495345
+  },
+  {
+   "tconst": "tt0252602",
+   "title": "Kiraci",
+   "year": 1987,
+   "rating": 6.7,
+   "votes": 3103,
+   "score": 6.561096702055307
+  },
+  {
+   "tconst": "tt0092576",
+   "title": "StageFright",
+   "year": 1987,
+   "rating": 6.6,
+   "votes": 10865,
+   "score": 6.560449006652797
+  },
+  {
+   "tconst": "tt0094155",
+   "title": "Tin Men",
+   "year": 1987,
+   "rating": 6.6,
+   "votes": 10778,
+   "score": 6.560179720659589
+  },
+  {
+   "tconst": "tt0091859",
+   "title": "Rita, Sue and Bob Too",
+   "year": 1987,
+   "rating": 6.6,
+   "votes": 5432,
+   "score": 6.531536123599062
+  },
+  {
+   "tconst": "tt0093239",
+   "title": "I've Heard the Mermaids Singing",
+   "year": 1987,
+   "rating": 6.7,
+   "votes": 2149,
+   "score": 6.529157982788198
+  },
+  {
+   "tconst": "tt0093648",
+   "title": "North Shore",
+   "year": 1987,
+   "rating": 6.6,
+   "votes": 3289,
+   "score": 6.503795891584085
+  },
+  {
+   "tconst": "tt0093936",
+   "title": "The Secret of My Success",
+   "year": 1987,
+   "rating": 6.5,
+   "votes": 39660,
+   "score": 6.492587049221993
+  },
+  {
+   "tconst": "tt0093044",
+   "title": "The Fourth Protocol",
+   "year": 1987,
+   "rating": 6.5,
+   "votes": 12353,
+   "score": 6.478483694738955
+  },
+  {
+   "tconst": "tt0142249",
+   "title": "Dragon Ball: Sleeping Princess in Devil's Castle",
+   "year": 1987,
+   "rating": 6.5,
+   "votes": 3576,
+   "score": 6.444615579373787
+  },
+  {
+   "tconst": "tt0092610",
+   "title": "Bad Taste",
+   "year": 1987,
+   "rating": 6.4,
+   "votes": 51773,
+   "score": 6.397976242177083
+  },
+  {
+   "tconst": "tt0093407",
+   "title": "Less Than Zero",
+   "year": 1987,
+   "rating": 6.4,
+   "votes": 23974,
+   "score": 6.395810289927937
+  },
+  {
+   "tconst": "tt0092605",
+   "title": "Baby Boom",
+   "year": 1987,
+   "rating": 6.4,
+   "votes": 21419,
+   "score": 6.395353194866914
+  },
+  {
+   "tconst": "tt0090738",
+   "title": "Black Widow",
+   "year": 1987,
+   "rating": 6.4,
+   "votes": 12166,
+   "score": 6.392317977593409
+  },
+  {
+   "tconst": "tt0093940",
+   "title": "September",
+   "year": 1987,
+   "rating": 6.4,
+   "votes": 11197,
+   "score": 6.3917539191170905
+  },
+  {
+   "tconst": "tt0092627",
+   "title": "The Bedroom Window",
+   "year": 1987,
+   "rating": 6.4,
+   "votes": 7935,
+   "score": 6.389046448977175
+  },
+  {
+   "tconst": "tt0092641",
+   "title": "Best Seller",
+   "year": 1987,
+   "rating": 6.4,
+   "votes": 7348,
+   "score": 6.388358629716328
+  },
+  {
+   "tconst": "tt0094056",
+   "title": "Street Smart",
+   "year": 1987,
+   "rating": 6.4,
+   "votes": 4722,
+   "score": 6.383810840611162
+  },
+  {
+   "tconst": "tt0094317",
+   "title": "White Mischief",
+   "year": 1987,
+   "rating": 6.4,
+   "votes": 3550,
+   "score": 6.380392156862744
+  },
+  {
+   "tconst": "tt0093727",
+   "title": "Personal Services",
+   "year": 1987,
+   "rating": 6.3,
+   "votes": 2063,
+   "score": 6.3224406769845505
+  },
+  {
+   "tconst": "tt0092751",
+   "title": "China Girl",
+   "year": 1987,
+   "rating": 6.3,
+   "votes": 2888,
+   "score": 6.318653124097429
+  },
+  {
+   "tconst": "tt0092638",
+   "title": "Benji the Hunted",
+   "year": 1987,
+   "rating": 6.3,
+   "votes": 3723,
+   "score": 6.315931586683249
+  },
+  {
+   "tconst": "tt0093186",
+   "title": "Hiding Out",
+   "year": 1987,
+   "rating": 6.3,
+   "votes": 4719,
+   "score": 6.313569946508146
+  },
+  {
+   "tconst": "tt0093771",
+   "title": "A Prayer for the Dying",
+   "year": 1987,
+   "rating": 6.3,
+   "votes": 6469,
+   "score": 6.3107659074965445
+  },
+  {
+   "tconst": "tt0093543",
+   "title": "Mio in the Land of Faraway",
+   "year": 1987,
+   "rating": 6.3,
+   "votes": 6606,
+   "score": 6.310594523656546
+  },
+  {
+   "tconst": "tt0093073",
+   "title": "Gardens of Stone",
+   "year": 1987,
+   "rating": 6.3,
+   "votes": 6870,
+   "score": 6.3102791962331715
+  },
+  {
+   "tconst": "tt0093780",
+   "title": "The Principal",
+   "year": 1987,
+   "rating": 6.3,
+   "votes": 12930,
+   "score": 6.306106930380993
+  },
+  {
+   "tconst": "tt0094142",
+   "title": "Throw Momma from the Train",
+   "year": 1987,
+   "rating": 6.3,
+   "votes": 44728,
+   "score": 6.301951217055902
+  },
+  {
+   "tconst": "tt0095958",
+   "title": "Rampage",
+   "year": 1987,
+   "rating": 6.2,
+   "votes": 3166,
+   "score": 6.256364009018242
+  },
+  {
+   "tconst": "tt0095975",
+   "title": "They Call Me Renegade",
+   "year": 1987,
+   "rating": 6.2,
+   "votes": 3569,
+   "score": 6.25228523443854
+  },
+  {
+   "tconst": "tt0093467",
+   "title": "Made in Heaven",
+   "year": 1987,
+   "rating": 6.2,
+   "votes": 4013,
+   "score": 6.24842449203197
+  },
+  {
+   "tconst": "tt0092842",
+   "title": "Dead of Winter",
+   "year": 1987,
+   "rating": 6.2,
+   "votes": 5503,
+   "score": 6.238808006209281
+  },
+  {
+   "tconst": "tt0094318",
+   "title": "White Water Summer",
+   "year": 1987,
+   "rating": 6.2,
+   "votes": 6505,
+   "score": 6.234235916588857
+  },
+  {
+   "tconst": "tt0093690",
+   "title": "Outrageous Fortune",
+   "year": 1987,
+   "rating": 6.2,
+   "votes": 9369,
+   "score": 6.225611440811701
+  },
+  {
+   "tconst": "tt0092546",
+   "title": "Amazon Women on the Moon",
+   "year": 1987,
+   "rating": 6.2,
+   "votes": 12180,
+   "score": 6.220534306811581
+  },
+  {
+   "tconst": "tt0093793",
+   "title": "Project X",
+   "year": 1987,
+   "rating": 6.2,
+   "votes": 12348,
+   "score": 6.220293871660736
+  },
+  {
+   "tconst": "tt0094137",
+   "title": "Three Men and a Baby",
+   "year": 1987,
+   "rating": 6.2,
+   "votes": 62252,
+   "score": 6.2045317884359745
+  },
+  {
+   "tconst": "tt0093051",
+   "title": "From the Hip",
+   "year": 1987,
+   "rating": 6.1,
+   "votes": 2812,
+   "score": 6.202073248251918
+  },
+  {
+   "tconst": "tt0094320",
+   "title": "White of the Eye",
+   "year": 1987,
+   "rating": 6.1,
+   "votes": 3390,
+   "score": 6.191127360034923
+  },
+  {
+   "tconst": "tt0093029",
+   "title": "Five Corners",
+   "year": 1987,
+   "rating": 6.1,
+   "votes": 4107,
+   "score": 6.180428437954516
+  },
+  {
+   "tconst": "tt0252562",
+   "title": "Japon Isi",
+   "year": 1987,
+   "rating": 6.1,
+   "votes": 4355,
+   "score": 6.177289767205071
+  },
+  {
+   "tconst": "tt0095684",
+   "title": "My Best Friend Is a Vampire",
+   "year": 1987,
+   "rating": 6.1,
+   "votes": 4872,
+   "score": 6.171475039375471
+  },
+  {
+   "tconst": "tt0097007",
+   "title": "The Caller",
+   "year": 1987,
+   "rating": 6,
+   "votes": 2166,
+   "score": 6.165908898364915
+  },
+  {
+   "tconst": "tt0093638",
+   "title": "No Man's Land",
+   "year": 1987,
+   "rating": 6.1,
+   "votes": 6212,
+   "score": 6.159812039769633
+  },
+  {
+   "tconst": "tt0092690",
+   "title": "Born in East L.A.",
+   "year": 1987,
+   "rating": 6.1,
+   "votes": 7322,
+   "score": 6.152690031172305
+  },
+  {
+   "tconst": "tt0092632",
+   "title": "The Believers",
+   "year": 1987,
+   "rating": 6.1,
+   "votes": 9719,
+   "score": 6.141912831349794
+  },
+  {
+   "tconst": "tt0094008",
+   "title": "Someone to Watch Over Me",
+   "year": 1987,
+   "rating": 6.1,
+   "votes": 13454,
+   "score": 6.131783128677897
+  },
+  {
+   "tconst": "tt0093075",
+   "title": "The Gate",
+   "year": 1987,
+   "rating": 6.1,
+   "votes": 22087,
+   "score": 6.1203917661223155
+  },
+  {
+   "tconst": "tt0092608",
+   "title": "Back to the Beach",
+   "year": 1987,
+   "rating": 6,
+   "votes": 3786,
+   "score": 6.119456700758422
+  },
+  {
+   "tconst": "tt0092796",
+   "title": "Creepshow 2",
+   "year": 1987,
+   "rating": 6.1,
+   "votes": 31195,
+   "score": 6.114796700424408
+  },
+  {
+   "tconst": "tt0093148",
+   "title": "Harry and the Hendersons",
+   "year": 1987,
+   "rating": 6.1,
+   "votes": 39964,
+   "score": 6.111704710480131
+  },
+  {
+   "tconst": "tt0092656",
+   "title": "The Big Town",
+   "year": 1987,
+   "rating": 5.9,
+   "votes": 2875,
+   "score": 6.082805429864253
+  },
+  {
+   "tconst": "tt0091982",
+   "title": "The Loner",
+   "year": 1987,
+   "rating": 5.8,
+   "votes": 2118,
+   "score": 6.064977287661057
+  },
+  {
+   "tconst": "tt0093881",
+   "title": "The Rosary Murders",
+   "year": 1987,
+   "rating": 5.8,
+   "votes": 2155,
+   "score": 6.062617682452041
+  },
+  {
+   "tconst": "tt0092666",
+   "title": "Blind Date",
+   "year": 1987,
+   "rating": 6,
+   "votes": 26178,
+   "score": 6.02452893997403
+  },
+  {
+   "tconst": "tt0095799",
+   "title": "Otto - Der Neue Film",
+   "year": 1987,
+   "rating": 5.8,
+   "votes": 2922,
+   "score": 6.021693716088628
+  },
+  {
+   "tconst": "tt0093828",
+   "title": "Real Men",
+   "year": 1987,
+   "rating": 5.9,
+   "votes": 5438,
+   "score": 6.0198139917435105
+  },
+  {
+   "tconst": "tt0093493",
+   "title": "Mannequin",
+   "year": 1987,
+   "rating": 6,
+   "votes": 40335,
+   "score": 6.016326360472145
+  },
+  {
+   "tconst": "tt0092925",
+   "title": "Dragnet",
+   "year": 1987,
+   "rating": 6,
+   "votes": 40356,
+   "score": 6.016318265903018
+  },
+  {
+   "tconst": "tt0093546",
+   "title": "The Misfit Brigade",
+   "year": 1987,
+   "rating": 5.7,
+   "votes": 2262,
+   "score": 6.002950837772931
+  },
+  {
+   "tconst": "tt0092972",
+   "title": "Epidemic",
+   "year": 1987,
+   "rating": 5.9,
+   "votes": 6745,
+   "score": 6.0019069720512555
+  },
+  {
+   "tconst": "tt0093489",
+   "title": "Man on Fire",
+   "year": 1987,
+   "rating": 5.8,
+   "votes": 3715,
+   "score": 5.990932015850959
+  },
+  {
+   "tconst": "tt0093483",
+   "title": "Malone",
+   "year": 1987,
+   "rating": 5.8,
+   "votes": 4134,
+   "score": 5.977889871305548
+  },
+  {
+   "tconst": "tt0093215",
+   "title": "Hot Pursuit",
+   "year": 1987,
+   "rating": 5.8,
+   "votes": 4532,
+   "score": 5.967050898742841
+  },
+  {
+   "tconst": "tt0094057",
+   "title": "Street Trash",
+   "year": 1987,
+   "rating": 5.9,
+   "votes": 13229,
+   "score": 5.9585183840428275
+  },
+  {
+   "tconst": "tt0093043",
+   "title": "Delirium",
+   "year": 1987,
+   "rating": 5.7,
+   "votes": 3098,
+   "score": 5.953271179009069
+  },
+  {
+   "tconst": "tt0095904",
+   "title": "Prison",
+   "year": 1987,
+   "rating": 5.8,
+   "votes": 5274,
+   "score": 5.950010512866131
+  },
+  {
+   "tconst": "tt0094642",
+   "title": "American Gothic",
+   "year": 1987,
+   "rating": 5.8,
+   "votes": 5390,
+   "score": 5.947655814693942
+  },
+  {
+   "tconst": "tt0091343",
+   "title": "The Kindred",
+   "year": 1987,
+   "rating": 5.7,
+   "votes": 3233,
+   "score": 5.946737334337518
+  },
+  {
+   "tconst": "tt0092580",
+   "title": "Aria",
+   "year": 1987,
+   "rating": 5.7,
+   "votes": 3396,
+   "score": 5.939284001220948
+  },
+  {
+   "tconst": "tt0091671",
+   "title": "From a Whisper to a Scream",
+   "year": 1987,
+   "rating": 5.7,
+   "votes": 3440,
+   "score": 5.937348615916955
+  }
+ ]
+}

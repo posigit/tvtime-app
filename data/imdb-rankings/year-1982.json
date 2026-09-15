@@ -1,0 +1,1608 @@
+{
+ "tag": "year-1982",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.321,
+ "minVotes": 1000,
+ "items": [
+  {
+   "tconst": "tt0084302",
+   "title": "The Marathon Family",
+   "year": 1982,
+   "rating": 8.8,
+   "votes": 18321,
+   "score": 8.671704990487664
+  },
+  {
+   "tconst": "tt0084787",
+   "title": "The Thing",
+   "year": 1982,
+   "rating": 8.2,
+   "votes": 535248,
+   "score": 8.196496419793101
+  },
+  {
+   "tconst": "tt0085809",
+   "title": "Koyaanisqatsi",
+   "year": 1982,
+   "rating": 8.2,
+   "votes": 45154,
+   "score": 8.15929306498271
+  },
+  {
+   "tconst": "tt0187318",
+   "title": "Moondram Pirai",
+   "year": 1982,
+   "rating": 8.6,
+   "votes": 3725,
+   "score": 8.117716851050185
+  },
+  {
+   "tconst": "tt0083658",
+   "title": "Blade Runner",
+   "year": 1982,
+   "rating": 8.1,
+   "votes": 891323,
+   "score": 8.098006565023216
+  },
+  {
+   "tconst": "tt0083922",
+   "title": "Fanny and Alexander",
+   "year": 1982,
+   "rating": 8.1,
+   "votes": 71856,
+   "score": 8.075584881426542
+  },
+  {
+   "tconst": "tt0215517",
+   "title": "Angoor",
+   "year": 1982,
+   "rating": 8.3,
+   "votes": 6362,
+   "score": 8.031215990384695
+  },
+  {
+   "tconst": "tt0083987",
+   "title": "Gandhi",
+   "year": 1982,
+   "rating": 8,
+   "votes": 247095,
+   "score": 7.993233286125123
+  },
+  {
+   "tconst": "tt0084503",
+   "title": "Pink Floyd: The Wall",
+   "year": 1982,
+   "rating": 8,
+   "votes": 90610,
+   "score": 7.981674621997731
+  },
+  {
+   "tconst": "tt0083866",
+   "title": "E.T. the Extra-Terrestrial",
+   "year": 1982,
+   "rating": 7.9,
+   "votes": 476808,
+   "score": 7.896695769265505
+  },
+  {
+   "tconst": "tt0263208",
+   "title": "Abbas in Flower",
+   "year": 1982,
+   "rating": 8,
+   "votes": 12113,
+   "score": 7.871975300938924
+  },
+  {
+   "tconst": "tt0083946",
+   "title": "Fitzcarraldo",
+   "year": 1982,
+   "rating": 7.9,
+   "votes": 43672,
+   "score": 7.864658222627421
+  },
+  {
+   "tconst": "tt0084780",
+   "title": "A Tight Spot",
+   "year": 1982,
+   "rating": 8.2,
+   "votes": 4175,
+   "score": 7.8369492021665925
+  },
+  {
+   "tconst": "tt0084934",
+   "title": "Yol",
+   "year": 1982,
+   "rating": 7.9,
+   "votes": 15568,
+   "score": 7.8047086021977385
+  },
+  {
+   "tconst": "tt0085794",
+   "title": "The King of Comedy",
+   "year": 1982,
+   "rating": 7.8,
+   "votes": 135722,
+   "score": 7.7891839800559675
+  },
+  {
+   "tconst": "tt0083702",
+   "title": "Burden of Dreams",
+   "year": 1982,
+   "rating": 7.9,
+   "votes": 9295,
+   "score": 7.746645179330949
+  },
+  {
+   "tconst": "tt0084352",
+   "title": "Monty Python Live at the Hollywood Bowl",
+   "year": 1982,
+   "rating": 7.8,
+   "votes": 15166,
+   "score": 7.708524812644571
+  },
+  {
+   "tconst": "tt0083275",
+   "title": "Variola Vera",
+   "year": 1982,
+   "rating": 8.1,
+   "votes": 3417,
+   "score": 7.697285968125904
+  },
+  {
+   "tconst": "tt0083944",
+   "title": "First Blood",
+   "year": 1982,
+   "rating": 7.7,
+   "votes": 305743,
+   "score": 7.695505071415524
+  },
+  {
+   "tconst": "tt0084726",
+   "title": "Star Trek II: The Wrath of Khan",
+   "year": 1982,
+   "rating": 7.7,
+   "votes": 136998,
+   "score": 7.690008638684707
+  },
+  {
+   "tconst": "tt0084855",
+   "title": "The Verdict",
+   "year": 1982,
+   "rating": 7.7,
+   "votes": 51367,
+   "score": 7.673670672775071
+  },
+  {
+   "tconst": "tt0084335",
+   "title": "Missing",
+   "year": 1982,
+   "rating": 7.7,
+   "votes": 24647,
+   "score": 7.646239798854141
+  },
+  {
+   "tconst": "tt0084509",
+   "title": "The Plague Dogs",
+   "year": 1982,
+   "rating": 7.7,
+   "votes": 10224,
+   "score": 7.577157174021037
+  },
+  {
+   "tconst": "tt0084865",
+   "title": "Victor/Victoria",
+   "year": 1982,
+   "rating": 7.6,
+   "votes": 25890,
+   "score": 7.552443738237714
+  },
+  {
+   "tconst": "tt0084953",
+   "title": "The Quack",
+   "year": 1982,
+   "rating": 7.8,
+   "votes": 4417,
+   "score": 7.527009806389536
+  },
+  {
+   "tconst": "tt0084304",
+   "title": "Death of Yazdgerd",
+   "year": 1982,
+   "rating": 8.3,
+   "votes": 1549,
+   "score": 7.52370032217031
+  },
+  {
+   "tconst": "tt0084707",
+   "title": "Sophie's Choice",
+   "year": 1982,
+   "rating": 7.5,
+   "votes": 56413,
+   "score": 7.479468275847145
+  },
+  {
+   "tconst": "tt0256951",
+   "title": "Nadiya Ke Paar",
+   "year": 1982,
+   "rating": 8.2,
+   "votes": 1603,
+   "score": 7.478222098045379
+  },
+  {
+   "tconst": "tt0084649",
+   "title": "The Secret of NIMH",
+   "year": 1982,
+   "rating": 7.5,
+   "votes": 49436,
+   "score": 7.476628045864305
+  },
+  {
+   "tconst": "tt0084654",
+   "title": "Veronika Voss",
+   "year": 1982,
+   "rating": 7.6,
+   "votes": 8418,
+   "score": 7.464218742961575
+  },
+  {
+   "tconst": "tt0084805",
+   "title": "Tootsie",
+   "year": 1982,
+   "rating": 7.4,
+   "votes": 123895,
+   "score": 7.39136244142049
+  },
+  {
+   "tconst": "tt0083590",
+   "title": "The Atomic Cafe",
+   "year": 1982,
+   "rating": 7.6,
+   "votes": 4890,
+   "score": 7.382888305808509
+  },
+  {
+   "tconst": "tt0084597",
+   "title": "Richard Pryor: Live on the Sunset Strip",
+   "year": 1982,
+   "rating": 7.6,
+   "votes": 4809,
+   "score": 7.3798609263577415
+  },
+  {
+   "tconst": "tt6109752",
+   "title": "The Shame",
+   "year": 1982,
+   "rating": 8,
+   "votes": 1589,
+   "score": 7.35156899235694
+  },
+  {
+   "tconst": "tt0083549",
+   "title": "All My Friends Part 2",
+   "year": 1982,
+   "rating": 7.6,
+   "votes": 3642,
+   "score": 7.324517906336087
+  },
+  {
+   "tconst": "tt0084555",
+   "title": "Santa Claus Is a Stinker",
+   "year": 1982,
+   "rating": 7.4,
+   "votes": 11653,
+   "score": 7.314740545421016
+  },
+  {
+   "tconst": "tt0084516",
+   "title": "Poltergeist",
+   "year": 1982,
+   "rating": 7.3,
+   "votes": 196937,
+   "score": 7.295055053482735
+  },
+  {
+   "tconst": "tt0083888",
+   "title": "The Simple-Minded Murderer",
+   "year": 1982,
+   "rating": 7.5,
+   "votes": 4192,
+   "score": 7.272960732128682
+  },
+  {
+   "tconst": "tt0084237",
+   "title": "The Last Unicorn",
+   "year": 1982,
+   "rating": 7.3,
+   "votes": 33676,
+   "score": 7.2717733337528
+  },
+  {
+   "tconst": "tt0083578",
+   "title": "Arth",
+   "year": 1982,
+   "rating": 7.8,
+   "votes": 1730,
+   "score": 7.258319458319457
+  },
+  {
+   "tconst": "tt0084667",
+   "title": "Shakti",
+   "year": 1982,
+   "rating": 7.6,
+   "votes": 2641,
+   "score": 7.248781137383169
+  },
+  {
+   "tconst": "tt0083865",
+   "title": "Dögkeselyü",
+   "year": 1982,
+   "rating": 7.8,
+   "votes": 1590,
+   "score": 7.229039429039428
+  },
+  {
+   "tconst": "tt0084589",
+   "title": "The Return of Martin Guerre",
+   "year": 1982,
+   "rating": 7.4,
+   "votes": 5302,
+   "score": 7.228818172201225
+  },
+  {
+   "tconst": "tt0084370",
+   "title": "My Favorite Year",
+   "year": 1982,
+   "rating": 7.3,
+   "votes": 11373,
+   "score": 7.220893245066849
+  },
+  {
+   "tconst": "tt0084315",
+   "title": "The Time Masters",
+   "year": 1982,
+   "rating": 7.3,
+   "votes": 7738,
+   "score": 7.18798490744016
+  },
+  {
+   "tconst": "tt0084807",
+   "title": "Boat People",
+   "year": 1982,
+   "rating": 7.6,
+   "votes": 2017,
+   "score": 7.1761392513132645
+  },
+  {
+   "tconst": "tt0125144",
+   "title": "Miracle",
+   "year": 1982,
+   "rating": 7.9,
+   "votes": 1111,
+   "score": 7.15211374761351
+  },
+  {
+   "tconst": "tt0083851",
+   "title": "The Draughtsman's Contract",
+   "year": 1982,
+   "rating": 7.2,
+   "votes": 12116,
+   "score": 7.132998789357435
+  },
+  {
+   "tconst": "tt0084296",
+   "title": "The Man from Snowy River",
+   "year": 1982,
+   "rating": 7.2,
+   "votes": 10925,
+   "score": 7.126307096118417
+  },
+  {
+   "tconst": "tt0083967",
+   "title": "Frances",
+   "year": 1982,
+   "rating": 7.2,
+   "votes": 9475,
+   "score": 7.116106169089463
+  },
+  {
+   "tconst": "tt0084821",
+   "title": "La Traviata",
+   "year": 1982,
+   "rating": 7.6,
+   "votes": 1609,
+   "score": 7.109855163362253
+  },
+  {
+   "tconst": "tt0084354",
+   "title": "Moonlighting",
+   "year": 1982,
+   "rating": 7.3,
+   "votes": 4086,
+   "score": 7.107552520883232
+  },
+  {
+   "tconst": "tt0159511",
+   "title": "Mobile Suit Gundam III: Encounters in Space",
+   "year": 1982,
+   "rating": 7.5,
+   "votes": 1968,
+   "score": 7.102834272645593
+  },
+  {
+   "tconst": "tt0083929",
+   "title": "Fast Times at Ridgemont High",
+   "year": 1982,
+   "rating": 7.1,
+   "votes": 126319,
+   "score": 7.093883176283289
+  },
+  {
+   "tconst": "tt0083791",
+   "title": "The Dark Crystal",
+   "year": 1982,
+   "rating": 7.1,
+   "votes": 77967,
+   "score": 7.090137805934277
+  },
+  {
+   "tconst": "tt0084434",
+   "title": "An Officer and a Gentleman",
+   "year": 1982,
+   "rating": 7.1,
+   "votes": 67080,
+   "score": 7.088560695082434
+  },
+  {
+   "tconst": "tt0082729",
+   "title": "Time Stands Still",
+   "year": 1982,
+   "rating": 7.5,
+   "votes": 1787,
+   "score": 7.077040588881277
+  },
+  {
+   "tconst": "tt0084917",
+   "title": "The World According to Garp",
+   "year": 1982,
+   "rating": 7.1,
+   "votes": 31385,
+   "score": 7.075952203835483
+  },
+  {
+   "tconst": "tt0083745",
+   "title": "Come Back to the 5 & Dime Jimmy Dean, Jimmy Dean",
+   "year": 1982,
+   "rating": 7.2,
+   "votes": 5856,
+   "score": 7.071822071355327
+  },
+  {
+   "tconst": "tt0086617",
+   "title": "The Year of Living Dangerously",
+   "year": 1982,
+   "rating": 7.1,
+   "votes": 25107,
+   "score": 7.070169384502704
+  },
+  {
+   "tconst": "tt0083908",
+   "title": "Evil Under the Sun",
+   "year": 1982,
+   "rating": 7.1,
+   "votes": 24455,
+   "score": 7.069405308238543
+  },
+  {
+   "tconst": "tt0215376",
+   "title": "Yavanika",
+   "year": 1982,
+   "rating": 7.8,
+   "votes": 1010,
+   "score": 7.0642846374189645
+  },
+  {
+   "tconst": "tt0084422",
+   "title": "The Night of the Shooting Stars",
+   "year": 1982,
+   "rating": 7.2,
+   "votes": 5106,
+   "score": 7.05607797596006
+  },
+  {
+   "tconst": "tt0085622",
+   "title": "The Grey Fox",
+   "year": 1982,
+   "rating": 7.3,
+   "votes": 2937,
+   "score": 7.051387381562641
+  },
+  {
+   "tconst": "tt0084630",
+   "title": "Satte Pe Satta",
+   "year": 1982,
+   "rating": 7.2,
+   "votes": 4047,
+   "score": 7.025879160137134
+  },
+  {
+   "tconst": "tt0084921",
+   "title": "Five Elements Ninjas",
+   "year": 1982,
+   "rating": 7.2,
+   "votes": 3623,
+   "score": 7.009909608741536
+  },
+  {
+   "tconst": "tt0084385",
+   "title": "Namak Halaal",
+   "year": 1982,
+   "rating": 7.2,
+   "votes": 3162,
+   "score": 6.988854426048082
+  },
+  {
+   "tconst": "tt0084777",
+   "title": "Tenebrae",
+   "year": 1982,
+   "rating": 7,
+   "votes": 31495,
+   "score": 6.979111005422745
+  },
+  {
+   "tconst": "tt0491977",
+   "title": "The Wheel Horse",
+   "year": 1982,
+   "rating": 7.2,
+   "votes": 2947,
+   "score": 6.977352956983056
+  },
+  {
+   "tconst": "tt0083833",
+   "title": "Diner",
+   "year": 1982,
+   "rating": 7,
+   "votes": 23825,
+   "score": 6.972657084439562
+  },
+  {
+   "tconst": "tt0084423",
+   "title": "That Night in Varennes",
+   "year": 1982,
+   "rating": 7.2,
+   "votes": 2833,
+   "score": 6.970731051712006
+  },
+  {
+   "tconst": "tt0083806",
+   "title": "Deathtrap",
+   "year": 1982,
+   "rating": 7,
+   "votes": 18123,
+   "score": 6.964504111342997
+  },
+  {
+   "tconst": "tt0083004",
+   "title": "Family Relations",
+   "year": 1982,
+   "rating": 7.3,
+   "votes": 1833,
+   "score": 6.954504808052283
+  },
+  {
+   "tconst": "tt0084899",
+   "title": "White Dog",
+   "year": 1982,
+   "rating": 7,
+   "votes": 11774,
+   "score": 6.946861759919534
+  },
+  {
+   "tconst": "tt0084633",
+   "title": "Savannah Smiles",
+   "year": 1982,
+   "rating": 7.2,
+   "votes": 2446,
+   "score": 6.944983204066197
+  },
+  {
+   "tconst": "tt0085807",
+   "title": "The Linnet",
+   "year": 1982,
+   "rating": 7.5,
+   "votes": 1080,
+   "score": 6.933275058275058
+  },
+  {
+   "tconst": "tt0084267",
+   "title": "Ninja in the Dragon's Den",
+   "year": 1982,
+   "rating": 7.2,
+   "votes": 2264,
+   "score": 6.930763517528223
+  },
+  {
+   "tconst": "tt0083579",
+   "title": "The Worthless",
+   "year": 1982,
+   "rating": 7.3,
+   "votes": 1476,
+   "score": 6.904689871248836
+  },
+  {
+   "tconst": "tt0084042",
+   "title": "An Egyptian Story",
+   "year": 1982,
+   "rating": 7.3,
+   "votes": 1473,
+   "score": 6.904210319940201
+  },
+  {
+   "tconst": "tt0084602",
+   "title": "Rocky III",
+   "year": 1982,
+   "rating": 6.9,
+   "votes": 232575,
+   "score": 6.897522046970833
+  },
+  {
+   "tconst": "tt0082198",
+   "title": "Conan the Barbarian",
+   "year": 1982,
+   "rating": 6.9,
+   "votes": 175680,
+   "score": 6.896724089434074
+  },
+  {
+   "tconst": "tt0083511",
+   "title": "48 Hrs.",
+   "year": 1982,
+   "rating": 6.9,
+   "votes": 94395,
+   "score": 6.893932723111401
+  },
+  {
+   "tconst": "tt0163494",
+   "title": "Space Adventure Cobra",
+   "year": 1982,
+   "rating": 7.1,
+   "votes": 2765,
+   "score": 6.8931506298040155
+  },
+  {
+   "tconst": "tt0084340",
+   "title": "Les Misérables",
+   "year": 1982,
+   "rating": 7.3,
+   "votes": 1199,
+   "score": 6.8548940978681765
+  },
+  {
+   "tconst": "tt0083728",
+   "title": "Chan Is Missing",
+   "year": 1982,
+   "rating": 7.1,
+   "votes": 2150,
+   "score": 6.852765752765752
+  },
+  {
+   "tconst": "tt0084136",
+   "title": "The Flight of the Eagle",
+   "year": 1982,
+   "rating": 7.2,
+   "votes": 1518,
+   "score": 6.8509976652947255
+  },
+  {
+   "tconst": "tt0084904",
+   "title": "Wild Style",
+   "year": 1982,
+   "rating": 7,
+   "votes": 3318,
+   "score": 6.842800398613274
+  },
+  {
+   "tconst": "tt0082602",
+   "title": "Karnaval",
+   "year": 1982,
+   "rating": 7.2,
+   "votes": 1249,
+   "score": 6.80925394451406
+  },
+  {
+   "tconst": "tt0083701",
+   "title": "Bugs Bunny's 3rd Movie: 1001 Rabbit Tales",
+   "year": 1982,
+   "rating": 7,
+   "votes": 2458,
+   "score": 6.803705066862961
+  },
+  {
+   "tconst": "tt0083767",
+   "title": "Creepshow",
+   "year": 1982,
+   "rating": 6.8,
+   "votes": 58296,
+   "score": 6.791925460759783
+  },
+  {
+   "tconst": "tt0084465",
+   "title": "The Prefab People",
+   "year": 1982,
+   "rating": 7.1,
+   "votes": 1522,
+   "score": 6.791202268521856
+  },
+  {
+   "tconst": "tt0082053",
+   "title": "A Good Marriage",
+   "year": 1982,
+   "rating": 6.9,
+   "votes": 4237,
+   "score": 6.789481023718182
+  },
+  {
+   "tconst": "tt0084725",
+   "title": "The State of Things",
+   "year": 1982,
+   "rating": 6.9,
+   "votes": 4031,
+   "score": 6.784955698909188
+  },
+  {
+   "tconst": "tt0083798",
+   "title": "Dead Men Don't Wear Plaid",
+   "year": 1982,
+   "rating": 6.8,
+   "votes": 26061,
+   "score": 6.782307088474636
+  },
+  {
+   "tconst": "tt0083925",
+   "title": "The Hatter's Ghost",
+   "year": 1982,
+   "rating": 7.1,
+   "votes": 1407,
+   "score": 6.776448741675164
+  },
+  {
+   "tconst": "tt0083053",
+   "title": "Gauche the Cellist",
+   "year": 1982,
+   "rating": 7,
+   "votes": 1889,
+   "score": 6.765044001804125
+  },
+  {
+   "tconst": "tt0084293",
+   "title": "Making Love",
+   "year": 1982,
+   "rating": 6.9,
+   "votes": 3259,
+   "score": 6.764102399908928
+  },
+  {
+   "tconst": "tt0084824",
+   "title": "Three Crowns of the Sailor",
+   "year": 1982,
+   "rating": 7.1,
+   "votes": 1285,
+   "score": 6.759173794841189
+  },
+  {
+   "tconst": "tt0083680",
+   "title": "Talcum Powder",
+   "year": 1982,
+   "rating": 6.9,
+   "votes": 3061,
+   "score": 6.757476513472573
+  },
+  {
+   "tconst": "tt0083743",
+   "title": "La colmena",
+   "year": 1982,
+   "rating": 7.1,
+   "votes": 1270,
+   "score": 6.756921639300493
+  },
+  {
+   "tconst": "tt0083869",
+   "title": "Eating Raoul",
+   "year": 1982,
+   "rating": 6.8,
+   "votes": 10067,
+   "score": 6.7567373381415115
+  },
+  {
+   "tconst": "tt0084897",
+   "title": "The White Rose",
+   "year": 1982,
+   "rating": 7.1,
+   "votes": 1248,
+   "score": 6.753564110859484
+  },
+  {
+   "tconst": "tt0084532",
+   "title": "Prem Rog",
+   "year": 1982,
+   "rating": 7.1,
+   "votes": 1214,
+   "score": 6.748243957187046
+  },
+  {
+   "tconst": "tt0084881",
+   "title": "Arcadia of My Youth",
+   "year": 1982,
+   "rating": 7.1,
+   "votes": 1167,
+   "score": 6.7406147306008855
+  },
+  {
+   "tconst": "tt0167479",
+   "title": "Vieni avanti cretino",
+   "year": 1982,
+   "rating": 7,
+   "votes": 1544,
+   "score": 6.733180865256337
+  },
+  {
+   "tconst": "tt0084346",
+   "title": "Moj tata na odredjeno vreme",
+   "year": 1982,
+   "rating": 7.1,
+   "votes": 1106,
+   "score": 6.73020518576074
+  },
+  {
+   "tconst": "tt0079891",
+   "title": "Shaolin Temple",
+   "year": 1982,
+   "rating": 6.8,
+   "votes": 5167,
+   "score": 6.722362918957698
+  },
+  {
+   "tconst": "tt0082749",
+   "title": "A Thousand Billion Dollars",
+   "year": 1982,
+   "rating": 7,
+   "votes": 1362,
+   "score": 6.7126215585148685
+  },
+  {
+   "tconst": "tt0230938",
+   "title": "Good Evening to You",
+   "year": 1982,
+   "rating": 7,
+   "votes": 1301,
+   "score": 6.705003094833602
+  },
+  {
+   "tconst": "tt0084827",
+   "title": "Tron",
+   "year": 1982,
+   "rating": 6.7,
+   "votes": 147544,
+   "score": 6.697449995430392
+  },
+  {
+   "tconst": "tt0084874",
+   "title": "Begin the Beguine",
+   "year": 1982,
+   "rating": 6.9,
+   "votes": 1819,
+   "score": 6.694683263998623
+  },
+  {
+   "tconst": "tt0084675",
+   "title": "Shoot the Moon",
+   "year": 1982,
+   "rating": 6.8,
+   "votes": 3488,
+   "score": 6.69331820882623
+  },
+  {
+   "tconst": "tt0082334",
+   "title": "The Entity",
+   "year": 1982,
+   "rating": 6.7,
+   "votes": 20672,
+   "score": 6.682521784847366
+  },
+  {
+   "tconst": "tt0084716",
+   "title": "Sportloto-82",
+   "year": 1982,
+   "rating": 6.8,
+   "votes": 2667,
+   "score": 6.669433357298096
+  },
+  {
+   "tconst": "tt0084755",
+   "title": "Taboo II",
+   "year": 1982,
+   "rating": 6.9,
+   "votes": 1474,
+   "score": 6.66605178707038
+  },
+  {
+   "tconst": "tt0083872",
+   "title": "Another Way",
+   "year": 1982,
+   "rating": 7,
+   "votes": 1019,
+   "score": 6.66379996097678
+  },
+  {
+   "tconst": "tt0084671",
+   "title": "Legendary Weapons of China",
+   "year": 1982,
+   "rating": 6.8,
+   "votes": 2076,
+   "score": 6.644347243567008
+  },
+  {
+   "tconst": "tt0082639",
+   "title": "Ladies and Gentlemen, the Fabulous Stains",
+   "year": 1982,
+   "rating": 6.7,
+   "votes": 3533,
+   "score": 6.616437705981054
+  },
+  {
+   "tconst": "tt0084698",
+   "title": "Smithereens",
+   "year": 1982,
+   "rating": 6.7,
+   "votes": 3237,
+   "score": 6.610599981404795
+  },
+  {
+   "tconst": "tt0084808",
+   "title": "A Whole Night",
+   "year": 1982,
+   "rating": 6.8,
+   "votes": 1407,
+   "score": 6.601085218617415
+  },
+  {
+   "tconst": "tt0084728",
+   "title": "Starstruck",
+   "year": 1982,
+   "rating": 6.8,
+   "votes": 1389,
+   "score": 6.599586488577698
+  },
+  {
+   "tconst": "tt0083564",
+   "title": "Annie",
+   "year": 1982,
+   "rating": 6.6,
+   "votes": 54395,
+   "score": 6.5949672736025295
+  },
+  {
+   "tconst": "tt0084329",
+   "title": "A Midsummer Night's Sex Comedy",
+   "year": 1982,
+   "rating": 6.6,
+   "votes": 22105,
+   "score": 6.587933872374469
+  },
+  {
+   "tconst": "tt0084088",
+   "title": "Honkytonk Man",
+   "year": 1982,
+   "rating": 6.6,
+   "votes": 10365,
+   "score": 6.575469610313428
+  },
+  {
+   "tconst": "tt0084565",
+   "title": "Querelle",
+   "year": 1982,
+   "rating": 6.6,
+   "votes": 8716,
+   "score": 6.571306311363948
+  },
+  {
+   "tconst": "tt0084843",
+   "title": "A Room in Town",
+   "year": 1982,
+   "rating": 6.7,
+   "votes": 1873,
+   "score": 6.568155976753261
+  },
+  {
+   "tconst": "tt0083580",
+   "title": "Ace of Aces",
+   "year": 1982,
+   "rating": 6.6,
+   "votes": 4761,
+   "score": 6.551607728035431
+  },
+  {
+   "tconst": "tt0083717",
+   "title": "Cannery Row",
+   "year": 1982,
+   "rating": 6.6,
+   "votes": 4398,
+   "score": 6.548353486701022
+  },
+  {
+   "tconst": "tt0086369",
+   "title": "A Question of Silence",
+   "year": 1982,
+   "rating": 6.7,
+   "votes": 1449,
+   "score": 6.545329571748518
+  },
+  {
+   "tconst": "tt0084116",
+   "title": "Identification of a Woman",
+   "year": 1982,
+   "rating": 6.6,
+   "votes": 3609,
+   "score": 6.539512284923436
+  },
+  {
+   "tconst": "tt0082361",
+   "title": "The Fan",
+   "year": 1982,
+   "rating": 6.6,
+   "votes": 2352,
+   "score": 6.516829391769725
+  },
+  {
+   "tconst": "tt0084117",
+   "title": "If You Could See What I Hear",
+   "year": 1982,
+   "rating": 6.7,
+   "votes": 1027,
+   "score": 6.513128821515599
+  },
+  {
+   "tconst": "tt0084955",
+   "title": "Mad Mission",
+   "year": 1982,
+   "rating": 6.6,
+   "votes": 2126,
+   "score": 6.510816417534267
+  },
+  {
+   "tconst": "tt0084412",
+   "title": "Night Shift",
+   "year": 1982,
+   "rating": 6.5,
+   "votes": 20203,
+   "score": 6.491567802726601
+  },
+  {
+   "tconst": "tt0083739",
+   "title": "Class of 1984",
+   "year": 1982,
+   "rating": 6.5,
+   "votes": 14993,
+   "score": 6.488820866704941
+  },
+  {
+   "tconst": "tt0082342",
+   "title": "Espion, lève-toi",
+   "year": 1982,
+   "rating": 6.6,
+   "votes": 1481,
+   "score": 6.487630842890818
+  },
+  {
+   "tconst": "tt0084586",
+   "title": "Human Lanterns",
+   "year": 1982,
+   "rating": 6.6,
+   "votes": 1319,
+   "score": 6.479780992329504
+  },
+  {
+   "tconst": "tt0084479",
+   "title": "The Passerby",
+   "year": 1982,
+   "rating": 6.6,
+   "votes": 1317,
+   "score": 6.479677221066948
+  },
+  {
+   "tconst": "tt0084867",
+   "title": "Vigilante",
+   "year": 1982,
+   "rating": 6.5,
+   "votes": 5461,
+   "score": 6.472328141342226
+  },
+  {
+   "tconst": "tt0084269",
+   "title": "Losing Ground",
+   "year": 1982,
+   "rating": 6.6,
+   "votes": 1098,
+   "score": 6.467117312303203
+  },
+  {
+   "tconst": "tt0084783",
+   "title": "Tex",
+   "year": 1982,
+   "rating": 6.5,
+   "votes": 2804,
+   "score": 6.453000031864384
+  },
+  {
+   "tconst": "tt0082810",
+   "title": "Night Crossing",
+   "year": 1982,
+   "rating": 6.5,
+   "votes": 1743,
+   "score": 6.434820313967233
+  },
+  {
+   "tconst": "tt0083611",
+   "title": "La balance",
+   "year": 1982,
+   "rating": 6.5,
+   "votes": 1577,
+   "score": 6.430621700121117
+  },
+  {
+   "tconst": "tt0083871",
+   "title": "Eccezzziunale... veramente",
+   "year": 1982,
+   "rating": 6.5,
+   "votes": 1505,
+   "score": 6.428627593298251
+  },
+  {
+   "tconst": "tt0083678",
+   "title": "The Border",
+   "year": 1982,
+   "rating": 6.4,
+   "votes": 7716,
+   "score": 6.390960546261143
+  },
+  {
+   "tconst": "tt0083941",
+   "title": "The Final Option",
+   "year": 1982,
+   "rating": 6.4,
+   "votes": 4254,
+   "score": 6.385004210356323
+  },
+  {
+   "tconst": "tt0085640",
+   "title": "Hammett",
+   "year": 1982,
+   "rating": 6.4,
+   "votes": 4049,
+   "score": 6.384395349814245
+  },
+  {
+   "tconst": "tt0084861",
+   "title": "Vice Squad",
+   "year": 1982,
+   "rating": 6.4,
+   "votes": 3693,
+   "score": 6.383211617560648
+  },
+  {
+   "tconst": "tt0084776",
+   "title": "Tempest",
+   "year": 1982,
+   "rating": 6.4,
+   "votes": 3002,
+   "score": 6.380312873866098
+  },
+  {
+   "tconst": "tt0208903",
+   "title": "Disco Dancer",
+   "year": 1982,
+   "rating": 6.4,
+   "votes": 1974,
+   "score": 6.373507774449267
+  },
+  {
+   "tconst": "tt0083693",
+   "title": "Brimstone & Treacle",
+   "year": 1982,
+   "rating": 6.4,
+   "votes": 1882,
+   "score": 6.372662082308162
+  },
+  {
+   "tconst": "tt0083560",
+   "title": "Angel",
+   "year": 1982,
+   "rating": 6.3,
+   "votes": 1073,
+   "score": 6.310232571737636
+  },
+  {
+   "tconst": "tt0084714",
+   "title": "Split Image",
+   "year": 1982,
+   "rating": 6.3,
+   "votes": 1384,
+   "score": 6.3088977018507215
+  },
+  {
+   "tconst": "tt0084131",
+   "title": "In viaggio con papà",
+   "year": 1982,
+   "rating": 6.3,
+   "votes": 1529,
+   "score": 6.308387552871538
+  },
+  {
+   "tconst": "tt0080393",
+   "title": "Attila",
+   "year": 1982,
+   "rating": 6.3,
+   "votes": 1871,
+   "score": 6.307388408642327
+  },
+  {
+   "tconst": "tt0083619",
+   "title": "Barbarosa",
+   "year": 1982,
+   "rating": 6.3,
+   "votes": 2348,
+   "score": 6.306335759023931
+  },
+  {
+   "tconst": "tt0084489",
+   "title": "Personal Best",
+   "year": 1982,
+   "rating": 6.3,
+   "votes": 3559,
+   "score": 6.304652801318736
+  },
+  {
+   "tconst": "tt0084266",
+   "title": "Dragon Lord",
+   "year": 1982,
+   "rating": 6.3,
+   "votes": 5068,
+   "score": 6.303495735203051
+  },
+  {
+   "tconst": "tt0083686",
+   "title": "The Party 2",
+   "year": 1982,
+   "rating": 6.3,
+   "votes": 5827,
+   "score": 6.303107092604677
+  },
+  {
+   "tconst": "tt0082045",
+   "title": "Banana Joe",
+   "year": 1982,
+   "rating": 6.3,
+   "votes": 9871,
+   "score": 6.301951257585513
+  },
+  {
+   "tconst": "tt0084234",
+   "title": "The Last American Virgin",
+   "year": 1982,
+   "rating": 6.3,
+   "votes": 11088,
+   "score": 6.301754808174398
+  },
+  {
+   "tconst": "tt0084719",
+   "title": "The New York Ripper",
+   "year": 1982,
+   "rating": 6.3,
+   "votes": 14032,
+   "score": 6.3014111310013385
+  },
+  {
+   "tconst": "tt0083707",
+   "title": "Café Flesh",
+   "year": 1982,
+   "rating": 6.2,
+   "votes": 1227,
+   "score": 6.254428433413615
+  },
+  {
+   "tconst": "tt0082025",
+   "title": "The Appointment",
+   "year": 1982,
+   "rating": 6.2,
+   "votes": 1513,
+   "score": 6.248234031520939
+  },
+  {
+   "tconst": "tt0083449",
+   "title": "The Missionary",
+   "year": 1982,
+   "rating": 6.2,
+   "votes": 3043,
+   "score": 6.229980737376236
+  },
+  {
+   "tconst": "tt0083726",
+   "title": "The Challenge",
+   "year": 1982,
+   "rating": 6.2,
+   "votes": 3048,
+   "score": 6.229943705833033
+  },
+  {
+   "tconst": "tt0084481",
+   "title": "Passion",
+   "year": 1982,
+   "rating": 6.2,
+   "votes": 3131,
+   "score": 6.22934207727236
+  },
+  {
+   "tconst": "tt0083694",
+   "title": "Britannia Hospital",
+   "year": 1982,
+   "rating": 6.2,
+   "votes": 3178,
+   "score": 6.229011996460537
+  },
+  {
+   "tconst": "tt0084189",
+   "title": "The Jonsson Gang & Dynamite Harry",
+   "year": 1982,
+   "rating": 6.2,
+   "votes": 4661,
+   "score": 6.2214117861176685
+  },
+  {
+   "tconst": "tt0083675",
+   "title": "Bomber",
+   "year": 1982,
+   "rating": 6.2,
+   "votes": 4823,
+   "score": 6.220816095004658
+  },
+  {
+   "tconst": "tt0084408",
+   "title": "Next of Kin",
+   "year": 1982,
+   "rating": 6.2,
+   "votes": 5279,
+   "score": 6.219304367130453
+  },
+  {
+   "tconst": "tt0083598",
+   "title": "Author! Author!",
+   "year": 1982,
+   "rating": 6.2,
+   "votes": 6206,
+   "score": 6.216820999335571
+  },
+  {
+   "tconst": "tt0083996",
+   "title": "The Gendarme and the Gendarmettes",
+   "year": 1982,
+   "rating": 6.2,
+   "votes": 9272,
+   "score": 6.211800245445105
+  },
+  {
+   "tconst": "tt0083219",
+   "title": "All Fired Up",
+   "year": 1982,
+   "rating": 6.1,
+   "votes": 1026,
+   "score": 6.209186634359387
+  },
+  {
+   "tconst": "tt0083642",
+   "title": "The Best Little Whorehouse in Texas",
+   "year": 1982,
+   "rating": 6.2,
+   "votes": 14316,
+   "score": 6.207914084696534
+  },
+  {
+   "tconst": "tt0083722",
+   "title": "Cat People",
+   "year": 1982,
+   "rating": 6.2,
+   "votes": 26914,
+   "score": 6.204342341520818
+  },
+  {
+   "tconst": "tt0083630",
+   "title": "The Beastmaster",
+   "year": 1982,
+   "rating": 6.2,
+   "votes": 27644,
+   "score": 6.204231675785929
+  },
+  {
+   "tconst": "tt0084526",
+   "title": "For 200 Grand, You Get Nothing Now",
+   "year": 1982,
+   "rating": 6.1,
+   "votes": 1126,
+   "score": 6.204050856637873
+  },
+  {
+   "tconst": "tt0084109",
+   "title": "I Ought to Be in Pictures",
+   "year": 1982,
+   "rating": 6.1,
+   "votes": 1138,
+   "score": 6.203466848087988
+  },
+  {
+   "tconst": "tt0083530",
+   "title": "Airplane II: The Sequel",
+   "year": 1982,
+   "rating": 6.2,
+   "votes": 61517,
+   "score": 6.201938866567688
+  },
+  {
+   "tconst": "tt0083947",
+   "title": "Five Days One Summer",
+   "year": 1982,
+   "rating": 6.1,
+   "votes": 1431,
+   "score": 6.190996347680839
+  },
+  {
+   "tconst": "tt0084070",
+   "title": "Hey Good Lookin'",
+   "year": 1982,
+   "rating": 6.1,
+   "votes": 1557,
+   "score": 6.186512366528008
+  },
+  {
+   "tconst": "tt0083936",
+   "title": "Fighting Back",
+   "year": 1982,
+   "rating": 6,
+   "votes": 1027,
+   "score": 6.15846675935477
+  },
+  {
+   "tconst": "tt0084182",
+   "title": "Julie Darling",
+   "year": 1982,
+   "rating": 6,
+   "votes": 1071,
+   "score": 6.155100010242452
+  },
+  {
+   "tconst": "tt0083609",
+   "title": "Burst City",
+   "year": 1982,
+   "rating": 6,
+   "votes": 1092,
+   "score": 6.153543078973288
+  },
+  {
+   "tconst": "tt0084690",
+   "title": "Six Pack",
+   "year": 1982,
+   "rating": 6.1,
+   "votes": 3760,
+   "score": 6.146473134708428
+  },
+  {
+   "tconst": "tt0084228",
+   "title": "Labyrinth of Passion",
+   "year": 1982,
+   "rating": 6.1,
+   "votes": 5146,
+   "score": 6.135992860594227
+  },
+  {
+   "tconst": "tt0084171",
+   "title": "Jekyll and Hyde... Together Again",
+   "year": 1982,
+   "rating": 6,
+   "votes": 1612,
+   "score": 6.122975544108774
+  },
+  {
+   "tconst": "tt0201021",
+   "title": "Roda, tsanta kai kopana",
+   "year": 1982,
+   "rating": 5.9,
+   "votes": 1038,
+   "score": 6.106679156630088
+  },
+  {
+   "tconst": "tt0489714",
+   "title": "Girgiriye'de Senlik Var",
+   "year": 1982,
+   "rating": 5.9,
+   "votes": 1142,
+   "score": 6.096644314291373
+  },
+  {
+   "tconst": "tt0083655",
+   "title": "Bingo Bongo",
+   "year": 1982,
+   "rating": 6,
+   "votes": 2605,
+   "score": 6.089101836674652
+  },
+  {
+   "tconst": "tt0084658",
+   "title": "The Sender",
+   "year": 1982,
+   "rating": 6,
+   "votes": 2653,
+   "score": 6.087931048785141
+  },
+  {
+   "tconst": "tt0084210",
+   "title": "Kiss Me Goodbye",
+   "year": 1982,
+   "rating": 6,
+   "votes": 2709,
+   "score": 6.086603429822627
+  },
+  {
+   "tconst": "tt0084156",
+   "title": "It Came from Hollywood",
+   "year": 1982,
+   "rating": 5.8,
+   "votes": 1083,
+   "score": 6.050221853678407
+  },
+  {
+   "tconst": "tt0083891",
+   "title": "Enigma",
+   "year": 1982,
+   "rating": 5.9,
+   "votes": 1920,
+   "score": 6.044250726442506
+  },
+  {
+   "tconst": "tt0084756",
+   "title": "Tag: The Assassination Game",
+   "year": 1982,
+   "rating": 5.8,
+   "votes": 1148,
+   "score": 6.042649963320354
+  },
+  {
+   "tconst": "tt0084112",
+   "title": "I, the Jury",
+   "year": 1982,
+   "rating": 5.9,
+   "votes": 2059,
+   "score": 6.037696018702884
+  },
+  {
+   "tconst": "tt0085852",
+   "title": "Liquid Sky",
+   "year": 1982,
+   "rating": 6,
+   "votes": 7608,
+   "score": 6.03731553452743
+  },
+  {
+   "tconst": "tt0084732",
+   "title": "Still of the Night",
+   "year": 1982,
+   "rating": 6,
+   "votes": 7979,
+   "score": 6.03577370767481
+  },
+  {
+   "tconst": "tt0083542",
+   "title": "Alone in the Dark",
+   "year": 1982,
+   "rating": 6,
+   "votes": 8008,
+   "score": 6.035658539210937
+  }
+ ]
+}

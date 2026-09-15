@@ -1,0 +1,1608 @@
+{
+ "tag": "year-2003",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.514,
+ "minVotes": 10000,
+ "items": [
+  {
+   "tconst": "tt0167260",
+   "title": "The Lord of the Rings: The Return of the King",
+   "year": 2003,
+   "rating": 9,
+   "votes": 2192676,
+   "score": 8.988714451385656
+  },
+  {
+   "tconst": "tt0364569",
+   "title": "Oldboy",
+   "year": 2003,
+   "rating": 8.3,
+   "votes": 732178,
+   "score": 8.275937838254913
+  },
+  {
+   "tconst": "tt0266697",
+   "title": "Kill Bill: Vol. 1",
+   "year": 2003,
+   "rating": 8.2,
+   "votes": 1324919,
+   "score": 8.18737121347464
+  },
+  {
+   "tconst": "tt0266543",
+   "title": "Finding Nemo",
+   "year": 2003,
+   "rating": 8.2,
+   "votes": 1225154,
+   "score": 8.186351169911083
+  },
+  {
+   "tconst": "tt0325980",
+   "title": "Pirates of the Caribbean: The Curse of the Black Pearl",
+   "year": 2003,
+   "rating": 8.1,
+   "votes": 1345769,
+   "score": 8.088303016900632
+  },
+  {
+   "tconst": "tt0367495",
+   "title": "Anbe Sivam",
+   "year": 2003,
+   "rating": 8.6,
+   "votes": 28616,
+   "score": 8.059850655695929
+  },
+  {
+   "tconst": "tt0374887",
+   "title": "Munna Bhai M.B.B.S.",
+   "year": 2003,
+   "rating": 8.2,
+   "votes": 99657,
+   "score": 8.046262371944826
+  },
+  {
+   "tconst": "tt0353969",
+   "title": "Memories of Murder",
+   "year": 2003,
+   "rating": 8.1,
+   "votes": 275089,
+   "score": 8.044373837364311
+  },
+  {
+   "tconst": "tt0276919",
+   "title": "Dogville",
+   "year": 2003,
+   "rating": 8,
+   "votes": 168941,
+   "score": 7.916964770065854
+  },
+  {
+   "tconst": "tt0346336",
+   "title": "The Best of Youth",
+   "year": 2003,
+   "rating": 8.4,
+   "votes": 28782,
+   "score": 7.9137329926345705
+  },
+  {
+   "tconst": "tt0327056",
+   "title": "Mystic River",
+   "year": 2003,
+   "rating": 7.9,
+   "votes": 531540,
+   "score": 7.874409264173199
+  },
+  {
+   "tconst": "tt0319061",
+   "title": "Big Fish",
+   "year": 2003,
+   "rating": 7.9,
+   "votes": 480081,
+   "score": 7.871722211063791
+  },
+  {
+   "tconst": "tt0374546",
+   "title": "Spring, Summer, Fall, Winter... and Spring",
+   "year": 2003,
+   "rating": 8,
+   "votes": 91502,
+   "score": 7.8536146373505344
+  },
+  {
+   "tconst": "tt0325710",
+   "title": "The Last Samurai",
+   "year": 2003,
+   "rating": 7.8,
+   "votes": 510055,
+   "score": 7.7752749092314355
+  },
+  {
+   "tconst": "tt0347304",
+   "title": "Kal Ho Naa Ho",
+   "year": 2003,
+   "rating": 7.9,
+   "votes": 82594,
+   "score": 7.75033147850135
+  },
+  {
+   "tconst": "tt0335266",
+   "title": "Lost in Translation",
+   "year": 2003,
+   "rating": 7.7,
+   "votes": 534813,
+   "score": 7.678233986561176
+  },
+  {
+   "tconst": "tt0376968",
+   "title": "The Return",
+   "year": 2003,
+   "rating": 7.9,
+   "votes": 49887,
+   "score": 7.668590727876733
+  },
+  {
+   "tconst": "tt0301357",
+   "title": "Good Bye Lenin!",
+   "year": 2003,
+   "rating": 7.7,
+   "votes": 160875,
+   "score": 7.630601860543403
+  },
+  {
+   "tconst": "tt0379557",
+   "title": "Touching the Void",
+   "year": 2003,
+   "rating": 7.9,
+   "votes": 40046,
+   "score": 7.623086618717859
+  },
+  {
+   "tconst": "tt0388473",
+   "title": "Tokyo Godfathers",
+   "year": 2003,
+   "rating": 7.8,
+   "votes": 55844,
+   "score": 7.604714065372
+  },
+  {
+   "tconst": "tt0317910",
+   "title": "The Fog of War",
+   "year": 2003,
+   "rating": 8,
+   "votes": 26399,
+   "score": 7.591790788767657
+  },
+  {
+   "tconst": "tt0315733",
+   "title": "21 Grams",
+   "year": 2003,
+   "rating": 7.6,
+   "votes": 253612,
+   "score": 7.558809132059064
+  },
+  {
+   "tconst": "tt0379225",
+   "title": "The Corporation",
+   "year": 2003,
+   "rating": 8,
+   "votes": 22374,
+   "score": 7.541038886771914
+  },
+  {
+   "tconst": "tt0286244",
+   "title": "The Triplets of Belleville",
+   "year": 2003,
+   "rating": 7.7,
+   "votes": 58687,
+   "score": 7.527355874042453
+  },
+  {
+   "tconst": "tt0338309",
+   "title": "Evil",
+   "year": 2003,
+   "rating": 7.7,
+   "votes": 45097,
+   "score": 7.4847721821579025
+  },
+  {
+   "tconst": "tt0314331",
+   "title": "Love Actually",
+   "year": 2003,
+   "rating": 7.5,
+   "votes": 584374,
+   "score": 7.4834137982488365
+  },
+  {
+   "tconst": "tt0340377",
+   "title": "The Station Agent",
+   "year": 2003,
+   "rating": 7.6,
+   "votes": 81762,
+   "score": 7.481667715615983
+  },
+  {
+   "tconst": "tt0311113",
+   "title": "Master and Commander: The Far Side of the World",
+   "year": 2003,
+   "rating": 7.5,
+   "votes": 259461,
+   "score": 7.46341434537968
+  },
+  {
+   "tconst": "tt0379370",
+   "title": "Maqbool",
+   "year": 2003,
+   "rating": 8,
+   "votes": 16342,
+   "score": 7.43594233241037
+  },
+  {
+   "tconst": "tt0289992",
+   "title": "The Life of David Gale",
+   "year": 2003,
+   "rating": 7.5,
+   "votes": 133405,
+   "score": 7.431254788329236
+  },
+  {
+   "tconst": "tt0290334",
+   "title": "X2: X-Men United",
+   "year": 2003,
+   "rating": 7.4,
+   "votes": 619819,
+   "score": 7.3859349954833915
+  },
+  {
+   "tconst": "tt0315983",
+   "title": "House of Sand and Fog",
+   "year": 2003,
+   "rating": 7.5,
+   "votes": 76284,
+   "score": 7.385744667845185
+  },
+  {
+   "tconst": "tt0364517",
+   "title": "Love Me If You Dare",
+   "year": 2003,
+   "rating": 7.5,
+   "votes": 74655,
+   "score": 7.383546074305758
+  },
+  {
+   "tconst": "tt0327137",
+   "title": "Secondhand Lions",
+   "year": 2003,
+   "rating": 7.5,
+   "votes": 66745,
+   "score": 7.371543330775347
+  },
+  {
+   "tconst": "tt0373856",
+   "title": "Gangaajal",
+   "year": 2003,
+   "rating": 7.8,
+   "votes": 19262,
+   "score": 7.360576615417742
+  },
+  {
+   "tconst": "tt0368667",
+   "title": "Interstella 5555: The 5tory of the 5ecret 5tar 5ystem",
+   "year": 2003,
+   "rating": 7.8,
+   "votes": 17987,
+   "score": 7.340557863306319
+  },
+  {
+   "tconst": "tt0342172",
+   "title": "Capturing the Friedmans",
+   "year": 2003,
+   "rating": 7.6,
+   "votes": 29020,
+   "score": 7.321722012310454
+  },
+  {
+   "tconst": "tt0373981",
+   "title": "Control",
+   "year": 2003,
+   "rating": 7.6,
+   "votes": 28592,
+   "score": 7.318635803284462
+  },
+  {
+   "tconst": "tt0366840",
+   "title": "Okkadu",
+   "year": 2003,
+   "rating": 8,
+   "votes": 11766,
+   "score": 7.317357021058253
+  },
+  {
+   "tconst": "tt0316356",
+   "title": "Open Range",
+   "year": 2003,
+   "rating": 7.4,
+   "votes": 85459,
+   "score": 7.307201970692695
+  },
+  {
+   "tconst": "tt0293007",
+   "title": "Carandiru",
+   "year": 2003,
+   "rating": 7.6,
+   "votes": 25248,
+   "score": 7.291942604413128
+  },
+  {
+   "tconst": "tt0309698",
+   "title": "Identity",
+   "year": 2003,
+   "rating": 7.3,
+   "votes": 297603,
+   "score": 7.274452761905294
+  },
+  {
+   "tconst": "tt0305206",
+   "title": "American Splendor",
+   "year": 2003,
+   "rating": 7.4,
+   "votes": 55082,
+   "score": 7.263888524021296
+  },
+  {
+   "tconst": "tt0363226",
+   "title": "The Blind Swordsman: Zatoichi",
+   "year": 2003,
+   "rating": 7.4,
+   "votes": 53506,
+   "score": 7.260510706395521
+  },
+  {
+   "tconst": "tt0338135",
+   "title": "The Barbarian Invasions",
+   "year": 2003,
+   "rating": 7.5,
+   "votes": 31043,
+   "score": 7.259802960805836
+  },
+  {
+   "tconst": "tt0340855",
+   "title": "Monster",
+   "year": 2003,
+   "rating": 7.3,
+   "votes": 173419,
+   "score": 7.257155981225249
+  },
+  {
+   "tconst": "tt0371735",
+   "title": "Hungama",
+   "year": 2003,
+   "rating": 7.6,
+   "votes": 19425,
+   "score": 7.230980218193846
+  },
+  {
+   "tconst": "tt0329575",
+   "title": "Seabiscuit",
+   "year": 2003,
+   "rating": 7.3,
+   "votes": 79483,
+   "score": 7.2121798880273795
+  },
+  {
+   "tconst": "tt0343121",
+   "title": "Tupac: Resurrection",
+   "year": 2003,
+   "rating": 7.9,
+   "votes": 10060,
+   "score": 7.20915218944935
+  },
+  {
+   "tconst": "tt0234215",
+   "title": "The Matrix Reloaded",
+   "year": 2003,
+   "rating": 7.2,
+   "votes": 676747,
+   "score": 7.190013196883792
+  },
+  {
+   "tconst": "tt0332379",
+   "title": "School of Rock",
+   "year": 2003,
+   "rating": 7.2,
+   "votes": 362124,
+   "score": 7.181569565307139
+  },
+  {
+   "tconst": "tt0159365",
+   "title": "Cold Mountain",
+   "year": 2003,
+   "rating": 7.2,
+   "votes": 165281,
+   "score": 7.160871930901547
+  },
+  {
+   "tconst": "tt0314412",
+   "title": "My Life Without Me",
+   "year": 2003,
+   "rating": 7.4,
+   "votes": 26746,
+   "score": 7.158928670341098
+  },
+  {
+   "tconst": "tt0325805",
+   "title": "Matchstick Men",
+   "year": 2003,
+   "rating": 7.2,
+   "votes": 146658,
+   "score": 7.15622051169014
+  },
+  {
+   "tconst": "tt0348568",
+   "title": "The Classic",
+   "year": 2003,
+   "rating": 7.7,
+   "votes": 11063,
+   "score": 7.137002939768976
+  },
+  {
+   "tconst": "tt0367859",
+   "title": "The Man Who Copied",
+   "year": 2003,
+   "rating": 7.6,
+   "votes": 12930,
+   "score": 7.126454117765109
+  },
+  {
+   "tconst": "tt0368909",
+   "title": "Ong-Bak: The Thai Warrior",
+   "year": 2003,
+   "rating": 7.2,
+   "votes": 82157,
+   "score": 7.125579097847737
+  },
+  {
+   "tconst": "tt0378897",
+   "title": "A Touch of Spice",
+   "year": 2003,
+   "rating": 7.5,
+   "votes": 15668,
+   "score": 7.115926169563424
+  },
+  {
+   "tconst": "tt0337578",
+   "title": "Baghban",
+   "year": 2003,
+   "rating": 7.4,
+   "votes": 19192,
+   "score": 7.096546756657782
+  },
+  {
+   "tconst": "tt0326977",
+   "title": "I'm Not Scared",
+   "year": 2003,
+   "rating": 7.4,
+   "votes": 18167,
+   "score": 7.085504062213014
+  },
+  {
+   "tconst": "tt0319343",
+   "title": "Elf",
+   "year": 2003,
+   "rating": 7.1,
+   "votes": 349338,
+   "score": 7.083696666983046
+  },
+  {
+   "tconst": "tt0309987",
+   "title": "The Dreamers",
+   "year": 2003,
+   "rating": 7.1,
+   "votes": 142312,
+   "score": 7.061536798941343
+  },
+  {
+   "tconst": "tt0313542",
+   "title": "Runaway Jury",
+   "year": 2003,
+   "rating": 7.1,
+   "votes": 122667,
+   "score": 7.055841263617583
+  },
+  {
+   "tconst": "tt0311289",
+   "title": "Holes",
+   "year": 2003,
+   "rating": 7.1,
+   "votes": 111671,
+   "score": 7.0518504238508255
+  },
+  {
+   "tconst": "tt0363589",
+   "title": "Elephant",
+   "year": 2003,
+   "rating": 7.1,
+   "votes": 105607,
+   "score": 7.049324806632418
+  },
+  {
+   "tconst": "tt0310281",
+   "title": "A Mighty Wind",
+   "year": 2003,
+   "rating": 7.2,
+   "votes": 32430,
+   "score": 7.038359484335468
+  },
+  {
+   "tconst": "tt0254481",
+   "title": "Koi... Mil Gaya",
+   "year": 2003,
+   "rating": 7.2,
+   "votes": 32000,
+   "score": 7.03670459334176
+  },
+  {
+   "tconst": "tt0365376",
+   "title": "A Tale of Two Sisters",
+   "year": 2003,
+   "rating": 7.1,
+   "votes": 75232,
+   "score": 7.031265169424088
+  },
+  {
+   "tconst": "tt0342492",
+   "title": "The Green Butchers",
+   "year": 2003,
+   "rating": 7.2,
+   "votes": 27980,
+   "score": 7.019420561357397
+  },
+  {
+   "tconst": "tt0331811",
+   "title": "11:14",
+   "year": 2003,
+   "rating": 7.1,
+   "votes": 52927,
+   "score": 7.006901535435567
+  },
+  {
+   "tconst": "tt0345549",
+   "title": "Last Life in the Universe",
+   "year": 2003,
+   "rating": 7.4,
+   "votes": 11977,
+   "score": 6.996923734829775
+  },
+  {
+   "tconst": "tt0374271",
+   "title": "In Your Name",
+   "year": 2003,
+   "rating": 7.2,
+   "votes": 22844,
+   "score": 6.991182344426804
+  },
+  {
+   "tconst": "tt0317740",
+   "title": "The Italian Job",
+   "year": 2003,
+   "rating": 7,
+   "votes": 410638,
+   "score": 6.988449909233959
+  },
+  {
+   "tconst": "tt0320691",
+   "title": "Underworld",
+   "year": 2003,
+   "rating": 7,
+   "votes": 303318,
+   "score": 6.984493686670903
+  },
+  {
+   "tconst": "tt0323944",
+   "title": "Shattered Glass",
+   "year": 2003,
+   "rating": 7.1,
+   "votes": 40386,
+   "score": 6.983729466922437
+  },
+  {
+   "tconst": "tt0369060",
+   "title": "Infernal Affairs II",
+   "year": 2003,
+   "rating": 7.2,
+   "votes": 21462,
+   "score": 6.9820098188403135
+  },
+  {
+   "tconst": "tt0302886",
+   "title": "Old School",
+   "year": 2003,
+   "rating": 7,
+   "votes": 258325,
+   "score": 6.981893572795505
+  },
+  {
+   "tconst": "tt0307987",
+   "title": "Bad Santa",
+   "year": 2003,
+   "rating": 7,
+   "votes": 168628,
+   "score": 6.972801536827115
+  },
+  {
+   "tconst": "tt0310203",
+   "title": "Ruby & Quentin",
+   "year": 2003,
+   "rating": 7.1,
+   "votes": 32793,
+   "score": 6.963098939554458
+  },
+  {
+   "tconst": "tt0337721",
+   "title": "The Snow Walker",
+   "year": 2003,
+   "rating": 7.3,
+   "votes": 12214,
+   "score": 6.946240790508416
+  },
+  {
+   "tconst": "tt0329388",
+   "title": "Monsieur Ibrahim",
+   "year": 2003,
+   "rating": 7.3,
+   "votes": 12049,
+   "score": 6.943593492691457
+  },
+  {
+   "tconst": "tt0379217",
+   "title": "Coffee and Cigarettes",
+   "year": 2003,
+   "rating": 7,
+   "votes": 71308,
+   "score": 6.940246875096595
+  },
+  {
+   "tconst": "tt0345551",
+   "title": "Latter Days",
+   "year": 2003,
+   "rating": 7.1,
+   "votes": 19609,
+   "score": 6.902141001734403
+  },
+  {
+   "tconst": "tt0352343",
+   "title": "Facing Windows",
+   "year": 2003,
+   "rating": 7.2,
+   "votes": 12240,
+   "score": 6.891618386706563
+  },
+  {
+   "tconst": "tt0374345",
+   "title": "The Memory of a Killer",
+   "year": 2003,
+   "rating": 7.2,
+   "votes": 11060,
+   "score": 6.874339644841118
+  },
+  {
+   "tconst": "tt0328880",
+   "title": "Brother Bear",
+   "year": 2003,
+   "rating": 6.9,
+   "votes": 138404,
+   "score": 6.874000653084513
+  },
+  {
+   "tconst": "tt0335119",
+   "title": "Girl with a Pearl Earring",
+   "year": 2003,
+   "rating": 6.9,
+   "votes": 84882,
+   "score": 6.859334678024852
+  },
+  {
+   "tconst": "tt0311648",
+   "title": "Pieces of April",
+   "year": 2003,
+   "rating": 7,
+   "votes": 23320,
+   "score": 6.8541894633959775
+  },
+  {
+   "tconst": "tt0316465",
+   "title": "Radio",
+   "year": 2003,
+   "rating": 6.9,
+   "votes": 49787,
+   "score": 6.83546411294017
+  },
+  {
+   "tconst": "tt0354668",
+   "title": "Save the Green Planet!",
+   "year": 2003,
+   "rating": 7.1,
+   "votes": 11827,
+   "score": 6.831598154595406
+  },
+  {
+   "tconst": "tt0318374",
+   "title": "The Cooler",
+   "year": 2003,
+   "rating": 6.9,
+   "votes": 37434,
+   "score": 6.8186573538043165
+  },
+  {
+   "tconst": "tt0285861",
+   "title": "Owning Mahowny",
+   "year": 2003,
+   "rating": 7,
+   "votes": 16320,
+   "score": 6.815410065362991
+  },
+  {
+   "tconst": "tt0337909",
+   "title": "Calendar Girls",
+   "year": 2003,
+   "rating": 6.9,
+   "votes": 28482,
+   "score": 6.7997347570384585
+  },
+  {
+   "tconst": "tt0242653",
+   "title": "The Matrix Revolutions",
+   "year": 2003,
+   "rating": 6.8,
+   "votes": 580203,
+   "score": 6.795156908589678
+  },
+  {
+   "tconst": "tt0315327",
+   "title": "Bruce Almighty",
+   "year": 2003,
+   "rating": 6.8,
+   "votes": 475684,
+   "score": 6.794114677280605
+  },
+  {
+   "tconst": "tt0301976",
+   "title": "The United States of Leland",
+   "year": 2003,
+   "rating": 6.9,
+   "votes": 25433,
+   "score": 6.791106960188354
+  },
+  {
+   "tconst": "tt0337741",
+   "title": "Something's Gotta Give",
+   "year": 2003,
+   "rating": 6.8,
+   "votes": 141002,
+   "score": 6.781070402513569
+  },
+  {
+   "tconst": "tt0328538",
+   "title": "Thirteen",
+   "year": 2003,
+   "rating": 6.8,
+   "votes": 108021,
+   "score": 6.7757805214356255
+  },
+  {
+   "tconst": "tt0316396",
+   "title": "Peter Pan",
+   "year": 2003,
+   "rating": 6.8,
+   "votes": 85760,
+   "score": 6.770150302008708
+  },
+  {
+   "tconst": "tt0328589",
+   "title": "Under the Tuscan Sun",
+   "year": 2003,
+   "rating": 6.8,
+   "votes": 65967,
+   "score": 6.762373042509957
+  },
+  {
+   "tconst": "tt0165982",
+   "title": "Sinbad: Legend of the Seven Seas",
+   "year": 2003,
+   "rating": 6.8,
+   "votes": 65060,
+   "score": 6.761918370907992
+  },
+  {
+   "tconst": "tt0361668",
+   "title": "Gozu",
+   "year": 2003,
+   "rating": 6.9,
+   "votes": 13470,
+   "score": 6.735602595669107
+  },
+  {
+   "tconst": "tt0323998",
+   "title": "Slim Susie",
+   "year": 2003,
+   "rating": 6.9,
+   "votes": 11077,
+   "score": 6.716937558492857
+  },
+  {
+   "tconst": "tt0312549",
+   "title": "Veronica Guerin",
+   "year": 2003,
+   "rating": 6.8,
+   "votes": 23178,
+   "score": 6.713846311421845
+  },
+  {
+   "tconst": "tt0332658",
+   "title": "Intermission",
+   "year": 2003,
+   "rating": 6.8,
+   "votes": 17464,
+   "score": 6.695921676389235
+  },
+  {
+   "tconst": "tt0374339",
+   "title": "Infernal Affairs III",
+   "year": 2003,
+   "rating": 6.8,
+   "votes": 15982,
+   "score": 6.68998510200731
+  },
+  {
+   "tconst": "tt0338095",
+   "title": "High Tension",
+   "year": 2003,
+   "rating": 6.7,
+   "votes": 83866,
+   "score": 6.6802014885086605
+  },
+  {
+   "tconst": "tt0324133",
+   "title": "Swimming Pool",
+   "year": 2003,
+   "rating": 6.7,
+   "votes": 51861,
+   "score": 6.669958340802024
+  },
+  {
+   "tconst": "tt0339230",
+   "title": "Kopps",
+   "year": 2003,
+   "rating": 6.7,
+   "votes": 22959,
+   "score": 6.6436145793365675
+  },
+  {
+   "tconst": "tt0384819",
+   "title": "Azumi",
+   "year": 2003,
+   "rating": 6.7,
+   "votes": 15559,
+   "score": 6.627289523078131
+  },
+  {
+   "tconst": "tt0299458",
+   "title": "All the Real Girls",
+   "year": 2003,
+   "rating": 6.7,
+   "votes": 11340,
+   "score": 6.612914382397093
+  },
+  {
+   "tconst": "tt0251127",
+   "title": "How to Lose a Guy in 10 Days",
+   "year": 2003,
+   "rating": 6.6,
+   "votes": 330390,
+   "score": 6.5974781659871145
+  },
+  {
+   "tconst": "tt0172156",
+   "title": "Bad Boys II",
+   "year": 2003,
+   "rating": 6.6,
+   "votes": 290879,
+   "score": 6.597147002350958
+  },
+  {
+   "tconst": "tt0327850",
+   "title": "The Rundown",
+   "year": 2003,
+   "rating": 6.6,
+   "votes": 149065,
+   "score": 6.594603419484826
+  },
+  {
+   "tconst": "tt0292506",
+   "title": "The Recruit",
+   "year": 2003,
+   "rating": 6.6,
+   "votes": 148190,
+   "score": 6.594573569254402
+  },
+  {
+   "tconst": "tt0314353",
+   "title": "Tears of the Sun",
+   "year": 2003,
+   "rating": 6.6,
+   "votes": 137512,
+   "score": 6.594180764414785
+  },
+  {
+   "tconst": "tt0304415",
+   "title": "Mona Lisa Smile",
+   "year": 2003,
+   "rating": 6.6,
+   "votes": 100563,
+   "score": 6.59223603665199
+  },
+  {
+   "tconst": "tt0310910",
+   "title": "Confidence",
+   "year": 2003,
+   "rating": 6.6,
+   "votes": 36546,
+   "score": 6.581557876516863
+  },
+  {
+   "tconst": "tt0373283",
+   "title": "Saints and Soldiers",
+   "year": 2003,
+   "rating": 6.6,
+   "votes": 22134,
+   "score": 6.573286640952073
+  },
+  {
+   "tconst": "tt0309820",
+   "title": "Luther",
+   "year": 2003,
+   "rating": 6.6,
+   "votes": 16802,
+   "score": 6.567972275216549
+  },
+  {
+   "tconst": "tt0308878",
+   "title": "The Shape of Things",
+   "year": 2003,
+   "rating": 6.6,
+   "votes": 12213,
+   "score": 6.56135564400819
+  },
+  {
+   "tconst": "tt0399854",
+   "title": "Vizontele Tuuba",
+   "year": 2003,
+   "rating": 6.5,
+   "votes": 17585,
+   "score": 6.505132967930177
+  },
+  {
+   "tconst": "tt0346723",
+   "title": "Chalte Chalte",
+   "year": 2003,
+   "rating": 6.5,
+   "votes": 17911,
+   "score": 6.505073014953027
+  },
+  {
+   "tconst": "tt0335563",
+   "title": "Wonderland",
+   "year": 2003,
+   "rating": 6.5,
+   "votes": 24944,
+   "score": 6.5040519952024365
+  },
+  {
+   "tconst": "tt0338188",
+   "title": "The Missing",
+   "year": 2003,
+   "rating": 6.5,
+   "votes": 41902,
+   "score": 6.50272808216165
+  },
+  {
+   "tconst": "tt0313443",
+   "title": "Out of Time",
+   "year": 2003,
+   "rating": 6.5,
+   "votes": 72452,
+   "score": 6.501717276965435
+  },
+  {
+   "tconst": "tt0356614",
+   "title": "Foolproof",
+   "year": 2003,
+   "rating": 6.4,
+   "votes": 12023,
+   "score": 6.451836394694363
+  },
+  {
+   "tconst": "tt0324197",
+   "title": "Time of the Wolf",
+   "year": 2003,
+   "rating": 6.4,
+   "votes": 12433,
+   "score": 6.450888999257966
+  },
+  {
+   "tconst": "tt0294357",
+   "title": "Beyond Borders",
+   "year": 2003,
+   "rating": 6.4,
+   "votes": 28622,
+   "score": 6.42955809953793
+  },
+  {
+   "tconst": "tt0277941",
+   "title": "Ned Kelly",
+   "year": 2003,
+   "rating": 6.4,
+   "votes": 29427,
+   "score": 6.428954597619751
+  },
+  {
+   "tconst": "tt0308152",
+   "title": "Dead End",
+   "year": 2003,
+   "rating": 6.4,
+   "votes": 36145,
+   "score": 6.424739254964871
+  },
+  {
+   "tconst": "tt0264395",
+   "title": "Basic",
+   "year": 2003,
+   "rating": 6.4,
+   "votes": 70151,
+   "score": 6.414243027789472
+  },
+  {
+   "tconst": "tt0322330",
+   "title": "Freaky Friday",
+   "year": 2003,
+   "rating": 6.4,
+   "votes": 179773,
+   "score": 6.406015570815416
+  },
+  {
+   "tconst": "tt0325055",
+   "title": "Sylvia",
+   "year": 2003,
+   "rating": 6.3,
+   "votes": 11655,
+   "score": 6.398896001863493
+  },
+  {
+   "tconst": "tt0367913",
+   "title": "Ju-On: The Grudge 2",
+   "year": 2003,
+   "rating": 6.3,
+   "votes": 12351,
+   "score": 6.395816425231709
+  },
+  {
+   "tconst": "tt0323939",
+   "title": "Shade",
+   "year": 2003,
+   "rating": 6.3,
+   "votes": 13947,
+   "score": 6.389430530770198
+  },
+  {
+   "tconst": "tt0289635",
+   "title": "Young Adam",
+   "year": 2003,
+   "rating": 6.3,
+   "votes": 15417,
+   "score": 6.384258288560961
+  },
+  {
+   "tconst": "tt0313792",
+   "title": "Anything Else",
+   "year": 2003,
+   "rating": 6.3,
+   "votes": 34526,
+   "score": 6.348097581645644
+  },
+  {
+   "tconst": "tt0309530",
+   "title": "Down with Love",
+   "year": 2003,
+   "rating": 6.3,
+   "votes": 47451,
+   "score": 6.3372768606352174
+  },
+  {
+   "tconst": "tt0263757",
+   "title": "Uptown Girls",
+   "year": 2003,
+   "rating": 6.3,
+   "votes": 54803,
+   "score": 6.333047743474128
+  },
+  {
+   "tconst": "tt0138524",
+   "title": "Intolerable Cruelty",
+   "year": 2003,
+   "rating": 6.3,
+   "votes": 106478,
+   "score": 6.31838624392893
+  },
+  {
+   "tconst": "tt0338337",
+   "title": "Paycheck",
+   "year": 2003,
+   "rating": 6.3,
+   "votes": 119334,
+   "score": 6.316558622793341
+  },
+  {
+   "tconst": "tt0285823",
+   "title": "Once Upon a Time in Mexico",
+   "year": 2003,
+   "rating": 6.3,
+   "votes": 177599,
+   "score": 6.311415801365434
+  },
+  {
+   "tconst": "tt0279111",
+   "title": "Gods and Generals",
+   "year": 2003,
+   "rating": 6.2,
+   "votes": 18304,
+   "score": 6.310994662251058
+  },
+  {
+   "tconst": "tt0274166",
+   "title": "Johnny English",
+   "year": 2003,
+   "rating": 6.3,
+   "votes": 187103,
+   "score": 6.31086534918471
+  },
+  {
+   "tconst": "tt0320244",
+   "title": "Party Monster",
+   "year": 2003,
+   "rating": 6.2,
+   "votes": 18424,
+   "score": 6.310526066716646
+  },
+  {
+   "tconst": "tt0328828",
+   "title": "American Wedding",
+   "year": 2003,
+   "rating": 6.3,
+   "votes": 231023,
+   "score": 6.3088854296907515
+  },
+  {
+   "tconst": "tt0305224",
+   "title": "Anger Management",
+   "year": 2003,
+   "rating": 6.3,
+   "votes": 244175,
+   "score": 6.308425663107521
+  },
+  {
+   "tconst": "tt0181852",
+   "title": "Terminator 3: Rise of the Machines",
+   "year": 2003,
+   "rating": 6.3,
+   "votes": 440617,
+   "score": 6.304752579064602
+  },
+  {
+   "tconst": "tt0366292",
+   "title": "One Missed Call",
+   "year": 2003,
+   "rating": 6.2,
+   "votes": 20990,
+   "score": 6.3013744085302985
+  },
+  {
+   "tconst": "tt0308383",
+   "title": "The Human Stain",
+   "year": 2003,
+   "rating": 6.2,
+   "votes": 33979,
+   "score": 6.27143393256677
+  },
+  {
+   "tconst": "tt0310357",
+   "title": "Willard",
+   "year": 2003,
+   "rating": 6.1,
+   "votes": 20293,
+   "score": 6.236717819970089
+  },
+  {
+   "tconst": "tt0345061",
+   "title": "Code 46",
+   "year": 2003,
+   "rating": 6.1,
+   "votes": 21878,
+   "score": 6.229920099139028
+  },
+  {
+   "tconst": "tt0339135",
+   "title": "In Hell",
+   "year": 2003,
+   "rating": 6.1,
+   "votes": 23033,
+   "score": 6.2253774383299705
+  },
+  {
+   "tconst": "tt0300471",
+   "title": "Shanghai Knights",
+   "year": 2003,
+   "rating": 6.2,
+   "votes": 118421,
+   "score": 6.224463233586048
+  },
+  {
+   "tconst": "tt0324216",
+   "title": "The Texas Chainsaw Massacre",
+   "year": 2003,
+   "rating": 6.2,
+   "votes": 163985,
+   "score": 6.218056688337235
+  },
+  {
+   "tconst": "tt0309593",
+   "title": "Final Destination 2",
+   "year": 2003,
+   "rating": 6.2,
+   "votes": 221824,
+   "score": 6.213551629341026
+  },
+  {
+   "tconst": "tt0338077",
+   "title": "Grind",
+   "year": 2003,
+   "rating": 6,
+   "votes": 14542,
+   "score": 6.2095017895996225
+  },
+  {
+   "tconst": "tt0269347",
+   "title": "The Hunted",
+   "year": 2003,
+   "rating": 6.1,
+   "votes": 55603,
+   "score": 6.163131151324694
+  },
+  {
+   "tconst": "tt0295700",
+   "title": "Wrong Turn",
+   "year": 2003,
+   "rating": 6.1,
+   "votes": 148236,
+   "score": 6.126173518796948
+  },
+  {
+   "tconst": "tt0257076",
+   "title": "S.W.A.T.",
+   "year": 2003,
+   "rating": 6.1,
+   "votes": 160893,
+   "score": 6.1242350062340405
+  },
+  {
+   "tconst": "tt0266465",
+   "title": "A Man Apart",
+   "year": 2003,
+   "rating": 6,
+   "votes": 51425,
+   "score": 6.083705216448578
+  },
+  {
+   "tconst": "tt0319524",
+   "title": "How to Deal",
+   "year": 2003,
+   "rating": 5.6,
+   "votes": 10203,
+   "score": 6.052486903942679
+  },
+  {
+   "tconst": "tt0314786",
+   "title": "The In-Laws",
+   "year": 2003,
+   "rating": 5.8,
+   "votes": 18433,
+   "score": 6.051172683865717
+  },
+  {
+   "tconst": "tt0251736",
+   "title": "House of 1000 Corpses",
+   "year": 2003,
+   "rating": 6,
+   "votes": 101215,
+   "score": 6.046231110195153
+  },
+  {
+   "tconst": "tt0349205",
+   "title": "Cheaper by the Dozen",
+   "year": 2003,
+   "rating": 6,
+   "votes": 116498,
+   "score": 6.040645645941864
+  },
+  {
+   "tconst": "tt0222812",
+   "title": "Beyond Re-Animator",
+   "year": 2003,
+   "rating": 5.7,
+   "votes": 14110,
+   "score": 6.037685313992283
+  },
+  {
+   "tconst": "tt0322259",
+   "title": "2 Fast 2 Furious",
+   "year": 2003,
+   "rating": 6,
+   "votes": 330139,
+   "score": 6.015116152279962
+  },
+  {
+   "tconst": "tt0266489",
+   "title": "Duplex",
+   "year": 2003,
+   "rating": 5.9,
+   "votes": 66096,
+   "score": 5.980708485601792
+  },
+  {
+   "tconst": "tt0348836",
+   "title": "Gothika",
+   "year": 2003,
+   "rating": 5.9,
+   "votes": 124689,
+   "score": 5.945598325923824
+  },
+  {
+   "tconst": "tt0325258",
+   "title": "Dickie Roberts: Former Child Star",
+   "year": 2003,
+   "rating": 5.6,
+   "votes": 16479,
+   "score": 5.945239356484533
+  },
+  {
+   "tconst": "tt0318155",
+   "title": "Looney Tunes: Back in Action",
+   "year": 2003,
+   "rating": 5.8,
+   "votes": 43873,
+   "score": 5.932563490437769
+  },
+  {
+   "tconst": "tt0306685",
+   "title": "Cradle 2 the Grave",
+   "year": 2003,
+   "rating": 5.8,
+   "votes": 48144,
+   "score": 5.922825965195961
+  },
+  {
+   "tconst": "tt0295721",
+   "title": "Taxi 3",
+   "year": 2003,
+   "rating": 5.8,
+   "votes": 49386,
+   "score": 5.920257180486208
+  },
+  {
+   "tconst": "tt0318283",
+   "title": "Alex & Emma",
+   "year": 2003,
+   "rating": 5.5,
+   "votes": 14582,
+   "score": 5.912561749261815
+  },
+  {
+   "tconst": "tt0338466",
+   "title": "Stuck on You",
+   "year": 2003,
+   "rating": 5.8,
+   "votes": 56991,
+   "score": 5.906605259219208
+  },
+  {
+   "tconst": "tt0295289",
+   "title": "A Guy Thing",
+   "year": 2003,
+   "rating": 5.6,
+   "votes": 19840,
+   "score": 5.90635365014591
+  },
+  {
+   "tconst": "tt0374102",
+   "title": "Open Water",
+   "year": 2003,
+   "rating": 5.8,
+   "votes": 59635,
+   "score": 5.90255752021762
+  },
+  {
+   "tconst": "tt0286788",
+   "title": "What a Girl Wants",
+   "year": 2003,
+   "rating": 5.8,
+   "votes": 71815,
+   "score": 5.8872895302860595
+  },
+  {
+   "tconst": "tt0337592",
+   "title": "Love Don't Cost a Thing",
+   "year": 2003,
+   "rating": 5.3,
+   "votes": 10824,
+   "score": 5.883057670013155
+  },
+  {
+   "tconst": "tt0305669",
+   "title": "Bringing Down the House",
+   "year": 2003,
+   "rating": 5.7,
+   "votes": 41527,
+   "score": 5.85800634464172
+  },
+  {
+   "tconst": "tt0329101",
+   "title": "Freddy vs. Jason",
+   "year": 2003,
+   "rating": 5.8,
+   "votes": 137483,
+   "score": 5.848423160095427
+  },
+  {
+   "tconst": "tt0311429",
+   "title": "The League of Extraordinary Gentlemen",
+   "year": 2003,
+   "rating": 5.8,
+   "votes": 193309,
+   "score": 5.835126791830927
+  },
+  {
+   "tconst": "tt0325537",
+   "title": "Head of State",
+   "year": 2003,
+   "rating": 5.5,
+   "votes": 21163,
+   "score": 5.825436990031574
+  },
+  {
+   "tconst": "tt0339840",
+   "title": "Undead",
+   "year": 2003,
+   "rating": 5.3,
+   "votes": 14009,
+   "score": 5.805710063740845
+  },
+  {
+   "tconst": "tt0300556",
+   "title": "Timeline",
+   "year": 2003,
+   "rating": 5.7,
+   "votes": 69921,
+   "score": 5.801870508631698
+  },
+  {
+   "tconst": "tt0301470",
+   "title": "Jeepers Creepers 2",
+   "year": 2003,
+   "rating": 5.7,
+   "votes": 76408,
+   "score": 5.794222675219355
+  },
+  {
+   "tconst": "tt0317303",
+   "title": "Daddy Day Care",
+   "year": 2003,
+   "rating": 5.7,
+   "votes": 80325,
+   "score": 5.790136650100791
+  },
+  {
+   "tconst": "tt0283426",
+   "title": "The Jungle Book 2",
+   "year": 2003,
+   "rating": 5.4,
+   "votes": 19908,
+   "score": 5.772528852492776
+  },
+  {
+   "tconst": "tt0306841",
+   "title": "The Lizzie McGuire Movie",
+   "year": 2003,
+   "rating": 5.6,
+   "votes": 43971,
+   "score": 5.769379720967815
+  },
+  {
+   "tconst": "tt0271668",
+   "title": "National Security",
+   "year": 2003,
+   "rating": 5.6,
+   "votes": 58195,
+   "score": 5.734050779681119
+  },
+  {
+   "tconst": "tt0286716",
+   "title": "Hulk",
+   "year": 2003,
+   "rating": 5.7,
+   "votes": 295617,
+   "score": 5.726639856160992
+  },
+  {
+   "tconst": "tt0199626",
+   "title": "In the Cut",
+   "year": 2003,
+   "rating": 5.4,
+   "votes": 28043,
+   "score": 5.692868409966458
+  },
+  {
+   "tconst": "tt0285531",
+   "title": "Dreamcatcher",
+   "year": 2003,
+   "rating": 5.6,
+   "votes": 101952,
+   "score": 5.681656360943564
+  },
+  {
+   "tconst": "tt0328099",
+   "title": "Malibu's Most Wanted",
+   "year": 2003,
+   "rating": 5.3,
+   "votes": 22471,
+   "score": 5.673921127170519
+  },
+  {
+   "tconst": "tt0245803",
+   "title": "Bulletproof Monk",
+   "year": 2003,
+   "rating": 5.5,
+   "votes": 53038,
+   "score": 5.660880626294521
+  },
+  {
+   "tconst": "tt0306047",
+   "title": "Scary Movie 3",
+   "year": 2003,
+   "rating": 5.6,
+   "votes": 177408,
+   "score": 5.648779096518579
+  },
+  {
+   "tconst": "tt0329717",
+   "title": "Hollywood Homicide",
+   "year": 2003,
+   "rating": 5.4,
+   "votes": 41746,
+   "score": 5.615313124113052
+  },
+  {
+   "tconst": "tt0305711",
+   "title": "Just Married",
+   "year": 2003,
+   "rating": 5.5,
+   "votes": 78273,
+   "score": 5.614888957216293
+  },
+  {
+   "tconst": "tt0306734",
+   "title": "The Divorce",
+   "year": 2003,
+   "rating": 4.9,
+   "votes": 12650,
+   "score": 5.6126531090663985
+  }
+ ]
+}

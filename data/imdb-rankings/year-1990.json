@@ -1,0 +1,1608 @@
+{
+ "tag": "year-1990",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.352,
+ "minVotes": 2000,
+ "items": [
+  {
+   "tconst": "tt0099685",
+   "title": "GoodFellas",
+   "year": 1990,
+   "rating": 8.7,
+   "votes": 1412684,
+   "score": 8.69668101675003
+  },
+  {
+   "tconst": "tt0100234",
+   "title": "Close-Up",
+   "year": 1990,
+   "rating": 8.2,
+   "votes": 27429,
+   "score": 8.074432957287028
+  },
+  {
+   "tconst": "tt0140377",
+   "title": "Michael Madana Kama Rajan",
+   "year": 1990,
+   "rating": 8.5,
+   "votes": 8036,
+   "score": 8.072009515743323
+  },
+  {
+   "tconst": "tt0100332",
+   "title": "Paris Is Burning",
+   "year": 1990,
+   "rating": 8.2,
+   "votes": 21690,
+   "score": 8.04401382439848
+  },
+  {
+   "tconst": "tt0099348",
+   "title": "Dances with Wolves",
+   "year": 1990,
+   "rating": 8,
+   "votes": 313180,
+   "score": 7.9895446649533595
+  },
+  {
+   "tconst": "tt0278501",
+   "title": "In Harihar Nagar",
+   "year": 1990,
+   "rating": 8.6,
+   "votes": 4585,
+   "score": 7.917340546697038
+  },
+  {
+   "tconst": "tt0102369",
+   "title": "Mother",
+   "year": 1990,
+   "rating": 8.4,
+   "votes": 5515,
+   "score": 7.855048236859613
+  },
+  {
+   "tconst": "tt0099785",
+   "title": "Home Alone",
+   "year": 1990,
+   "rating": 7.8,
+   "votes": 754815,
+   "score": 7.79617434577803
+  },
+  {
+   "tconst": "tt0099487",
+   "title": "Edward Scissorhands",
+   "year": 1990,
+   "rating": 7.8,
+   "votes": 570454,
+   "score": 7.794942279204967
+  },
+  {
+   "tconst": "tt0100157",
+   "title": "Misery",
+   "year": 1990,
+   "rating": 7.8,
+   "votes": 269262,
+   "score": 7.7893265090576636
+  },
+  {
+   "tconst": "tt0099077",
+   "title": "Awakenings",
+   "year": 1990,
+   "rating": 7.8,
+   "votes": 178799,
+   "score": 7.783986014856277
+  },
+  {
+   "tconst": "tt0100150",
+   "title": "Miller's Crossing",
+   "year": 1990,
+   "rating": 7.7,
+   "votes": 149263,
+   "score": 7.682181283592154
+  },
+  {
+   "tconst": "tt0100998",
+   "title": "Dreams",
+   "year": 1990,
+   "rating": 7.7,
+   "votes": 33294,
+   "score": 7.62363255794186
+  },
+  {
+   "tconst": "tt0099043",
+   "title": "Anjali",
+   "year": 1990,
+   "rating": 8.2,
+   "votes": 3360,
+   "score": 7.510576026119402
+  },
+  {
+   "tconst": "tt0099729",
+   "title": "Hamoun",
+   "year": 1990,
+   "rating": 7.8,
+   "votes": 7770,
+   "score": 7.503652763561924
+  },
+  {
+   "tconst": "tt0099088",
+   "title": "Back to the Future Part III",
+   "year": 1990,
+   "rating": 7.5,
+   "votes": 526357,
+   "score": 7.495655754537179
+  },
+  {
+   "tconst": "tt0099674",
+   "title": "The Godfather Part III",
+   "year": 1990,
+   "rating": 7.5,
+   "votes": 460620,
+   "score": 7.495038449483378
+  },
+  {
+   "tconst": "tt0100802",
+   "title": "Total Recall",
+   "year": 1990,
+   "rating": 7.5,
+   "votes": 384888,
+   "score": 7.494067242974712
+  },
+  {
+   "tconst": "tt0099810",
+   "title": "The Hunt for Red October",
+   "year": 1990,
+   "rating": 7.5,
+   "votes": 234196,
+   "score": 7.490282170316179
+  },
+  {
+   "tconst": "tt0099334",
+   "title": "Cyrano de Bergerac",
+   "year": 1990,
+   "rating": 7.5,
+   "votes": 27825,
+   "score": 7.423040653813914
+  },
+  {
+   "tconst": "tt0098999",
+   "title": "Agneepath",
+   "year": 1990,
+   "rating": 7.6,
+   "votes": 10078,
+   "score": 7.393400190428879
+  },
+  {
+   "tconst": "tt0099776",
+   "title": "Europa Europa",
+   "year": 1990,
+   "rating": 7.5,
+   "votes": 18783,
+   "score": 7.389558172544868
+  },
+  {
+   "tconst": "tt0099902",
+   "title": "Ju Dou",
+   "year": 1990,
+   "rating": 7.6,
+   "votes": 9761,
+   "score": 7.387831604455402
+  },
+  {
+   "tconst": "tt0099871",
+   "title": "Jacob's Ladder",
+   "year": 1990,
+   "rating": 7.4,
+   "votes": 130953,
+   "score": 7.384240201424563
+  },
+  {
+   "tconst": "tt0447484",
+   "title": "Tatar Ramazan",
+   "year": 1990,
+   "rating": 7.9,
+   "votes": 3732,
+   "score": 7.359994330076761
+  },
+  {
+   "tconst": "tt0098532",
+   "title": "The Match Factory Girl",
+   "year": 1990,
+   "rating": 7.5,
+   "votes": 13926,
+   "score": 7.355876397086525
+  },
+  {
+   "tconst": "tt0099426",
+   "title": "Bullet in the Head",
+   "year": 1990,
+   "rating": 7.5,
+   "votes": 13611,
+   "score": 7.352968259560566
+  },
+  {
+   "tconst": "tt0099652",
+   "title": "Ghayal",
+   "year": 1990,
+   "rating": 7.7,
+   "votes": 5680,
+   "score": 7.3490478515625
+  },
+  {
+   "tconst": "tt0099669",
+   "title": "My Father's Glory",
+   "year": 1990,
+   "rating": 7.6,
+   "votes": 7656,
+   "score": 7.341579070008284
+  },
+  {
+   "tconst": "tt0101258",
+   "title": "Days of Being Wild",
+   "year": 1990,
+   "rating": 7.4,
+   "votes": 28939,
+   "score": 7.33227601086008
+  },
+  {
+   "tconst": "tt0099266",
+   "title": "My Mother's Castle",
+   "year": 1990,
+   "rating": 7.6,
+   "votes": 6182,
+   "score": 7.29502413835248
+  },
+  {
+   "tconst": "tt0098214",
+   "title": "Red Dawn",
+   "year": 1990,
+   "rating": 8,
+   "votes": 2450,
+   "score": 7.259480337078651
+  },
+  {
+   "tconst": "tt0100024",
+   "title": "Life Is Sweet",
+   "year": 1990,
+   "rating": 7.4,
+   "votes": 12272,
+   "score": 7.2531871846973095
+  },
+  {
+   "tconst": "tt0100681",
+   "title": "Everybody's Fine",
+   "year": 1990,
+   "rating": 7.6,
+   "votes": 4981,
+   "score": 7.242556582151553
+  },
+  {
+   "tconst": "tt0263074",
+   "title": "The Unforgettable Director of Love Movies",
+   "year": 1990,
+   "rating": 7.6,
+   "votes": 4856,
+   "score": 7.2360396003500576
+  },
+  {
+   "tconst": "tt0100519",
+   "title": "Rosencrantz & Guildenstern Are Dead",
+   "year": 1990,
+   "rating": 7.3,
+   "votes": 26011,
+   "score": 7.232336849809004
+  },
+  {
+   "tconst": "tt0099040",
+   "title": "An Angel at My Table",
+   "year": 1990,
+   "rating": 7.4,
+   "votes": 9530,
+   "score": 7.218272983521248
+  },
+  {
+   "tconst": "tt0099423",
+   "title": "Die Hard 2",
+   "year": 1990,
+   "rating": 7.2,
+   "votes": 410010,
+   "score": 7.195885263707192
+  },
+  {
+   "tconst": "tt0100814",
+   "title": "Tremors",
+   "year": 1990,
+   "rating": 7.2,
+   "votes": 168384,
+   "score": 7.190050048713494
+  },
+  {
+   "tconst": "tt0100935",
+   "title": "Wild at Heart",
+   "year": 1990,
+   "rating": 7.2,
+   "votes": 113106,
+   "score": 7.185271727798725
+  },
+  {
+   "tconst": "tt0100263",
+   "title": "La Femme Nikita",
+   "year": 1990,
+   "rating": 7.2,
+   "votes": 82366,
+   "score": 7.179905263968898
+  },
+  {
+   "tconst": "tt0103130",
+   "title": "Trust",
+   "year": 1990,
+   "rating": 7.3,
+   "votes": 11900,
+   "score": 7.163646582733813
+  },
+  {
+   "tconst": "tt0100436",
+   "title": "Pump Up the Volume",
+   "year": 1990,
+   "rating": 7.2,
+   "votes": 33854,
+   "score": 7.1527162241312
+  },
+  {
+   "tconst": "tt0100151",
+   "title": "Mindwalk",
+   "year": 1990,
+   "rating": 7.6,
+   "votes": 3421,
+   "score": 7.139695166943368
+  },
+  {
+   "tconst": "tt0099566",
+   "title": "The Field",
+   "year": 1990,
+   "rating": 7.3,
+   "votes": 7692,
+   "score": 7.1044456768468836
+  },
+  {
+   "tconst": "tt0100405",
+   "title": "Pretty Woman",
+   "year": 1990,
+   "rating": 7.1,
+   "votes": 411966,
+   "score": 7.096387837406936
+  },
+  {
+   "tconst": "tt0099653",
+   "title": "Ghost",
+   "year": 1990,
+   "rating": 7.1,
+   "votes": 259439,
+   "score": 7.094280453566606
+  },
+  {
+   "tconst": "tt0100142",
+   "title": "Metropolitan",
+   "year": 1990,
+   "rating": 7.2,
+   "votes": 13889,
+   "score": 7.09330275662408
+  },
+  {
+   "tconst": "tt0100046",
+   "title": "The Long Walk Home",
+   "year": 1990,
+   "rating": 7.3,
+   "votes": 5804,
+   "score": 7.057135763710917
+  },
+  {
+   "tconst": "tt0100685",
+   "title": "State of Grace",
+   "year": 1990,
+   "rating": 7.1,
+   "votes": 29958,
+   "score": 7.053210072595281
+  },
+  {
+   "tconst": "tt0103129",
+   "title": "Truly Madly Deeply",
+   "year": 1990,
+   "rating": 7.2,
+   "votes": 9450,
+   "score": 7.051937772925765
+  },
+  {
+   "tconst": "tt0100486",
+   "title": "Reversal of Fortune",
+   "year": 1990,
+   "rating": 7.1,
+   "votes": 21741,
+   "score": 7.037015605913819
+  },
+  {
+   "tconst": "tt0099073",
+   "title": "Avalon",
+   "year": 1990,
+   "rating": 7.2,
+   "votes": 7559,
+   "score": 7.0226475049691395
+  },
+  {
+   "tconst": "tt0100470",
+   "title": "Journey of Hope",
+   "year": 1990,
+   "rating": 7.5,
+   "votes": 2595,
+   "score": 7.0004760609357986
+  },
+  {
+   "tconst": "tt0100112",
+   "title": "The Hairdresser's Husband",
+   "year": 1990,
+   "rating": 7.1,
+   "votes": 11207,
+   "score": 6.986778791549935
+  },
+  {
+   "tconst": "tt0099818",
+   "title": "I Hired a Contract Killer",
+   "year": 1990,
+   "rating": 7.1,
+   "votes": 9105,
+   "score": 6.965347816298964
+  },
+  {
+   "tconst": "tt0102943",
+   "title": "Slacker",
+   "year": 1990,
+   "rating": 7,
+   "votes": 25708,
+   "score": 6.95325131730908
+  },
+  {
+   "tconst": "tt0097106",
+   "title": "A Tale of Springtime",
+   "year": 1990,
+   "rating": 7.1,
+   "votes": 6646,
+   "score": 6.927051526717555
+  },
+  {
+   "tconst": "tt0100557",
+   "title": "The Nasty Girl",
+   "year": 1990,
+   "rating": 7.3,
+   "votes": 2985,
+   "score": 6.919796890672015
+  },
+  {
+   "tconst": "tt0097884",
+   "title": "May Fools",
+   "year": 1990,
+   "rating": 7.2,
+   "votes": 3682,
+   "score": 6.901634547694473
+  },
+  {
+   "tconst": "tt0100404",
+   "title": "Presumed Innocent",
+   "year": 1990,
+   "rating": 6.9,
+   "votes": 53590,
+   "score": 6.88029659111351
+  },
+  {
+   "tconst": "tt0100196",
+   "title": "Mountains of the Moon",
+   "year": 1990,
+   "rating": 7.1,
+   "votes": 4778,
+   "score": 6.879387356152256
+  },
+  {
+   "tconst": "tt0099939",
+   "title": "King of New York",
+   "year": 1990,
+   "rating": 6.9,
+   "votes": 49860,
+   "score": 6.878879435017354
+  },
+  {
+   "tconst": "tt0100777",
+   "title": "A Moment of Romance",
+   "year": 1990,
+   "rating": 7.3,
+   "votes": 2400,
+   "score": 6.869247159090907
+  },
+  {
+   "tconst": "tt0100133",
+   "title": "Memphis Belle",
+   "year": 1990,
+   "rating": 6.9,
+   "votes": 32316,
+   "score": 6.868081580020982
+  },
+  {
+   "tconst": "tt0102744",
+   "title": "Quigley Down Under",
+   "year": 1990,
+   "rating": 6.9,
+   "votes": 27794,
+   "score": 6.863237145062764
+  },
+  {
+   "tconst": "tt0100747",
+   "title": "Auntie Danielle",
+   "year": 1990,
+   "rating": 7.1,
+   "votes": 3980,
+   "score": 6.849947742474916
+  },
+  {
+   "tconst": "tt0100757",
+   "title": "Taxi Blues",
+   "year": 1990,
+   "rating": 7.3,
+   "votes": 2189,
+   "score": 6.84755013129625
+  },
+  {
+   "tconst": "tt0101025",
+   "title": "Oh, Carmela!",
+   "year": 1990,
+   "rating": 7.1,
+   "votes": 3652,
+   "score": 6.835436571125265
+  },
+  {
+   "tconst": "tt0100791",
+   "title": "To Sleep with Anger",
+   "year": 1990,
+   "rating": 7.1,
+   "votes": 3592,
+   "score": 6.8325979077253205
+  },
+  {
+   "tconst": "tt0100758",
+   "title": "Teenage Mutant Ninja Turtles",
+   "year": 1990,
+   "rating": 6.8,
+   "votes": 113641,
+   "score": 6.792257828105948
+  },
+  {
+   "tconst": "tt0100944",
+   "title": "The Witches",
+   "year": 1990,
+   "rating": 6.8,
+   "votes": 59955,
+   "score": 6.785548987168106
+  },
+  {
+   "tconst": "tt0100477",
+   "title": "The Rescuers Down Under",
+   "year": 1990,
+   "rating": 6.8,
+   "votes": 51844,
+   "score": 6.783372102741253
+  },
+  {
+   "tconst": "tt0100258",
+   "title": "Night of the Living Dead",
+   "year": 1990,
+   "rating": 6.8,
+   "votes": 49516,
+   "score": 6.782620690659213
+  },
+  {
+   "tconst": "tt0099703",
+   "title": "The Grifters",
+   "year": 1990,
+   "rating": 6.8,
+   "votes": 33730,
+   "score": 6.774942275398824
+  },
+  {
+   "tconst": "tt0099472",
+   "title": "DuckTales: The Movie - Treasure of the Lost Lamp",
+   "year": 1990,
+   "rating": 6.8,
+   "votes": 30679,
+   "score": 6.772602818323694
+  },
+  {
+   "tconst": "tt0100449",
+   "title": "Quick Change",
+   "year": 1990,
+   "rating": 6.8,
+   "votes": 24329,
+   "score": 6.765995195411903
+  },
+  {
+   "tconst": "tt0101597",
+   "title": "Closet Land",
+   "year": 1990,
+   "rating": 7,
+   "votes": 3292,
+   "score": 6.755231953892667
+  },
+  {
+   "tconst": "tt0099768",
+   "title": "Hidden Agenda",
+   "year": 1990,
+   "rating": 6.9,
+   "votes": 5439,
+   "score": 6.752760787740287
+  },
+  {
+   "tconst": "tt0252607",
+   "title": "Seat Trouble",
+   "year": 1990,
+   "rating": 7,
+   "votes": 3065,
+   "score": 6.744262092793682
+  },
+  {
+   "tconst": "tt0252486",
+   "title": "The Laughing Man",
+   "year": 1990,
+   "rating": 6.9,
+   "votes": 4678,
+   "score": 6.735981955675351
+  },
+  {
+   "tconst": "tt0100873",
+   "title": "Vincent & Theo",
+   "year": 1990,
+   "rating": 6.9,
+   "votes": 4538,
+   "score": 6.7324697919853165
+  },
+  {
+   "tconst": "tt0098967",
+   "title": "Boiling Point",
+   "year": 1990,
+   "rating": 6.8,
+   "votes": 8228,
+   "score": 6.712464558075869
+  },
+  {
+   "tconst": "tt0100912",
+   "title": "Werner and the Wizard of Booze",
+   "year": 1990,
+   "rating": 6.8,
+   "votes": 6853,
+   "score": 6.698869027448321
+  },
+  {
+   "tconst": "tt0100140",
+   "title": "Mermaids",
+   "year": 1990,
+   "rating": 6.7,
+   "votes": 41842,
+   "score": 6.6841404931344375
+  },
+  {
+   "tconst": "tt0099726",
+   "title": "Hamlet",
+   "year": 1990,
+   "rating": 6.7,
+   "votes": 25246,
+   "score": 6.674480198928283
+  },
+  {
+   "tconst": "tt0100395",
+   "title": "Postcards from the Edge",
+   "year": 1990,
+   "rating": 6.7,
+   "votes": 22780,
+   "score": 6.671940577078289
+  },
+  {
+   "tconst": "tt0100625",
+   "title": "A Chinese Ghost Story II",
+   "year": 1990,
+   "rating": 6.8,
+   "votes": 4632,
+   "score": 6.665001130880578
+  },
+  {
+   "tconst": "tt0100168",
+   "title": "Mo' Better Blues",
+   "year": 1990,
+   "rating": 6.7,
+   "votes": 15154,
+   "score": 6.659466450973534
+  },
+  {
+   "tconst": "tt0100594",
+   "title": "The Sheltering Sky",
+   "year": 1990,
+   "rating": 6.7,
+   "votes": 14942,
+   "score": 6.658959243300672
+  },
+  {
+   "tconst": "tt0101763",
+   "title": "God of Gamblers II",
+   "year": 1990,
+   "rating": 6.8,
+   "votes": 4107,
+   "score": 6.653395693466513
+  },
+  {
+   "tconst": "tt0100469",
+   "title": "The Reflecting Skin",
+   "year": 1990,
+   "rating": 6.7,
+   "votes": 10705,
+   "score": 6.645272530499803
+  },
+  {
+   "tconst": "tt0142233",
+   "title": "Dragon Ball Z: The Tree of Might",
+   "year": 1990,
+   "rating": 6.7,
+   "votes": 9811,
+   "score": 6.641130090593515
+  },
+  {
+   "tconst": "tt0104147",
+   "title": "All for the Winner",
+   "year": 1990,
+   "rating": 6.8,
+   "votes": 3144,
+   "score": 6.625950136080871
+  },
+  {
+   "tconst": "tt0138545",
+   "title": "The Juniper Tree",
+   "year": 1990,
+   "rating": 6.8,
+   "votes": 3036,
+   "score": 6.622217533756949
+  },
+  {
+   "tconst": "tt0100973",
+   "title": "Swordsman",
+   "year": 1990,
+   "rating": 6.8,
+   "votes": 2930,
+   "score": 6.618395030425962
+  },
+  {
+   "tconst": "tt0100281",
+   "title": "The Nutcracker Prince",
+   "year": 1990,
+   "rating": 6.8,
+   "votes": 2928,
+   "score": 6.6183213271103885
+  },
+  {
+   "tconst": "tt0099582",
+   "title": "Flatliners",
+   "year": 1990,
+   "rating": 6.6,
+   "votes": 99190,
+   "score": 6.595105124024113
+  },
+  {
+   "tconst": "tt0099012",
+   "title": "Alice",
+   "year": 1990,
+   "rating": 6.6,
+   "votes": 16444,
+   "score": 6.573145060724355
+  },
+  {
+   "tconst": "tt0099291",
+   "title": "Come See the Paradise",
+   "year": 1990,
+   "rating": 6.7,
+   "votes": 3310,
+   "score": 6.569056026365347
+  },
+  {
+   "tconst": "tt0100224",
+   "title": "Narrow Margin",
+   "year": 1990,
+   "rating": 6.6,
+   "votes": 12194,
+   "score": 6.565104093278849
+  },
+  {
+   "tconst": "tt0099951",
+   "title": "The Krays",
+   "year": 1990,
+   "rating": 6.6,
+   "votes": 9814,
+   "score": 6.558074106991704
+  },
+  {
+   "tconst": "tt0099310",
+   "title": "Coupe de Ville",
+   "year": 1990,
+   "rating": 6.7,
+   "votes": 2787,
+   "score": 6.554749843325673
+  },
+  {
+   "tconst": "tt0142240",
+   "title": "Dragon Ball Z: The World's Strongest",
+   "year": 1990,
+   "rating": 6.6,
+   "votes": 8370,
+   "score": 6.552236017357762
+  },
+  {
+   "tconst": "tt0100442",
+   "title": "Q&A",
+   "year": 1990,
+   "rating": 6.6,
+   "votes": 8304,
+   "score": 6.551930075698756
+  },
+  {
+   "tconst": "tt0100602",
+   "title": "A Shock to the System",
+   "year": 1990,
+   "rating": 6.6,
+   "votes": 6605,
+   "score": 6.542438988959907
+  },
+  {
+   "tconst": "tt0090665",
+   "title": "Halfaouine: Boy of the Terraces",
+   "year": 1990,
+   "rating": 6.7,
+   "votes": 2400,
+   "score": 6.541974431818181
+  },
+  {
+   "tconst": "tt0099429",
+   "title": "Dil",
+   "year": 1990,
+   "rating": 6.6,
+   "votes": 6211,
+   "score": 6.5396769577396165
+  },
+  {
+   "tconst": "tt0173283",
+   "title": "Swarg",
+   "year": 1990,
+   "rating": 6.7,
+   "votes": 2040,
+   "score": 6.527892945544553
+  },
+  {
+   "tconst": "tt0100200",
+   "title": "Mr. & Mrs. Bridge",
+   "year": 1990,
+   "rating": 6.6,
+   "votes": 3960,
+   "score": 6.516893875838925
+  },
+  {
+   "tconst": "tt0100134",
+   "title": "Men Don't Leave",
+   "year": 1990,
+   "rating": 6.6,
+   "votes": 3007,
+   "score": 6.501075993608946
+  },
+  {
+   "tconst": "tt0099700",
+   "title": "Gremlins 2: The New Batch",
+   "year": 1990,
+   "rating": 6.5,
+   "votes": 120321,
+   "score": 6.497585757964699
+  },
+  {
+   "tconst": "tt0099052",
+   "title": "Arachnophobia",
+   "year": 1990,
+   "rating": 6.5,
+   "votes": 81450,
+   "score": 6.4964612043139605
+  },
+  {
+   "tconst": "tt0099329",
+   "title": "Cry-Baby",
+   "year": 1990,
+   "rating": 6.5,
+   "votes": 69355,
+   "score": 6.49586136220307
+  },
+  {
+   "tconst": "tt0099528",
+   "title": "The Exorcist III",
+   "year": 1990,
+   "rating": 6.5,
+   "votes": 42720,
+   "score": 6.493396411001789
+  },
+  {
+   "tconst": "tt0100994",
+   "title": "Young Guns II",
+   "year": 1990,
+   "rating": 6.5,
+   "votes": 41003,
+   "score": 6.493132746552566
+  },
+  {
+   "tconst": "tt0100260",
+   "title": "Nightbreed",
+   "year": 1990,
+   "rating": 6.5,
+   "votes": 29230,
+   "score": 6.490543948126801
+  },
+  {
+   "tconst": "tt0099850",
+   "title": "Internal Affairs",
+   "year": 1990,
+   "rating": 6.5,
+   "votes": 25064,
+   "score": 6.489088364617204
+  },
+  {
+   "tconst": "tt0099615",
+   "title": "The Freshman",
+   "year": 1990,
+   "rating": 6.5,
+   "votes": 23467,
+   "score": 6.488404111202732
+  },
+  {
+   "tconst": "tt0099800",
+   "title": "House Party",
+   "year": 1990,
+   "rating": 6.5,
+   "votes": 18395,
+   "score": 6.48552034812454
+  },
+  {
+   "tconst": "tt0100201",
+   "title": "Mr. Destiny",
+   "year": 1990,
+   "rating": 6.5,
+   "votes": 14518,
+   "score": 6.482121776244097
+  },
+  {
+   "tconst": "tt0100928",
+   "title": "White Hunter Black Heart",
+   "year": 1990,
+   "rating": 6.5,
+   "votes": 14464,
+   "score": 6.482063137755102
+  },
+  {
+   "tconst": "tt0103251",
+   "title": "White Palace",
+   "year": 1990,
+   "rating": 6.5,
+   "votes": 9990,
+   "score": 6.475370100083403
+  },
+  {
+   "tconst": "tt0101531",
+   "title": "Cadence",
+   "year": 1990,
+   "rating": 6.5,
+   "votes": 6930,
+   "score": 6.466930291153415
+  },
+  {
+   "tconst": "tt0098994",
+   "title": "After Dark, My Sweet",
+   "year": 1990,
+   "rating": 6.5,
+   "votes": 4878,
+   "score": 6.457064190171561
+  },
+  {
+   "tconst": "tt0099816",
+   "title": "Shipwrecked",
+   "year": 1990,
+   "rating": 6.5,
+   "votes": 3538,
+   "score": 6.446675243770313
+  },
+  {
+   "tconst": "tt0099273",
+   "title": "City Life",
+   "year": 1990,
+   "rating": 6.5,
+   "votes": 2165,
+   "score": 6.42909663865546
+  },
+  {
+   "tconst": "tt0099365",
+   "title": "Darkman",
+   "year": 1990,
+   "rating": 6.4,
+   "votes": 75590,
+   "score": 6.398771587833484
+  },
+  {
+   "tconst": "tt0100054",
+   "title": "Lord of the Flies",
+   "year": 1990,
+   "rating": 6.4,
+   "votes": 36090,
+   "score": 6.397497702809136
+  },
+  {
+   "tconst": "tt0100318",
+   "title": "Pacific Heights",
+   "year": 1990,
+   "rating": 6.4,
+   "votes": 26119,
+   "score": 6.396610387993884
+  },
+  {
+   "tconst": "tt0098987",
+   "title": "The Adventures of Ford Fairlane",
+   "year": 1990,
+   "rating": 6.4,
+   "votes": 20436,
+   "score": 6.395751805134605
+  },
+  {
+   "tconst": "tt0099819",
+   "title": "I Love You to Death",
+   "year": 1990,
+   "rating": 6.4,
+   "votes": 16687,
+   "score": 6.39489952908439
+  },
+  {
+   "tconst": "tt0099797",
+   "title": "The Hot Spot",
+   "year": 1990,
+   "rating": 6.4,
+   "votes": 15800,
+   "score": 6.3946453651685395
+  },
+  {
+   "tconst": "tt0100143",
+   "title": "Miami Blues",
+   "year": 1990,
+   "rating": 6.4,
+   "votes": 11723,
+   "score": 6.393054543467172
+  },
+  {
+   "tconst": "tt0103035",
+   "title": "Taking Care of Business",
+   "year": 1990,
+   "rating": 6.4,
+   "votes": 10179,
+   "score": 6.392174029066426
+  },
+  {
+   "tconst": "tt0100680",
+   "title": "Stanley & Iris",
+   "year": 1990,
+   "rating": 6.4,
+   "votes": 9546,
+   "score": 6.391744976615278
+  },
+  {
+   "tconst": "tt0100623",
+   "title": "Singapore Sling",
+   "year": 1990,
+   "rating": 6.4,
+   "votes": 3271,
+   "score": 6.381917567823942
+  },
+  {
+   "tconst": "tt0100604",
+   "title": "Short Time",
+   "year": 1990,
+   "rating": 6.4,
+   "votes": 3017,
+   "score": 6.381002092884192
+  },
+  {
+   "tconst": "tt0101692",
+   "title": "Death in Brunswick",
+   "year": 1990,
+   "rating": 6.4,
+   "votes": 2008,
+   "score": 6.376219436127744
+  },
+  {
+   "tconst": "tt0149573",
+   "title": "Aashiqui",
+   "year": 1990,
+   "rating": 6.3,
+   "votes": 2339,
+   "score": 6.324127103019127
+  },
+  {
+   "tconst": "tt0121442",
+   "title": "Koko Flanel",
+   "year": 1990,
+   "rating": 6.3,
+   "votes": 2504,
+   "score": 6.323243228241562
+  },
+  {
+   "tconst": "tt0098486",
+   "title": "The Death King",
+   "year": 1990,
+   "rating": 6.3,
+   "votes": 3245,
+   "score": 6.319959485224022
+  },
+  {
+   "tconst": "tt0098606",
+   "title": "The Voice of the Moon",
+   "year": 1990,
+   "rating": 6.3,
+   "votes": 3696,
+   "score": 6.318379125702246
+  },
+  {
+   "tconst": "tt0099292",
+   "title": "The Comfort of Strangers",
+   "year": 1990,
+   "rating": 6.3,
+   "votes": 7279,
+   "score": 6.311282196357365
+  },
+  {
+   "tconst": "tt0099091",
+   "title": "Bad Influence",
+   "year": 1990,
+   "rating": 6.3,
+   "votes": 11763,
+   "score": 6.30760644481581
+  },
+  {
+   "tconst": "tt0099762",
+   "title": "Henry & June",
+   "year": 1990,
+   "rating": 6.3,
+   "votes": 15046,
+   "score": 6.306141470139622
+  },
+  {
+   "tconst": "tt0100212",
+   "title": "My Blue Heaven",
+   "year": 1990,
+   "rating": 6.3,
+   "votes": 24294,
+   "score": 6.303981421617098
+  },
+  {
+   "tconst": "tt0099699",
+   "title": "Green Card",
+   "year": 1990,
+   "rating": 6.3,
+   "votes": 27775,
+   "score": 6.303515952980688
+  },
+  {
+   "tconst": "tt0099938",
+   "title": "Kindergarten Cop",
+   "year": 1990,
+   "rating": 6.3,
+   "votes": 177743,
+   "score": 6.300582428801121
+  },
+  {
+   "tconst": "tt0100403",
+   "title": "Predator 2",
+   "year": 1990,
+   "rating": 6.3,
+   "votes": 204361,
+   "score": 6.300507302736466
+  },
+  {
+   "tconst": "tt0100496",
+   "title": "My New Partner at the Races",
+   "year": 1990,
+   "rating": 6.2,
+   "votes": 2440,
+   "score": 6.26862331081081
+  },
+  {
+   "tconst": "tt0100691",
+   "title": "Stella",
+   "year": 1990,
+   "rating": 6.2,
+   "votes": 3077,
+   "score": 6.260013295253102
+  },
+  {
+   "tconst": "tt0099581",
+   "title": "Flashback",
+   "year": 1990,
+   "rating": 6.2,
+   "votes": 6059,
+   "score": 6.237807110063283
+  },
+  {
+   "tconst": "tt0100822",
+   "title": "Tune in Tomorrow...",
+   "year": 1990,
+   "rating": 6.1,
+   "votes": 2154,
+   "score": 6.221494342802117
+  },
+  {
+   "tconst": "tt0099611",
+   "title": "Frankenhooker",
+   "year": 1990,
+   "rating": 6.2,
+   "votes": 17327,
+   "score": 6.215764862627412
+  },
+  {
+   "tconst": "tt0099180",
+   "title": "Bride of Re-Animator",
+   "year": 1990,
+   "rating": 6.2,
+   "votes": 19330,
+   "score": 6.214284458509142
+  },
+  {
+   "tconst": "tt0100740",
+   "title": "Tales from the Darkside: The Movie",
+   "year": 1990,
+   "rating": 6.2,
+   "votes": 21218,
+   "score": 6.2131229003359465
+  },
+  {
+   "tconst": "tt0100485",
+   "title": "Revenge",
+   "year": 1990,
+   "rating": 6.2,
+   "votes": 23031,
+   "score": 6.2121724062162915
+  },
+  {
+   "tconst": "tt0100029",
+   "title": "Lionheart",
+   "year": 1990,
+   "rating": 6.2,
+   "votes": 43701,
+   "score": 6.206666976652589
+  },
+  {
+   "tconst": "tt0099422",
+   "title": "Dick Tracy",
+   "year": 1990,
+   "rating": 6.2,
+   "votes": 70744,
+   "score": 6.204188489772353
+  },
+  {
+   "tconst": "tt0099371",
+   "title": "Days of Thunder",
+   "year": 1990,
+   "rating": 6.2,
+   "votes": 106673,
+   "score": 6.202803709293017
+  },
+  {
+   "tconst": "tt0096871",
+   "title": "Baby Blood",
+   "year": 1990,
+   "rating": 6,
+   "votes": 2816,
+   "score": 6.146322155315614
+  },
+  {
+   "tconst": "tt0100827",
+   "title": "Two Evil Eyes",
+   "year": 1990,
+   "rating": 6.1,
+   "votes": 9236,
+   "score": 6.1449170078319675
+  },
+  {
+   "tconst": "tt0099747",
+   "title": "Havana",
+   "year": 1990,
+   "rating": 6.1,
+   "votes": 9267,
+   "score": 6.1447934232715005
+  },
+  {
+   "tconst": "tt0103069",
+   "title": "Texasville",
+   "year": 1990,
+   "rating": 6,
+   "votes": 3340,
+   "score": 6.13196395131086
+  },
+  {
+   "tconst": "tt0100828",
+   "title": "The Two Jakes",
+   "year": 1990,
+   "rating": 6.1,
+   "votes": 15843,
+   "score": 6.1282849016420995
+  },
+  {
+   "tconst": "tt0099817",
+   "title": "I Come in Peace",
+   "year": 1990,
+   "rating": 6.1,
+   "votes": 16606,
+   "score": 6.127124986563473
+  },
+  {
+   "tconst": "tt0100301",
+   "title": "Opportunity Knocks",
+   "year": 1990,
+   "rating": 6,
+   "votes": 3685,
+   "score": 6.123955584872471
+  },
+  {
+   "tconst": "tt0099080",
+   "title": "Baaghi: A Rebel for Love",
+   "year": 1990,
+   "rating": 5.9,
+   "votes": 2048,
+   "score": 6.123489995059288
+  },
+  {
+   "tconst": "tt0100530",
+   "title": "The Russia House",
+   "year": 1990,
+   "rating": 6.1,
+   "votes": 19907,
+   "score": 6.123037727666956
+  },
+  {
+   "tconst": "tt0102217",
+   "title": "The King of the Kickboxers",
+   "year": 1990,
+   "rating": 5.9,
+   "votes": 2324,
+   "score": 6.109224676225716
+  },
+  {
+   "tconst": "tt0099316",
+   "title": "Crazy People",
+   "year": 1990,
+   "rating": 6,
+   "votes": 5134,
+   "score": 6.098778735632184
+  },
+  {
+   "tconst": "tt0099026",
+   "title": "The Ambulance",
+   "year": 1990,
+   "rating": 6,
+   "votes": 5230,
+   "score": 6.0974671507607185
+  },
+  {
+   "tconst": "tt0100031",
+   "title": "Lisa",
+   "year": 1990,
+   "rating": 5.9,
+   "votes": 2755,
+   "score": 6.09026025236593
+  },
+  {
+   "tconst": "tt0100161",
+   "title": "Mister Frost",
+   "year": 1990,
+   "rating": 5.9,
+   "votes": 3160,
+   "score": 6.0753270348837205
+  },
+  {
+   "tconst": "tt0099142",
+   "title": "BlackJack",
+   "year": 1990,
+   "rating": 5.8,
+   "votes": 2085,
+   "score": 6.070425336597305
+  },
+  {
+   "tconst": "tt0100280",
+   "title": "Nuns on the Run",
+   "year": 1990,
+   "rating": 6,
+   "votes": 9771,
+   "score": 6.0598664089711995
+  },
+  {
+   "tconst": "tt0099731",
+   "title": "The Handmaid's Tale",
+   "year": 1990,
+   "rating": 6,
+   "votes": 12588,
+   "score": 6.048305970660817
+  },
+  {
+   "tconst": "tt0099740",
+   "title": "Hardware",
+   "year": 1990,
+   "rating": 6,
+   "votes": 16924,
+   "score": 6.037237766856901
+  },
+  {
+   "tconst": "tt0101268",
+   "title": "Across the Tracks",
+   "year": 1990,
+   "rating": 5.8,
+   "votes": 3050,
+   "score": 6.018749999999999
+  },
+  {
+   "tconst": "tt0099141",
+   "title": "Bird on a Wire",
+   "year": 1990,
+   "rating": 6,
+   "votes": 51326,
+   "score": 6.013214707647301
+  },
+  {
+   "tconst": "tt0099253",
+   "title": "Child's Play 2",
+   "year": 1990,
+   "rating": 6,
+   "votes": 65465,
+   "score": 6.010445230860446
+  },
+  {
+   "tconst": "tt0100911",
+   "title": "Welcome Home, Roxy Carmichael",
+   "year": 1990,
+   "rating": 5.9,
+   "votes": 6677,
+   "score": 6.004262706004379
+  },
+  {
+   "tconst": "tt0099460",
+   "title": "Downtown",
+   "year": 1990,
+   "rating": 5.7,
+   "votes": 2350,
+   "score": 5.99992816091954
+  },
+  {
+   "tconst": "tt0100107",
+   "title": "Maniac Cop 2",
+   "year": 1990,
+   "rating": 5.9,
+   "votes": 10056,
+   "score": 5.975040436297279
+  },
+  {
+   "tconst": "tt0099277",
+   "title": "Class of 1999",
+   "year": 1990,
+   "rating": 5.9,
+   "votes": 10069,
+   "score": 5.974959607258265
+  },
+  {
+   "tconst": "tt0099450",
+   "title": "The Boyfriend School",
+   "year": 1990,
+   "rating": 5.7,
+   "votes": 3561,
+   "score": 5.93461382844812
+  },
+  {
+   "tconst": "tt0100114",
+   "title": "Marked for Death",
+   "year": 1990,
+   "rating": 5.9,
+   "votes": 26616,
+   "score": 5.93161474350014
+  },
+  {
+   "tconst": "tt0099173",
+   "title": "Brain Dead",
+   "year": 1990,
+   "rating": 5.8,
+   "votes": 6539,
+   "score": 5.929369656868485
+  },
+  {
+   "tconst": "tt0100135",
+   "title": "Men at Work",
+   "year": 1990,
+   "rating": 5.9,
+   "votes": 29878,
+   "score": 5.928379681912291
+  },
+  {
+   "tconst": "tt0100514",
+   "title": "The Rookie",
+   "year": 1990,
+   "rating": 5.9,
+   "votes": 32071,
+   "score": 5.926553006956063
+  },
+  {
+   "tconst": "tt0117609",
+   "title": "Sgt. Kabukiman N.Y.P.D.",
+   "year": 1990,
+   "rating": 5.7,
+   "votes": 3774,
+   "score": 5.925959040526497
+  },
+  {
+   "tconst": "tt0099892",
+   "title": "Joe Versus the Volcano",
+   "year": 1990,
+   "rating": 5.9,
+   "votes": 42533,
+   "score": 5.920314991130173
+  },
+  {
+   "tconst": "tt0100613",
+   "title": "Side Out",
+   "year": 1990,
+   "rating": 5.6,
+   "votes": 2716,
+   "score": 5.919060114503816
+  },
+  {
+   "tconst": "tt0099044",
+   "title": "Another 48 Hrs.",
+   "year": 1990,
+   "rating": 5.9,
+   "votes": 48177,
+   "score": 5.918029924068797
+  },
+  {
+   "tconst": "tt0100502",
+   "title": "RoboCop 2",
+   "year": 1990,
+   "rating": 5.9,
+   "votes": 100993,
+   "score": 5.9087839707552945
+  },
+  {
+   "tconst": "tt0099128",
+   "title": "Betsy's Wedding",
+   "year": 1990,
+   "rating": 5.7,
+   "votes": 4281,
+   "score": 5.907719710237222
+  },
+  {
+   "tconst": "tt0102703",
+   "title": "Prayer of the Rollerboys",
+   "year": 1990,
+   "rating": 5.6,
+   "votes": 3056,
+   "score": 5.89760433148734
+  },
+  {
+   "tconst": "tt0099606",
+   "title": "The Fourth War",
+   "year": 1990,
+   "rating": 5.5,
+   "votes": 2293,
+   "score": 5.897085371535056
+  },
+  {
+   "tconst": "tt0099578",
+   "title": "The First Power",
+   "year": 1990,
+   "rating": 5.7,
+   "votes": 5902,
+   "score": 5.865108516831181
+  }
+ ]
+}

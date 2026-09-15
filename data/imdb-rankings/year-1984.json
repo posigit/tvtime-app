@@ -1,0 +1,1608 @@
+{
+ "tag": "year-1984",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.419,
+ "minVotes": 2000,
+ "items": [
+  {
+   "tconst": "tt0088178",
+   "title": "Stop Making Sense",
+   "year": 1984,
+   "rating": 8.7,
+   "votes": 24535,
+   "score": 8.528111477410866
+  },
+  {
+   "tconst": "tt0086935",
+   "title": "Balkan Spy",
+   "year": 1984,
+   "rating": 8.7,
+   "votes": 13589,
+   "score": 8.407417926300425
+  },
+  {
+   "tconst": "tt0086879",
+   "title": "Amadeus",
+   "year": 1984,
+   "rating": 8.4,
+   "votes": 473327,
+   "score": 8.391666659064386
+  },
+  {
+   "tconst": "tt0087843",
+   "title": "Once Upon a Time in America",
+   "year": 1984,
+   "rating": 8.3,
+   "votes": 412101,
+   "score": 8.290917525079866
+  },
+  {
+   "tconst": "tt0088247",
+   "title": "The Terminator",
+   "year": 1984,
+   "rating": 8.1,
+   "votes": 1018092,
+   "score": 8.096705138412121
+  },
+  {
+   "tconst": "tt0087884",
+   "title": "Paris, Texas",
+   "year": 1984,
+   "rating": 8.1,
+   "votes": 144744,
+   "score": 8.07709574533267
+  },
+  {
+   "tconst": "tt0087544",
+   "title": "Nausicaä of the Valley of the Wind",
+   "year": 1984,
+   "rating": 8,
+   "votes": 199355,
+   "score": 7.984301050647351
+  },
+  {
+   "tconst": "tt0088338",
+   "title": "The Elusive Summer of '68",
+   "year": 1984,
+   "rating": 8.4,
+   "votes": 6805,
+   "score": 7.9501349293693755
+  },
+  {
+   "tconst": "tt0088258",
+   "title": "This Is Spinal Tap",
+   "year": 1984,
+   "rating": 7.9,
+   "votes": 161674,
+   "score": 7.88190878241564
+  },
+  {
+   "tconst": "tt0088275",
+   "title": "The Times of Harvey Milk",
+   "year": 1984,
+   "rating": 8.2,
+   "votes": 7297,
+   "score": 7.816966554060164
+  },
+  {
+   "tconst": "tt0087332",
+   "title": "Ghostbusters",
+   "year": 1984,
+   "rating": 7.8,
+   "votes": 490714,
+   "score": 7.794396217791857
+  },
+  {
+   "tconst": "tt0263776",
+   "title": "The Honest One",
+   "year": 1984,
+   "rating": 8.1,
+   "votes": 8173,
+   "score": 7.769609559923065
+  },
+  {
+   "tconst": "tt0087553",
+   "title": "The Killing Fields",
+   "year": 1984,
+   "rating": 7.8,
+   "votes": 64327,
+   "score": 7.758371976014253
+  },
+  {
+   "tconst": "tt0088040",
+   "title": "The Holy Innocents",
+   "year": 1984,
+   "rating": 8.1,
+   "votes": 5391,
+   "score": 7.645249364510533
+  },
+  {
+   "tconst": "tt0283524",
+   "title": "Opasen char",
+   "year": 1984,
+   "rating": 8.8,
+   "votes": 2090,
+   "score": 7.635926174351431
+  },
+  {
+   "tconst": "tt0088196",
+   "title": "Streetwise",
+   "year": 1984,
+   "rating": 8.2,
+   "votes": 3861,
+   "score": 7.59241393159825
+  },
+  {
+   "tconst": "tt0093754",
+   "title": "Repentance",
+   "year": 1984,
+   "rating": 8,
+   "votes": 5512,
+   "score": 7.579198356376111
+  },
+  {
+   "tconst": "tt0087123",
+   "title": "Strangler vs. Strangler",
+   "year": 1984,
+   "rating": 8,
+   "votes": 5053,
+   "score": 7.55181313669323
+  },
+  {
+   "tconst": "tt0087469",
+   "title": "Indiana Jones and the Temple of Doom",
+   "year": 1984,
+   "rating": 7.5,
+   "votes": 573788,
+   "score": 7.496246774946851
+  },
+  {
+   "tconst": "tt0086979",
+   "title": "Blood Simple",
+   "year": 1984,
+   "rating": 7.5,
+   "votes": 115119,
+   "score": 7.481548152333075
+  },
+  {
+   "tconst": "tt0090368",
+   "title": "A Cruel Romance",
+   "year": 1984,
+   "rating": 7.9,
+   "votes": 4483,
+   "score": 7.443257450732277
+  },
+  {
+   "tconst": "tt0134402",
+   "title": "Twenty Years Later",
+   "year": 1984,
+   "rating": 8.3,
+   "votes": 2239,
+   "score": 7.41274783040749
+  },
+  {
+   "tconst": "tt0087800",
+   "title": "A Nightmare on Elm Street",
+   "year": 1984,
+   "rating": 7.4,
+   "votes": 294745,
+   "score": 7.3933914237918
+  },
+  {
+   "tconst": "tt0087538",
+   "title": "The Karate Kid",
+   "year": 1984,
+   "rating": 7.4,
+   "votes": 274697,
+   "score": 7.392912601340446
+  },
+  {
+   "tconst": "tt0086960",
+   "title": "Beverly Hills Cop",
+   "year": 1984,
+   "rating": 7.4,
+   "votes": 234583,
+   "score": 7.3917108923849035
+  },
+  {
+   "tconst": "tt0088083",
+   "title": "Sexmission",
+   "year": 1984,
+   "rating": 7.5,
+   "votes": 15962,
+   "score": 7.379687008857441
+  },
+  {
+   "tconst": "tt0087781",
+   "title": "The Natural",
+   "year": 1984,
+   "rating": 7.4,
+   "votes": 58365,
+   "score": 7.3675132618752155
+  },
+  {
+   "tconst": "tt0087814",
+   "title": "Nothing Left to Do but Cry",
+   "year": 1984,
+   "rating": 7.6,
+   "votes": 8113,
+   "score": 7.36653199378002
+  },
+  {
+   "tconst": "tt0088184",
+   "title": "Stranger Than Paradise",
+   "year": 1984,
+   "rating": 7.4,
+   "votes": 43690,
+   "score": 7.357078968113314
+  },
+  {
+   "tconst": "tt0087644",
+   "title": "Love Streams",
+   "year": 1984,
+   "rating": 7.6,
+   "votes": 7566,
+   "score": 7.353181899759288
+  },
+  {
+   "tconst": "tt0087003",
+   "title": "Broadway Danny Rose",
+   "year": 1984,
+   "rating": 7.4,
+   "votes": 28417,
+   "score": 7.335527437061424
+  },
+  {
+   "tconst": "tt0252245",
+   "title": "Atla Gel Saban",
+   "year": 1984,
+   "rating": 7.6,
+   "votes": 5910,
+   "score": 7.301509235536959
+  },
+  {
+   "tconst": "tt0087363",
+   "title": "Gremlins",
+   "year": 1984,
+   "rating": 7.3,
+   "votes": 277475,
+   "score": 7.293698678068154
+  },
+  {
+   "tconst": "tt0087921",
+   "title": "Places in the Heart",
+   "year": 1984,
+   "rating": 7.4,
+   "votes": 15927,
+   "score": 7.290608470636322
+  },
+  {
+   "tconst": "tt0088323",
+   "title": "The NeverEnding Story",
+   "year": 1984,
+   "rating": 7.3,
+   "votes": 172590,
+   "score": 7.289913156842301
+  },
+  {
+   "tconst": "tt0087537",
+   "title": "Kaos",
+   "year": 1984,
+   "rating": 7.8,
+   "votes": 3405,
+   "score": 7.289165227215049
+  },
+  {
+   "tconst": "tt0088031",
+   "title": "Saaransh",
+   "year": 1984,
+   "rating": 8.1,
+   "votes": 2131,
+   "score": 7.286380550253534
+  },
+  {
+   "tconst": "tt0123976",
+   "title": "Loafing and Camouflage",
+   "year": 1984,
+   "rating": 7.7,
+   "votes": 4041,
+   "score": 7.276053311222867
+  },
+  {
+   "tconst": "tt0088241",
+   "title": "Voyage to Cythera",
+   "year": 1984,
+   "rating": 7.7,
+   "votes": 3627,
+   "score": 7.244861925199458
+  },
+  {
+   "tconst": "tt0087892",
+   "title": "A Passage to India",
+   "year": 1984,
+   "rating": 7.3,
+   "votes": 23556,
+   "score": 7.231090078772004
+  },
+  {
+   "tconst": "tt0087660",
+   "title": "Macross: Do You Remember Love?",
+   "year": 1984,
+   "rating": 7.6,
+   "votes": 3792,
+   "score": 7.192358089277857
+  },
+  {
+   "tconst": "tt0088015",
+   "title": "Ronia: The Robber's Daughter",
+   "year": 1984,
+   "rating": 7.3,
+   "votes": 13097,
+   "score": 7.183350205543972
+  },
+  {
+   "tconst": "tt0088286",
+   "title": "Top Secret!",
+   "year": 1984,
+   "rating": 7.2,
+   "votes": 83664,
+   "score": 7.18177691974572
+  },
+  {
+   "tconst": "tt0086969",
+   "title": "Birdy",
+   "year": 1984,
+   "rating": 7.2,
+   "votes": 26852,
+   "score": 7.145894151292712
+  },
+  {
+   "tconst": "tt0088992",
+   "title": "The Runner",
+   "year": 1984,
+   "rating": 7.6,
+   "votes": 2963,
+   "score": 7.124267187809258
+  },
+  {
+   "tconst": "tt0088146",
+   "title": "A Soldier's Story",
+   "year": 1984,
+   "rating": 7.2,
+   "votes": 12769,
+   "score": 7.094301445805224
+  },
+  {
+   "tconst": "tt0086606",
+   "title": "The Eight Diagram Pole Fighter",
+   "year": 1984,
+   "rating": 7.4,
+   "votes": 4183,
+   "score": 7.0828300263783515
+  },
+  {
+   "tconst": "tt0086993",
+   "title": "The Bounty",
+   "year": 1984,
+   "rating": 7.1,
+   "votes": 35383,
+   "score": 7.063591419979599
+  },
+  {
+   "tconst": "tt0088318",
+   "title": "A Sunday in the Country",
+   "year": 1984,
+   "rating": 7.4,
+   "votes": 3537,
+   "score": 7.045825908090546
+  },
+  {
+   "tconst": "tt0085335",
+   "title": "Scarecrow",
+   "year": 1984,
+   "rating": 7.6,
+   "votes": 2149,
+   "score": 7.030932285634453
+  },
+  {
+   "tconst": "tt0087164",
+   "title": "A Summer at Grandpa's",
+   "year": 1984,
+   "rating": 7.6,
+   "votes": 2146,
+   "score": 7.03052051449526
+  },
+  {
+   "tconst": "tt0087481",
+   "title": "Double Trouble",
+   "year": 1984,
+   "rating": 7.1,
+   "votes": 13047,
+   "score": 7.009545959533285
+  },
+  {
+   "tconst": "tt0085240",
+   "title": "Bianca",
+   "year": 1984,
+   "rating": 7.3,
+   "votes": 4063,
+   "score": 7.009539510654354
+  },
+  {
+   "tconst": "tt0087821",
+   "title": "Full Moon in Paris",
+   "year": 1984,
+   "rating": 7.2,
+   "votes": 6116,
+   "score": 7.00765624114063
+  },
+  {
+   "tconst": "tt0088461",
+   "title": "What Have I Done to Deserve This?",
+   "year": 1984,
+   "rating": 7.1,
+   "votes": 12220,
+   "score": 7.004285376448476
+  },
+  {
+   "tconst": "tt0087373",
+   "title": "The Dog Who Stopped the War",
+   "year": 1984,
+   "rating": 7.5,
+   "votes": 2346,
+   "score": 7.002746905912874
+  },
+  {
+   "tconst": "tt0088002",
+   "title": "My New Partner",
+   "year": 1984,
+   "rating": 7.2,
+   "votes": 5632,
+   "score": 6.995458340290533
+  },
+  {
+   "tconst": "tt0088128",
+   "title": "Sixteen Candles",
+   "year": 1984,
+   "rating": 7,
+   "votes": 136514,
+   "score": 6.991617728555218
+  },
+  {
+   "tconst": "tt0087803",
+   "title": "1984",
+   "year": 1984,
+   "rating": 7,
+   "votes": 89610,
+   "score": 6.987326034855337
+  },
+  {
+   "tconst": "tt0088172",
+   "title": "Starman",
+   "year": 1984,
+   "rating": 7,
+   "votes": 59509,
+   "score": 6.981123706337241
+  },
+  {
+   "tconst": "tt0088099",
+   "title": "Sharaabi",
+   "year": 1984,
+   "rating": 7.3,
+   "votes": 3463,
+   "score": 6.977638303697116
+  },
+  {
+   "tconst": "tt0087328",
+   "title": "The Home and the World",
+   "year": 1984,
+   "rating": 7.5,
+   "votes": 2053,
+   "score": 6.966799420946792
+  },
+  {
+   "tconst": "tt0088334",
+   "title": "Urusei Yatsura 2: Beautiful Dreamer",
+   "year": 1984,
+   "rating": 7.4,
+   "votes": 2484,
+   "score": 6.962653446275056
+  },
+  {
+   "tconst": "tt0087578",
+   "title": "Wheels on Meals",
+   "year": 1984,
+   "rating": 7,
+   "votes": 17522,
+   "score": 6.940525461176998
+  },
+  {
+   "tconst": "tt0088074",
+   "title": "Secret Honor",
+   "year": 1984,
+   "rating": 7.2,
+   "votes": 3774,
+   "score": 6.9296394272769914
+  },
+  {
+   "tconst": "tt0253420",
+   "title": "Ortadirek Saban",
+   "year": 1984,
+   "rating": 7.1,
+   "votes": 5575,
+   "score": 6.920321855194369
+  },
+  {
+   "tconst": "tt0087414",
+   "title": "The Hit",
+   "year": 1984,
+   "rating": 7,
+   "votes": 11596,
+   "score": 6.914602681163383
+  },
+  {
+   "tconst": "tt0088011",
+   "title": "Romancing the Stone",
+   "year": 1984,
+   "rating": 6.9,
+   "votes": 113183,
+   "score": 6.891656217090173
+  },
+  {
+   "tconst": "tt0088299",
+   "title": "Twist and Shout",
+   "year": 1984,
+   "rating": 7.3,
+   "votes": 2132,
+   "score": 6.873799141601488
+  },
+  {
+   "tconst": "tt0087755",
+   "title": "The Muppets Take Manhattan",
+   "year": 1984,
+   "rating": 6.9,
+   "votes": 24497,
+   "score": 6.86372940533258
+  },
+  {
+   "tconst": "tt0089746",
+   "title": "The Funeral",
+   "year": 1984,
+   "rating": 7.2,
+   "votes": 2350,
+   "score": 6.8411351846200805
+  },
+  {
+   "tconst": "tt0253499",
+   "title": "The Postman",
+   "year": 1984,
+   "rating": 7,
+   "votes": 5239,
+   "score": 6.83961017448506
+  },
+  {
+   "tconst": "tt0087433",
+   "title": "Yellow Earth",
+   "year": 1984,
+   "rating": 7.1,
+   "votes": 2808,
+   "score": 6.816917232341379
+  },
+  {
+   "tconst": "tt0086904",
+   "title": "Another Country",
+   "year": 1984,
+   "rating": 6.9,
+   "votes": 8115,
+   "score": 6.804986461008141
+  },
+  {
+   "tconst": "tt0087995",
+   "title": "Repo Man",
+   "year": 1984,
+   "rating": 6.8,
+   "votes": 46181,
+   "score": 6.784204106454771
+  },
+  {
+   "tconst": "tt0086984",
+   "title": "Body Double",
+   "year": 1984,
+   "rating": 6.8,
+   "votes": 46115,
+   "score": 6.784182439012727
+  },
+  {
+   "tconst": "tt0087060",
+   "title": "Ciske the Rat",
+   "year": 1984,
+   "rating": 7,
+   "votes": 3190,
+   "score": 6.776288642215289
+  },
+  {
+   "tconst": "tt0088412",
+   "title": "Where the Green Ants Dream",
+   "year": 1984,
+   "rating": 7,
+   "votes": 2996,
+   "score": 6.767601691973049
+  },
+  {
+   "tconst": "tt0087004",
+   "title": "The Brother from Another Planet",
+   "year": 1984,
+   "rating": 6.8,
+   "votes": 7127,
+   "score": 6.716614227358097
+  },
+  {
+   "tconst": "tt0088322",
+   "title": "Under the Volcano",
+   "year": 1984,
+   "rating": 6.8,
+   "votes": 6914,
+   "score": 6.714621724601452
+  },
+  {
+   "tconst": "tt0087677",
+   "title": "The Man from Majorca",
+   "year": 1984,
+   "rating": 6.9,
+   "votes": 3068,
+   "score": 6.710366624525918
+  },
+  {
+   "tconst": "tt0086874",
+   "title": "L'allenatore nel pallone",
+   "year": 1984,
+   "rating": 6.9,
+   "votes": 3014,
+   "score": 6.708324302572269
+  },
+  {
+   "tconst": "tt0087971",
+   "title": "The Country Boy",
+   "year": 1984,
+   "rating": 6.9,
+   "votes": 2765,
+   "score": 6.698308090891365
+  },
+  {
+   "tconst": "tt0087928",
+   "title": "Police Academy",
+   "year": 1984,
+   "rating": 6.7,
+   "votes": 150642,
+   "score": 6.696324327859288
+  },
+  {
+   "tconst": "tt0088170",
+   "title": "Star Trek III: The Search for Spock",
+   "year": 1984,
+   "rating": 6.7,
+   "votes": 91538,
+   "score": 6.6940017752474645
+  },
+  {
+   "tconst": "tt0086837",
+   "title": "2010: The Year We Make Contact",
+   "year": 1984,
+   "rating": 6.7,
+   "votes": 61639,
+   "score": 6.691183677510605
+  },
+  {
+   "tconst": "tt0087597",
+   "title": "The Last Starfighter",
+   "year": 1984,
+   "rating": 6.7,
+   "votes": 50359,
+   "score": 6.689284326535979
+  },
+  {
+   "tconst": "tt0086994",
+   "title": "Boy Meets Girl",
+   "year": 1984,
+   "rating": 6.8,
+   "votes": 4455,
+   "score": 6.6820972971490855
+  },
+  {
+   "tconst": "tt0088194",
+   "title": "Streets of Fire",
+   "year": 1984,
+   "rating": 6.7,
+   "votes": 27853,
+   "score": 6.681205843737559
+  },
+  {
+   "tconst": "tt0086873",
+   "title": "All of Me",
+   "year": 1984,
+   "rating": 6.7,
+   "votes": 21546,
+   "score": 6.676171666231944
+  },
+  {
+   "tconst": "tt9015178",
+   "title": "The Return of Godzilla",
+   "year": 1984,
+   "rating": 6.8,
+   "votes": 3848,
+   "score": 6.669859448204061
+  },
+  {
+   "tconst": "tt0087720",
+   "title": "In the Middle of the Night",
+   "year": 1984,
+   "rating": 6.8,
+   "votes": 3263,
+   "score": 6.655393891905252
+  },
+  {
+   "tconst": "tt0088336",
+   "title": "Uuno Turhapuro armeijan leivissä",
+   "year": 1984,
+   "rating": 6.8,
+   "votes": 2735,
+   "score": 6.639268860210633
+  },
+  {
+   "tconst": "tt0087054",
+   "title": "Choose Me",
+   "year": 1984,
+   "rating": 6.7,
+   "votes": 3573,
+   "score": 6.599324969154377
+  },
+  {
+   "tconst": "tt0252414",
+   "title": "En Büyük Saban",
+   "year": 1984,
+   "rating": 6.7,
+   "votes": 3515,
+   "score": 6.598266192764705
+  },
+  {
+   "tconst": "tt0087277",
+   "title": "Footloose",
+   "year": 1984,
+   "rating": 6.6,
+   "votes": 103167,
+   "score": 6.596566775253619
+  },
+  {
+   "tconst": "tt0088000",
+   "title": "Revenge of the Nerds",
+   "year": 1984,
+   "rating": 6.6,
+   "votes": 62795,
+   "score": 6.59442762640786
+  },
+  {
+   "tconst": "tt0087089",
+   "title": "The Cotton Club",
+   "year": 1984,
+   "rating": 6.6,
+   "votes": 21382,
+   "score": 6.584558123902888
+  },
+  {
+   "tconst": "tt0087075",
+   "title": "The Company of Wolves",
+   "year": 1984,
+   "rating": 6.6,
+   "votes": 21261,
+   "score": 6.58447779773429
+  },
+  {
+   "tconst": "tt0087432",
+   "title": "When the Raven Flies",
+   "year": 1984,
+   "rating": 6.7,
+   "votes": 2750,
+   "score": 6.581881695388915
+  },
+  {
+   "tconst": "tt0087280",
+   "title": "The Element of Crime",
+   "year": 1984,
+   "rating": 6.6,
+   "votes": 12382,
+   "score": 6.574894872277663
+  },
+  {
+   "tconst": "tt0087932",
+   "title": "The Pope of Greenwich Village",
+   "year": 1984,
+   "rating": 6.6,
+   "votes": 11211,
+   "score": 6.572669597539728
+  },
+  {
+   "tconst": "tt0087065",
+   "title": "Cloak & Dagger",
+   "year": 1984,
+   "rating": 6.6,
+   "votes": 9346,
+   "score": 6.5681771596243035
+  },
+  {
+   "tconst": "tt0087968",
+   "title": "Racing with the Moon",
+   "year": 1984,
+   "rating": 6.6,
+   "votes": 5698,
+   "score": 6.553096655377676
+  },
+  {
+   "tconst": "tt0087072",
+   "title": "Comfort and Joy",
+   "year": 1984,
+   "rating": 6.6,
+   "votes": 2640,
+   "score": 6.5221849252364965
+  },
+  {
+   "tconst": "tt0087091",
+   "title": "Country",
+   "year": 1984,
+   "rating": 6.6,
+   "votes": 2440,
+   "score": 6.518679741688592
+  },
+  {
+   "tconst": "tt0087957",
+   "title": "Purple Rain",
+   "year": 1984,
+   "rating": 6.5,
+   "votes": 26818,
+   "score": 6.494411064372869
+  },
+  {
+   "tconst": "tt0087507",
+   "title": "Johnny Dangerously",
+   "year": 1984,
+   "rating": 6.5,
+   "votes": 17760,
+   "score": 6.491849091755938
+  },
+  {
+   "tconst": "tt0087233",
+   "title": "Falling in Love",
+   "year": 1984,
+   "rating": 6.5,
+   "votes": 17002,
+   "score": 6.491523947642214
+  },
+  {
+   "tconst": "tt0087747",
+   "title": "Moscow on the Hudson",
+   "year": 1984,
+   "rating": 6.5,
+   "votes": 14329,
+   "score": 6.4901364476145105
+  },
+  {
+   "tconst": "tt0086946",
+   "title": "Beat Street",
+   "year": 1984,
+   "rating": 6.5,
+   "votes": 4848,
+   "score": 6.476480439996692
+  },
+  {
+   "tconst": "tt0089838",
+   "title": "A Private Function",
+   "year": 1984,
+   "rating": 6.5,
+   "votes": 3776,
+   "score": 6.472115313901895
+  },
+  {
+   "tconst": "tt0087682",
+   "title": "Maria's Lovers",
+   "year": 1984,
+   "rating": 6.5,
+   "votes": 3207,
+   "score": 6.46906818765073
+  },
+  {
+   "tconst": "tt0088315",
+   "title": "Swann in Love",
+   "year": 1984,
+   "rating": 6.5,
+   "votes": 2480,
+   "score": 6.464048672566372
+  },
+  {
+   "tconst": "tt0087250",
+   "title": "The Public Woman",
+   "year": 1984,
+   "rating": 6.4,
+   "votes": 2047,
+   "score": 6.409621461106338
+  },
+  {
+   "tconst": "tt0087313",
+   "title": "Garbo Talks",
+   "year": 1984,
+   "rating": 6.4,
+   "votes": 2081,
+   "score": 6.409541301910647
+  },
+  {
+   "tconst": "tt0088249",
+   "title": "Terror in the Aisles",
+   "year": 1984,
+   "rating": 6.4,
+   "votes": 2503,
+   "score": 6.408647135931012
+  },
+  {
+   "tconst": "tt0088050",
+   "title": "Darlings!",
+   "year": 1984,
+   "rating": 6.4,
+   "votes": 2527,
+   "score": 6.408601292930715
+  },
+  {
+   "tconst": "tt0087268",
+   "title": "Flashpoint",
+   "year": 1984,
+   "rating": 6.4,
+   "votes": 3546,
+   "score": 6.4070209255494674
+  },
+  {
+   "tconst": "tt0089753",
+   "title": "Holly - The Movie",
+   "year": 1984,
+   "rating": 6.4,
+   "votes": 5089,
+   "score": 6.40549274271369
+  },
+  {
+   "tconst": "tt0087980",
+   "title": "The Razor's Edge",
+   "year": 1984,
+   "rating": 6.4,
+   "votes": 6379,
+   "score": 6.4046471002622445
+  },
+  {
+   "tconst": "tt0087100",
+   "title": "Crimes of Passion",
+   "year": 1984,
+   "rating": 6.4,
+   "votes": 9840,
+   "score": 6.403288686917006
+  },
+  {
+   "tconst": "tt0087197",
+   "title": "Electric Dreams",
+   "year": 1984,
+   "rating": 6.4,
+   "votes": 10059,
+   "score": 6.403228962028141
+  },
+  {
+   "tconst": "tt0087365",
+   "title": "Greystoke: The Legend of Tarzan, Lord of the Apes",
+   "year": 1984,
+   "rating": 6.4,
+   "votes": 21457,
+   "score": 6.401659975832262
+  },
+  {
+   "tconst": "tt0087985",
+   "title": "Red Dawn",
+   "year": 1984,
+   "rating": 6.4,
+   "votes": 69546,
+   "score": 6.4005442380160655
+  },
+  {
+   "tconst": "tt0087527",
+   "title": "The Jönsson Gang Gets Gold Fever",
+   "year": 1984,
+   "rating": 6.3,
+   "votes": 4806,
+   "score": 6.335106972244688
+  },
+  {
+   "tconst": "tt0088007",
+   "title": "The River",
+   "year": 1984,
+   "rating": 6.3,
+   "votes": 8448,
+   "score": 6.322869262356178
+  },
+  {
+   "tconst": "tt0087175",
+   "title": "Dreamscape",
+   "year": 1984,
+   "rating": 6.3,
+   "votes": 18904,
+   "score": 6.311430255123295
+  },
+  {
+   "tconst": "tt0088272",
+   "title": "Tightrope",
+   "year": 1984,
+   "rating": 6.3,
+   "votes": 21122,
+   "score": 6.31033379695084
+  },
+  {
+   "tconst": "tt0087799",
+   "title": "Night of the Comet",
+   "year": 1984,
+   "rating": 6.3,
+   "votes": 27413,
+   "score": 6.308123552616101
+  },
+  {
+   "tconst": "tt0086927",
+   "title": "Bachelor Party",
+   "year": 1984,
+   "rating": 6.3,
+   "votes": 44081,
+   "score": 6.305185175085119
+  },
+  {
+   "tconst": "tt0088161",
+   "title": "Splash",
+   "year": 1984,
+   "rating": 6.3,
+   "votes": 89263,
+   "score": 6.302618126218701
+  },
+  {
+   "tconst": "tt0087983",
+   "title": "Reckless",
+   "year": 1984,
+   "rating": 6.2,
+   "votes": 2709,
+   "score": 6.2932125829469845
+  },
+  {
+   "tconst": "tt0087514",
+   "title": "Happy Easter",
+   "year": 1984,
+   "rating": 6.2,
+   "votes": 3369,
+   "score": 6.281754154050541
+  },
+  {
+   "tconst": "tt0087263",
+   "title": "Firstborn",
+   "year": 1984,
+   "rating": 6.2,
+   "votes": 3465,
+   "score": 6.280318033503632
+  },
+  {
+   "tconst": "tt0090866",
+   "title": "Combat Shock",
+   "year": 1984,
+   "rating": 6.2,
+   "votes": 3747,
+   "score": 6.276376901530773
+  },
+  {
+   "tconst": "tt0253616",
+   "title": "Sabaniye",
+   "year": 1984,
+   "rating": 6.2,
+   "votes": 4285,
+   "score": 6.269838990150731
+  },
+  {
+   "tconst": "tt0088044",
+   "title": "Savage Streets",
+   "year": 1984,
+   "rating": 6.2,
+   "votes": 6410,
+   "score": 6.252192396325487
+  },
+  {
+   "tconst": "tt0087452",
+   "title": "Iceman",
+   "year": 1984,
+   "rating": 6.2,
+   "votes": 6588,
+   "score": 6.251110625651764
+  },
+  {
+   "tconst": "tt0087265",
+   "title": "The Flamingo Kid",
+   "year": 1984,
+   "rating": 6.2,
+   "votes": 6594,
+   "score": 6.251074942180283
+  },
+  {
+   "tconst": "tt0087635",
+   "title": "The Lonely Guy",
+   "year": 1984,
+   "rating": 6.2,
+   "votes": 8246,
+   "score": 6.242839942718851
+  },
+  {
+   "tconst": "tt0087742",
+   "title": "The Vultures",
+   "year": 1984,
+   "rating": 6.1,
+   "votes": 2623,
+   "score": 6.238208534089843
+  },
+  {
+   "tconst": "tt0086992",
+   "title": "The Bostonians",
+   "year": 1984,
+   "rating": 6.1,
+   "votes": 2772,
+   "score": 6.233893137698522
+  },
+  {
+   "tconst": "tt0087629",
+   "title": "The Little Drummer Girl",
+   "year": 1984,
+   "rating": 6.1,
+   "votes": 2784,
+   "score": 6.233557285346436
+  },
+  {
+   "tconst": "tt0086856",
+   "title": "The Adventures of Buckaroo Banzai Across the 8th Dimension",
+   "year": 1984,
+   "rating": 6.2,
+   "votes": 33385,
+   "score": 6.212404636232792
+  },
+  {
+   "tconst": "tt0090190",
+   "title": "The Toxic Avenger",
+   "year": 1984,
+   "rating": 6.2,
+   "votes": 36375,
+   "score": 6.211438125162146
+  },
+  {
+   "tconst": "tt0087751",
+   "title": "Mrs. Soffel",
+   "year": 1984,
+   "rating": 6.1,
+   "votes": 3949,
+   "score": 6.207402597595788
+  },
+  {
+   "tconst": "tt0087182",
+   "title": "Dune",
+   "year": 1984,
+   "rating": 6.2,
+   "votes": 194123,
+   "score": 6.202238075356268
+  },
+  {
+   "tconst": "tt0088242",
+   "title": "Teachers",
+   "year": 1984,
+   "rating": 6.1,
+   "votes": 4986,
+   "score": 6.191459784296786
+  },
+  {
+   "tconst": "tt0181012",
+   "title": "Sole Survivor",
+   "year": 1984,
+   "rating": 6,
+   "votes": 3082,
+   "score": 6.165080293801131
+  },
+  {
+   "tconst": "tt0088326",
+   "title": "Unfaithfully Yours",
+   "year": 1984,
+   "rating": 6,
+   "votes": 3388,
+   "score": 6.155704909632024
+  },
+  {
+   "tconst": "tt0088402",
+   "title": "The Wild Life",
+   "year": 1984,
+   "rating": 6,
+   "votes": 3607,
+   "score": 6.149623337452711
+  },
+  {
+   "tconst": "tt0087718",
+   "title": "Micki + Maude",
+   "year": 1984,
+   "rating": 6,
+   "votes": 3673,
+   "score": 6.14788261115765
+  },
+  {
+   "tconst": "tt0087910",
+   "title": "The Philadelphia Experiment",
+   "year": 1984,
+   "rating": 6.1,
+   "votes": 18379,
+   "score": 6.131352767706823
+  },
+  {
+   "tconst": "tt0087262",
+   "title": "Firestarter",
+   "year": 1984,
+   "rating": 6.1,
+   "votes": 39993,
+   "score": 6.115215346679145
+  },
+  {
+   "tconst": "tt0087464",
+   "title": "Impulse",
+   "year": 1984,
+   "rating": 5.8,
+   "votes": 2024,
+   "score": 6.107887190133535
+  },
+  {
+   "tconst": "tt0088213",
+   "title": "Swing Shift",
+   "year": 1984,
+   "rating": 6,
+   "votes": 5977,
+   "score": 6.105169619292635
+  },
+  {
+   "tconst": "tt0088256",
+   "title": "Thief of Hearts",
+   "year": 1984,
+   "rating": 5.8,
+   "votes": 2101,
+   "score": 6.102106328480211
+  },
+  {
+   "tconst": "tt0087981",
+   "title": "Razorback",
+   "year": 1984,
+   "rating": 6,
+   "votes": 8959,
+   "score": 6.076552427511392
+  },
+  {
+   "tconst": "tt0090192",
+   "title": "Trancers",
+   "year": 1984,
+   "rating": 6,
+   "votes": 9152,
+   "score": 6.075227587257653
+  },
+  {
+   "tconst": "tt0089523",
+   "title": "Lust in the Dust",
+   "year": 1984,
+   "rating": 5.9,
+   "votes": 4115,
+   "score": 6.069899926916983
+  },
+  {
+   "tconst": "tt0087386",
+   "title": "Harry & Son",
+   "year": 1984,
+   "rating": 5.8,
+   "votes": 2676,
+   "score": 6.064956812039638
+  },
+  {
+   "tconst": "tt0087589",
+   "title": "Lassiter",
+   "year": 1984,
+   "rating": 5.8,
+   "votes": 2962,
+   "score": 6.049685218278385
+  },
+  {
+   "tconst": "tt0086859",
+   "title": "Against All Odds",
+   "year": 1984,
+   "rating": 6,
+   "votes": 15794,
+   "score": 6.047147243626917
+  },
+  {
+   "tconst": "tt0087222",
+   "title": "The Evil That Men Do",
+   "year": 1984,
+   "rating": 5.9,
+   "votes": 5419,
+   "score": 6.040037478514267
+  },
+  {
+   "tconst": "tt0088414",
+   "title": "The Woman in Red",
+   "year": 1984,
+   "rating": 6,
+   "votes": 19712,
+   "score": 6.038639372379207
+  },
+  {
+   "tconst": "tt0087482",
+   "title": "Irreconcilable Differences",
+   "year": 1984,
+   "rating": 5.8,
+   "votes": 3660,
+   "score": 6.018893648957128
+  },
+  {
+   "tconst": "tt0087298",
+   "title": "Friday the 13th: The Final Chapter",
+   "year": 1984,
+   "rating": 6,
+   "votes": 67554,
+   "score": 6.012061679459087
+  },
+  {
+   "tconst": "tt0086998",
+   "title": "Breakin'",
+   "year": 1984,
+   "rating": 5.9,
+   "votes": 8043,
+   "score": 6.003448974718446
+  },
+  {
+   "tconst": "tt0087001",
+   "title": "A Breed Apart",
+   "year": 1984,
+   "rating": 5.6,
+   "votes": 2280,
+   "score": 5.982929451658258
+  },
+  {
+   "tconst": "tt0087247",
+   "title": "Fear City",
+   "year": 1984,
+   "rating": 5.8,
+   "votes": 5284,
+   "score": 5.970090342270366
+  },
+  {
+   "tconst": "tt0088224",
+   "title": "Tank",
+   "year": 1984,
+   "rating": 5.8,
+   "votes": 5413,
+   "score": 5.967130453675617
+  },
+  {
+   "tconst": "tt0085454",
+   "title": "The World of Don Camillo",
+   "year": 1984,
+   "rating": 5.6,
+   "votes": 2478,
+   "score": 5.965997778717585
+  },
+  {
+   "tconst": "tt0086896",
+   "title": "Angel",
+   "year": 1984,
+   "rating": 5.8,
+   "votes": 5588,
+   "score": 5.9632759690428765
+  },
+  {
+   "tconst": "tt0088024",
+   "title": "Runaway",
+   "year": 1984,
+   "rating": 5.9,
+   "votes": 16399,
+   "score": 5.956467093488633
+  },
+  {
+   "tconst": "tt0087810",
+   "title": "No Small Affair",
+   "year": 1984,
+   "rating": 5.6,
+   "votes": 2766,
+   "score": 5.943881253272628
+  },
+  {
+   "tconst": "tt0091818",
+   "title": "Radioactive Dreams",
+   "year": 1984,
+   "rating": 5.5,
+   "votes": 2189,
+   "score": 5.938992134900298
+  },
+  {
+   "tconst": "tt0089338",
+   "title": "Cut and Run",
+   "year": 1984,
+   "rating": 5.6,
+   "votes": 3024,
+   "score": 5.926221746237529
+  },
+  {
+   "tconst": "tt0087078",
+   "title": "Conan the Destroyer",
+   "year": 1984,
+   "rating": 5.9,
+   "votes": 91371,
+   "score": 5.911126988605642
+  },
+  {
+   "tconst": "tt0087428",
+   "title": "The Hotel New Hampshire",
+   "year": 1984,
+   "rating": 5.8,
+   "votes": 9864,
+   "score": 5.9044283591619475
+  },
+  {
+   "tconst": "tt0087359",
+   "title": "Grandview, U.S.A.",
+   "year": 1984,
+   "rating": 5.5,
+   "votes": 2568,
+   "score": 5.902569626334795
+  },
+  {
+   "tconst": "tt0087759",
+   "title": "Murder-Rock: Dancing Death",
+   "year": 1984,
+   "rating": 5.5,
+   "votes": 2798,
+   "score": 5.883271790974853
+  },
+  {
+   "tconst": "tt0086973",
+   "title": "Blame It on Rio",
+   "year": 1984,
+   "rating": 5.8,
+   "votes": 13349,
+   "score": 5.880717835239908
+  },
+  {
+   "tconst": "tt0087835",
+   "title": "Oh, God! You Devil",
+   "year": 1984,
+   "rating": 5.5,
+   "votes": 3048,
+   "score": 5.864290422562867
+  },
+  {
+   "tconst": "tt0088117",
+   "title": "Silent Night, Deadly Night",
+   "year": 1984,
+   "rating": 5.8,
+   "votes": 22439,
+   "score": 5.85069512063085
+  },
+  {
+   "tconst": "tt0087472",
+   "title": "The Initiation",
+   "year": 1984,
+   "rating": 5.6,
+   "votes": 5191,
+   "score": 5.827915179126317
+  },
+  {
+   "tconst": "tt0087451",
+   "title": "The Ice Pirates",
+   "year": 1984,
+   "rating": 5.7,
+   "votes": 12877,
+   "score": 5.796722326618092
+  },
+  {
+   "tconst": "tt0088333",
+   "title": "Up the Creek",
+   "year": 1984,
+   "rating": 5.5,
+   "votes": 4574,
+   "score": 5.779728940233853
+  },
+  {
+   "tconst": "tt0088116",
+   "title": "Silent Madness",
+   "year": 1984,
+   "rating": 5.1,
+   "votes": 2038,
+   "score": 5.753526016121185
+  },
+  {
+   "tconst": "tt0087866",
+   "title": "Oxford Blues",
+   "year": 1984,
+   "rating": 5.4,
+   "votes": 3853,
+   "score": 5.748357774320407
+  },
+  {
+   "tconst": "tt0087951",
+   "title": "Protocol",
+   "year": 1984,
+   "rating": 5.5,
+   "votes": 5740,
+   "score": 5.7375888957490115
+  },
+  {
+   "tconst": "tt0087015",
+   "title": "C.H.U.D.",
+   "year": 1984,
+   "rating": 5.6,
+   "votes": 15667,
+   "score": 5.692768328131394
+  },
+  {
+   "tconst": "tt0087805",
+   "title": "Ninja III: The Domination",
+   "year": 1984,
+   "rating": 5.4,
+   "votes": 5947,
+   "score": 5.656567013098949
+  },
+  {
+   "tconst": "tt0087062",
+   "title": "City Heat",
+   "year": 1984,
+   "rating": 5.5,
+   "votes": 11925,
+   "score": 5.632060183346308
+  },
+  {
+   "tconst": "tt0087050",
+   "title": "Children of the Corn",
+   "year": 1984,
+   "rating": 5.6,
+   "votes": 63470,
+   "score": 5.625033420697989
+  },
+  {
+   "tconst": "tt0087903",
+   "title": "The Perils of Gwendoline in the Land of the Yik Yak",
+   "year": 1984,
+   "rating": 5.2,
+   "votes": 3841,
+   "score": 5.617554879831767
+  },
+  {
+   "tconst": "tt0085627",
+   "title": "Warriors of the Year 2072",
+   "year": 1984,
+   "rating": 4.8,
+   "votes": 2017,
+   "score": 5.606307705525852
+  },
+  {
+   "tconst": "tt0087727",
+   "title": "Missing in Action",
+   "year": 1984,
+   "rating": 5.5,
+   "votes": 18962,
+   "score": 5.587727223218078
+  },
+  {
+   "tconst": "tt0087796",
+   "title": "Mutant",
+   "year": 1984,
+   "rating": 5.1,
+   "votes": 3582,
+   "score": 5.572758519007049
+  },
+  {
+   "tconst": "tt0090009",
+   "title": "She",
+   "year": 1984,
+   "rating": 4.8,
+   "votes": 2370,
+   "score": 5.541175755857517
+  }
+ ]
+}

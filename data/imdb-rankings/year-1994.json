@@ -1,0 +1,1608 @@
+{
+ "tag": "year-1994",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.431,
+ "minVotes": 5000,
+ "items": [
+  {
+   "tconst": "tt0111161",
+   "title": "The Shawshank Redemption",
+   "year": 1994,
+   "rating": 9.3,
+   "votes": 3237776,
+   "score": 9.295576581347538
+  },
+  {
+   "tconst": "tt0109830",
+   "title": "Forrest Gump",
+   "year": 1994,
+   "rating": 8.8,
+   "votes": 2534428,
+   "score": 8.795335896176558
+  },
+  {
+   "tconst": "tt0110912",
+   "title": "Pulp Fiction",
+   "year": 1994,
+   "rating": 8.8,
+   "votes": 2467026,
+   "score": 8.795208725213994
+  },
+  {
+   "tconst": "tt0110413",
+   "title": "Léon: The Professional",
+   "year": 1994,
+   "rating": 8.5,
+   "votes": 1365501,
+   "score": 8.492452281432735
+  },
+  {
+   "tconst": "tt0110357",
+   "title": "The Lion King",
+   "year": 1994,
+   "rating": 8.5,
+   "votes": 1277493,
+   "score": 8.491934337384956
+  },
+  {
+   "tconst": "tt0110057",
+   "title": "Hoop Dreams",
+   "year": 1994,
+   "rating": 8.3,
+   "votes": 29815,
+   "score": 8.03160546189413
+  },
+  {
+   "tconst": "tt0110081",
+   "title": "To Live",
+   "year": 1994,
+   "rating": 8.3,
+   "votes": 22689,
+   "score": 7.9625318413754265
+  },
+  {
+   "tconst": "tt0111495",
+   "title": "Three Colors: Red",
+   "year": 1994,
+   "rating": 8,
+   "votes": 116933,
+   "score": 7.935668310923575
+  },
+  {
+   "tconst": "tt0109117",
+   "title": "Andaz Apna Apna",
+   "year": 1994,
+   "rating": 8,
+   "votes": 58308,
+   "score": 7.8760953458622005
+  },
+  {
+   "tconst": "tt0109424",
+   "title": "Chungking Express",
+   "year": 1994,
+   "rating": 7.9,
+   "votes": 113880,
+   "score": 7.8382221076366445
+  },
+  {
+   "tconst": "tt0109707",
+   "title": "Ed Wood",
+   "year": 1994,
+   "rating": 7.8,
+   "votes": 191034,
+   "score": 7.76508689388496
+  },
+  {
+   "tconst": "tt0111341",
+   "title": "Satantango",
+   "year": 1994,
+   "rating": 8.2,
+   "votes": 14584,
+   "score": 7.748398905016552
+  },
+  {
+   "tconst": "tt0110729",
+   "title": "Once Were Warriors",
+   "year": 1994,
+   "rating": 7.9,
+   "votes": 39717,
+   "score": 7.735763672783151
+  },
+  {
+   "tconst": "tt0109508",
+   "title": "Crumb",
+   "year": 1994,
+   "rating": 8,
+   "votes": 23221,
+   "score": 7.722045432686445
+  },
+  {
+   "tconst": "tt0109445",
+   "title": "Clerks",
+   "year": 1994,
+   "rating": 7.7,
+   "votes": 241781,
+   "score": 7.674292365116618
+  },
+  {
+   "tconst": "tt0110877",
+   "title": "The Postman",
+   "year": 1994,
+   "rating": 7.8,
+   "votes": 41942,
+   "score": 7.654199739164164
+  },
+  {
+   "tconst": "tt0111797",
+   "title": "Eat Drink Man Woman",
+   "year": 1994,
+   "rating": 7.8,
+   "votes": 25517,
+   "score": 7.5757264526606205
+  },
+  {
+   "tconst": "tt0140348",
+   "title": "Mahanadi",
+   "year": 1994,
+   "rating": 8.6,
+   "votes": 5193,
+   "score": 7.536117350715606
+  },
+  {
+   "tconst": "tt0111507",
+   "title": "Three Colors: White",
+   "year": 1994,
+   "rating": 7.6,
+   "votes": 85521,
+   "score": 7.535438673411078
+  },
+  {
+   "tconst": "tt0111579",
+   "title": "Burnt by the Sun",
+   "year": 1994,
+   "rating": 7.8,
+   "votes": 17439,
+   "score": 7.494988375410854
+  },
+  {
+   "tconst": "tt0110882",
+   "title": "Before the Rain",
+   "year": 1994,
+   "rating": 7.8,
+   "votes": 16821,
+   "score": 7.486350036929754
+  },
+  {
+   "tconst": "tt0110148",
+   "title": "Interview with the Vampire: The Vampire Chronicles",
+   "year": 1994,
+   "rating": 7.5,
+   "votes": 380865,
+   "score": 7.486150192828694
+  },
+  {
+   "tconst": "tt0109506",
+   "title": "The Crow",
+   "year": 1994,
+   "rating": 7.5,
+   "votes": 233549,
+   "score": 7.477597240633346
+  },
+  {
+   "tconst": "tt0110322",
+   "title": "Legends of the Fall",
+   "year": 1994,
+   "rating": 7.5,
+   "votes": 202115,
+   "score": 7.47419715692173
+  },
+  {
+   "tconst": "tt0110932",
+   "title": "Quiz Show",
+   "year": 1994,
+   "rating": 7.5,
+   "votes": 78424,
+   "score": 7.435939827337987
+  },
+  {
+   "tconst": "tt0109045",
+   "title": "The Adventures of Priscilla, Queen of the Desert",
+   "year": 1994,
+   "rating": 7.5,
+   "votes": 62574,
+   "score": 7.4209140224915515
+  },
+  {
+   "tconst": "tt0111512",
+   "title": "Drunken Master II",
+   "year": 1994,
+   "rating": 7.5,
+   "votes": 52191,
+   "score": 7.406555999297864
+  },
+  {
+   "tconst": "tt0110222",
+   "title": "Kabhi Haan Kabhi Naa",
+   "year": 1994,
+   "rating": 7.6,
+   "votes": 20522,
+   "score": 7.371014973585305
+  },
+  {
+   "tconst": "tt0110200",
+   "title": "Fist of Legend",
+   "year": 1994,
+   "rating": 7.5,
+   "votes": 27044,
+   "score": 7.333224446256527
+  },
+  {
+   "tconst": "tt0111845",
+   "title": "Through the Olive Trees",
+   "year": 1994,
+   "rating": 7.7,
+   "votes": 12191,
+   "score": 7.33096062799396
+  },
+  {
+   "tconst": "tt0110076",
+   "title": "Hum Aapke Hain Koun..!",
+   "year": 1994,
+   "rating": 7.5,
+   "votes": 24562,
+   "score": 7.319222114736627
+  },
+  {
+   "tconst": "tt0111786",
+   "title": "In the Heat of the Sun",
+   "year": 1994,
+   "rating": 8,
+   "votes": 6395,
+   "score": 7.311614230438277
+  },
+  {
+   "tconst": "tt0109348",
+   "title": "Bullets Over Broadway",
+   "year": 1994,
+   "rating": 7.4,
+   "votes": 43496,
+   "score": 7.300112259894511
+  },
+  {
+   "tconst": "tt0109686",
+   "title": "Dumb and Dumber",
+   "year": 1994,
+   "rating": 7.3,
+   "votes": 447769,
+   "score": 7.29040535936834
+  },
+  {
+   "tconst": "tt0111257",
+   "title": "Speed",
+   "year": 1994,
+   "rating": 7.3,
+   "votes": 427654,
+   "score": 7.289959284222136
+  },
+  {
+   "tconst": "tt0111503",
+   "title": "True Lies",
+   "year": 1994,
+   "rating": 7.3,
+   "votes": 303481,
+   "score": 7.285917590243303
+  },
+  {
+   "tconst": "tt0110116",
+   "title": "Immortal Beloved",
+   "year": 1994,
+   "rating": 7.4,
+   "votes": 27777,
+   "score": 7.2522086876725815
+  },
+  {
+   "tconst": "tt0109842",
+   "title": "Fresh",
+   "year": 1994,
+   "rating": 7.5,
+   "votes": 16452,
+   "score": 7.250878433518747
+  },
+  {
+   "tconst": "tt0110367",
+   "title": "Little Women",
+   "year": 1994,
+   "rating": 7.3,
+   "votes": 69866,
+   "score": 7.241974249403523
+  },
+  {
+   "tconst": "tt0110917",
+   "title": "A Pure Formality",
+   "year": 1994,
+   "rating": 7.5,
+   "votes": 13767,
+   "score": 7.215236540514956
+  },
+  {
+   "tconst": "tt0110598",
+   "title": "Muriel's Wedding",
+   "year": 1994,
+   "rating": 7.3,
+   "votes": 46112,
+   "score": 7.215007124664348
+  },
+  {
+   "tconst": "tt0110963",
+   "title": "Queen Margot",
+   "year": 1994,
+   "rating": 7.4,
+   "votes": 20542,
+   "score": 7.210345476307422
+  },
+  {
+   "tconst": "tt0110632",
+   "title": "Natural Born Killers",
+   "year": 1994,
+   "rating": 7.2,
+   "votes": 270135,
+   "score": 7.186028110403417
+  },
+  {
+   "tconst": "tt0109440",
+   "title": "Fear City: A Family-Style Comedy",
+   "year": 1994,
+   "rating": 7.5,
+   "votes": 11720,
+   "score": 7.1803734542969
+  },
+  {
+   "tconst": "tt0110074",
+   "title": "The Hudsucker Proxy",
+   "year": 1994,
+   "rating": 7.2,
+   "votes": 90953,
+   "score": 7.1599370958265425
+  },
+  {
+   "tconst": "tt0110684",
+   "title": "Nobody's Fool",
+   "year": 1994,
+   "rating": 7.3,
+   "votes": 24962,
+   "score": 7.155011152654835
+  },
+  {
+   "tconst": "tt0111149",
+   "title": "Shallow Grave",
+   "year": 1994,
+   "rating": 7.2,
+   "votes": 71554,
+   "score": 7.14978504266066
+  },
+  {
+   "tconst": "tt0110005",
+   "title": "Heavenly Creatures",
+   "year": 1994,
+   "rating": 7.2,
+   "votes": 70294,
+   "score": 7.1489447254209395
+  },
+  {
+   "tconst": "tt0110008",
+   "title": "Pom Poko",
+   "year": 1994,
+   "rating": 7.2,
+   "votes": 39498,
+   "score": 7.11361059274224
+  },
+  {
+   "tconst": "tt0109579",
+   "title": "Death and the Maiden",
+   "year": 1994,
+   "rating": 7.2,
+   "votes": 29264,
+   "score": 7.087807732776214
+  },
+  {
+   "tconst": "tt0109831",
+   "title": "Four Weddings and a Funeral",
+   "year": 1994,
+   "rating": 7.1,
+   "votes": 184477,
+   "score": 7.082350597464833
+  },
+  {
+   "tconst": "tt0111112",
+   "title": "The Secret of Roan Inish",
+   "year": 1994,
+   "rating": 7.4,
+   "votes": 9536,
+   "score": 7.066747671700893
+  },
+  {
+   "tconst": "tt0113409",
+   "title": "In the Mouth of Madness",
+   "year": 1994,
+   "rating": 7.1,
+   "votes": 91637,
+   "score": 7.065394664112547
+  },
+  {
+   "tconst": "tt0110570",
+   "title": "The Monster",
+   "year": 1994,
+   "rating": 7.3,
+   "votes": 12626,
+   "score": 7.053537056385122
+  },
+  {
+   "tconst": "tt0110428",
+   "title": "The Madness of King George",
+   "year": 1994,
+   "rating": 7.2,
+   "votes": 20359,
+   "score": 7.048410590159082
+  },
+  {
+   "tconst": "tt0109206",
+   "title": "Bandit Queen",
+   "year": 1994,
+   "rating": 7.5,
+   "votes": 5932,
+   "score": 7.011145641771329
+  },
+  {
+   "tconst": "tt0110475",
+   "title": "The Mask",
+   "year": 1994,
+   "rating": 7,
+   "votes": 477187,
+   "score": 6.994101550136865
+  },
+  {
+   "tconst": "tt0110201",
+   "title": "Hail the Judge",
+   "year": 1994,
+   "rating": 7.5,
+   "votes": 5475,
+   "score": 6.989818057837152
+  },
+  {
+   "tconst": "tt0111282",
+   "title": "Stargate",
+   "year": 1994,
+   "rating": 7,
+   "votes": 221539,
+   "score": 6.987445182312292
+  },
+  {
+   "tconst": "tt0110478",
+   "title": "Maverick",
+   "year": 1994,
+   "rating": 7,
+   "votes": 126039,
+   "score": 6.978295348376012
+  },
+  {
+   "tconst": "tt0110631",
+   "title": "Nightwatch",
+   "year": 1994,
+   "rating": 7.1,
+   "votes": 20769,
+   "score": 6.970225625978663
+  },
+  {
+   "tconst": "tt0109066",
+   "title": "Vive L'Amour",
+   "year": 1994,
+   "rating": 7.4,
+   "votes": 5608,
+   "score": 6.943348808054692
+  },
+  {
+   "tconst": "tt0110308",
+   "title": "The Last Seduction",
+   "year": 1994,
+   "rating": 7,
+   "votes": 29160,
+   "score": 6.9167401684966086
+  },
+  {
+   "tconst": "tt0111309",
+   "title": "The Sum of Us",
+   "year": 1994,
+   "rating": 7.3,
+   "votes": 6263,
+   "score": 6.914298513348501
+  },
+  {
+   "tconst": "tt0109592",
+   "title": "Cemetery Man",
+   "year": 1994,
+   "rating": 7,
+   "votes": 26542,
+   "score": 6.909829565526731
+  },
+  {
+   "tconst": "tt0109504",
+   "title": "Crooklyn",
+   "year": 1994,
+   "rating": 7.1,
+   "votes": 12482,
+   "score": 6.908708623489542
+  },
+  {
+   "tconst": "tt0114594",
+   "title": "Swimming with Sharks",
+   "year": 1994,
+   "rating": 7,
+   "votes": 24823,
+   "score": 6.9046321347900665
+  },
+  {
+   "tconst": "tt0110889",
+   "title": "Priest",
+   "year": 1994,
+   "rating": 7.1,
+   "votes": 11856,
+   "score": 6.901604423104186
+  },
+  {
+   "tconst": "tt0109759",
+   "title": "Exotica",
+   "year": 1994,
+   "rating": 7,
+   "votes": 22753,
+   "score": 6.897518976537461
+  },
+  {
+   "tconst": "tt0114563",
+   "title": "Street Fighter II: The Animated Movie",
+   "year": 1994,
+   "rating": 7.1,
+   "votes": 11370,
+   "score": 6.895714365048513
+  },
+  {
+   "tconst": "tt0111590",
+   "title": "Vanya on 42nd Street",
+   "year": 1994,
+   "rating": 7.3,
+   "votes": 5705,
+   "score": 6.894193755800483
+  },
+  {
+   "tconst": "tt0109040",
+   "title": "Ace Ventura: Pet Detective",
+   "year": 1994,
+   "rating": 6.9,
+   "votes": 358155,
+   "score": 6.89354502665761
+  },
+  {
+   "tconst": "tt0111019",
+   "title": "Wild Reeds",
+   "year": 1994,
+   "rating": 7.2,
+   "votes": 7345,
+   "score": 6.8886062499671254
+  },
+  {
+   "tconst": "tt0109444",
+   "title": "Clear and Present Danger",
+   "year": 1994,
+   "rating": 6.9,
+   "votes": 117872,
+   "score": 6.88092196884436
+  },
+  {
+   "tconst": "tt0109688",
+   "title": "Ashes of Time",
+   "year": 1994,
+   "rating": 7,
+   "votes": 18460,
+   "score": 6.8787657355432295
+  },
+  {
+   "tconst": "tt0109020",
+   "title": "71 Fragments of a Chronology of Chance",
+   "year": 1994,
+   "rating": 7.1,
+   "votes": 9750,
+   "score": 6.87327756988774
+  },
+  {
+   "tconst": "tt0111666",
+   "title": "War of the Buttons",
+   "year": 1994,
+   "rating": 7.3,
+   "votes": 5012,
+   "score": 6.866105089477044
+  },
+  {
+   "tconst": "tt0109962",
+   "title": "From Beijing with Love",
+   "year": 1994,
+   "rating": 7.1,
+   "votes": 9224,
+   "score": 6.864893430528976
+  },
+  {
+   "tconst": "tt0111127",
+   "title": "Serial Mom",
+   "year": 1994,
+   "rating": 6.9,
+   "votes": 38518,
+   "score": 6.846133649428838
+  },
+  {
+   "tconst": "tt0110955",
+   "title": "The Ref",
+   "year": 1994,
+   "rating": 6.9,
+   "votes": 28828,
+   "score": 6.830703682033941
+  },
+  {
+   "tconst": "tt0110546",
+   "title": "Mohra",
+   "year": 1994,
+   "rating": 7,
+   "votes": 9329,
+   "score": 6.801510514051516
+  },
+  {
+   "tconst": "tt0110361",
+   "title": "Lisbon Story",
+   "year": 1994,
+   "rating": 7.1,
+   "votes": 6002,
+   "score": 6.796041097604451
+  },
+  {
+   "tconst": "tt0109731",
+   "title": "Hell",
+   "year": 1994,
+   "rating": 7,
+   "votes": 7428,
+   "score": 6.771149352739312
+  },
+  {
+   "tconst": "tt0109219",
+   "title": "Barcelona",
+   "year": 1994,
+   "rating": 7,
+   "votes": 7099,
+   "score": 6.76492637043096
+  },
+  {
+   "tconst": "tt0109791",
+   "title": "Felidae",
+   "year": 1994,
+   "rating": 7,
+   "votes": 6000,
+   "score": 6.741440377804015
+  },
+  {
+   "tconst": "tt0111732",
+   "title": "With Honors",
+   "year": 1994,
+   "rating": 6.8,
+   "votes": 18455,
+   "score": 6.721374724188624
+  },
+  {
+   "tconst": "tt0111667",
+   "title": "The War",
+   "year": 1994,
+   "rating": 6.8,
+   "votes": 14493,
+   "score": 6.705393944279699
+  },
+  {
+   "tconst": "tt0109446",
+   "title": "The Client",
+   "year": 1994,
+   "rating": 6.7,
+   "votes": 87723,
+   "score": 6.685503533706245
+  },
+  {
+   "tconst": "tt0111756",
+   "title": "Wyatt Earp",
+   "year": 1994,
+   "rating": 6.7,
+   "votes": 60064,
+   "score": 6.679341020469755
+  },
+  {
+   "tconst": "tt0112883",
+   "title": "Don Juan DeMarco",
+   "year": 1994,
+   "rating": 6.7,
+   "votes": 55607,
+   "score": 6.677821772333958
+  },
+  {
+   "tconst": "tt0110527",
+   "title": "Miracle on 34th Street",
+   "year": 1994,
+   "rating": 6.7,
+   "votes": 51388,
+   "score": 6.676162377737182
+  },
+  {
+   "tconst": "tt0109771",
+   "title": "Farinelli",
+   "year": 1994,
+   "rating": 6.8,
+   "votes": 7948,
+   "score": 6.657572146728774
+  },
+  {
+   "tconst": "tt0110771",
+   "title": "The Paper",
+   "year": 1994,
+   "rating": 6.7,
+   "votes": 17552,
+   "score": 6.640397488286811
+  },
+  {
+   "tconst": "tt0110365",
+   "title": "Little Odessa",
+   "year": 1994,
+   "rating": 6.7,
+   "votes": 10201,
+   "score": 6.611574511929753
+  },
+  {
+   "tconst": "tt0111070",
+   "title": "The Santa Clause",
+   "year": 1994,
+   "rating": 6.6,
+   "votes": 148575,
+   "score": 6.594503299077611
+  },
+  {
+   "tconst": "tt0109093",
+   "title": "Amateur",
+   "year": 1994,
+   "rating": 6.7,
+   "votes": 7512,
+   "score": 6.5925706646294895
+  },
+  {
+   "tconst": "tt0111280",
+   "title": "Star Trek: Generations",
+   "year": 1994,
+   "rating": 6.6,
+   "votes": 92096,
+   "score": 6.591305966835339
+  },
+  {
+   "tconst": "tt0106339",
+   "title": "Backbeat",
+   "year": 1994,
+   "rating": 6.7,
+   "votes": 7070,
+   "score": 6.588636632630006
+  },
+  {
+   "tconst": "tt0110950",
+   "title": "Reality Bites",
+   "year": 1994,
+   "rating": 6.6,
+   "votes": 58169,
+   "score": 6.586636548874355
+  },
+  {
+   "tconst": "tt0109021",
+   "title": "8 Seconds",
+   "year": 1994,
+   "rating": 6.7,
+   "votes": 6490,
+   "score": 6.583015157166594
+  },
+  {
+   "tconst": "tt0111693",
+   "title": "When a Man Loves a Woman",
+   "year": 1994,
+   "rating": 6.6,
+   "votes": 25214,
+   "score": 6.572060771690083
+  },
+  {
+   "tconst": "tt0109035",
+   "title": "Above the Rim",
+   "year": 1994,
+   "rating": 6.6,
+   "votes": 18449,
+   "score": 6.564000347812025
+  },
+  {
+   "tconst": "tt0110759",
+   "title": "PCU",
+   "year": 1994,
+   "rating": 6.6,
+   "votes": 15537,
+   "score": 6.558895854109371
+  },
+  {
+   "tconst": "tt0109484",
+   "title": "Corrina, Corrina",
+   "year": 1994,
+   "rating": 6.6,
+   "votes": 15501,
+   "score": 6.558823674739971
+  },
+  {
+   "tconst": "tt0109279",
+   "title": "Black Beauty",
+   "year": 1994,
+   "rating": 6.6,
+   "votes": 11437,
+   "score": 6.548642949190495
+  },
+  {
+   "tconst": "tt0110157",
+   "title": "Iron Will",
+   "year": 1994,
+   "rating": 6.6,
+   "votes": 10273,
+   "score": 6.544728878140782
+  },
+  {
+   "tconst": "tt0109134",
+   "title": "Anjaam",
+   "year": 1994,
+   "rating": 6.6,
+   "votes": 8005,
+   "score": 6.535089900487825
+  },
+  {
+   "tconst": "tt0110186",
+   "title": "Jason's Lyric",
+   "year": 1994,
+   "rating": 6.6,
+   "votes": 5179,
+   "score": 6.517068882586125
+  },
+  {
+   "tconst": "tt0110622",
+   "title": "Naked Gun 33 1/3: The Final Insult",
+   "year": 1994,
+   "rating": 6.5,
+   "votes": 129799,
+   "score": 6.497446896162762
+  },
+  {
+   "tconst": "tt0110997",
+   "title": "The River Wild",
+   "year": 1994,
+   "rating": 6.5,
+   "votes": 54186,
+   "score": 6.4941851815605744
+  },
+  {
+   "tconst": "tt0110364",
+   "title": "Little Giants",
+   "year": 1994,
+   "rating": 6.5,
+   "votes": 33467,
+   "score": 6.491053218494923
+  },
+  {
+   "tconst": "tt0110638",
+   "title": "Nell",
+   "year": 1994,
+   "rating": 6.5,
+   "votes": 32689,
+   "score": 6.490868533414105
+  },
+  {
+   "tconst": "tt0110737",
+   "title": "Only You",
+   "year": 1994,
+   "rating": 6.5,
+   "votes": 30370,
+   "score": 6.490269837598082
+  },
+  {
+   "tconst": "tt0111333",
+   "title": "The Swan Princess",
+   "year": 1994,
+   "rating": 6.5,
+   "votes": 29762,
+   "score": 6.490099653525233
+  },
+  {
+   "tconst": "tt0142239",
+   "title": "Dragon Ball Z: Broly - Second Coming",
+   "year": 1994,
+   "rating": 6.5,
+   "votes": 7505,
+   "score": 6.472478541051114
+  },
+  {
+   "tconst": "tt0110438",
+   "title": "Main Khiladi Tu Anari",
+   "year": 1994,
+   "rating": 6.5,
+   "votes": 7043,
+   "score": 6.471422748139514
+  },
+  {
+   "tconst": "tt0109255",
+   "title": "Maybe... Maybe Not",
+   "year": 1994,
+   "rating": 6.5,
+   "votes": 6709,
+   "score": 6.4706075801387115
+  },
+  {
+   "tconst": "tt0110588",
+   "title": "Mrs. Parker and the Vicious Circle",
+   "year": 1994,
+   "rating": 6.4,
+   "votes": 5107,
+   "score": 6.415419427707942
+  },
+  {
+   "tconst": "tt0110944",
+   "title": "Rapa Nui",
+   "year": 1994,
+   "rating": 6.4,
+   "votes": 5775,
+   "score": 6.414463494741918
+  },
+  {
+   "tconst": "tt0111835",
+   "title": "The Bodyguard from Beijing",
+   "year": 1994,
+   "rating": 6.4,
+   "votes": 6261,
+   "score": 6.413839282110308
+  },
+  {
+   "tconst": "tt0109450",
+   "title": "Cobb",
+   "year": 1994,
+   "rating": 6.4,
+   "votes": 8586,
+   "score": 6.411470937424125
+  },
+  {
+   "tconst": "tt0109306",
+   "title": "Blue Sky",
+   "year": 1994,
+   "rating": 6.4,
+   "votes": 9104,
+   "score": 6.41104964235991
+  },
+  {
+   "tconst": "tt0110167",
+   "title": "It Could Happen to You",
+   "year": 1994,
+   "rating": 6.4,
+   "votes": 49727,
+   "score": 6.402847664879204
+  },
+  {
+   "tconst": "tt0110366",
+   "title": "The Little Rascals",
+   "year": 1994,
+   "rating": 6.4,
+   "votes": 62352,
+   "score": 6.402313875695513
+  },
+  {
+   "tconst": "tt0111686",
+   "title": "New Nightmare",
+   "year": 1994,
+   "rating": 6.4,
+   "votes": 70392,
+   "score": 6.402067117941481
+  },
+  {
+   "tconst": "tt0110054",
+   "title": "The New Legend of Shaolin",
+   "year": 1994,
+   "rating": 6.3,
+   "votes": 6524,
+   "score": 6.3569111554880395
+  },
+  {
+   "tconst": "tt0111194",
+   "title": "A Simple Twist of Fate",
+   "year": 1994,
+   "rating": 6.3,
+   "votes": 6699,
+   "score": 6.356059847495015
+  },
+  {
+   "tconst": "tt0111252",
+   "title": "Spanking the Monkey",
+   "year": 1994,
+   "rating": 6.3,
+   "votes": 7112,
+   "score": 6.354148295561771
+  },
+  {
+   "tconst": "tt0109417",
+   "title": "China Moon",
+   "year": 1994,
+   "rating": 6.3,
+   "votes": 9473,
+   "score": 6.345315011113395
+  },
+  {
+   "tconst": "tt0111418",
+   "title": "Threesome",
+   "year": 1994,
+   "rating": 6.3,
+   "votes": 14361,
+   "score": 6.333874498003418
+  },
+  {
+   "tconst": "tt0109936",
+   "title": "Greedy",
+   "year": 1994,
+   "rating": 6.3,
+   "votes": 15679,
+   "score": 6.331715467664982
+  },
+  {
+   "tconst": "tt0109305",
+   "title": "Blue Chips",
+   "year": 1994,
+   "rating": 6.3,
+   "votes": 16561,
+   "score": 6.330418076890876
+  },
+  {
+   "tconst": "tt0111419",
+   "title": "Thumbelina",
+   "year": 1994,
+   "rating": 6.3,
+   "votes": 20461,
+   "score": 6.325758774433218
+  },
+  {
+   "tconst": "tt0109303",
+   "title": "Blown Away",
+   "year": 1994,
+   "rating": 6.3,
+   "votes": 37214,
+   "score": 6.315536176525422
+  },
+  {
+   "tconst": "tt0109127",
+   "title": "Angels in the Outfield",
+   "year": 1994,
+   "rating": 6.3,
+   "votes": 38265,
+   "score": 6.315158769348068
+  },
+  {
+   "tconst": "tt0109190",
+   "title": "Baby's Day Out",
+   "year": 1994,
+   "rating": 6.3,
+   "votes": 61390,
+   "score": 6.309878658771564
+  },
+  {
+   "tconst": "tt0109836",
+   "title": "Mary Shelley's Frankenstein",
+   "year": 1994,
+   "rating": 6.3,
+   "votes": 64360,
+   "score": 6.309455653919322
+  },
+  {
+   "tconst": "tt0111742",
+   "title": "Wolf",
+   "year": 1994,
+   "rating": 6.3,
+   "votes": 65031,
+   "score": 6.309365054844914
+  },
+  {
+   "tconst": "tt0111293",
+   "title": "The Stöned Age",
+   "year": 1994,
+   "rating": 6.2,
+   "votes": 5902,
+   "score": 6.306021294793998
+  },
+  {
+   "tconst": "tt0109665",
+   "title": "Dream Lover",
+   "year": 1994,
+   "rating": 6.2,
+   "votes": 7793,
+   "score": 6.290349734686483
+  },
+  {
+   "tconst": "tt0109297",
+   "title": "Blink",
+   "year": 1994,
+   "rating": 6.2,
+   "votes": 9859,
+   "score": 6.277787479362284
+  },
+  {
+   "tconst": "tt0110363",
+   "title": "Little Big League",
+   "year": 1994,
+   "rating": 6.2,
+   "votes": 12563,
+   "score": 6.265811316736558
+  },
+  {
+   "tconst": "tt0111323",
+   "title": "Surviving the Game",
+   "year": 1994,
+   "rating": 6.2,
+   "votes": 14582,
+   "score": 6.259025848015737
+  },
+  {
+   "tconst": "tt0110971",
+   "title": "Renaissance Man",
+   "year": 1994,
+   "rating": 6.2,
+   "votes": 20511,
+   "score": 6.245307677309559
+  },
+  {
+   "tconst": "tt0109951",
+   "title": "Guarding Tess",
+   "year": 1994,
+   "rating": 6.2,
+   "votes": 21020,
+   "score": 6.2444213741677235
+  },
+  {
+   "tconst": "tt0110099",
+   "title": "I.Q.",
+   "year": 1994,
+   "rating": 6.2,
+   "votes": 27951,
+   "score": 6.235077665498594
+  },
+  {
+   "tconst": "tt0110763",
+   "title": "The Pagemaster",
+   "year": 1994,
+   "rating": 6.2,
+   "votes": 28250,
+   "score": 6.234762230250952
+  },
+  {
+   "tconst": "tt0109635",
+   "title": "Disclosure",
+   "year": 1994,
+   "rating": 6.2,
+   "votes": 58897,
+   "score": 6.218089177204629
+  },
+  {
+   "tconst": "tt0109068",
+   "title": "Airheads",
+   "year": 1994,
+   "rating": 6.2,
+   "votes": 60251,
+   "score": 6.217713815203509
+  },
+  {
+   "tconst": "tt0109321",
+   "title": "Troublemakers",
+   "year": 1994,
+   "rating": 6,
+   "votes": 5136,
+   "score": 6.212691807009094
+  },
+  {
+   "tconst": "tt0110395",
+   "title": "Love and a .45",
+   "year": 1994,
+   "rating": 6,
+   "votes": 5184,
+   "score": 6.211689331877864
+  },
+  {
+   "tconst": "tt0110391",
+   "title": "Love Affair",
+   "year": 1994,
+   "rating": 6,
+   "votes": 5422,
+   "score": 6.206855129134924
+  },
+  {
+   "tconst": "tt0109369",
+   "title": "Camp Nowhere",
+   "year": 1994,
+   "rating": 6.1,
+   "votes": 11741,
+   "score": 6.198909512923014
+  },
+  {
+   "tconst": "tt0110213",
+   "title": "The Jungle Book",
+   "year": 1994,
+   "rating": 6.1,
+   "votes": 20253,
+   "score": 6.165570195851747
+  },
+  {
+   "tconst": "tt0111187",
+   "title": "Silent Fall",
+   "year": 1994,
+   "rating": 5.9,
+   "votes": 5295,
+   "score": 6.157974177352518
+  },
+  {
+   "tconst": "tt0110678",
+   "title": "No Escape",
+   "year": 1994,
+   "rating": 6.1,
+   "votes": 24651,
+   "score": 6.1558444624412045
+  },
+  {
+   "tconst": "tt0111143",
+   "title": "The Shadow",
+   "year": 1994,
+   "rating": 6.1,
+   "votes": 29461,
+   "score": 6.148049799943244
+  },
+  {
+   "tconst": "tt0109493",
+   "title": "The Cowboy Way",
+   "year": 1994,
+   "rating": 6,
+   "votes": 9935,
+   "score": 6.14434845368893
+  },
+  {
+   "tconst": "tt0109520",
+   "title": "D2: The Mighty Ducks",
+   "year": 1994,
+   "rating": 6.1,
+   "votes": 46277,
+   "score": 6.13229214181493
+  },
+  {
+   "tconst": "tt0110823",
+   "title": "Phantasm III: Lord of the Dead",
+   "year": 1994,
+   "rating": 6,
+   "votes": 11729,
+   "score": 6.128868680485634
+  },
+  {
+   "tconst": "tt0110305",
+   "title": "Lassie",
+   "year": 1994,
+   "rating": 5.9,
+   "votes": 6708,
+   "score": 6.126840122637869
+  },
+  {
+   "tconst": "tt0110667",
+   "title": "Night of the Demons 2",
+   "year": 1994,
+   "rating": 5.9,
+   "votes": 7319,
+   "score": 6.115589265025097
+  },
+  {
+   "tconst": "tt0109327",
+   "title": "Brainscan",
+   "year": 1994,
+   "rating": 6,
+   "votes": 14410,
+   "score": 6.1110687354891375
+  },
+  {
+   "tconst": "tt0107079",
+   "title": "Sugar Hill",
+   "year": 1994,
+   "rating": 5.8,
+   "votes": 5330,
+   "score": 6.105502822443773
+  },
+  {
+   "tconst": "tt0110399",
+   "title": "A Low Down Dirty Shame",
+   "year": 1994,
+   "rating": 5.9,
+   "votes": 8494,
+   "score": 6.096816670805111
+  },
+  {
+   "tconst": "tt0111256",
+   "title": "Speechless",
+   "year": 1994,
+   "rating": 5.8,
+   "votes": 5671,
+   "score": 6.095740245135804
+  },
+  {
+   "tconst": "tt0111048",
+   "title": "S.F.W.",
+   "year": 1994,
+   "rating": 5.8,
+   "votes": 5682,
+   "score": 6.095435700790504
+  },
+  {
+   "tconst": "tt0109162",
+   "title": "Asterix in America",
+   "year": 1994,
+   "rating": 5.9,
+   "votes": 9209,
+   "score": 6.086912812713363
+  },
+  {
+   "tconst": "tt0109916",
+   "title": "Godzilla vs. SpaceGodzilla",
+   "year": 1994,
+   "rating": 5.8,
+   "votes": 6610,
+   "score": 6.071821202053761
+  },
+  {
+   "tconst": "tt0111003",
+   "title": "The Puppet Masters",
+   "year": 1994,
+   "rating": 5.9,
+   "votes": 10552,
+   "score": 6.070771872160762
+  },
+  {
+   "tconst": "tt0142234",
+   "title": "Dragon Ball Z: Bio-Broly",
+   "year": 1994,
+   "rating": 5.8,
+   "votes": 6928,
+   "score": 6.0645744597454865
+  },
+  {
+   "tconst": "tt0111543",
+   "title": "Little Indian, Big City",
+   "year": 1994,
+   "rating": 5.7,
+   "votes": 5155,
+   "score": 6.06000434818751
+  },
+  {
+   "tconst": "tt0111201",
+   "title": "Sirens",
+   "year": 1994,
+   "rating": 5.9,
+   "votes": 12412,
+   "score": 6.052529528821743
+  },
+  {
+   "tconst": "tt0111001",
+   "title": "The Road to Wellville",
+   "year": 1994,
+   "rating": 5.9,
+   "votes": 14138,
+   "score": 6.038773338689737
+  },
+  {
+   "tconst": "tt0111438",
+   "title": "Timecop",
+   "year": 1994,
+   "rating": 6,
+   "votes": 70669,
+   "score": 6.028490453895838
+  },
+  {
+   "tconst": "tt0111477",
+   "title": "Trapped in Paradise",
+   "year": 1994,
+   "rating": 5.9,
+   "votes": 16662,
+   "score": 6.022603829556097
+  },
+  {
+   "tconst": "tt0110490",
+   "title": "Men of War",
+   "year": 1994,
+   "rating": 5.6,
+   "votes": 5054,
+   "score": 6.01335231309371
+  },
+  {
+   "tconst": "tt0109402",
+   "title": "The Chase",
+   "year": 1994,
+   "rating": 5.9,
+   "votes": 20807,
+   "score": 6.002911774163761
+  },
+  {
+   "tconst": "tt0109890",
+   "title": "The Getaway",
+   "year": 1994,
+   "rating": 5.9,
+   "votes": 21661,
+   "score": 5.999615324100528
+  },
+  {
+   "tconst": "tt0109575",
+   "title": "Death Machine",
+   "year": 1994,
+   "rating": 5.6,
+   "votes": 5520,
+   "score": 5.995042220137279
+  },
+  {
+   "tconst": "tt0109120",
+   "title": "Andre",
+   "year": 1994,
+   "rating": 5.7,
+   "votes": 7793,
+   "score": 5.985769104654434
+  },
+  {
+   "tconst": "tt0110516",
+   "title": "Milk Money",
+   "year": 1994,
+   "rating": 5.7,
+   "votes": 14111,
+   "score": 5.891295283127214
+  },
+  {
+   "tconst": "tt0109447",
+   "title": "Clifford",
+   "year": 1994,
+   "rating": 5.6,
+   "votes": 9584,
+   "score": 5.884959143982732
+  },
+  {
+   "tconst": "tt0109067",
+   "title": "The Air Up There",
+   "year": 1994,
+   "rating": 5.6,
+   "votes": 9932,
+   "score": 5.878317985256105
+  },
+  {
+   "tconst": "tt0111094",
+   "title": "The Scout",
+   "year": 1994,
+   "rating": 5.5,
+   "votes": 7468,
+   "score": 5.873423496618878
+  },
+  {
+   "tconst": "tt0110353",
+   "title": "Lightning Jack",
+   "year": 1994,
+   "rating": 5.5,
+   "votes": 7649,
+   "score": 5.868080018645282
+  },
+  {
+   "tconst": "tt0111361",
+   "title": "Tammy and the T-Rex",
+   "year": 1994,
+   "rating": 5.4,
+   "votes": 6843,
+   "score": 5.835349502308889
+  },
+  {
+   "tconst": "tt0110442",
+   "title": "Major League II",
+   "year": 1994,
+   "rating": 5.7,
+   "votes": 30051,
+   "score": 5.804300709133667
+  },
+  {
+   "tconst": "tt0110557",
+   "title": "Monkey Trouble",
+   "year": 1994,
+   "rating": 5.4,
+   "votes": 7825,
+   "score": 5.802015138857246
+  },
+  {
+   "tconst": "tt0111400",
+   "title": "Terminal Velocity",
+   "year": 1994,
+   "rating": 5.6,
+   "votes": 15655,
+   "score": 5.801202815581901
+  },
+  {
+   "tconst": "tt0108395",
+   "title": "A Troll in Central Park",
+   "year": 1994,
+   "rating": 5.4,
+   "votes": 7909,
+   "score": 5.799399190939978
+  },
+  {
+   "tconst": "tt0110612",
+   "title": "My Father the Hero",
+   "year": 1994,
+   "rating": 5.5,
+   "votes": 12336,
+   "score": 5.7685650759024085
+  },
+  {
+   "tconst": "tt0109439",
+   "title": "City Slickers II: The Legend of Curly's Gold",
+   "year": 1994,
+   "rating": 5.6,
+   "votes": 21900,
+   "score": 5.754492347800898
+  },
+  {
+   "tconst": "tt0110146",
+   "title": "Intersection",
+   "year": 1994,
+   "rating": 5.4,
+   "votes": 9670,
+   "score": 5.751454952681947
+  },
+  {
+   "tconst": "tt0109361",
+   "title": "Cabin Boy",
+   "year": 1994,
+   "rating": 5.4,
+   "votes": 9740,
+   "score": 5.749785899311002
+  },
+  {
+   "tconst": "tt0109676",
+   "title": "Drop Zone",
+   "year": 1994,
+   "rating": 5.6,
+   "votes": 23237,
+   "score": 5.747177255226977
+  },
+  {
+   "tconst": "tt0109480",
+   "title": "Cops and Robbersons",
+   "year": 1994,
+   "rating": 5.3,
+   "votes": 8032,
+   "score": 5.733996635654096
+  },
+  {
+   "tconst": "tt0109403",
+   "title": "Chasers",
+   "year": 1994,
+   "rating": 5.2,
+   "votes": 7641,
+   "score": 5.686974460552502
+  },
+  {
+   "tconst": "tt0110093",
+   "title": "I Love Trouble",
+   "year": 1994,
+   "rating": 5.4,
+   "votes": 13355,
+   "score": 5.680895895169936
+  },
+  {
+   "tconst": "tt0110538",
+   "title": "Mixed Nuts",
+   "year": 1994,
+   "rating": 5.4,
+   "votes": 14865,
+   "score": 5.65954413067426
+  }
+ ]
+}

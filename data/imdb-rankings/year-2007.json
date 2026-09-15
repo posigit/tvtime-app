@@ -1,0 +1,1608 @@
+{
+ "tag": "year-2007",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.494,
+ "minVotes": 10000,
+ "items": [
+  {
+   "tconst": "tt0986264",
+   "title": "Like Stars on Earth",
+   "year": 2007,
+   "rating": 8.3,
+   "votes": 236192,
+   "score": 8.226630945556733
+  },
+  {
+   "tconst": "tt0477348",
+   "title": "No Country for Old Men",
+   "year": 2007,
+   "rating": 8.2,
+   "votes": 1213449,
+   "score": 8.186053465039004
+  },
+  {
+   "tconst": "tt0469494",
+   "title": "There Will Be Blood",
+   "year": 2007,
+   "rating": 8.2,
+   "votes": 719092,
+   "score": 8.176597090282847
+  },
+  {
+   "tconst": "tt0382932",
+   "title": "Ratatouille",
+   "year": 2007,
+   "rating": 8.1,
+   "votes": 965800,
+   "score": 8.083538763833268
+  },
+  {
+   "tconst": "tt0758758",
+   "title": "Into the Wild",
+   "year": 2007,
+   "rating": 8,
+   "votes": 699612,
+   "score": 7.978773084091733
+  },
+  {
+   "tconst": "tt0440963",
+   "title": "The Bourne Ultimatum",
+   "year": 2007,
+   "rating": 8,
+   "votes": 688742,
+   "score": 7.9784428669644925
+  },
+  {
+   "tconst": "tt0871510",
+   "title": "Chak De! India",
+   "year": 2007,
+   "rating": 8.1,
+   "votes": 92760,
+   "score": 7.943685536672859
+  },
+  {
+   "tconst": "tt0861739",
+   "title": "Elite Squad",
+   "year": 2007,
+   "rating": 8,
+   "votes": 121202,
+   "score": 7.8851932573322285
+  },
+  {
+   "tconst": "tt0401383",
+   "title": "The Diving Bell and the Butterfly",
+   "year": 2007,
+   "rating": 8,
+   "votes": 113251,
+   "score": 7.877787001716034
+  },
+  {
+   "tconst": "tt0808417",
+   "title": "Persepolis",
+   "year": 2007,
+   "rating": 8,
+   "votes": 107104,
+   "score": 7.871371821188883
+  },
+  {
+   "tconst": "tt0386032",
+   "title": "Sicko",
+   "year": 2007,
+   "rating": 8,
+   "votes": 78273,
+   "score": 7.8293603451622005
+  },
+  {
+   "tconst": "tt0425112",
+   "title": "Hot Fuzz",
+   "year": 2007,
+   "rating": 7.8,
+   "votes": 572739,
+   "score": 7.777583662237301
+  },
+  {
+   "tconst": "tt0765429",
+   "title": "American Gangster",
+   "year": 2007,
+   "rating": 7.8,
+   "votes": 493595,
+   "score": 7.774060754670923
+  },
+  {
+   "tconst": "tt0783233",
+   "title": "Atonement",
+   "year": 2007,
+   "rating": 7.8,
+   "votes": 333621,
+   "score": 7.761984645142477
+  },
+  {
+   "tconst": "tt0756683",
+   "title": "The Man from Earth",
+   "year": 2007,
+   "rating": 7.8,
+   "votes": 221127,
+   "score": 7.743481833574195
+  },
+  {
+   "tconst": "tt1032846",
+   "title": "4 Months, 3 Weeks and 2 Days",
+   "year": 2007,
+   "rating": 7.9,
+   "votes": 66525,
+   "score": 7.716231633433559
+  },
+  {
+   "tconst": "tt1093370",
+   "title": "Jab We Met",
+   "year": 2007,
+   "rating": 7.9,
+   "votes": 66336,
+   "score": 7.715776642062762
+  },
+  {
+   "tconst": "tt0923752",
+   "title": "The King of Kong: A Fistful of Quarters",
+   "year": 2007,
+   "rating": 8,
+   "votes": 38741,
+   "score": 7.690960910701524
+  },
+  {
+   "tconst": "tt0443706",
+   "title": "Zodiac",
+   "year": 2007,
+   "rating": 7.7,
+   "votes": 689231,
+   "score": 7.682748370350432
+  },
+  {
+   "tconst": "tt0829482",
+   "title": "Superbad",
+   "year": 2007,
+   "rating": 7.6,
+   "votes": 703873,
+   "score": 7.584503021893955
+  },
+  {
+   "tconst": "tt0381849",
+   "title": "3:10 to Yuma",
+   "year": 2007,
+   "rating": 7.6,
+   "votes": 353785,
+   "score": 7.569589526089595
+  },
+  {
+   "tconst": "tt0452623",
+   "title": "Gone Baby Gone",
+   "year": 2007,
+   "rating": 7.6,
+   "votes": 313536,
+   "score": 7.565806357711361
+  },
+  {
+   "tconst": "tt0486655",
+   "title": "Stardust",
+   "year": 2007,
+   "rating": 7.6,
+   "votes": 300732,
+   "score": 7.564397376995298
+  },
+  {
+   "tconst": "tt0765443",
+   "title": "Eastern Promises",
+   "year": 2007,
+   "rating": 7.6,
+   "votes": 279818,
+   "score": 7.561828201659328
+  },
+  {
+   "tconst": "tt0463998",
+   "title": "Freedom Writers",
+   "year": 2007,
+   "rating": 7.6,
+   "votes": 93677,
+   "score": 7.493294807416331
+  },
+  {
+   "tconst": "tt0373889",
+   "title": "Harry Potter and the Order of the Phoenix",
+   "year": 2007,
+   "rating": 7.5,
+   "votes": 711373,
+   "score": 7.486050386899015
+  },
+  {
+   "tconst": "tt0421082",
+   "title": "Control",
+   "year": 2007,
+   "rating": 7.6,
+   "votes": 72211,
+   "score": 7.46543316281888
+  },
+  {
+   "tconst": "tt0443680",
+   "title": "The Assassination of Jesse James by the Coward Robert Ford",
+   "year": 2007,
+   "rating": 7.5,
+   "votes": 206329,
+   "score": 7.453483470771385
+  },
+  {
+   "tconst": "tt0462322",
+   "title": "Grindhouse",
+   "year": 2007,
+   "rating": 7.5,
+   "votes": 197797,
+   "score": 7.451573534500031
+  },
+  {
+   "tconst": "tt1051907",
+   "title": "For Love and Honor",
+   "year": 2007,
+   "rating": 7.8,
+   "votes": 26240,
+   "score": 7.439545412486286
+  },
+  {
+   "tconst": "tt0880502",
+   "title": "The Edge of Heaven",
+   "year": 2007,
+   "rating": 7.7,
+   "votes": 35727,
+   "score": 7.4361979956809545
+  },
+  {
+   "tconst": "tt0857191",
+   "title": "The Visitor",
+   "year": 2007,
+   "rating": 7.6,
+   "votes": 46570,
+   "score": 7.404439203615043
+  },
+  {
+   "tconst": "tt0450188",
+   "title": "La Vie En Rose",
+   "year": 2007,
+   "rating": 7.5,
+   "votes": 94651,
+   "score": 7.403843496464468
+  },
+  {
+   "tconst": "tt0419887",
+   "title": "The Kite Runner",
+   "year": 2007,
+   "rating": 7.5,
+   "votes": 85573,
+   "score": 7.394710072389723
+  },
+  {
+   "tconst": "tt0467406",
+   "title": "Juno",
+   "year": 2007,
+   "rating": 7.4,
+   "votes": 575435,
+   "score": 7.384519418464054
+  },
+  {
+   "tconst": "tt0988108",
+   "title": "The Class",
+   "year": 2007,
+   "rating": 7.9,
+   "votes": 16812,
+   "score": 7.37550073655464
+  },
+  {
+   "tconst": "tt0427309",
+   "title": "The Great Debaters",
+   "year": 2007,
+   "rating": 7.5,
+   "votes": 66881,
+   "score": 7.369111038468581
+  },
+  {
+   "tconst": "tt0499375",
+   "title": "Guru",
+   "year": 2007,
+   "rating": 7.7,
+   "votes": 26454,
+   "score": 7.369093261329429
+  },
+  {
+   "tconst": "tt1038988",
+   "title": "REC",
+   "year": 2007,
+   "rating": 7.4,
+   "votes": 220192,
+   "score": 7.360629065078296
+  },
+  {
+   "tconst": "tt0464141",
+   "title": "The Orphanage",
+   "year": 2007,
+   "rating": 7.4,
+   "votes": 171777,
+   "score": 7.350142898983386
+  },
+  {
+   "tconst": "tt0393597",
+   "title": "Earth",
+   "year": 2007,
+   "rating": 7.9,
+   "votes": 14989,
+   "score": 7.337237414402457
+  },
+  {
+   "tconst": "tt0813547",
+   "title": "The Counterfeiters",
+   "year": 2007,
+   "rating": 7.5,
+   "votes": 48815,
+   "score": 7.328906329142277
+  },
+  {
+   "tconst": "tt0426931",
+   "title": "August Rush",
+   "year": 2007,
+   "rating": 7.4,
+   "votes": 115281,
+   "score": 7.3276596271462
+  },
+  {
+   "tconst": "tt0808357",
+   "title": "Lust, Caution",
+   "year": 2007,
+   "rating": 7.5,
+   "votes": 48350,
+   "score": 7.327542857729272
+  },
+  {
+   "tconst": "tt0490204",
+   "title": "Reign Over Me",
+   "year": 2007,
+   "rating": 7.4,
+   "votes": 105663,
+   "score": 7.321644136400604
+  },
+  {
+   "tconst": "tt1093824",
+   "title": "Encounters at the End of the World",
+   "year": 2007,
+   "rating": 7.7,
+   "votes": 20517,
+   "score": 7.3047162482715535
+  },
+  {
+   "tconst": "tt1121794",
+   "title": "Sword of the Stranger",
+   "year": 2007,
+   "rating": 7.7,
+   "votes": 20151,
+   "score": 7.299917937995522
+  },
+  {
+   "tconst": "tt1078188",
+   "title": "Boy A",
+   "year": 2007,
+   "rating": 7.5,
+   "votes": 40242,
+   "score": 7.2997119093289085
+  },
+  {
+   "tconst": "tt0995031",
+   "title": "Bhool Bhulaiyaa",
+   "year": 2007,
+   "rating": 7.5,
+   "votes": 39494,
+   "score": 7.296684966834424
+  },
+  {
+   "tconst": "tt0942384",
+   "title": "Shelter",
+   "year": 2007,
+   "rating": 7.6,
+   "votes": 25989,
+   "score": 7.292604010906192
+  },
+  {
+   "tconst": "tt0983213",
+   "title": "5 Centimeters per Second",
+   "year": 2007,
+   "rating": 7.4,
+   "votes": 72007,
+   "score": 7.289486577347093
+  },
+  {
+   "tconst": "tt0408236",
+   "title": "Sweeney Todd: The Demon Barber of Fleet Street",
+   "year": 2007,
+   "rating": 7.3,
+   "votes": 409352,
+   "score": 7.280773015863768
+  },
+  {
+   "tconst": "tt0462538",
+   "title": "The Simpsons Movie",
+   "year": 2007,
+   "rating": 7.3,
+   "votes": 365537,
+   "score": 7.278529747397734
+  },
+  {
+   "tconst": "tt0479751",
+   "title": "Sivaji",
+   "year": 2007,
+   "rating": 7.6,
+   "votes": 24227,
+   "score": 7.276779318914979
+  },
+  {
+   "tconst": "tt0825232",
+   "title": "The Bucket List",
+   "year": 2007,
+   "rating": 7.3,
+   "votes": 274962,
+   "score": 7.271705440544714
+  },
+  {
+   "tconst": "tt0845448",
+   "title": "Dhamaal",
+   "year": 2007,
+   "rating": 7.6,
+   "votes": 23415,
+   "score": 7.268924906434326
+  },
+  {
+   "tconst": "tt1077248",
+   "title": "Johnny Gaddaar",
+   "year": 2007,
+   "rating": 7.8,
+   "votes": 14346,
+   "score": 7.263448851905979
+  },
+  {
+   "tconst": "tt0923811",
+   "title": "Evangelion: 1.0 You Are (Not) Alone",
+   "year": 2007,
+   "rating": 7.5,
+   "votes": 32398,
+   "score": 7.262656864675291
+  },
+  {
+   "tconst": "tt0805564",
+   "title": "Lars and the Real Girl",
+   "year": 2007,
+   "rating": 7.3,
+   "votes": 170807,
+   "score": 7.2554061831041
+  },
+  {
+   "tconst": "tt0795368",
+   "title": "Death at a Funeral",
+   "year": 2007,
+   "rating": 7.3,
+   "votes": 129066,
+   "score": 7.242021239904096
+  },
+  {
+   "tconst": "tt0292963",
+   "title": "Before the Devil Knows You're Dead",
+   "year": 2007,
+   "rating": 7.3,
+   "votes": 123997,
+   "score": 7.23982794949516
+  },
+  {
+   "tconst": "tt0445922",
+   "title": "Across the Universe",
+   "year": 2007,
+   "rating": 7.3,
+   "votes": 118245,
+   "score": 7.237129133677749
+  },
+  {
+   "tconst": "tt0478813",
+   "title": "The Trap",
+   "year": 2007,
+   "rating": 7.9,
+   "votes": 11028,
+   "score": 7.2312310133394995
+  },
+  {
+   "tconst": "tt0480249",
+   "title": "I Am Legend",
+   "year": 2007,
+   "rating": 7.2,
+   "votes": 888238,
+   "score": 7.192136967873217
+  },
+  {
+   "tconst": "tt0449088",
+   "title": "Pirates of the Caribbean: At World's End",
+   "year": 2007,
+   "rating": 7.2,
+   "votes": 753083,
+   "score": 7.19074429092052
+  },
+  {
+   "tconst": "tt0822854",
+   "title": "Shooter",
+   "year": 2007,
+   "rating": 7.2,
+   "votes": 379318,
+   "score": 7.181858341377751
+  },
+  {
+   "tconst": "tt0448134",
+   "title": "Sunshine",
+   "year": 2007,
+   "rating": 7.2,
+   "votes": 290553,
+   "score": 7.176500403418043
+  },
+  {
+   "tconst": "tt0488120",
+   "title": "Fracture",
+   "year": 2007,
+   "rating": 7.2,
+   "votes": 238716,
+   "score": 7.171602654226117
+  },
+  {
+   "tconst": "tt0838221",
+   "title": "The Darjeeling Limited",
+   "year": 2007,
+   "rating": 7.2,
+   "votes": 238668,
+   "score": 7.171597172730319
+  },
+  {
+   "tconst": "tt0398808",
+   "title": "Bridge to Terabithia",
+   "year": 2007,
+   "rating": 7.2,
+   "votes": 194615,
+   "score": 7.165482128624505
+  },
+  {
+   "tconst": "tt0465538",
+   "title": "Michael Clayton",
+   "year": 2007,
+   "rating": 7.2,
+   "votes": 185238,
+   "score": 7.163824284967593
+  },
+  {
+   "tconst": "tt1039960",
+   "title": "Estomago: A Gastronomic Story",
+   "year": 2007,
+   "rating": 7.8,
+   "votes": 10453,
+   "score": 7.161322336503348
+  },
+  {
+   "tconst": "tt1451409",
+   "title": "Pokkiri",
+   "year": 2007,
+   "rating": 7.6,
+   "votes": 15133,
+   "score": 7.159826751621494
+  },
+  {
+   "tconst": "tt0780571",
+   "title": "Mr. Brooks",
+   "year": 2007,
+   "rating": 7.2,
+   "votes": 164448,
+   "score": 7.159513011031958
+  },
+  {
+   "tconst": "tt1014672",
+   "title": "Bheja Fry",
+   "year": 2007,
+   "rating": 7.6,
+   "votes": 12803,
+   "score": 7.114850052559005
+  },
+  {
+   "tconst": "tt0488478",
+   "title": "12",
+   "year": 2007,
+   "rating": 7.5,
+   "votes": 16052,
+   "score": 7.113738897148126
+  },
+  {
+   "tconst": "tt1032856",
+   "title": "The Band's Visit",
+   "year": 2007,
+   "rating": 7.5,
+   "votes": 14725,
+   "score": 7.0930081192518895
+  },
+  {
+   "tconst": "tt0418279",
+   "title": "Transformers",
+   "year": 2007,
+   "rating": 7.1,
+   "votes": 726771,
+   "score": 7.091771019419199
+  },
+  {
+   "tconst": "tt0337978",
+   "title": "Live Free or Die Hard",
+   "year": 2007,
+   "rating": 7.1,
+   "votes": 437841,
+   "score": 7.086461993762302
+  },
+  {
+   "tconst": "tt0416044",
+   "title": "Mongol: The Rise of Genghis Khan",
+   "year": 2007,
+   "rating": 7.2,
+   "votes": 51777,
+   "score": 7.085671459418602
+  },
+  {
+   "tconst": "tt0884328",
+   "title": "The Mist",
+   "year": 2007,
+   "rating": 7.1,
+   "votes": 380316,
+   "score": 7.084466754497645
+  },
+  {
+   "tconst": "tt0854678",
+   "title": "Taxi to the Dark Side",
+   "year": 2007,
+   "rating": 7.4,
+   "votes": 17840,
+   "score": 7.074465723724964
+  },
+  {
+   "tconst": "tt0461770",
+   "title": "Enchanted",
+   "year": 2007,
+   "rating": 7.1,
+   "votes": 226947,
+   "score": 7.074412530010942
+  },
+  {
+   "tconst": "tt0445336",
+   "title": "You, the Living",
+   "year": 2007,
+   "rating": 7.4,
+   "votes": 17100,
+   "score": 7.0655765958857195
+  },
+  {
+   "tconst": "tt0802948",
+   "title": "An American Crime",
+   "year": 2007,
+   "rating": 7.2,
+   "votes": 40241,
+   "score": 7.059420110039669
+  },
+  {
+   "tconst": "tt0800956",
+   "title": "Life in a Metro",
+   "year": 2007,
+   "rating": 7.4,
+   "votes": 15334,
+   "score": 7.042264377852017
+  },
+  {
+   "tconst": "tt0478134",
+   "title": "In the Valley of Elah",
+   "year": 2007,
+   "rating": 7.1,
+   "votes": 77797,
+   "score": 7.030944402980774
+  },
+  {
+   "tconst": "tt0480669",
+   "title": "Timecrimes",
+   "year": 2007,
+   "rating": 7.1,
+   "votes": 76658,
+   "score": 7.030036762312804
+  },
+  {
+   "tconst": "tt0953318",
+   "title": "Ben X",
+   "year": 2007,
+   "rating": 7.3,
+   "votes": 19820,
+   "score": 7.029615216247585
+  },
+  {
+   "tconst": "tt0488798",
+   "title": "Welcome",
+   "year": 2007,
+   "rating": 7.2,
+   "votes": 30323,
+   "score": 7.024842540200456
+  },
+  {
+   "tconst": "tt0399095",
+   "title": "Trade",
+   "year": 2007,
+   "rating": 7.3,
+   "votes": 18999,
+   "score": 7.021960265819613
+  },
+  {
+   "tconst": "tt0817225",
+   "title": "Secret Sunshine",
+   "year": 2007,
+   "rating": 7.5,
+   "votes": 10993,
+   "score": 7.0206557304102795
+  },
+  {
+   "tconst": "tt0385277",
+   "title": "The Music Man",
+   "year": 2007,
+   "rating": 7.5,
+   "votes": 10043,
+   "score": 6.997935725615077
+  },
+  {
+   "tconst": "tt1028528",
+   "title": "Death Proof",
+   "year": 2007,
+   "rating": 7,
+   "votes": 336921,
+   "score": 6.985406261795922
+  },
+  {
+   "tconst": "tt1077258",
+   "title": "Planet Terror",
+   "year": 2007,
+   "rating": 7,
+   "votes": 234731,
+   "score": 6.979312493098557
+  },
+  {
+   "tconst": "tt0775529",
+   "title": "The Savages",
+   "year": 2007,
+   "rating": 7.1,
+   "votes": 39967,
+   "score": 6.978662432175295
+  },
+  {
+   "tconst": "tt0431308",
+   "title": "P.S. I Love You",
+   "year": 2007,
+   "rating": 7,
+   "votes": 226895,
+   "score": 6.97862819286394
+  },
+  {
+   "tconst": "tt1020937",
+   "title": "Awarapan",
+   "year": 2007,
+   "rating": 7.4,
+   "votes": 11348,
+   "score": 6.975469634087643
+  },
+  {
+   "tconst": "tt0829297",
+   "title": "Ten Inch Hero",
+   "year": 2007,
+   "rating": 7.3,
+   "votes": 14648,
+   "score": 6.972879168634494
+  },
+  {
+   "tconst": "tt0431197",
+   "title": "The Kingdom",
+   "year": 2007,
+   "rating": 7,
+   "votes": 138196,
+   "score": 6.965836633569753
+  },
+  {
+   "tconst": "tt0472062",
+   "title": "Charlie Wilson's War",
+   "year": 2007,
+   "rating": 7,
+   "votes": 132296,
+   "score": 6.964420122480624
+  },
+  {
+   "tconst": "tt0469623",
+   "title": "Things We Lost in the Fire",
+   "year": 2007,
+   "rating": 7.1,
+   "votes": 30797,
+   "score": 6.951389213630977
+  },
+  {
+   "tconst": "tt0870090",
+   "title": "City of Men",
+   "year": 2007,
+   "rating": 7.2,
+   "votes": 17043,
+   "score": 6.938828005343453
+  },
+  {
+   "tconst": "tt0416508",
+   "title": "Becoming Jane",
+   "year": 2007,
+   "rating": 7,
+   "votes": 68725,
+   "score": 6.935689117161042
+  },
+  {
+   "tconst": "tt0401997",
+   "title": "Breach",
+   "year": 2007,
+   "rating": 7,
+   "votes": 64171,
+   "score": 6.931740515140729
+  },
+  {
+   "tconst": "tt0995740",
+   "title": "No Smoking",
+   "year": 2007,
+   "rating": 7.3,
+   "votes": 11716,
+   "score": 6.9287127347809445
+  },
+  {
+   "tconst": "tt0795434",
+   "title": "Namastey London",
+   "year": 2007,
+   "rating": 7.1,
+   "votes": 24428,
+   "score": 6.923896995134861
+  },
+  {
+   "tconst": "tt0473308",
+   "title": "Waitress",
+   "year": 2007,
+   "rating": 7,
+   "votes": 51531,
+   "score": 6.91771831675908
+  },
+  {
+   "tconst": "tt0796368",
+   "title": "Talk to Me",
+   "year": 2007,
+   "rating": 7.3,
+   "votes": 10733,
+   "score": 6.91110913753451
+  },
+  {
+   "tconst": "tt0875113",
+   "title": "99 Francs",
+   "year": 2007,
+   "rating": 7.1,
+   "votes": 21903,
+   "score": 6.909959118217817
+  },
+  {
+   "tconst": "tt0478311",
+   "title": "Knocked Up",
+   "year": 2007,
+   "rating": 6.9,
+   "votes": 402656,
+   "score": 6.890154331328039
+  },
+  {
+   "tconst": "tt0496806",
+   "title": "Ocean's Thirteen",
+   "year": 2007,
+   "rating": 6.9,
+   "votes": 390587,
+   "score": 6.889857698199151
+  },
+  {
+   "tconst": "tt0845046",
+   "title": "Son of Rambow",
+   "year": 2007,
+   "rating": 7,
+   "votes": 33837,
+   "score": 6.884506826391017
+  },
+  {
+   "tconst": "tt0913968",
+   "title": "The Warlords",
+   "year": 2007,
+   "rating": 7,
+   "votes": 28895,
+   "score": 6.869832259892094
+  },
+  {
+   "tconst": "tt0825236",
+   "title": "Caramel",
+   "year": 2007,
+   "rating": 7.1,
+   "votes": 15400,
+   "score": 6.86130416332689
+  },
+  {
+   "tconst": "tt0841046",
+   "title": "Walk Hard: The Dewey Cox Story",
+   "year": 2007,
+   "rating": 6.9,
+   "votes": 82594,
+   "score": 6.856121625035132
+  },
+  {
+   "tconst": "tt0847880",
+   "title": "Cargo 200",
+   "year": 2007,
+   "rating": 7.1,
+   "votes": 14273,
+   "score": 6.850221470296337
+  },
+  {
+   "tconst": "tt0423977",
+   "title": "Charlie Bartlett",
+   "year": 2007,
+   "rating": 6.9,
+   "votes": 68473,
+   "score": 6.848225832432849
+  },
+  {
+   "tconst": "tt0427470",
+   "title": "The Lookout",
+   "year": 2007,
+   "rating": 6.9,
+   "votes": 62367,
+   "score": 6.843857362451159
+  },
+  {
+   "tconst": "tt0438859",
+   "title": "Goodbye Bafana",
+   "year": 2007,
+   "rating": 7.1,
+   "votes": 12533,
+   "score": 6.830933552944703
+  },
+  {
+   "tconst": "tt0952682",
+   "title": "Shotgun Stories",
+   "year": 2007,
+   "rating": 7.1,
+   "votes": 12050,
+   "score": 6.825039716485396
+  },
+  {
+   "tconst": "tt0879843",
+   "title": "Katyn",
+   "year": 2007,
+   "rating": 7,
+   "votes": 18393,
+   "score": 6.821685829200964
+  },
+  {
+   "tconst": "tt0811066",
+   "title": "Shootout at Lokhandwala",
+   "year": 2007,
+   "rating": 7.1,
+   "votes": 11740,
+   "score": 6.82111893967355
+  },
+  {
+   "tconst": "tt0902955",
+   "title": "At the Bar",
+   "year": 2007,
+   "rating": 7,
+   "votes": 17374,
+   "score": 6.815048065628078
+  },
+  {
+   "tconst": "tt0995829",
+   "title": "XXY",
+   "year": 2007,
+   "rating": 7,
+   "votes": 15565,
+   "score": 6.8019607177196555
+  },
+  {
+   "tconst": "tt0463854",
+   "title": "28 Weeks Later",
+   "year": 2007,
+   "rating": 6.8,
+   "votes": 368404,
+   "score": 6.79190580899912
+  },
+  {
+   "tconst": "tt0450385",
+   "title": "1408",
+   "year": 2007,
+   "rating": 6.8,
+   "votes": 317314,
+   "score": 6.7906423976624986
+  },
+  {
+   "tconst": "tt0486822",
+   "title": "Disturbia",
+   "year": 2007,
+   "rating": 6.8,
+   "votes": 276650,
+   "score": 6.789314933711854
+  },
+  {
+   "tconst": "tt0396555",
+   "title": "Meet the Robinsons",
+   "year": 2007,
+   "rating": 6.8,
+   "votes": 123547,
+   "score": 6.777065196136963
+  },
+  {
+   "tconst": "tt0480242",
+   "title": "Dan in Real Life",
+   "year": 2007,
+   "rating": 6.8,
+   "votes": 111720,
+   "score": 6.774836721561805
+  },
+  {
+   "tconst": "tt0498399",
+   "title": "We Own the Night",
+   "year": 2007,
+   "rating": 6.8,
+   "votes": 97204,
+   "score": 6.771429477897308
+  },
+  {
+   "tconst": "tt0414055",
+   "title": "Elizabeth: The Golden Age",
+   "year": 2007,
+   "rating": 6.8,
+   "votes": 78501,
+   "score": 6.765391642450401
+  },
+  {
+   "tconst": "tt0368794",
+   "title": "I'm Not There",
+   "year": 2007,
+   "rating": 6.8,
+   "votes": 63776,
+   "score": 6.758484137775198
+  },
+  {
+   "tconst": "tt0804522",
+   "title": "Rendition",
+   "year": 2007,
+   "rating": 6.8,
+   "votes": 60099,
+   "score": 6.756306448715431
+  },
+  {
+   "tconst": "tt0996605",
+   "title": "Love Songs",
+   "year": 2007,
+   "rating": 7,
+   "votes": 10617,
+   "score": 6.754432058422806
+  },
+  {
+   "tconst": "tt1024943",
+   "title": "Om Shanti Om",
+   "year": 2007,
+   "rating": 6.8,
+   "votes": 57213,
+   "score": 6.754430329675851
+  },
+  {
+   "tconst": "tt1043842",
+   "title": "Appleseed: Ex Machina",
+   "year": 2007,
+   "rating": 7,
+   "votes": 10127,
+   "score": 6.748453607020569
+  },
+  {
+   "tconst": "tt0466816",
+   "title": "Hallam Foe",
+   "year": 2007,
+   "rating": 6.9,
+   "votes": 13687,
+   "score": 6.728476622134631
+  },
+  {
+   "tconst": "tt0787523",
+   "title": "Towelhead",
+   "year": 2007,
+   "rating": 6.9,
+   "votes": 12361,
+   "score": 6.718305341822951
+  },
+  {
+   "tconst": "tt0812243",
+   "title": "Ex Drummer",
+   "year": 2007,
+   "rating": 6.9,
+   "votes": 11631,
+   "score": 6.7121735355971985
+  },
+  {
+   "tconst": "tt0427327",
+   "title": "Hairspray",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 146849,
+   "score": 6.686848024204827
+  },
+  {
+   "tconst": "tt0862856",
+   "title": "Trick 'r Treat",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 115396,
+   "score": 6.683549122368362
+  },
+  {
+   "tconst": "tt0423294",
+   "title": "Surf's Up",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 104299,
+   "score": 6.681951948385401
+  },
+  {
+   "tconst": "tt0787475",
+   "title": "Hot Rod",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 100249,
+   "score": 6.681288952720687
+  },
+  {
+   "tconst": "tt0804461",
+   "title": "Death Sentence",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 78298,
+   "score": 6.676637361531439
+  },
+  {
+   "tconst": "tt0480269",
+   "title": "Interview",
+   "year": 2007,
+   "rating": 6.8,
+   "votes": 14256,
+   "score": 6.673727149921792
+  },
+  {
+   "tconst": "tt0476964",
+   "title": "The Brave One",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 68374,
+   "score": 6.673679099554738
+  },
+  {
+   "tconst": "tt0856288",
+   "title": "Inside",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 49070,
+   "score": 6.665077463153935
+  },
+  {
+   "tconst": "tt0485851",
+   "title": "The Air I Breathe",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 35620,
+   "score": 6.654781362308263
+  },
+  {
+   "tconst": "tt0841044",
+   "title": "Two Days in Paris",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 32747,
+   "score": 6.65174224503481
+  },
+  {
+   "tconst": "tt0866437",
+   "title": "The Jane Austen Book Club",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 30080,
+   "score": 6.648531081549475
+  },
+  {
+   "tconst": "tt0780516",
+   "title": "Flawless",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 28703,
+   "score": 6.646699887566932
+  },
+  {
+   "tconst": "tt0494222",
+   "title": "Eagle vs Shark",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 27785,
+   "score": 6.645404942397856
+  },
+  {
+   "tconst": "tt0455782",
+   "title": "The Hunting Party",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 26916,
+   "score": 6.644119778646196
+  },
+  {
+   "tconst": "tt0760311",
+   "title": "He Was a Quiet Man",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 23982,
+   "score": 6.639295090003619
+  },
+  {
+   "tconst": "tt0901507",
+   "title": "Rise of the Footsoldier",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 23221,
+   "score": 6.637904510656001
+  },
+  {
+   "tconst": "tt0416185",
+   "title": "Resurrecting the Champ",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 21862,
+   "score": 6.635255971015724
+  },
+  {
+   "tconst": "tt0415965",
+   "title": "Martian Child",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 21530,
+   "score": 6.634574238772693
+  },
+  {
+   "tconst": "tt0869977",
+   "title": "Water Lilies",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 15529,
+   "score": 6.6191948665636335
+  },
+  {
+   "tconst": "tt0455326",
+   "title": "Aqua Teen Hunger Force Colon Movie Film for Theaters",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 14932,
+   "score": 6.6172599770777705
+  },
+  {
+   "tconst": "tt0992911",
+   "title": "Flash Point",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 14703,
+   "score": 6.616492966380723
+  },
+  {
+   "tconst": "tt0453548",
+   "title": "Snow Angels",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 13465,
+   "score": 6.61208718297477
+  },
+  {
+   "tconst": "tt0792965",
+   "title": "Hunting and Gathering",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 13032,
+   "score": 6.610434428121874
+  },
+  {
+   "tconst": "tt0772168",
+   "title": "Grace Is Gone",
+   "year": 2007,
+   "rating": 6.7,
+   "votes": 10007,
+   "score": 6.5968923750938675
+  },
+  {
+   "tconst": "tt0389722",
+   "title": "30 Days of Night",
+   "year": 2007,
+   "rating": 6.6,
+   "votes": 203174,
+   "score": 6.595014053066992
+  },
+  {
+   "tconst": "tt0465602",
+   "title": "Shoot 'Em Up",
+   "year": 2007,
+   "rating": 6.6,
+   "votes": 159887,
+   "score": 6.593743639881232
+  },
+  {
+   "tconst": "tt0765120",
+   "title": "My Blueberry Nights",
+   "year": 2007,
+   "rating": 6.6,
+   "votes": 59066,
+   "score": 6.584610745497104
+  },
+  {
+   "tconst": "tt0795493",
+   "title": "Cassandra's Dream",
+   "year": 2007,
+   "rating": 6.6,
+   "votes": 55622,
+   "score": 6.583803080498963
+  },
+  {
+   "tconst": "tt0489664",
+   "title": "Shattered",
+   "year": 2007,
+   "rating": 6.6,
+   "votes": 35299,
+   "score": 6.576536474282059
+  },
+  {
+   "tconst": "tt0842929",
+   "title": "Paranoid Park",
+   "year": 2007,
+   "rating": 6.6,
+   "votes": 33176,
+   "score": 6.575382753115226
+  },
+  {
+   "tconst": "tt0829459",
+   "title": "A Mighty Heart",
+   "year": 2007,
+   "rating": 6.6,
+   "votes": 28811,
+   "score": 6.57261409776875
+  },
+  {
+   "tconst": "tt0831884",
+   "title": "Reservation Road",
+   "year": 2007,
+   "rating": 6.6,
+   "votes": 26124,
+   "score": 6.570577060915263
+  },
+  {
+   "tconst": "tt0837106",
+   "title": "Arn: The Knight Templar",
+   "year": 2007,
+   "rating": 6.6,
+   "votes": 24383,
+   "score": 6.56908721602254
+  },
+  {
+   "tconst": "tt0388182",
+   "title": "King of California",
+   "year": 2007,
+   "rating": 6.6,
+   "votes": 24299,
+   "score": 6.569011509038251
+  },
+  {
+   "tconst": "tt1016301",
+   "title": "Fermat's Room",
+   "year": 2007,
+   "rating": 6.6,
+   "votes": 24138,
+   "score": 6.568865362601881
+  },
+  {
+   "tconst": "tt0850253",
+   "title": "Battle in Seattle",
+   "year": 2007,
+   "rating": 6.6,
+   "votes": 15616,
+   "score": 6.55850740742126
+  },
+  {
+   "tconst": "tt0465234",
+   "title": "National Treasure: Book of Secrets",
+   "year": 2007,
+   "rating": 6.5,
+   "votes": 269530,
+   "score": 6.499775071543316
+  },
+  {
+   "tconst": "tt0758766",
+   "title": "Music and Lyrics",
+   "year": 2007,
+   "rating": 6.5,
+   "votes": 112090,
+   "score": 6.499485017188165
+  },
+  {
+   "tconst": "tt0808279",
+   "title": "Funny Games",
+   "year": 2007,
+   "rating": 6.5,
+   "votes": 111199,
+   "score": 6.499481231268435
+  },
+  {
+   "tconst": "tt0211933",
+   "title": "Awake",
+   "year": 2007,
+   "rating": 6.5,
+   "votes": 88927,
+   "score": 6.499364437903736
+  },
+  {
+   "tconst": "tt0425413",
+   "title": "Run Fatboy Run",
+   "year": 2007,
+   "rating": 6.5,
+   "votes": 72020,
+   "score": 6.4992334278042305
+  },
+  {
+   "tconst": "tt0460745",
+   "title": "Chaos Theory",
+   "year": 2007,
+   "rating": 6.5,
+   "votes": 35265,
+   "score": 6.498610974229603
+  },
+  {
+   "tconst": "tt0960790",
+   "title": "Rabbit Without Ears",
+   "year": 2007,
+   "rating": 6.5,
+   "votes": 19507,
+   "score": 6.4978691750602575
+  },
+  {
+   "tconst": "tt0800027",
+   "title": "Feast of Love",
+   "year": 2007,
+   "rating": 6.5,
+   "votes": 17738,
+   "score": 6.497733281004505
+  },
+  {
+   "tconst": "tt0477078",
+   "title": "Rocket Science",
+   "year": 2007,
+   "rating": 6.5,
+   "votes": 14068,
+   "score": 6.497387641204213
+  },
+  {
+   "tconst": "tt0465436",
+   "title": "December Boys",
+   "year": 2007,
+   "rating": 6.5,
+   "votes": 12724,
+   "score": 6.4972331345055006
+  },
+  {
+   "tconst": "tt0858486",
+   "title": "Battle for Terra",
+   "year": 2007,
+   "rating": 6.5,
+   "votes": 12606,
+   "score": 6.497218691873972
+  },
+  {
+   "tconst": "tt0758786",
+   "title": "Stuck",
+   "year": 2007,
+   "rating": 6.4,
+   "votes": 10868,
+   "score": 6.444907310164032
+  },
+  {
+   "tconst": "tt0937375",
+   "title": "This Christmas",
+   "year": 2007,
+   "rating": 6.4,
+   "votes": 11418,
+   "score": 6.443754120296154
+  },
+  {
+   "tconst": "tt0765447",
+   "title": "Evening",
+   "year": 2007,
+   "rating": 6.4,
+   "votes": 14466,
+   "score": 6.438303185992929
+  },
+  {
+   "tconst": "tt0796375",
+   "title": "You Kill Me",
+   "year": 2007,
+   "rating": 6.4,
+   "votes": 19484,
+   "score": 6.43178421342094
+  },
+  {
+   "tconst": "tt0484740",
+   "title": "Love in the Time of Cholera",
+   "year": 2007,
+   "rating": 6.4,
+   "votes": 24952,
+   "score": 6.4268117918431855
+  },
+  {
+   "tconst": "tt0830558",
+   "title": "The Girl Next Door",
+   "year": 2007,
+   "rating": 6.4,
+   "votes": 32512,
+   "score": 6.422043793481912
+  },
+  {
+   "tconst": "tt0419843",
+   "title": "In the Land of Women",
+   "year": 2007,
+   "rating": 6.4,
+   "votes": 33663,
+   "score": 6.4214626972151025
+  },
+  {
+   "tconst": "tt0760329",
+   "title": "The Water Horse",
+   "year": 2007,
+   "rating": 6.4,
+   "votes": 45060,
+   "score": 6.417020082609935
+  },
+  {
+   "tconst": "tt0481141",
+   "title": "No Reservations",
+   "year": 2007,
+   "rating": 6.4,
+   "votes": 86012,
+   "score": 6.409760506483596
+  },
+  {
+   "tconst": "tt0453451",
+   "title": "Mr. Bean's Holiday",
+   "year": 2007,
+   "rating": 6.4,
+   "votes": 143290,
+   "score": 6.406113417369059
+  },
+  {
+   "tconst": "tt0481369",
+   "title": "The Number 23",
+   "year": 2007,
+   "rating": 6.4,
+   "votes": 222638,
+   "score": 6.404028257414966
+  },
+  {
+   "tconst": "tt0804505",
+   "title": "Married Life",
+   "year": 2007,
+   "rating": 6.2,
+   "votes": 10276,
+   "score": 6.344857257274758
+  },
+  {
+   "tconst": "tt0857265",
+   "title": "Sleuth",
+   "year": 2007,
+   "rating": 6.3,
+   "votes": 34029,
+   "score": 6.343996587442435
+  }
+ ]
+}

@@ -1,0 +1,1608 @@
+{
+ "tag": "year-1986",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.402,
+ "minVotes": 2000,
+ "items": [
+  {
+   "tconst": "tt0090605",
+   "title": "Aliens",
+   "year": 1986,
+   "rating": 8.4,
+   "votes": 848166,
+   "score": 8.395299876996184
+  },
+  {
+   "tconst": "tt0092005",
+   "title": "Stand by Me",
+   "year": 1986,
+   "rating": 8.1,
+   "votes": 494861,
+   "score": 8.093165322346366
+  },
+  {
+   "tconst": "tt0179955",
+   "title": "Cat City",
+   "year": 1986,
+   "rating": 8.3,
+   "votes": 11739,
+   "score": 8.02371462452416
+  },
+  {
+   "tconst": "tt0091763",
+   "title": "Platoon",
+   "year": 1986,
+   "rating": 8,
+   "votes": 477065,
+   "score": 7.993328911998033
+  },
+  {
+   "tconst": "tt0091288",
+   "title": "Jean de Florette",
+   "year": 1986,
+   "rating": 8.1,
+   "votes": 29697,
+   "score": 7.992864158322158
+  },
+  {
+   "tconst": "tt0092067",
+   "title": "Castle in the Sky",
+   "year": 1986,
+   "rating": 8,
+   "votes": 200692,
+   "score": 7.984232802608576
+  },
+  {
+   "tconst": "tt0091480",
+   "title": "Manon of the Spring",
+   "year": 1986,
+   "rating": 8,
+   "votes": 26079,
+   "score": 7.886182386350563
+  },
+  {
+   "tconst": "tt0091559",
+   "title": "Mouna Ragam",
+   "year": 1986,
+   "rating": 8.4,
+   "votes": 4879,
+   "score": 7.819118364055451
+  },
+  {
+   "tconst": "tt0091042",
+   "title": "Ferris Bueller's Day Off",
+   "year": 1986,
+   "rating": 7.8,
+   "votes": 420598,
+   "score": 7.793384055831636
+  },
+  {
+   "tconst": "tt0091167",
+   "title": "Hannah and Her Sisters",
+   "year": 1986,
+   "rating": 7.8,
+   "votes": 82190,
+   "score": 7.766790773563813
+  },
+  {
+   "tconst": "tt0091670",
+   "title": "The Sacrifice",
+   "year": 1986,
+   "rating": 7.8,
+   "votes": 35572,
+   "score": 7.725585947682781
+  },
+  {
+   "tconst": "tt0090756",
+   "title": "Blue Velvet",
+   "year": 1986,
+   "rating": 7.7,
+   "votes": 249003,
+   "score": 7.689657953197123
+  },
+  {
+   "tconst": "tt0091605",
+   "title": "The Name of the Rose",
+   "year": 1986,
+   "rating": 7.7,
+   "votes": 128605,
+   "score": 7.680124154713353
+  },
+  {
+   "tconst": "tt0091341",
+   "title": "Kin-dza-dza!",
+   "year": 1986,
+   "rating": 7.8,
+   "votes": 15627,
+   "score": 7.641386238516903
+  },
+  {
+   "tconst": "tt0249047",
+   "title": "Namukku Parkkan Munthiri Thoppukal",
+   "year": 1986,
+   "rating": 8.5,
+   "votes": 2834,
+   "score": 7.632005632258471
+  },
+  {
+   "tconst": "tt0091064",
+   "title": "The Fly",
+   "year": 1986,
+   "rating": 7.6,
+   "votes": 227364,
+   "score": 7.589554224840591
+  },
+  {
+   "tconst": "tt0090967",
+   "title": "Down by Law",
+   "year": 1986,
+   "rating": 7.6,
+   "votes": 59216,
+   "score": 7.5608617881981415
+  },
+  {
+   "tconst": "tt0090315",
+   "title": "When the Wind Blows",
+   "year": 1986,
+   "rating": 7.7,
+   "votes": 15227,
+   "score": 7.549313010178061
+  },
+  {
+   "tconst": "tt0091830",
+   "title": "The Green Ray",
+   "year": 1986,
+   "rating": 7.6,
+   "votes": 12262,
+   "score": 7.432009201117475
+  },
+  {
+   "tconst": "tt0091364",
+   "title": "Courier",
+   "year": 1986,
+   "rating": 7.7,
+   "votes": 7023,
+   "score": 7.412303582659587
+  },
+  {
+   "tconst": "tt0091355",
+   "title": "The Terrorizers",
+   "year": 1986,
+   "rating": 7.7,
+   "votes": 6378,
+   "score": 7.390154598512466
+  },
+  {
+   "tconst": "tt0091530",
+   "title": "The Mission",
+   "year": 1986,
+   "rating": 7.4,
+   "votes": 70384,
+   "score": 7.372426437145466
+  },
+  {
+   "tconst": "tt0091217",
+   "title": "Hoosiers",
+   "year": 1986,
+   "rating": 7.4,
+   "votes": 57782,
+   "score": 7.366613951128056
+  },
+  {
+   "tconst": "tt0091398",
+   "title": "The Beauty of Vice",
+   "year": 1986,
+   "rating": 8,
+   "votes": 2887,
+   "score": 7.346043631335675
+  },
+  {
+   "tconst": "tt0092263",
+   "title": "A Better Tomorrow",
+   "year": 1986,
+   "rating": 7.4,
+   "votes": 29627,
+   "score": 7.336893009970514
+  },
+  {
+   "tconst": "tt0134786",
+   "title": "The Graduates",
+   "year": 1986,
+   "rating": 8,
+   "votes": 2643,
+   "score": 7.311676766387562
+  },
+  {
+   "tconst": "tt0091369",
+   "title": "Labyrinth",
+   "year": 1986,
+   "rating": 7.3,
+   "votes": 166913,
+   "score": 7.289367989594274
+  },
+  {
+   "tconst": "tt0092007",
+   "title": "Star Trek IV: The Voyage Home",
+   "year": 1986,
+   "rating": 7.3,
+   "votes": 97628,
+   "score": 7.281974095900123
+  },
+  {
+   "tconst": "tt0278891",
+   "title": "Oh, Belinda",
+   "year": 1986,
+   "rating": 7.7,
+   "votes": 4182,
+   "score": 7.280089813383606
+  },
+  {
+   "tconst": "tt0091214",
+   "title": "Man Facing Southeast",
+   "year": 1986,
+   "rating": 7.6,
+   "votes": 5060,
+   "score": 7.260639550472726
+  },
+  {
+   "tconst": "tt0091886",
+   "title": "Salvador",
+   "year": 1986,
+   "rating": 7.3,
+   "votes": 25752,
+   "score": 7.235288095500772
+  },
+  {
+   "tconst": "tt0090563",
+   "title": "Betty Blue",
+   "year": 1986,
+   "rating": 7.3,
+   "votes": 24219,
+   "score": 7.231504451975187
+  },
+  {
+   "tconst": "tt0067625",
+   "title": "Trial on the Road",
+   "year": 1986,
+   "rating": 7.8,
+   "votes": 2910,
+   "score": 7.230573365852841
+  },
+  {
+   "tconst": "tt0091538",
+   "title": "Mona Lisa",
+   "year": 1986,
+   "rating": 7.3,
+   "votes": 19635,
+   "score": 7.216991690609541
+  },
+  {
+   "tconst": "tt0092149",
+   "title": "Shadows in Paradise",
+   "year": 1986,
+   "rating": 7.4,
+   "votes": 8861,
+   "score": 7.216233793051971
+  },
+  {
+   "tconst": "tt0174834",
+   "title": "The Pied Piper",
+   "year": 1986,
+   "rating": 7.8,
+   "votes": 2645,
+   "score": 7.198087239254564
+  },
+  {
+   "tconst": "tt0090728",
+   "title": "Big Trouble in Little China",
+   "year": 1986,
+   "rating": 7.2,
+   "votes": 169453,
+   "score": 7.190691998543843
+  },
+  {
+   "tconst": "tt0091474",
+   "title": "Manhunter",
+   "year": 1986,
+   "rating": 7.2,
+   "votes": 93540,
+   "score": 7.1832961610460275
+  },
+  {
+   "tconst": "tt0091406",
+   "title": "Dust in the Wind",
+   "year": 1986,
+   "rating": 7.6,
+   "votes": 3694,
+   "score": 7.179226418394352
+  },
+  {
+   "tconst": "tt0091209",
+   "title": "The Hitcher",
+   "year": 1986,
+   "rating": 7.2,
+   "votes": 59923,
+   "score": 7.174227915739506
+  },
+  {
+   "tconst": "tt0091759",
+   "title": "Dead Man's Letters",
+   "year": 1986,
+   "rating": 7.5,
+   "votes": 4726,
+   "score": 7.173522929874732
+  },
+  {
+   "tconst": "tt0091867",
+   "title": "A Room with a View",
+   "year": 1986,
+   "rating": 7.2,
+   "votes": 53131,
+   "score": 7.171052860030428
+  },
+  {
+   "tconst": "tt0092106",
+   "title": "The Transformers: The Movie",
+   "year": 1986,
+   "rating": 7.2,
+   "votes": 45186,
+   "score": 7.16617885021696
+  },
+  {
+   "tconst": "tt0090557",
+   "title": "'Round Midnight",
+   "year": 1986,
+   "rating": 7.4,
+   "votes": 6513,
+   "score": 7.165548599358328
+  },
+  {
+   "tconst": "tt0092117",
+   "title": "True Stories",
+   "year": 1986,
+   "rating": 7.3,
+   "votes": 8577,
+   "score": 7.13020849261014
+  },
+  {
+   "tconst": "tt0090830",
+   "title": "Children of a Lesser God",
+   "year": 1986,
+   "rating": 7.2,
+   "votes": 20228,
+   "score": 7.128203852183617
+  },
+  {
+   "tconst": "tt0091419",
+   "title": "Little Shop of Horrors",
+   "year": 1986,
+   "rating": 7.1,
+   "votes": 95914,
+   "score": 7.085743767248172
+  },
+  {
+   "tconst": "tt0091149",
+   "title": "The Great Mouse Detective",
+   "year": 1986,
+   "rating": 7.1,
+   "votes": 59682,
+   "score": 7.077369657701395
+  },
+  {
+   "tconst": "tt0090556",
+   "title": "'night, Mother",
+   "year": 1986,
+   "rating": 7.5,
+   "votes": 2839,
+   "score": 7.046211040780625
+  },
+  {
+   "tconst": "tt0090888",
+   "title": "Crossroads",
+   "year": 1986,
+   "rating": 7.1,
+   "votes": 19669,
+   "score": 7.035581486286281
+  },
+  {
+   "tconst": "tt0252364",
+   "title": "Deli Deli Küpeli",
+   "year": 1986,
+   "rating": 7.3,
+   "votes": 4313,
+   "score": 7.015525934791294
+  },
+  {
+   "tconst": "tt0090667",
+   "title": "Asterix in Britain",
+   "year": 1986,
+   "rating": 7.1,
+   "votes": 13723,
+   "score": 7.011220201382525
+  },
+  {
+   "tconst": "tt0091113",
+   "title": "Ginger & Fred",
+   "year": 1986,
+   "rating": 7.2,
+   "votes": 5956,
+   "score": 6.99941116469802
+  },
+  {
+   "tconst": "tt0092099",
+   "title": "Top Gun",
+   "year": 1986,
+   "rating": 7,
+   "votes": 561137,
+   "score": 6.99787638749778
+  },
+  {
+   "tconst": "tt0091203",
+   "title": "Highlander",
+   "year": 1986,
+   "rating": 7,
+   "votes": 160842,
+   "score": 6.992656165033207
+  },
+  {
+   "tconst": "tt0090863",
+   "title": "The Color of Money",
+   "year": 1986,
+   "rating": 7,
+   "votes": 102696,
+   "score": 6.988577550492258
+  },
+  {
+   "tconst": "tt0091497",
+   "title": "Bad Blood",
+   "year": 1986,
+   "rating": 7.1,
+   "votes": 10314,
+   "score": 6.9866424578802535
+  },
+  {
+   "tconst": "tt0253966",
+   "title": "Yoksul",
+   "year": 1986,
+   "rating": 7.3,
+   "votes": 3730,
+   "score": 6.986582063933237
+  },
+  {
+   "tconst": "tt0180659",
+   "title": "Druga Zikina dinastija",
+   "year": 1986,
+   "rating": 7.5,
+   "votes": 2234,
+   "score": 6.981368735554428
+  },
+  {
+   "tconst": "tt0090579",
+   "title": "Voyeur",
+   "year": 1986,
+   "rating": 7.4,
+   "votes": 2735,
+   "score": 6.97848262435849
+  },
+  {
+   "tconst": "tt0090985",
+   "title": "The Decline of the American Empire",
+   "year": 1986,
+   "rating": 7.1,
+   "votes": 9205,
+   "score": 6.975423045634757
+  },
+  {
+   "tconst": "tt0099763",
+   "title": "Henry: Portrait of a Serial Killer",
+   "year": 1986,
+   "rating": 7,
+   "votes": 45013,
+   "score": 6.974562678968316
+  },
+  {
+   "tconst": "tt0091954",
+   "title": "Sid and Nancy",
+   "year": 1986,
+   "rating": 7,
+   "votes": 37266,
+   "score": 6.969544013302539
+  },
+  {
+   "tconst": "tt0090952",
+   "title": "Peking Opera Blues",
+   "year": 1986,
+   "rating": 7.3,
+   "votes": 3370,
+   "score": 6.965570805649431
+  },
+  {
+   "tconst": "tt0142371",
+   "title": "Fist of the North Star",
+   "year": 1986,
+   "rating": 7.1,
+   "votes": 8029,
+   "score": 6.960815158673591
+  },
+  {
+   "tconst": "tt0090259",
+   "title": "Voyage to Nowhere",
+   "year": 1986,
+   "rating": 7.5,
+   "votes": 2038,
+   "score": 6.956194954516455
+  },
+  {
+   "tconst": "tt0091374",
+   "title": "Lady Jane",
+   "year": 1986,
+   "rating": 7.1,
+   "votes": 7593,
+   "score": 6.954489234476956
+  },
+  {
+   "tconst": "tt0263257",
+   "title": "The Windmill",
+   "year": 1986,
+   "rating": 7.4,
+   "votes": 2306,
+   "score": 6.936487511922305
+  },
+  {
+   "tconst": "tt0090576",
+   "title": "The Assault",
+   "year": 1986,
+   "rating": 7.2,
+   "votes": 3671,
+   "score": 6.918588472286624
+  },
+  {
+   "tconst": "tt0135033",
+   "title": "Poison for the Fairies",
+   "year": 1986,
+   "rating": 7.2,
+   "votes": 3425,
+   "score": 6.9058276914907735
+  },
+  {
+   "tconst": "tt0091506",
+   "title": "The Beekeeper",
+   "year": 1986,
+   "rating": 7.2,
+   "votes": 3367,
+   "score": 6.902648635427138
+  },
+  {
+   "tconst": "tt0193355",
+   "title": "The Night of the Pencils",
+   "year": 1986,
+   "rating": 7.3,
+   "votes": 2502,
+   "score": 6.901091787280642
+  },
+  {
+   "tconst": "tt0252465",
+   "title": "Poor",
+   "year": 1986,
+   "rating": 7.1,
+   "votes": 4937,
+   "score": 6.8987768814094625
+  },
+  {
+   "tconst": "tt0091093",
+   "title": "The Fugitives",
+   "year": 1986,
+   "rating": 7,
+   "votes": 9028,
+   "score": 6.8915592334364755
+  },
+  {
+   "tconst": "tt0090633",
+   "title": "An American Tail",
+   "year": 1986,
+   "rating": 6.9,
+   "votes": 62124,
+   "score": 6.884469390966526
+  },
+  {
+   "tconst": "tt0091059",
+   "title": "Flight of the Navigator",
+   "year": 1986,
+   "rating": 6.9,
+   "votes": 55993,
+   "score": 6.882827500324822
+  },
+  {
+   "tconst": "tt0091877",
+   "title": "Ruthless People",
+   "year": 1986,
+   "rating": 6.9,
+   "votes": 33401,
+   "score": 6.871868456437317
+  },
+  {
+   "tconst": "tt0091431",
+   "title": "Armour of God",
+   "year": 1986,
+   "rating": 6.9,
+   "votes": 24753,
+   "score": 6.862774837451405
+  },
+  {
+   "tconst": "tt0091983",
+   "title": "Something Wild",
+   "year": 1986,
+   "rating": 6.9,
+   "votes": 24316,
+   "score": 6.862156681347373
+  },
+  {
+   "tconst": "tt0091328",
+   "title": "Karma",
+   "year": 1986,
+   "rating": 7.2,
+   "votes": 2690,
+   "score": 6.85972606105276
+  },
+  {
+   "tconst": "tt0090670",
+   "title": "At Close Range",
+   "year": 1986,
+   "rating": 6.9,
+   "votes": 20919,
+   "score": 6.856547634117433
+  },
+  {
+   "tconst": "tt0091445",
+   "title": "Lucas",
+   "year": 1986,
+   "rating": 6.9,
+   "votes": 19047,
+   "score": 6.852682815904283
+  },
+  {
+   "tconst": "tt0091725",
+   "title": "Parting Glances",
+   "year": 1986,
+   "rating": 7.1,
+   "votes": 3469,
+   "score": 6.844764166454095
+  },
+  {
+   "tconst": "tt0091495",
+   "title": "Matador",
+   "year": 1986,
+   "rating": 6.9,
+   "votes": 14274,
+   "score": 6.838805163225848
+  },
+  {
+   "tconst": "tt0091464",
+   "title": "Malcolm",
+   "year": 1986,
+   "rating": 7.1,
+   "votes": 3173,
+   "score": 6.8301595256789955
+  },
+  {
+   "tconst": "tt0094238",
+   "title": "Valhalla",
+   "year": 1986,
+   "rating": 7.1,
+   "votes": 2787,
+   "score": 6.808400924657916
+  },
+  {
+   "tconst": "tt0094374",
+   "title": "Righting Wrongs",
+   "year": 1986,
+   "rating": 7.1,
+   "votes": 2584,
+   "score": 6.795487614820559
+  },
+  {
+   "tconst": "tt0091187",
+   "title": "Heartbreak Ridge",
+   "year": 1986,
+   "rating": 6.8,
+   "votes": 52966,
+   "score": 6.785520416736482
+  },
+  {
+   "tconst": "tt0091860",
+   "title": "River's Edge",
+   "year": 1986,
+   "rating": 6.8,
+   "votes": 23764,
+   "score": 6.769108648747766
+  },
+  {
+   "tconst": "tt0097050",
+   "title": "The Adventures of Milo and Otis",
+   "year": 1986,
+   "rating": 6.8,
+   "votes": 13617,
+   "score": 6.749037281573762
+  },
+  {
+   "tconst": "tt0091229",
+   "title": "Royal Warriors",
+   "year": 1986,
+   "rating": 7,
+   "votes": 2647,
+   "score": 6.7426544493947596
+  },
+  {
+   "tconst": "tt0090555",
+   "title": "Crocodile Dundee",
+   "year": 1986,
+   "rating": 6.7,
+   "votes": 125500,
+   "score": 6.695326393932058
+  },
+  {
+   "tconst": "tt0091790",
+   "title": "Pretty in Pink",
+   "year": 1986,
+   "rating": 6.7,
+   "votes": 96450,
+   "score": 6.6939473359709245
+  },
+  {
+   "tconst": "tt0090685",
+   "title": "Back to School",
+   "year": 1986,
+   "rating": 6.7,
+   "votes": 40084,
+   "score": 6.685840586121506
+  },
+  {
+   "tconst": "tt0091091",
+   "title": "Millionaires' Express",
+   "year": 1986,
+   "rating": 6.9,
+   "votes": 2600,
+   "score": 6.683503310073357
+  },
+  {
+   "tconst": "tt0091630",
+   "title": "Night of the Creeps",
+   "year": 1986,
+   "rating": 6.7,
+   "votes": 29182,
+   "score": 6.6808901041093405
+  },
+  {
+   "tconst": "tt0089118",
+   "title": "F/X",
+   "year": 1986,
+   "rating": 6.7,
+   "votes": 25230,
+   "score": 6.6781166076510265
+  },
+  {
+   "tconst": "tt0090774",
+   "title": "Brighton Beach Memoirs",
+   "year": 1986,
+   "rating": 6.8,
+   "votes": 4191,
+   "score": 6.671444875841939
+  },
+  {
+   "tconst": "tt0091939",
+   "title": "She's Gotta Have It",
+   "year": 1986,
+   "rating": 6.7,
+   "votes": 17871,
+   "score": 6.67001234091578
+  },
+  {
+   "tconst": "tt0092068",
+   "title": "Ménage",
+   "year": 1986,
+   "rating": 6.8,
+   "votes": 4034,
+   "score": 6.668099971219331
+  },
+  {
+   "tconst": "tt0091869",
+   "title": "Rosa Luxemburg",
+   "year": 1986,
+   "rating": 6.9,
+   "votes": 2143,
+   "score": 6.659622309036314
+  },
+  {
+   "tconst": "tt0091060",
+   "title": "Flodder",
+   "year": 1986,
+   "rating": 6.7,
+   "votes": 8505,
+   "score": 6.643276080565203
+  },
+  {
+   "tconst": "tt0091817",
+   "title": "Rad",
+   "year": 1986,
+   "rating": 6.7,
+   "votes": 8090,
+   "score": 6.640943035315901
+  },
+  {
+   "tconst": "tt0090610",
+   "title": "The Children of Noisy Village",
+   "year": 1986,
+   "rating": 6.8,
+   "votes": 2753,
+   "score": 6.632551068028077
+  },
+  {
+   "tconst": "tt0092238",
+   "title": "Working Girls",
+   "year": 1986,
+   "rating": 6.8,
+   "votes": 2686,
+   "score": 6.630156898492839
+  },
+  {
+   "tconst": "tt0090197",
+   "title": "In a Glass Cage",
+   "year": 1986,
+   "rating": 6.7,
+   "votes": 5598,
+   "score": 6.621573470168129
+  },
+  {
+   "tconst": "tt0091949",
+   "title": "Short Circuit",
+   "year": 1986,
+   "rating": 6.6,
+   "votes": 71549,
+   "score": 6.594617401002561
+  },
+  {
+   "tconst": "tt0091083",
+   "title": "From Beyond",
+   "year": 1986,
+   "rating": 6.6,
+   "votes": 36380,
+   "score": 6.58968512835689
+  },
+  {
+   "tconst": "tt0091557",
+   "title": "The Mosquito Coast",
+   "year": 1986,
+   "rating": 6.6,
+   "votes": 34006,
+   "score": 6.589005033226057
+  },
+  {
+   "tconst": "tt0090852",
+   "title": "Clockwise",
+   "year": 1986,
+   "rating": 6.6,
+   "votes": 14800,
+   "score": 6.576435430139133
+  },
+  {
+   "tconst": "tt0092273",
+   "title": "The Seventh Curse",
+   "year": 1986,
+   "rating": 6.7,
+   "votes": 2346,
+   "score": 6.562888915402082
+  },
+  {
+   "tconst": "tt1529326",
+   "title": "Good Bye My Fiend",
+   "year": 1986,
+   "rating": 6.7,
+   "votes": 2246,
+   "score": 6.55965973300458
+  },
+  {
+   "tconst": "tt0090768",
+   "title": "The Boy Who Could Fly",
+   "year": 1986,
+   "rating": 6.6,
+   "votes": 7190,
+   "score": 6.556922222670016
+  },
+  {
+   "tconst": "tt0142251",
+   "title": "Dragon Ball: Curse of the Blood Rubies",
+   "year": 1986,
+   "rating": 6.6,
+   "votes": 4445,
+   "score": 6.538574899354142
+  },
+  {
+   "tconst": "tt0092086",
+   "title": "¡Three Amigos!",
+   "year": 1986,
+   "rating": 6.5,
+   "votes": 93526,
+   "score": 6.4979494088136995
+  },
+  {
+   "tconst": "tt0091875",
+   "title": "Running Scared",
+   "year": 1986,
+   "rating": 6.5,
+   "votes": 17631,
+   "score": 6.490021660961615
+  },
+  {
+   "tconst": "tt0092654",
+   "title": "The Big Easy",
+   "year": 1986,
+   "rating": 6.5,
+   "votes": 15207,
+   "score": 6.488615983398469
+  },
+  {
+   "tconst": "tt0090798",
+   "title": "Caravaggio",
+   "year": 1986,
+   "rating": 6.5,
+   "votes": 7914,
+   "score": 6.480241600397159
+  },
+  {
+   "tconst": "tt0089537",
+   "title": "Mala Noche",
+   "year": 1986,
+   "rating": 6.5,
+   "votes": 4733,
+   "score": 6.470906761671981
+  },
+  {
+   "tconst": "tt0091537",
+   "title": "Momo",
+   "year": 1986,
+   "rating": 6.5,
+   "votes": 2389,
+   "score": 6.455369156148883
+  },
+  {
+   "tconst": "tt0091053",
+   "title": "Fire with Fire",
+   "year": 1986,
+   "rating": 6.4,
+   "votes": 2118,
+   "score": 6.40099932645397
+  },
+  {
+   "tconst": "tt0090101",
+   "title": "Super Fantozzi",
+   "year": 1986,
+   "rating": 6.4,
+   "votes": 2477,
+   "score": 6.4009191928383835
+  },
+  {
+   "tconst": "tt0091295",
+   "title": "Jo Jo Dancer, Your Life Is Calling",
+   "year": 1986,
+   "rating": 6.4,
+   "votes": 2611,
+   "score": 6.400892480229332
+  },
+  {
+   "tconst": "tt0091607",
+   "title": "Martial Arts of Shaolin",
+   "year": 1986,
+   "rating": 6.4,
+   "votes": 2852,
+   "score": 6.400848150522969
+  },
+  {
+   "tconst": "tt0253790",
+   "title": "Tarzan Rifki",
+   "year": 1986,
+   "rating": 6.4,
+   "votes": 3503,
+   "score": 6.400747815071315
+  },
+  {
+   "tconst": "tt0092085",
+   "title": "Thrashin'",
+   "year": 1986,
+   "rating": 6.4,
+   "votes": 5762,
+   "score": 6.4005301760290445
+  },
+  {
+   "tconst": "tt0090567",
+   "title": "52 Pick-Up",
+   "year": 1986,
+   "rating": 6.4,
+   "votes": 8494,
+   "score": 6.400392150403797
+  },
+  {
+   "tconst": "tt0091680",
+   "title": "One Crazy Summer",
+   "year": 1986,
+   "rating": 6.4,
+   "votes": 18546,
+   "score": 6.400200293309522
+  },
+  {
+   "tconst": "tt0091738",
+   "title": "Peggy Sue Got Married",
+   "year": 1986,
+   "rating": 6.4,
+   "votes": 43433,
+   "score": 6.400090577913355
+  },
+  {
+   "tconst": "tt0091541",
+   "title": "The Money Pit",
+   "year": 1986,
+   "rating": 6.4,
+   "votes": 67729,
+   "score": 6.400059017429441
+  },
+  {
+   "tconst": "tt0091024",
+   "title": "Extremities",
+   "year": 1986,
+   "rating": 6.3,
+   "votes": 5000,
+   "score": 6.329159318048206
+  },
+  {
+   "tconst": "tt0090886",
+   "title": "Crimes of the Heart",
+   "year": 1986,
+   "rating": 6.3,
+   "votes": 5048,
+   "score": 6.328960730184086
+  },
+  {
+   "tconst": "tt0092105",
+   "title": "Tough Guys",
+   "year": 1986,
+   "rating": 6.3,
+   "votes": 8497,
+   "score": 6.319445101108645
+  },
+  {
+   "tconst": "tt0092906",
+   "title": "Dolls",
+   "year": 1986,
+   "rating": 6.3,
+   "votes": 14571,
+   "score": 6.312317616700105
+  },
+  {
+   "tconst": "tt0091159",
+   "title": "Gung Ho",
+   "year": 1986,
+   "rating": 6.3,
+   "votes": 15168,
+   "score": 6.3118892839199345
+  },
+  {
+   "tconst": "tt0090583",
+   "title": "About Last Night",
+   "year": 1986,
+   "rating": 6.3,
+   "votes": 19466,
+   "score": 6.309508768579962
+  },
+  {
+   "tconst": "tt0090966",
+   "title": "Down and Out in Beverly Hills",
+   "year": 1986,
+   "rating": 6.3,
+   "votes": 20175,
+   "score": 6.309204745268881
+  },
+  {
+   "tconst": "tt0092206",
+   "title": "The Whistle Blower",
+   "year": 1986,
+   "rating": 6.2,
+   "votes": 2951,
+   "score": 6.281622950179246
+  },
+  {
+   "tconst": "tt0090693",
+   "title": "Band of the Hand",
+   "year": 1986,
+   "rating": 6.2,
+   "votes": 3584,
+   "score": 6.272370205289658
+  },
+  {
+   "tconst": "tt0091314",
+   "title": "Jönssonligan dyker upp igen",
+   "year": 1986,
+   "rating": 6.2,
+   "votes": 4355,
+   "score": 6.263590122161675
+  },
+  {
+   "tconst": "tt0091810",
+   "title": "The Quest",
+   "year": 1986,
+   "rating": 6.1,
+   "votes": 2501,
+   "score": 6.234218001852355
+  },
+  {
+   "tconst": "tt0092272",
+   "title": "Youngblood",
+   "year": 1986,
+   "rating": 6.2,
+   "votes": 16035,
+   "score": 6.222407276203906
+  },
+  {
+   "tconst": "tt0090655",
+   "title": "April Fool's Day",
+   "year": 1986,
+   "rating": 6.2,
+   "votes": 20315,
+   "score": 6.218109577698295
+  },
+  {
+   "tconst": "tt0091326",
+   "title": "The Karate Kid Part II",
+   "year": 1986,
+   "rating": 6.2,
+   "votes": 111117,
+   "score": 6.203572541937441
+  },
+  {
+   "tconst": "tt0091472",
+   "title": "The Manhattan Project",
+   "year": 1986,
+   "rating": 6.1,
+   "votes": 7590,
+   "score": 6.162994288460631
+  },
+  {
+   "tconst": "tt0091584",
+   "title": "My Little Pony: The Movie",
+   "year": 1986,
+   "rating": 6,
+   "votes": 3122,
+   "score": 6.156992429976073
+  },
+  {
+   "tconst": "tt0089122",
+   "title": "Fair Game",
+   "year": 1986,
+   "rating": 5.9,
+   "votes": 2206,
+   "score": 6.138734005310853
+  },
+  {
+   "tconst": "tt0091188",
+   "title": "Heartburn",
+   "year": 1986,
+   "rating": 6.1,
+   "votes": 14290,
+   "score": 6.1370850353798305
+  },
+  {
+   "tconst": "tt0092214",
+   "title": "Wildcats",
+   "year": 1986,
+   "rating": 6.1,
+   "votes": 16056,
+   "score": 6.133457865880452
+  },
+  {
+   "tconst": "tt0089997",
+   "title": "Seven Minutes in Heaven",
+   "year": 1986,
+   "rating": 5.9,
+   "votes": 2311,
+   "score": 6.1329193287723145
+  },
+  {
+   "tconst": "tt0090887",
+   "title": "Critters",
+   "year": 1986,
+   "rating": 6.1,
+   "votes": 41930,
+   "score": 6.1137517693225005
+  },
+  {
+   "tconst": "tt0090713",
+   "title": "The Best of Times",
+   "year": 1986,
+   "rating": 6,
+   "votes": 9092,
+   "score": 6.072495061876799
+  },
+  {
+   "tconst": "tt0091757",
+   "title": "Pirates",
+   "year": 1986,
+   "rating": 6,
+   "votes": 10263,
+   "score": 6.06557247217952
+  },
+  {
+   "tconst": "tt0091415",
+   "title": "Link",
+   "year": 1986,
+   "rating": 5.9,
+   "votes": 4470,
+   "score": 6.055195552756947
+  },
+  {
+   "tconst": "tt0090915",
+   "title": "Dead End Drive-In",
+   "year": 1986,
+   "rating": 5.9,
+   "votes": 4494,
+   "score": 6.054621993584455
+  },
+  {
+   "tconst": "tt0091396",
+   "title": "Legal Eagles",
+   "year": 1986,
+   "rating": 6,
+   "votes": 13369,
+   "score": 6.052320595115977
+  },
+  {
+   "tconst": "tt0091019",
+   "title": "Every Time We Say Goodbye",
+   "year": 1986,
+   "rating": 5.8,
+   "votes": 2963,
+   "score": 6.042618421587235
+  },
+  {
+   "tconst": "tt0091306",
+   "title": "Jumpin' Jack Flash",
+   "year": 1986,
+   "rating": 6,
+   "votes": 22014,
+   "score": 6.033485268024379
+  },
+  {
+   "tconst": "tt0092035",
+   "title": "Sweet Liberty",
+   "year": 1986,
+   "rating": 5.8,
+   "votes": 3206,
+   "score": 6.031293743053677
+  },
+  {
+   "tconst": "tt0091080",
+   "title": "Friday the 13th Part VI: Jason Lives",
+   "year": 1986,
+   "rating": 6,
+   "votes": 58283,
+   "score": 6.013339004799652
+  },
+  {
+   "tconst": "tt0091129",
+   "title": "The Golden Child",
+   "year": 1986,
+   "rating": 6,
+   "votes": 64071,
+   "score": 6.012170471558437
+  },
+  {
+   "tconst": "tt0094293",
+   "title": "Wanted: Dead or Alive",
+   "year": 1986,
+   "rating": 5.9,
+   "votes": 7009,
+   "score": 6.01145690158036
+  },
+  {
+   "tconst": "tt0092732",
+   "title": "Castaway",
+   "year": 1986,
+   "rating": 5.8,
+   "votes": 3747,
+   "score": 6.009520658837211
+  },
+  {
+   "tconst": "tt0091575",
+   "title": "Murphy's Law",
+   "year": 1986,
+   "rating": 5.9,
+   "votes": 7513,
+   "score": 6.005551900172128
+  },
+  {
+   "tconst": "tt0090678",
+   "title": "Avenging Force",
+   "year": 1986,
+   "rating": 5.8,
+   "votes": 3903,
+   "score": 6.003983606020235
+  },
+  {
+   "tconst": "tt0092225",
+   "title": "Wisdom",
+   "year": 1986,
+   "rating": 5.8,
+   "votes": 3939,
+   "score": 6.00274713358098
+  },
+  {
+   "tconst": "tt0091554",
+   "title": "The Morning After",
+   "year": 1986,
+   "rating": 5.9,
+   "votes": 7996,
+   "score": 6.000451703315071
+  },
+  {
+   "tconst": "tt0092147",
+   "title": "Vamp",
+   "year": 1986,
+   "rating": 5.9,
+   "votes": 8283,
+   "score": 5.997648081915535
+  },
+  {
+   "tconst": "tt0091653",
+   "title": "Nothing in Common",
+   "year": 1986,
+   "rating": 5.9,
+   "votes": 8787,
+   "score": 5.993085679645634
+  },
+  {
+   "tconst": "tt0092112",
+   "title": "Trick or Treat",
+   "year": 1986,
+   "rating": 5.9,
+   "votes": 9493,
+   "score": 5.987367547754063
+  },
+  {
+   "tconst": "tt0092042",
+   "title": "Tai-Pan",
+   "year": 1986,
+   "rating": 5.6,
+   "votes": 2142,
+   "score": 5.987280354016766
+  },
+  {
+   "tconst": "tt0093164",
+   "title": "Heat",
+   "year": 1986,
+   "rating": 5.7,
+   "votes": 3019,
+   "score": 5.979759957429259
+  },
+  {
+   "tconst": "tt0091027",
+   "title": "Eye of the Tiger",
+   "year": 1986,
+   "rating": 5.7,
+   "votes": 3050,
+   "score": 5.978042619076723
+  },
+  {
+   "tconst": "tt0090944",
+   "title": "Devil in the Flesh",
+   "year": 1986,
+   "rating": 5.6,
+   "votes": 2256,
+   "score": 5.976906773105602
+  },
+  {
+   "tconst": "tt0090930",
+   "title": "Demons 2",
+   "year": 1986,
+   "rating": 5.9,
+   "votes": 13515,
+   "score": 5.964718996218979
+  },
+  {
+   "tconst": "tt0091786",
+   "title": "Power",
+   "year": 1986,
+   "rating": 5.7,
+   "votes": 3785,
+   "score": 5.942716547335772
+  },
+  {
+   "tconst": "tt0092240",
+   "title": "The Wraith",
+   "year": 1986,
+   "rating": 5.9,
+   "votes": 22112,
+   "score": 5.941643796712734
+  },
+  {
+   "tconst": "tt0090799",
+   "title": "Care Bears Movie II: A New Generation",
+   "year": 1986,
+   "rating": 5.6,
+   "votes": 2698,
+   "score": 5.941446408330661
+  },
+  {
+   "tconst": "tt0090568",
+   "title": "8 Million Ways to Die",
+   "year": 1986,
+   "rating": 5.8,
+   "votes": 7010,
+   "score": 5.933642089493612
+  },
+  {
+   "tconst": "tt0091635",
+   "title": "9½ Weeks",
+   "year": 1986,
+   "rating": 5.9,
+   "votes": 47498,
+   "score": 5.920285975723009
+  },
+  {
+   "tconst": "tt0091579",
+   "title": "My Chauffeur",
+   "year": 1986,
+   "rating": 5.5,
+   "votes": 2323,
+   "score": 5.917329453235588
+  },
+  {
+   "tconst": "tt0091706",
+   "title": "Out of Bounds",
+   "year": 1986,
+   "rating": 5.5,
+   "votes": 2411,
+   "score": 5.909003678607447
+  },
+  {
+   "tconst": "tt0091814",
+   "title": "Quicksilver",
+   "year": 1986,
+   "rating": 5.7,
+   "votes": 5858,
+   "score": 5.878686081234085
+  },
+  {
+   "tconst": "tt0090729",
+   "title": "Biggles: Adventures in Time",
+   "year": 1986,
+   "rating": 5.6,
+   "votes": 3819,
+   "score": 5.875668538638503
+  },
+  {
+   "tconst": "tt0090660",
+   "title": "Armed and Dangerous",
+   "year": 1986,
+   "rating": 5.8,
+   "votes": 14248,
+   "score": 5.874108519592408
+  },
+  {
+   "tconst": "tt0091993",
+   "title": "SpaceCamp",
+   "year": 1986,
+   "rating": 5.8,
+   "votes": 15665,
+   "score": 5.868163896197987
+  },
+  {
+   "tconst": "tt0090585",
+   "title": "Absolute Beginners",
+   "year": 1986,
+   "rating": 5.6,
+   "votes": 3997,
+   "score": 5.867486280863339
+  },
+  {
+   "tconst": "tt0091178",
+   "title": "Haunted Honeymoon",
+   "year": 1986,
+   "rating": 5.7,
+   "votes": 8880,
+   "score": 5.829054708303074
+  },
+  {
+   "tconst": "tt0091637",
+   "title": "No Mercy",
+   "year": 1986,
+   "rating": 5.7,
+   "votes": 9437,
+   "score": 5.822769539768947
+  },
+  {
+   "tconst": "tt0090327",
+   "title": "Witchboard",
+   "year": 1986,
+   "rating": 5.7,
+   "votes": 9601,
+   "score": 5.8210339820996
+  },
+  {
+   "tconst": "tt0091142",
+   "title": "Gothic",
+   "year": 1986,
+   "rating": 5.7,
+   "votes": 10114,
+   "score": 5.8159084717135086
+  },
+  {
+   "tconst": "tt0090903",
+   "title": "The Devil's Honey",
+   "year": 1986,
+   "rating": 5.3,
+   "votes": 2286,
+   "score": 5.8142592688608135
+  },
+  {
+   "tconst": "tt0090859",
+   "title": "Cobra",
+   "year": 1986,
+   "rating": 5.8,
+   "votes": 86852,
+   "score": 5.813551920343239
+  },
+  {
+   "tconst": "tt0091164",
+   "title": "Half Moon Street",
+   "year": 1986,
+   "rating": 5.4,
+   "votes": 3020,
+   "score": 5.799226140704671
+  },
+  {
+   "tconst": "tt0092995",
+   "title": "What Every Frenchwoman Wants",
+   "year": 1986,
+   "rating": 5.6,
+   "votes": 6802,
+   "score": 5.782244401992439
+  },
+  {
+   "tconst": "tt0092226",
+   "title": "Wise Guys",
+   "year": 1986,
+   "rating": 5.6,
+   "votes": 6952,
+   "score": 5.779190708929563
+  },
+  {
+   "tconst": "tt0091836",
+   "title": "Reform School Girls",
+   "year": 1986,
+   "rating": 5.4,
+   "votes": 3326,
+   "score": 5.776289002316457
+  },
+  {
+   "tconst": "tt0092288",
+   "title": "The Zero Boys",
+   "year": 1986,
+   "rating": 5.2,
+   "votes": 2252,
+   "score": 5.765408096504573
+  },
+  {
+   "tconst": "tt0090927",
+   "title": "The Delta Force",
+   "year": 1986,
+   "rating": 5.7,
+   "votes": 24719,
+   "score": 5.7525511892786945
+  },
+  {
+   "tconst": "tt0092074",
+   "title": "TerrorVision",
+   "year": 1986,
+   "rating": 5.6,
+   "votes": 8662,
+   "score": 5.7504516250550965
+  }
+ ]
+}

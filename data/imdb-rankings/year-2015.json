@@ -1,0 +1,1608 @@
+{
+ "tag": "year-2015",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.481,
+ "minVotes": 10000,
+ "items": [
+  {
+   "tconst": "tt1392190",
+   "title": "Mad Max: Fury Road",
+   "year": 2015,
+   "rating": 8.1,
+   "votes": 1221070,
+   "score": 8.086845956454875
+  },
+  {
+   "tconst": "tt2096673",
+   "title": "Inside Out",
+   "year": 2015,
+   "rating": 8.1,
+   "votes": 932746,
+   "score": 8.082822999633946
+  },
+  {
+   "tconst": "tt1895587",
+   "title": "Spotlight",
+   "year": 2015,
+   "rating": 8.1,
+   "votes": 540859,
+   "score": 8.070603097367753
+  },
+  {
+   "tconst": "tt3170832",
+   "title": "Room",
+   "year": 2015,
+   "rating": 8.1,
+   "votes": 484797,
+   "score": 8.06727233918739
+  },
+  {
+   "tconst": "tt4430212",
+   "title": "Drishyam",
+   "year": 2015,
+   "rating": 8.2,
+   "votes": 110885,
+   "score": 8.057769380923217
+  },
+  {
+   "tconst": "tt3659388",
+   "title": "The Martian",
+   "year": 2015,
+   "rating": 8,
+   "votes": 1030095,
+   "score": 7.98539215322918
+  },
+  {
+   "tconst": "tt1663202",
+   "title": "The Revenant",
+   "year": 2015,
+   "rating": 8,
+   "votes": 961654,
+   "score": 7.9843632111975085
+  },
+  {
+   "tconst": "tt3863552",
+   "title": "Bajrangi Bhaijaan",
+   "year": 2015,
+   "rating": 8.1,
+   "votes": 113668,
+   "score": 7.969056276586531
+  },
+  {
+   "tconst": "tt2631186",
+   "title": "Baahubali: The Beginning",
+   "year": 2015,
+   "rating": 8,
+   "votes": 156650,
+   "score": 7.908829592636683
+  },
+  {
+   "tconst": "tt4987556",
+   "title": "Thani Oruvan",
+   "year": 2015,
+   "rating": 8.4,
+   "votes": 24443,
+   "score": 7.842744581276405
+  },
+  {
+   "tconst": "tt4679210",
+   "title": "Premam",
+   "year": 2015,
+   "rating": 8.3,
+   "votes": 28919,
+   "score": 7.8325278556207305
+  },
+  {
+   "tconst": "tt4934950",
+   "title": "Talvar",
+   "year": 2015,
+   "rating": 8.1,
+   "votes": 44002,
+   "score": 7.800130580587815
+  },
+  {
+   "tconst": "tt3460252",
+   "title": "The Hateful Eight",
+   "year": 2015,
+   "rating": 7.8,
+   "votes": 731040,
+   "score": 7.782195902532797
+  },
+  {
+   "tconst": "tt1596363",
+   "title": "The Big Short",
+   "year": 2015,
+   "rating": 7.8,
+   "votes": 547925,
+   "score": 7.776352469620295
+  },
+  {
+   "tconst": "tt4635372",
+   "title": "Masaan",
+   "year": 2015,
+   "rating": 8.1,
+   "votes": 36097,
+   "score": 7.748707109202403
+  },
+  {
+   "tconst": "tt1398426",
+   "title": "Straight Outta Compton",
+   "year": 2015,
+   "rating": 7.8,
+   "votes": 236172,
+   "score": 7.7464051622967
+  },
+  {
+   "tconst": "tt4908644",
+   "title": "Winter on Fire: Ukraine's Fight for Freedom",
+   "year": 2015,
+   "rating": 8.3,
+   "votes": 21599,
+   "score": 7.724236577515214
+  },
+  {
+   "tconst": "tt4257858",
+   "title": "Going Clear: Scientology & the Prison of Belief",
+   "year": 2015,
+   "rating": 8,
+   "votes": 42680,
+   "score": 7.711587919758983
+  },
+  {
+   "tconst": "tt3848892",
+   "title": "Baby",
+   "year": 2015,
+   "rating": 7.9,
+   "votes": 63677,
+   "score": 7.707354420143371
+  },
+  {
+   "tconst": "tt2488496",
+   "title": "Star Wars: Episode VII - The Force Awakens",
+   "year": 2015,
+   "rating": 7.7,
+   "votes": 1035440,
+   "score": 7.688336443615036
+  },
+  {
+   "tconst": "tt3397884",
+   "title": "Sicario",
+   "year": 2015,
+   "rating": 7.7,
+   "votes": 549767,
+   "score": 7.678216743060779
+  },
+  {
+   "tconst": "tt4991384",
+   "title": "Visaaranai",
+   "year": 2015,
+   "rating": 8.4,
+   "votes": 15921,
+   "score": 7.659536731333791
+  },
+  {
+   "tconst": "tt2582496",
+   "title": "Me and Earl and the Dying Girl",
+   "year": 2015,
+   "rating": 7.7,
+   "votes": 145354,
+   "score": 7.621511204171783
+  },
+  {
+   "tconst": "tt2870648",
+   "title": "Amy",
+   "year": 2015,
+   "rating": 7.8,
+   "votes": 58226,
+   "score": 7.606619933938721
+  },
+  {
+   "tconst": "tt1365050",
+   "title": "Beasts of No Nation",
+   "year": 2015,
+   "rating": 7.7,
+   "votes": 92245,
+   "score": 7.580741861341906
+  },
+  {
+   "tconst": "tt3841424",
+   "title": "Land of Mine",
+   "year": 2015,
+   "rating": 7.8,
+   "votes": 49809,
+   "score": 7.579405300421395
+  },
+  {
+   "tconst": "tt3682448",
+   "title": "Bridge of Spies",
+   "year": 2015,
+   "rating": 7.6,
+   "votes": 347312,
+   "score": 7.568672901030201
+  },
+  {
+   "tconst": "tt3076658",
+   "title": "Creed",
+   "year": 2015,
+   "rating": 7.6,
+   "votes": 340074,
+   "score": 7.568025193567369
+  },
+  {
+   "tconst": "tt4080728",
+   "title": "A Man Called Ove",
+   "year": 2015,
+   "rating": 7.7,
+   "votes": 75661,
+   "score": 7.557653443374502
+  },
+  {
+   "tconst": "tt3449292",
+   "title": "Manjhi: The Mountain Man",
+   "year": 2015,
+   "rating": 8,
+   "votes": 21465,
+   "score": 7.517128606798131
+  },
+  {
+   "tconst": "tt4432480",
+   "title": "RangiTaranga",
+   "year": 2015,
+   "rating": 8.1,
+   "votes": 16140,
+   "score": 7.480506947700963
+  },
+  {
+   "tconst": "tt1754656",
+   "title": "The Little Prince",
+   "year": 2015,
+   "rating": 7.6,
+   "votes": 72370,
+   "score": 7.464106490383673
+  },
+  {
+   "tconst": "tt5082014",
+   "title": "Charlie",
+   "year": 2015,
+   "rating": 8.1,
+   "votes": 15383,
+   "score": 7.462031738285592
+  },
+  {
+   "tconst": "tt2381111",
+   "title": "Brooklyn",
+   "year": 2015,
+   "rating": 7.5,
+   "votes": 159608,
+   "score": 7.439899365672039
+  },
+  {
+   "tconst": "tt4285496",
+   "title": "Embrace of the Serpent",
+   "year": 2015,
+   "rating": 7.8,
+   "votes": 26096,
+   "score": 7.4344872454815825
+  },
+  {
+   "tconst": "tt3966404",
+   "title": "Mustang",
+   "year": 2015,
+   "rating": 7.6,
+   "votes": 43390,
+   "score": 7.390343727531433
+  },
+  {
+   "tconst": "tt2381249",
+   "title": "Mission: Impossible - Rogue Nation",
+   "year": 2015,
+   "rating": 7.4,
+   "votes": 450002,
+   "score": 7.380014112140607
+  },
+  {
+   "tconst": "tt4226388",
+   "title": "Victoria",
+   "year": 2015,
+   "rating": 7.5,
+   "votes": 67951,
+   "score": 7.369231332669282
+  },
+  {
+   "tconst": "tt3767372",
+   "title": "Piku",
+   "year": 2015,
+   "rating": 7.6,
+   "votes": 37326,
+   "score": 7.363479939418146
+  },
+  {
+   "tconst": "tt3742378",
+   "title": "The Second Mother",
+   "year": 2015,
+   "rating": 7.8,
+   "votes": 19643,
+   "score": 7.354918584924036
+  },
+  {
+   "tconst": "tt4309356",
+   "title": "Ivy",
+   "year": 2015,
+   "rating": 7.9,
+   "votes": 14938,
+   "score": 7.330846563994836
+  },
+  {
+   "tconst": "tt2140465",
+   "title": "Tanu Weds Manu Returns",
+   "year": 2015,
+   "rating": 7.6,
+   "votes": 30870,
+   "score": 7.326118219058067
+  },
+  {
+   "tconst": "tt4272866",
+   "title": "The Boy and the Beast",
+   "year": 2015,
+   "rating": 7.6,
+   "votes": 30363,
+   "score": 7.322677987585244
+  },
+  {
+   "tconst": "tt3203606",
+   "title": "Trumbo",
+   "year": 2015,
+   "rating": 7.4,
+   "votes": 88043,
+   "score": 7.306229425995769
+  },
+  {
+   "tconst": "tt2545428",
+   "title": "Meru",
+   "year": 2015,
+   "rating": 7.7,
+   "votes": 20914,
+   "score": 7.305565491780527
+  },
+  {
+   "tconst": "tt2395427",
+   "title": "Avengers: Age of Ultron",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 1021839,
+   "score": 7.292059276314331
+  },
+  {
+   "tconst": "tt3447364",
+   "title": "Detective Byomkesh Bakshy!",
+   "year": 2015,
+   "rating": 7.6,
+   "votes": 25852,
+   "score": 7.287784547944415
+  },
+  {
+   "tconst": "tt1798684",
+   "title": "Southpaw",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 282402,
+   "score": 7.271978480355481
+  },
+  {
+   "tconst": "tt4229236",
+   "title": "Cobain: Montage of Heck",
+   "year": 2015,
+   "rating": 7.5,
+   "votes": 33562,
+   "score": 7.265999072882402
+  },
+  {
+   "tconst": "tt3808342",
+   "title": "Son of Saul",
+   "year": 2015,
+   "rating": 7.4,
+   "votes": 54858,
+   "score": 7.258251127276561
+  },
+  {
+   "tconst": "tt3270538",
+   "title": "Requiem for the American Dream",
+   "year": 2015,
+   "rating": 8,
+   "votes": 10285,
+   "score": 7.250995889223722
+  },
+  {
+   "tconst": "tt2402927",
+   "title": "Carol",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 155014,
+   "score": 7.250346344024769
+  },
+  {
+   "tconst": "tt3488710",
+   "title": "The Walk",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 142360,
+   "score": 7.246222444295768
+  },
+  {
+   "tconst": "tt3704050",
+   "title": "Remember",
+   "year": 2015,
+   "rating": 7.5,
+   "votes": 30117,
+   "score": 7.2459045196027425
+  },
+  {
+   "tconst": "tt2097298",
+   "title": "McFarland, USA",
+   "year": 2015,
+   "rating": 7.4,
+   "votes": 47124,
+   "score": 7.239059792957483
+  },
+  {
+   "tconst": "tt1083452",
+   "title": "Eddie the Eagle",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 108605,
+   "score": 7.23091734423425
+  },
+  {
+   "tconst": "tt2057392",
+   "title": "Eye in the Sky",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 96793,
+   "score": 7.223276353439862
+  },
+  {
+   "tconst": "tt4897822",
+   "title": "Where to Invade Next",
+   "year": 2015,
+   "rating": 7.5,
+   "votes": 26596,
+   "score": 7.221457307162073
+  },
+  {
+   "tconst": "tt3756788",
+   "title": "Our Little Sister",
+   "year": 2015,
+   "rating": 7.6,
+   "votes": 19307,
+   "score": 7.218058880571304
+  },
+  {
+   "tconst": "tt3312830",
+   "title": "Youth",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 89508,
+   "score": 7.217659400378896
+  },
+  {
+   "tconst": "tt3148502",
+   "title": "Tamasha",
+   "year": 2015,
+   "rating": 7.4,
+   "votes": 37062,
+   "score": 7.2046502828801
+  },
+  {
+   "tconst": "tt2404425",
+   "title": "Woman in Gold",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 66461,
+   "score": 7.1928401618197935
+  },
+  {
+   "tconst": "tt0478970",
+   "title": "Ant-Man",
+   "year": 2015,
+   "rating": 7.2,
+   "votes": 794618,
+   "score": 7.191059672556298
+  },
+  {
+   "tconst": "tt4618398",
+   "title": "Boruto: Naruto the Movie",
+   "year": 2015,
+   "rating": 7.7,
+   "votes": 13916,
+   "score": 7.190151012414416
+  },
+  {
+   "tconst": "tt1638355",
+   "title": "The Man from U.N.C.L.E.",
+   "year": 2015,
+   "rating": 7.2,
+   "votes": 360471,
+   "score": 7.180582695036597
+  },
+  {
+   "tconst": "tt1655441",
+   "title": "The Age of Adaline",
+   "year": 2015,
+   "rating": 7.2,
+   "votes": 232079,
+   "score": 7.170284294023452
+  },
+  {
+   "tconst": "tt3138782",
+   "title": "The Miracle",
+   "year": 2015,
+   "rating": 7.6,
+   "votes": 15921,
+   "score": 7.168166799618193
+  },
+  {
+   "tconst": "tt3678782",
+   "title": "Badlapur",
+   "year": 2015,
+   "rating": 7.4,
+   "votes": 29130,
+   "score": 7.165051152898115
+  },
+  {
+   "tconst": "tt2080374",
+   "title": "Steve Jobs",
+   "year": 2015,
+   "rating": 7.2,
+   "votes": 188431,
+   "score": 7.163747860026423
+  },
+  {
+   "tconst": "tt4284010",
+   "title": "What Happened, Miss Simone?",
+   "year": 2015,
+   "rating": 7.6,
+   "votes": 15498,
+   "score": 7.1610028870069495
+  },
+  {
+   "tconst": "tt2872750",
+   "title": "Shaun the Sheep Movie",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 47392,
+   "score": 7.157235357068985
+  },
+  {
+   "tconst": "tt3576728",
+   "title": "Bilal: A New Breed of Hero",
+   "year": 2015,
+   "rating": 7.5,
+   "votes": 19384,
+   "score": 7.153091873567355
+  },
+  {
+   "tconst": "tt3735246",
+   "title": "Bajirao Mastani",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 43020,
+   "score": 7.145463063238461
+  },
+  {
+   "tconst": "tt2302966",
+   "title": "I",
+   "year": 2015,
+   "rating": 7.4,
+   "votes": 25938,
+   "score": 7.144183082333552
+  },
+  {
+   "tconst": "tt3850214",
+   "title": "Dope",
+   "year": 2015,
+   "rating": 7.2,
+   "votes": 92311,
+   "score": 7.129689394228413
+  },
+  {
+   "tconst": "tt4025514",
+   "title": "Suburra",
+   "year": 2015,
+   "rating": 7.4,
+   "votes": 23392,
+   "score": 7.124678114904864
+  },
+  {
+   "tconst": "tt2401878",
+   "title": "Anomalisa",
+   "year": 2015,
+   "rating": 7.2,
+   "votes": 79176,
+   "score": 7.119333134620337
+  },
+  {
+   "tconst": "tt3495030",
+   "title": "Dum Laga Ke Haisha",
+   "year": 2015,
+   "rating": 7.4,
+   "votes": 22733,
+   "score": 7.119135172850127
+  },
+  {
+   "tconst": "tt0787524",
+   "title": "The Man Who Knew Infinity",
+   "year": 2015,
+   "rating": 7.2,
+   "votes": 67576,
+   "score": 7.107270955100845
+  },
+  {
+   "tconst": "tt2820852",
+   "title": "Furious 7",
+   "year": 2015,
+   "rating": 7.1,
+   "votes": 444912,
+   "score": 7.0863851725452465
+  },
+  {
+   "tconst": "tt4727512",
+   "title": "Srimanthudu",
+   "year": 2015,
+   "rating": 7.5,
+   "votes": 14541,
+   "score": 7.084631906316091
+  },
+  {
+   "tconst": "tt3464902",
+   "title": "The Lobster",
+   "year": 2015,
+   "rating": 7.1,
+   "votes": 338107,
+   "score": 7.08220791771755
+  },
+  {
+   "tconst": "tt3671542",
+   "title": "Holding the Man",
+   "year": 2015,
+   "rating": 7.5,
+   "votes": 14366,
+   "score": 7.081648674911893
+  },
+  {
+   "tconst": "tt2361509",
+   "title": "The Intern",
+   "year": 2015,
+   "rating": 7.1,
+   "votes": 314768,
+   "score": 7.080929314504209
+  },
+  {
+   "tconst": "tt2719848",
+   "title": "Everest",
+   "year": 2015,
+   "rating": 7.1,
+   "votes": 249513,
+   "score": 7.076133957115455
+  },
+  {
+   "tconst": "tt0810819",
+   "title": "The Danish Girl",
+   "year": 2015,
+   "rating": 7.1,
+   "votes": 207486,
+   "score": 7.071522082400261
+  },
+  {
+   "tconst": "tt1810683",
+   "title": "Little Boy",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 25119,
+   "score": 7.066691865169942
+  },
+  {
+   "tconst": "tt2494362",
+   "title": "Bone Tomahawk",
+   "year": 2015,
+   "rating": 7.1,
+   "votes": 142453,
+   "score": 7.059374047168001
+  },
+  {
+   "tconst": "tt3322364",
+   "title": "Concussion",
+   "year": 2015,
+   "rating": 7.1,
+   "votes": 105777,
+   "score": 7.046504501005408
+  },
+  {
+   "tconst": "tt2726560",
+   "title": "The Longest Ride",
+   "year": 2015,
+   "rating": 7.1,
+   "votes": 95566,
+   "score": 7.041330083671856
+  },
+  {
+   "tconst": "tt3416744",
+   "title": "The End of the Tour",
+   "year": 2015,
+   "rating": 7.2,
+   "votes": 35064,
+   "score": 7.040370397942997
+  },
+  {
+   "tconst": "tt4298958",
+   "title": "Sweet Bean",
+   "year": 2015,
+   "rating": 7.4,
+   "votes": 14429,
+   "score": 7.0236625163904876
+  },
+  {
+   "tconst": "tt4126304",
+   "title": "Cartel Land",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 19233,
+   "score": 7.019715787394492
+  },
+  {
+   "tconst": "tt4359416",
+   "title": "Taxi",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 18578,
+   "score": 7.013291749349262
+  },
+  {
+   "tconst": "tt2935476",
+   "title": "Far from the Madding Crowd",
+   "year": 2015,
+   "rating": 7.1,
+   "votes": 58120,
+   "score": 7.00907885515125
+  },
+  {
+   "tconst": "tt4195278",
+   "title": "Telling Tales",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 17526,
+   "score": 7.002334215392835
+  },
+  {
+   "tconst": "tt2210769",
+   "title": "Liza the Fox-Fairy",
+   "year": 2015,
+   "rating": 7.5,
+   "votes": 10093,
+   "score": 6.992681611153298
+  },
+  {
+   "tconst": "tt4263482",
+   "title": "The Witch",
+   "year": 2015,
+   "rating": 7,
+   "votes": 359673,
+   "score": 6.985950966429529
+  },
+  {
+   "tconst": "tt3824458",
+   "title": "Tangerine",
+   "year": 2015,
+   "rating": 7.1,
+   "votes": 43600,
+   "score": 6.984448724121329
+  },
+  {
+   "tconst": "tt3079380",
+   "title": "Spy",
+   "year": 2015,
+   "rating": 7,
+   "votes": 276559,
+   "score": 6.981876163766985
+  },
+  {
+   "tconst": "tt4192740",
+   "title": "Lemonade",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 15463,
+   "score": 6.978217476844959
+  },
+  {
+   "tconst": "tt4178092",
+   "title": "The Gift",
+   "year": 2015,
+   "rating": 7,
+   "votes": 187701,
+   "score": 6.97373028772188
+  },
+  {
+   "tconst": "tt3754940",
+   "title": "Truman",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 14869,
+   "score": 6.970531650364036
+  },
+  {
+   "tconst": "tt3792960",
+   "title": "The Brand New Testament",
+   "year": 2015,
+   "rating": 7.1,
+   "votes": 37337,
+   "score": 6.969160521640645
+  },
+  {
+   "tconst": "tt3544082",
+   "title": "45 Years",
+   "year": 2015,
+   "rating": 7.1,
+   "votes": 36872,
+   "score": 6.967862510942636
+  },
+  {
+   "tconst": "tt1172049",
+   "title": "Demolition",
+   "year": 2015,
+   "rating": 7,
+   "votes": 139503,
+   "score": 6.96526124300451
+  },
+  {
+   "tconst": "tt2611652",
+   "title": "Virgin Mountain",
+   "year": 2015,
+   "rating": 7.4,
+   "votes": 10480,
+   "score": 6.95109627016129
+  },
+  {
+   "tconst": "tt3202202",
+   "title": "Palm Trees in the Snow",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 13254,
+   "score": 6.947649936049849
+  },
+  {
+   "tconst": "tt4082068",
+   "title": "Dheepan",
+   "year": 2015,
+   "rating": 7.2,
+   "votes": 18099,
+   "score": 6.943992726178982
+  },
+  {
+   "tconst": "tt4430136",
+   "title": "Pyaar Ka Punchnama 2",
+   "year": 2015,
+   "rating": 7.2,
+   "votes": 17710,
+   "score": 6.940398831212674
+  },
+  {
+   "tconst": "tt2910904",
+   "title": "The Dressmaker",
+   "year": 2015,
+   "rating": 7,
+   "votes": 71536,
+   "score": 6.936303615739099
+  },
+  {
+   "tconst": "tt3233418",
+   "title": "Spare Parts",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 12474,
+   "score": 6.935421002620949
+  },
+  {
+   "tconst": "tt2888046",
+   "title": "Ip Man 3",
+   "year": 2015,
+   "rating": 7,
+   "votes": 65459,
+   "score": 6.931173903880295
+  },
+  {
+   "tconst": "tt3819668",
+   "title": "Dragon Ball Z: Resurrection 'F'",
+   "year": 2015,
+   "rating": 7.1,
+   "votes": 26048,
+   "score": 6.928186074481336
+  },
+  {
+   "tconst": "tt4005402",
+   "title": "Colonia",
+   "year": 2015,
+   "rating": 7,
+   "votes": 60087,
+   "score": 6.925898549130412
+  },
+  {
+   "tconst": "tt3253624",
+   "title": "Soaked in Bleach",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 11871,
+   "score": 6.925369284116099
+  },
+  {
+   "tconst": "tt3296658",
+   "title": "Rams",
+   "year": 2015,
+   "rating": 7.2,
+   "votes": 15821,
+   "score": 6.921407056771745
+  },
+  {
+   "tconst": "tt4176826",
+   "title": "Look Who's Back",
+   "year": 2015,
+   "rating": 7,
+   "votes": 54559,
+   "score": 6.9195534567280035
+  },
+  {
+   "tconst": "tt2452042",
+   "title": "The Peanuts Movie",
+   "year": 2015,
+   "rating": 7,
+   "votes": 54086,
+   "score": 6.918959704348893
+  },
+  {
+   "tconst": "tt4258292",
+   "title": "Yennai Arindhaal",
+   "year": 2015,
+   "rating": 7.3,
+   "votes": 11204,
+   "score": 6.913584777065799
+  },
+  {
+   "tconst": "tt3742284",
+   "title": "NH 10",
+   "year": 2015,
+   "rating": 7.2,
+   "votes": 15093,
+   "score": 6.913324497385853
+  },
+  {
+   "tconst": "tt4110568",
+   "title": "Dil Dhadakne Do",
+   "year": 2015,
+   "rating": 7.1,
+   "votes": 22383,
+   "score": 6.908740747086533
+  },
+  {
+   "tconst": "tt0369610",
+   "title": "Jurassic World",
+   "year": 2015,
+   "rating": 6.9,
+   "votes": 737975,
+   "score": 6.8943934645047005
+  },
+  {
+   "tconst": "tt3921314",
+   "title": "Muhammad: The Messenger of God",
+   "year": 2015,
+   "rating": 7.2,
+   "votes": 13140,
+   "score": 6.8891292831851
+  },
+  {
+   "tconst": "tt1772288",
+   "title": "Danny Collins",
+   "year": 2015,
+   "rating": 7,
+   "votes": 35205,
+   "score": 6.885111195949634
+  },
+  {
+   "tconst": "tt4375438",
+   "title": "The Club",
+   "year": 2015,
+   "rating": 7.2,
+   "votes": 12745,
+   "score": 6.88373056113006
+  },
+  {
+   "tconst": "tt3569230",
+   "title": "Legend",
+   "year": 2015,
+   "rating": 6.9,
+   "votes": 226854,
+   "score": 6.882294796004725
+  },
+  {
+   "tconst": "tt1661199",
+   "title": "Cinderella",
+   "year": 2015,
+   "rating": 6.9,
+   "votes": 206929,
+   "score": 6.88066856719435
+  },
+  {
+   "tconst": "tt1390411",
+   "title": "In the Heart of the Sea",
+   "year": 2015,
+   "rating": 6.9,
+   "votes": 160654,
+   "score": 6.875426603612592
+  },
+  {
+   "tconst": "tt4062536",
+   "title": "Green Room",
+   "year": 2015,
+   "rating": 6.9,
+   "votes": 155653,
+   "score": 6.874684742279967
+  },
+  {
+   "tconst": "tt2582502",
+   "title": "Fathers & Daughters",
+   "year": 2015,
+   "rating": 7,
+   "votes": 31215,
+   "score": 6.873988878148809
+  },
+  {
+   "tconst": "tt2424988",
+   "title": "Gabbar Is Back",
+   "year": 2015,
+   "rating": 7,
+   "votes": 29884,
+   "score": 6.86978366294512
+  },
+  {
+   "tconst": "tt3478962",
+   "title": "My King",
+   "year": 2015,
+   "rating": 7.1,
+   "votes": 15255,
+   "score": 6.854759517438257
+  },
+  {
+   "tconst": "tt3205376",
+   "title": "Slow West",
+   "year": 2015,
+   "rating": 6.9,
+   "votes": 50513,
+   "score": 6.8307000415266685
+  },
+  {
+   "tconst": "tt3077214",
+   "title": "Suffragette",
+   "year": 2015,
+   "rating": 6.9,
+   "votes": 46752,
+   "score": 6.826107478377911
+  },
+  {
+   "tconst": "tt2006295",
+   "title": "The 33",
+   "year": 2015,
+   "rating": 6.9,
+   "votes": 42101,
+   "score": 6.819511172777936
+  },
+  {
+   "tconst": "tt3775086",
+   "title": "They Call Me Jeeg Robot",
+   "year": 2015,
+   "rating": 7,
+   "votes": 17732,
+   "score": 6.812723626601155
+  },
+  {
+   "tconst": "tt4266638",
+   "title": "Krisha",
+   "year": 2015,
+   "rating": 7.1,
+   "votes": 10977,
+   "score": 6.804745750722372
+  },
+  {
+   "tconst": "tt4084744",
+   "title": "Battle for Sevastopol",
+   "year": 2015,
+   "rating": 7,
+   "votes": 15562,
+   "score": 6.796825428875017
+  },
+  {
+   "tconst": "tt2379713",
+   "title": "Spectre",
+   "year": 2015,
+   "rating": 6.8,
+   "votes": 501783,
+   "score": 6.793759956100345
+  },
+  {
+   "tconst": "tt1823672",
+   "title": "Chappie",
+   "year": 2015,
+   "rating": 6.8,
+   "votes": 285905,
+   "score": 6.789207521376466
+  },
+  {
+   "tconst": "tt1355683",
+   "title": "Black Mass",
+   "year": 2015,
+   "rating": 6.8,
+   "votes": 203917,
+   "score": 6.785071086509737
+  },
+  {
+   "tconst": "tt2415458",
+   "title": "The Wolfpack",
+   "year": 2015,
+   "rating": 7,
+   "votes": 13936,
+   "score": 6.783023546662067
+  },
+  {
+   "tconst": "tt1781922",
+   "title": "No Escape",
+   "year": 2015,
+   "rating": 6.8,
+   "votes": 99616,
+   "score": 6.770866037922413
+  },
+  {
+   "tconst": "tt3830162",
+   "title": "A War",
+   "year": 2015,
+   "rating": 7,
+   "votes": 11719,
+   "score": 6.760875344762798
+  },
+  {
+   "tconst": "tt3168230",
+   "title": "Mr. Holmes",
+   "year": 2015,
+   "rating": 6.8,
+   "votes": 70576,
+   "score": 6.760366009890082
+  },
+  {
+   "tconst": "tt2544766",
+   "title": "The Admiral",
+   "year": 2015,
+   "rating": 7,
+   "votes": 11145,
+   "score": 6.754384091411833
+  },
+  {
+   "tconst": "tt3064298",
+   "title": "Man Up",
+   "year": 2015,
+   "rating": 6.8,
+   "votes": 59836,
+   "score": 6.754270743068091
+  },
+  {
+   "tconst": "tt1708135",
+   "title": "13 Minutes",
+   "year": 2015,
+   "rating": 7,
+   "votes": 10681,
+   "score": 6.748873440012726
+  },
+  {
+   "tconst": "tt0420293",
+   "title": "The Stanford Prison Experiment",
+   "year": 2015,
+   "rating": 6.8,
+   "votes": 48400,
+   "score": 6.74531595227574
+  },
+  {
+   "tconst": "tt4411504",
+   "title": "The Clan",
+   "year": 2015,
+   "rating": 6.9,
+   "votes": 15342,
+   "score": 6.734521806207214
+  },
+  {
+   "tconst": "tt3172532",
+   "title": "The Diary of a Teenage Girl",
+   "year": 2015,
+   "rating": 6.8,
+   "votes": 35792,
+   "score": 6.7302596875634
+  },
+  {
+   "tconst": "tt3577624",
+   "title": "A Perfect Day",
+   "year": 2015,
+   "rating": 6.8,
+   "votes": 24792,
+   "score": 6.70821026709885
+  },
+  {
+   "tconst": "tt3859076",
+   "title": "Truth",
+   "year": 2015,
+   "rating": 6.8,
+   "votes": 22841,
+   "score": 6.702757273313944
+  },
+  {
+   "tconst": "tt2245003",
+   "title": "Miss You Already",
+   "year": 2015,
+   "rating": 6.8,
+   "votes": 20777,
+   "score": 6.696235877860195
+  },
+  {
+   "tconst": "tt1979388",
+   "title": "The Good Dinosaur",
+   "year": 2015,
+   "rating": 6.7,
+   "votes": 142487,
+   "score": 6.685614849875092
+  },
+  {
+   "tconst": "tt3072482",
+   "title": "Hardcore Henry",
+   "year": 2015,
+   "rating": 6.7,
+   "votes": 109832,
+   "score": 6.68169480283149
+  },
+  {
+   "tconst": "tt4104022",
+   "title": "People Places Things",
+   "year": 2015,
+   "rating": 6.8,
+   "votes": 11644,
+   "score": 6.652451100208058
+  },
+  {
+   "tconst": "tt3722070",
+   "title": "The Lady in the Van",
+   "year": 2015,
+   "rating": 6.7,
+   "votes": 35037,
+   "score": 6.651294527008975
+  },
+  {
+   "tconst": "tt3672742",
+   "title": "Turbo Kid",
+   "year": 2015,
+   "rating": 6.7,
+   "votes": 31370,
+   "score": 6.646977317208199
+  },
+  {
+   "tconst": "tt2872462",
+   "title": "Mistress America",
+   "year": 2015,
+   "rating": 6.7,
+   "votes": 29805,
+   "score": 6.644892641952096
+  },
+  {
+   "tconst": "tt4270516",
+   "title": "Grandma",
+   "year": 2015,
+   "rating": 6.7,
+   "votes": 18135,
+   "score": 6.622034889386999
+  },
+  {
+   "tconst": "tt3877674",
+   "title": "Men & Chicken",
+   "year": 2015,
+   "rating": 6.7,
+   "votes": 16206,
+   "score": 6.616295947985316
+  },
+  {
+   "tconst": "tt5076214",
+   "title": "Delibal",
+   "year": 2015,
+   "rating": 6.7,
+   "votes": 13497,
+   "score": 6.606645597859437
+  },
+  {
+   "tconst": "tt3978720",
+   "title": "4th Man Out",
+   "year": 2015,
+   "rating": 6.7,
+   "votes": 11524,
+   "score": 6.598088255570675
+  },
+  {
+   "tconst": "tt1951266",
+   "title": "The Hunger Games: Mockingjay - Part 2",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 421432,
+   "score": 6.597233519101279
+  },
+  {
+   "tconst": "tt2381941",
+   "title": "Focus",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 297474,
+   "score": 6.596118213614496
+  },
+  {
+   "tconst": "tt2510894",
+   "title": "Hotel Transylvania 2",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 165792,
+   "score": 6.593210451060931
+  },
+  {
+   "tconst": "tt4974684",
+   "title": "Kara Bela",
+   "year": 2015,
+   "rating": 6.7,
+   "votes": 10494,
+   "score": 6.592966312720952
+  },
+  {
+   "tconst": "tt2446980",
+   "title": "Joy",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 153331,
+   "score": 6.592692456501847
+  },
+  {
+   "tconst": "tt2503944",
+   "title": "Burnt",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 144514,
+   "score": 6.592275467678677
+  },
+  {
+   "tconst": "tt2400463",
+   "title": "The Invitation",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 131344,
+   "score": 6.591555719470959
+  },
+  {
+   "tconst": "tt2199571",
+   "title": "Run All Night",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 120568,
+   "score": 6.590858798579308
+  },
+  {
+   "tconst": "tt0884732",
+   "title": "The Wedding Ringer",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 85547,
+   "score": 6.587508258897748
+  },
+  {
+   "tconst": "tt3715320",
+   "title": "Irrational Man",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 71044,
+   "score": 6.585272834668862
+  },
+  {
+   "tconst": "tt2884018",
+   "title": "Macbeth",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 62111,
+   "score": 6.583448456031718
+  },
+  {
+   "tconst": "tt3616916",
+   "title": "The Wave",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 47019,
+   "score": 6.579067532101636
+  },
+  {
+   "tconst": "tt3369806",
+   "title": "Max",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 31418,
+   "score": 6.571182858006258
+  },
+  {
+   "tconst": "tt3766394",
+   "title": "Hello, My Name Is Doris",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 23669,
+   "score": 6.56455052460433
+  },
+  {
+   "tconst": "tt3726704",
+   "title": "Experimenter",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 21002,
+   "score": 6.561500922937333
+  },
+  {
+   "tconst": "tt3810760",
+   "title": "Minimalism: A Documentary About the Important Things",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 17118,
+   "score": 6.555986857913682
+  },
+  {
+   "tconst": "tt2217859",
+   "title": "Louder Than Bombs",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 15491,
+   "score": 6.553177655364763
+  },
+  {
+   "tconst": "tt5111874",
+   "title": "My Scientology Movie",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 14315,
+   "score": 6.550913082990055
+  },
+  {
+   "tconst": "tt1658801",
+   "title": "Freeheld",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 13838,
+   "score": 6.549930850444802
+  },
+  {
+   "tconst": "tt3169770",
+   "title": "Retribution",
+   "year": 2015,
+   "rating": 6.6,
+   "votes": 11653,
+   "score": 6.544878382344396
+  },
+  {
+   "tconst": "tt2554274",
+   "title": "Crimson Peak",
+   "year": 2015,
+   "rating": 6.5,
+   "votes": 171012,
+   "score": 6.4989307427844745
+  },
+  {
+   "tconst": "tt2224026",
+   "title": "Home",
+   "year": 2015,
+   "rating": 6.5,
+   "votes": 123017,
+   "score": 6.498544934954955
+  },
+  {
+   "tconst": "tt2140379",
+   "title": "Self/less",
+   "year": 2015,
+   "rating": 6.5,
+   "votes": 108640,
+   "score": 6.498368607661018
+  },
+  {
+   "tconst": "tt1674771",
+   "title": "Entourage",
+   "year": 2015,
+   "rating": 6.5,
+   "votes": 86445,
+   "score": 6.497993173445002
+  },
+  {
+   "tconst": "tt2118624",
+   "title": "The Final Girls",
+   "year": 2015,
+   "rating": 6.5,
+   "votes": 58194,
+   "score": 6.497161797414775
+  },
+  {
+   "tconst": "tt3165612",
+   "title": "Sleeping with Other People",
+   "year": 2015,
+   "rating": 6.5,
+   "votes": 52160,
+   "score": 6.496886287208868
+  },
+  {
+   "tconst": "tt2555736",
+   "title": "The Second Best Exotic Marigold Hotel",
+   "year": 2015,
+   "rating": 6.5,
+   "votes": 37983,
+   "score": 6.4959663133381245
+  },
+  {
+   "tconst": "tt3083008",
+   "title": "The Program",
+   "year": 2015,
+   "rating": 6.5,
+   "votes": 20640,
+   "score": 6.493683146635222
+  },
+  {
+   "tconst": "tt3832914",
+   "title": "War Room",
+   "year": 2015,
+   "rating": 6.5,
+   "votes": 17785,
+   "score": 6.493034069206522
+  },
+  {
+   "tconst": "tt1837562",
+   "title": "A Royal Night Out",
+   "year": 2015,
+   "rating": 6.5,
+   "votes": 11696,
+   "score": 6.491079075078503
+  },
+  {
+   "tconst": "tt4034452",
+   "title": "Hyena Road",
+   "year": 2015,
+   "rating": 6.5,
+   "votes": 10111,
+   "score": 6.49037599387913
+  },
+  {
+   "tconst": "tt0790770",
+   "title": "Miles Ahead",
+   "year": 2015,
+   "rating": 6.4,
+   "votes": 11091,
+   "score": 6.438236765108492
+  },
+  {
+   "tconst": "tt2271563",
+   "title": "Forsaken",
+   "year": 2015,
+   "rating": 6.4,
+   "votes": 15116,
+   "score": 6.432109078392388
+  },
+  {
+   "tconst": "tt3802576",
+   "title": "Brothers",
+   "year": 2015,
+   "rating": 6.4,
+   "votes": 15734,
+   "score": 6.431337981382731
+  },
+  {
+   "tconst": "tt3774466",
+   "title": "Ashby",
+   "year": 2015,
+   "rating": 6.4,
+   "votes": 16676,
+   "score": 6.430231354509792
+  }
+ ]
+}

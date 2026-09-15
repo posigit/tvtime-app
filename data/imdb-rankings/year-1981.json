@@ -1,0 +1,1608 @@
+{
+ "tag": "year-1981",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.484,
+ "minVotes": 2000,
+ "items": [
+  {
+   "tconst": "tt0082971",
+   "title": "Raiders of the Lost Ark",
+   "year": 1981,
+   "rating": 8.4,
+   "votes": 1120814,
+   "score": 8.39658651363416
+  },
+  {
+   "tconst": "tt0082096",
+   "title": "Das Boot",
+   "year": 1981,
+   "rating": 8.3,
+   "votes": 290500,
+   "score": 8.287580477673936
+  },
+  {
+   "tconst": "tt0131636",
+   "title": "The Little Fox",
+   "year": 1981,
+   "rating": 8.3,
+   "votes": 6485,
+   "score": 7.871866790763249
+  },
+  {
+   "tconst": "tt0155265",
+   "title": "Thillu Mullu",
+   "year": 1981,
+   "rating": 8.5,
+   "votes": 4129,
+   "score": 7.8420280175601516
+  },
+  {
+   "tconst": "tt0082755",
+   "title": "Teddy Bear",
+   "year": 1981,
+   "rating": 8.1,
+   "votes": 7260,
+   "score": 7.750895218102176
+  },
+  {
+   "tconst": "tt0252361",
+   "title": "Davaro",
+   "year": 1981,
+   "rating": 8,
+   "votes": 10097,
+   "score": 7.7493006298773395
+  },
+  {
+   "tconst": "tt0205306",
+   "title": "A Nameless Band",
+   "year": 1981,
+   "rating": 8.7,
+   "votes": 2471,
+   "score": 7.7085640169148215
+  },
+  {
+   "tconst": "tt0082694",
+   "title": "The Road Warrior",
+   "year": 1981,
+   "rating": 7.6,
+   "votes": 215103,
+   "score": 7.589715893928808
+  },
+  {
+   "tconst": "tt0082846",
+   "title": "On Golden Pond",
+   "year": 1981,
+   "rating": 7.6,
+   "votes": 38129,
+   "score": 7.544361676583671
+  },
+  {
+   "tconst": "tt0082736",
+   "title": "Mephisto",
+   "year": 1981,
+   "rating": 7.7,
+   "votes": 12703,
+   "score": 7.534543271415776
+  },
+  {
+   "tconst": "tt0082783",
+   "title": "My Dinner with Andre",
+   "year": 1981,
+   "rating": 7.6,
+   "votes": 31227,
+   "score": 7.532804337425172
+  },
+  {
+   "tconst": "tt0082010",
+   "title": "An American Werewolf in London",
+   "year": 1981,
+   "rating": 7.5,
+   "votes": 136271,
+   "score": 7.485299084548648
+  },
+  {
+   "tconst": "tt0083271",
+   "title": "Vabank",
+   "year": 1981,
+   "rating": 7.8,
+   "votes": 5674,
+   "score": 7.456931159711514
+  },
+  {
+   "tconst": "tt0082176",
+   "title": "Christiane F.",
+   "year": 1981,
+   "rating": 7.5,
+   "votes": 35946,
+   "score": 7.446431500543566
+  },
+  {
+   "tconst": "tt0254001",
+   "title": "Trickster",
+   "year": 1981,
+   "rating": 7.7,
+   "votes": 7193,
+   "score": 7.43537362336845
+  },
+  {
+   "tconst": "tt0082317",
+   "title": "They Don't Wear Black Tie",
+   "year": 1981,
+   "rating": 8.2,
+   "votes": 2323,
+   "score": 7.405942567574869
+  },
+  {
+   "tconst": "tt0211653",
+   "title": "The Mystery of the Third Planet",
+   "year": 1981,
+   "rating": 7.8,
+   "votes": 4424,
+   "score": 7.390175859219514
+  },
+  {
+   "tconst": "tt0082085",
+   "title": "Blow Out",
+   "year": 1981,
+   "rating": 7.4,
+   "votes": 78063,
+   "score": 7.377109148041244
+  },
+  {
+   "tconst": "tt0083190",
+   "title": "Thief",
+   "year": 1981,
+   "rating": 7.4,
+   "votes": 51493,
+   "score": 7.3657392503622185
+  },
+  {
+   "tconst": "tt0082432",
+   "title": "Gallipoli",
+   "year": 1981,
+   "rating": 7.4,
+   "votes": 45057,
+   "score": 7.3610533973612045
+  },
+  {
+   "tconst": "tt0082089",
+   "title": "Body Heat",
+   "year": 1981,
+   "rating": 7.4,
+   "votes": 44818,
+   "score": 7.360854579854461
+  },
+  {
+   "tconst": "tt0083931",
+   "title": "Son of the White Mare",
+   "year": 1981,
+   "rating": 7.8,
+   "votes": 3988,
+   "score": 7.360335624520068
+  },
+  {
+   "tconst": "tt0082436",
+   "title": "The Grilling",
+   "year": 1981,
+   "rating": 7.6,
+   "votes": 6566,
+   "score": 7.339352056925772
+  },
+  {
+   "tconst": "tt0082162",
+   "title": "Chashme Buddoor",
+   "year": 1981,
+   "rating": 7.9,
+   "votes": 2917,
+   "score": 7.323894594188767
+  },
+  {
+   "tconst": "tt0082949",
+   "title": "The Professional",
+   "year": 1981,
+   "rating": 7.4,
+   "votes": 19505,
+   "score": 7.314777480568527
+  },
+  {
+   "tconst": "tt0082714",
+   "title": "The Marquis of Grillo",
+   "year": 1981,
+   "rating": 7.7,
+   "votes": 4309,
+   "score": 7.314406359110187
+  },
+  {
+   "tconst": "tt0083907",
+   "title": "The Evil Dead",
+   "year": 1981,
+   "rating": 7.3,
+   "votes": 256993,
+   "score": 7.293695928923276
+  },
+  {
+   "tconst": "tt0083089",
+   "title": "Do You Remember Dolly Bell?",
+   "year": 1981,
+   "rating": 7.5,
+   "votes": 7396,
+   "score": 7.283662166839736
+  },
+  {
+   "tconst": "tt0082348",
+   "title": "Excalibur",
+   "year": 1981,
+   "rating": 7.3,
+   "votes": 74824,
+   "score": 7.278747392997321
+  },
+  {
+   "tconst": "tt0081730",
+   "title": "Run, Waiter, Run!",
+   "year": 1981,
+   "rating": 7.9,
+   "votes": 2501,
+   "score": 7.270648682431942
+  },
+  {
+   "tconst": "tt0082945",
+   "title": "Prince of the City",
+   "year": 1981,
+   "rating": 7.4,
+   "votes": 10807,
+   "score": 7.256897768378712
+  },
+  {
+   "tconst": "tt0082979",
+   "title": "Reds",
+   "year": 1981,
+   "rating": 7.3,
+   "votes": 27046,
+   "score": 7.24378880808463
+  },
+  {
+   "tconst": "tt0082484",
+   "title": "Quest for Fire",
+   "year": 1981,
+   "rating": 7.3,
+   "votes": 26753,
+   "score": 7.243216002491085
+  },
+  {
+   "tconst": "tt0082252",
+   "title": "The Decline of Western Civilization",
+   "year": 1981,
+   "rating": 7.5,
+   "votes": 5824,
+   "score": 7.240195516312137
+  },
+  {
+   "tconst": "tt0082671",
+   "title": "Lola",
+   "year": 1981,
+   "rating": 7.4,
+   "votes": 7509,
+   "score": 7.207265718753409
+  },
+  {
+   "tconst": "tt0082314",
+   "title": "Ek Duuje Ke Liye",
+   "year": 1981,
+   "rating": 7.5,
+   "votes": 4866,
+   "score": 7.203945487857
+  },
+  {
+   "tconst": "tt0153489",
+   "title": "Love and Lies",
+   "year": 1981,
+   "rating": 7.8,
+   "votes": 2301,
+   "score": 7.1878841477856685
+  },
+  {
+   "tconst": "tt0082406",
+   "title": "The Fox and the Hound",
+   "year": 1981,
+   "rating": 7.2,
+   "votes": 111726,
+   "score": 7.187402086766669
+  },
+  {
+   "tconst": "tt0082183",
+   "title": "La Chèvre",
+   "year": 1981,
+   "rating": 7.3,
+   "votes": 12134,
+   "score": 7.184483495091706
+  },
+  {
+   "tconst": "tt0082970",
+   "title": "Ragtime",
+   "year": 1981,
+   "rating": 7.3,
+   "votes": 11687,
+   "score": 7.1807108730639415
+  },
+  {
+   "tconst": "tt0082933",
+   "title": "Possession",
+   "year": 1981,
+   "rating": 7.2,
+   "votes": 60332,
+   "score": 7.177014851434675
+  },
+  {
+   "tconst": "tt0080728",
+   "title": "The Aviator's Wife",
+   "year": 1981,
+   "rating": 7.4,
+   "votes": 5911,
+   "score": 7.168333929923672
+  },
+  {
+   "tconst": "tt0080341",
+   "title": "In Search of Famine",
+   "year": 1981,
+   "rating": 7.6,
+   "votes": 3134,
+   "score": 7.165112917730067
+  },
+  {
+   "tconst": "tt0082073",
+   "title": "Bianco, rosso e Verdone",
+   "year": 1981,
+   "rating": 7.4,
+   "votes": 4795,
+   "score": 7.130285462785308
+  },
+  {
+   "tconst": "tt0082206",
+   "title": "Coup de torchon",
+   "year": 1981,
+   "rating": 7.3,
+   "votes": 7388,
+   "score": 7.1260853983410914
+  },
+  {
+   "tconst": "tt0082340",
+   "title": "Escape from New York",
+   "year": 1981,
+   "rating": 7.1,
+   "votes": 175371,
+   "score": 7.093050102438538
+  },
+  {
+   "tconst": "tt0081363",
+   "title": "Cutting it Short",
+   "year": 1981,
+   "rating": 7.5,
+   "votes": 2993,
+   "score": 7.092887987107182
+  },
+  {
+   "tconst": "tt0082158",
+   "title": "Chariots of Fire",
+   "year": 1981,
+   "rating": 7.1,
+   "votes": 71695,
+   "score": 7.083272809819203
+  },
+  {
+   "tconst": "tt0157894",
+   "title": "The Killing of America",
+   "year": 1981,
+   "rating": 7.5,
+   "votes": 2869,
+   "score": 7.0825199670622645
+  },
+  {
+   "tconst": "tt0082370",
+   "title": "The Woman Next Door",
+   "year": 1981,
+   "rating": 7.2,
+   "votes": 9671,
+   "score": 7.077241857563719
+  },
+  {
+   "tconst": "tt0081427",
+   "title": "I'm Starting from Three",
+   "year": 1981,
+   "rating": 7.4,
+   "votes": 3392,
+   "score": 7.060105660168057
+  },
+  {
+   "tconst": "tt0083111",
+   "title": "Southern Comfort",
+   "year": 1981,
+   "rating": 7.1,
+   "votes": 23746,
+   "score": 7.052120318481556
+  },
+  {
+   "tconst": "tt0082474",
+   "title": "The Great Muppet Caper",
+   "year": 1981,
+   "rating": 7.1,
+   "votes": 18590,
+   "score": 7.040130632327643
+  },
+  {
+   "tconst": "tt0082222",
+   "title": "Man of Iron",
+   "year": 1981,
+   "rating": 7.3,
+   "votes": 4275,
+   "score": 7.039807126633651
+  },
+  {
+   "tconst": "tt0082269",
+   "title": "Diva",
+   "year": 1981,
+   "rating": 7.1,
+   "votes": 15478,
+   "score": 7.029470747203694
+  },
+  {
+   "tconst": "tt0082009",
+   "title": "American Pop",
+   "year": 1981,
+   "rating": 7.2,
+   "votes": 6231,
+   "score": 7.025937276105718
+  },
+  {
+   "tconst": "tt0085327",
+   "title": "Who Finds a Friend Finds a Treasure",
+   "year": 1981,
+   "rating": 7.1,
+   "votes": 14395,
+   "score": 7.024811815774697
+  },
+  {
+   "tconst": "tt0082351",
+   "title": "Eye of the Needle",
+   "year": 1981,
+   "rating": 7.1,
+   "votes": 14324,
+   "score": 7.024484790469625
+  },
+  {
+   "tconst": "tt0085211",
+   "title": "The Prodigal Son",
+   "year": 1981,
+   "rating": 7.3,
+   "votes": 3817,
+   "score": 7.0193209076201075
+  },
+  {
+   "tconst": "tt0083326",
+   "title": "Whose Life Is It Anyway?",
+   "year": 1981,
+   "rating": 7.3,
+   "votes": 3756,
+   "score": 7.016346372415942
+  },
+  {
+   "tconst": "tt0083260",
+   "title": "Bolero",
+   "year": 1981,
+   "rating": 7.3,
+   "votes": 3078,
+   "score": 6.97847375337262
+  },
+  {
+   "tconst": "tt0082081",
+   "title": "Marianne & Juliane",
+   "year": 1981,
+   "rating": 7.3,
+   "votes": 3031,
+   "score": 6.975470029740839
+  },
+  {
+   "tconst": "tt0082088",
+   "title": "Blood Wedding",
+   "year": 1981,
+   "rating": 7.4,
+   "votes": 2216,
+   "score": 6.965296423061234
+  },
+  {
+   "tconst": "tt0082210",
+   "title": "El crack",
+   "year": 1981,
+   "rating": 7.4,
+   "votes": 2199,
+   "score": 6.963536489551361
+  },
+  {
+   "tconst": "tt0082661",
+   "title": "Lili Marleen",
+   "year": 1981,
+   "rating": 7.1,
+   "votes": 4784,
+   "score": 6.918291527067536
+  },
+  {
+   "tconst": "tt0082926",
+   "title": "Polyester",
+   "year": 1981,
+   "rating": 7,
+   "votes": 10291,
+   "score": 6.915978335336927
+  },
+  {
+   "tconst": "tt0082175",
+   "title": "The Chosen",
+   "year": 1981,
+   "rating": 7.2,
+   "votes": 2674,
+   "score": 6.893472340527635
+  },
+  {
+   "tconst": "tt0081633",
+   "title": "Time Bandits",
+   "year": 1981,
+   "rating": 6.9,
+   "votes": 74924,
+   "score": 6.889174896256385
+  },
+  {
+   "tconst": "tt0252589",
+   "title": "Bloody Nigar",
+   "year": 1981,
+   "rating": 7.1,
+   "votes": 3788,
+   "score": 6.887023102907078
+  },
+  {
+   "tconst": "tt0082186",
+   "title": "Clash of the Titans",
+   "year": 1981,
+   "rating": 6.9,
+   "votes": 52103,
+   "score": 6.88460879654781
+  },
+  {
+   "tconst": "tt0083081",
+   "title": "Silsila",
+   "year": 1981,
+   "rating": 7.1,
+   "votes": 3584,
+   "score": 6.879242428299815
+  },
+  {
+   "tconst": "tt0082031",
+   "title": "Arthur",
+   "year": 1981,
+   "rating": 6.9,
+   "votes": 34017,
+   "score": 6.876880076620101
+  },
+  {
+   "tconst": "tt0082764",
+   "title": "Modern Romance",
+   "year": 1981,
+   "rating": 7,
+   "votes": 5389,
+   "score": 6.86023680059902
+  },
+  {
+   "tconst": "tt0082416",
+   "title": "The French Lieutenant's Woman",
+   "year": 1981,
+   "rating": 6.9,
+   "votes": 16954,
+   "score": 6.856066778496686
+  },
+  {
+   "tconst": "tt0081974",
+   "title": "Absence of Malice",
+   "year": 1981,
+   "rating": 6.9,
+   "votes": 16775,
+   "score": 6.85564792115186
+  },
+  {
+   "tconst": "tt0082679",
+   "title": "The Looney, Looney, Looney Bugs Bunny Movie",
+   "year": 1981,
+   "rating": 7.1,
+   "votes": 2907,
+   "score": 6.848785351462434
+  },
+  {
+   "tconst": "tt0082633",
+   "title": "Tree of Knowledge",
+   "year": 1981,
+   "rating": 7.2,
+   "votes": 2051,
+   "score": 6.846331700722331
+  },
+  {
+   "tconst": "tt0083281",
+   "title": "Vernon, Florida",
+   "year": 1981,
+   "rating": 7,
+   "votes": 3962,
+   "score": 6.82678458900137
+  },
+  {
+   "tconst": "tt0082247",
+   "title": "Death Hunt",
+   "year": 1981,
+   "rating": 6.9,
+   "votes": 9177,
+   "score": 6.825497872383123
+  },
+  {
+   "tconst": "tt0082797",
+   "title": "Naseeb",
+   "year": 1981,
+   "rating": 7.1,
+   "votes": 2242,
+   "score": 6.809403517120736
+  },
+  {
+   "tconst": "tt0159510",
+   "title": "Mobile Suit Gundam II: Soldiers of Sorrow",
+   "year": 1981,
+   "rating": 7.1,
+   "votes": 2047,
+   "score": 6.795401462719585
+  },
+  {
+   "tconst": "tt0083131",
+   "title": "Stripes",
+   "year": 1981,
+   "rating": 6.8,
+   "votes": 86851,
+   "score": 6.792878974008466
+  },
+  {
+   "tconst": "tt0082517",
+   "title": "History of the World: Part I",
+   "year": 1981,
+   "rating": 6.8,
+   "votes": 59593,
+   "score": 6.789727561892199
+  },
+  {
+   "tconst": "tt0159509",
+   "title": "Mobile Suit Gundam I",
+   "year": 1981,
+   "rating": 7,
+   "votes": 2884,
+   "score": 6.788552358645816
+  },
+  {
+   "tconst": "tt0082562",
+   "title": "Madly in Love",
+   "year": 1981,
+   "rating": 6.9,
+   "votes": 5188,
+   "score": 6.784152715585165
+  },
+  {
+   "tconst": "tt0082644",
+   "title": "Laawaris",
+   "year": 1981,
+   "rating": 7,
+   "votes": 2712,
+   "score": 6.780833981244942
+  },
+  {
+   "tconst": "tt0083169",
+   "title": "Taps",
+   "year": 1981,
+   "rating": 6.8,
+   "votes": 22213,
+   "score": 6.773868984414412
+  },
+  {
+   "tconst": "tt0082054",
+   "title": "Stepfather",
+   "year": 1981,
+   "rating": 6.9,
+   "votes": 4412,
+   "score": 6.770132520216182
+  },
+  {
+   "tconst": "tt0082776",
+   "title": "Ms .45",
+   "year": 1981,
+   "rating": 6.8,
+   "votes": 15488,
+   "score": 6.76382031791092
+  },
+  {
+   "tconst": "tt0082404",
+   "title": "Four Friends",
+   "year": 1981,
+   "rating": 7,
+   "votes": 2169,
+   "score": 6.752288251289557
+  },
+  {
+   "tconst": "tt0082259",
+   "title": "Deprisa, Deprisa",
+   "year": 1981,
+   "rating": 7,
+   "votes": 2127,
+   "score": 6.74976731757358
+  },
+  {
+   "tconst": "tt0082220",
+   "title": "Cutter's Way",
+   "year": 1981,
+   "rating": 6.8,
+   "votes": 9109,
+   "score": 6.743045253364494
+  },
+  {
+   "tconst": "tt0082405",
+   "title": "The Four Seasons",
+   "year": 1981,
+   "rating": 6.8,
+   "votes": 8224,
+   "score": 6.738115191669225
+  },
+  {
+   "tconst": "tt0082173",
+   "title": "Choice of Arms",
+   "year": 1981,
+   "rating": 6.9,
+   "votes": 2403,
+   "score": 6.710876611316412
+  },
+  {
+   "tconst": "tt0182916",
+   "title": "The Top Scorer",
+   "year": 1981,
+   "rating": 6.8,
+   "votes": 4424,
+   "score": 6.70150836233284
+  },
+  {
+   "tconst": "tt0083349",
+   "title": "Yaarana",
+   "year": 1981,
+   "rating": 6.9,
+   "votes": 2167,
+   "score": 6.700165519468722
+  },
+  {
+   "tconst": "tt0082398",
+   "title": "For Your Eyes Only",
+   "year": 1981,
+   "rating": 6.7,
+   "votes": 117604,
+   "score": 6.696382142065701
+  },
+  {
+   "tconst": "tt0081455",
+   "title": "Scanners",
+   "year": 1981,
+   "rating": 6.7,
+   "votes": 68425,
+   "score": 6.693855729068175
+  },
+  {
+   "tconst": "tt0083284",
+   "title": "Victory",
+   "year": 1981,
+   "rating": 6.7,
+   "votes": 36327,
+   "score": 6.68871004043171
+  },
+  {
+   "tconst": "tt0082766",
+   "title": "Mommie Dearest",
+   "year": 1981,
+   "rating": 6.7,
+   "votes": 20305,
+   "score": 6.680600301260981
+  },
+  {
+   "tconst": "tt0082973",
+   "title": "Rasmus and the Vagabond",
+   "year": 1981,
+   "rating": 6.8,
+   "votes": 2799,
+   "score": 6.66815789114944
+  },
+  {
+   "tconst": "tt0082402",
+   "title": "Fort Apache the Bronx",
+   "year": 1981,
+   "rating": 6.7,
+   "votes": 7890,
+   "score": 6.656247696625497
+  },
+  {
+   "tconst": "tt0082969",
+   "title": "Raggedy Man",
+   "year": 1981,
+   "rating": 6.8,
+   "votes": 2122,
+   "score": 6.646504056192665
+  },
+  {
+   "tconst": "tt0082509",
+   "title": "Heavy Metal",
+   "year": 1981,
+   "rating": 6.6,
+   "votes": 42204,
+   "score": 6.594735537951908
+  },
+  {
+   "tconst": "tt0082869",
+   "title": "Outland",
+   "year": 1981,
+   "rating": 6.6,
+   "votes": 36016,
+   "score": 6.593878622675351
+  },
+  {
+   "tconst": "tt0082407",
+   "title": "Fracchia la belva umana",
+   "year": 1981,
+   "rating": 6.7,
+   "votes": 2067,
+   "score": 6.593604553633186
+  },
+  {
+   "tconst": "tt0082934",
+   "title": "The Postman Always Rings Twice",
+   "year": 1981,
+   "rating": 6.6,
+   "votes": 28136,
+   "score": 6.5922779970675
+  },
+  {
+   "tconst": "tt0082288",
+   "title": "Dragonslayer",
+   "year": 1981,
+   "rating": 6.6,
+   "votes": 20916,
+   "score": 6.589845074167663
+  },
+  {
+   "tconst": "tt0083000",
+   "title": "Road Games",
+   "year": 1981,
+   "rating": 6.6,
+   "votes": 11144,
+   "score": 6.582295322552203
+  },
+  {
+   "tconst": "tt0086410",
+   "title": "Tales of Ordinary Madness",
+   "year": 1981,
+   "rating": 6.6,
+   "votes": 3376,
+   "score": 6.556713117489985
+  },
+  {
+   "tconst": "tt0082495",
+   "title": "Halloween II",
+   "year": 1981,
+   "rating": 6.5,
+   "votes": 113421,
+   "score": 6.499716600268809
+  },
+  {
+   "tconst": "tt0082533",
+   "title": "The Howling",
+   "year": 1981,
+   "rating": 6.5,
+   "votes": 45308,
+   "score": 6.49930856767621
+  },
+  {
+   "tconst": "tt0082307",
+   "title": "The Beyond",
+   "year": 1981,
+   "rating": 6.5,
+   "votes": 28283,
+   "score": 6.498919846766376
+  },
+  {
+   "tconst": "tt0082242",
+   "title": "Dead & Buried",
+   "year": 1981,
+   "rating": 6.5,
+   "votes": 16901,
+   "score": 6.498269388901442
+  },
+  {
+   "tconst": "tt0083109",
+   "title": "The Cabbage Soup",
+   "year": 1981,
+   "rating": 6.5,
+   "votes": 10785,
+   "score": 6.497441511116634
+  },
+  {
+   "tconst": "tt0084445",
+   "title": "One from the Heart",
+   "year": 1981,
+   "rating": 6.5,
+   "votes": 9202,
+   "score": 6.497079960687928
+  },
+  {
+   "tconst": "tt0082894",
+   "title": "Pennies from Heaven",
+   "year": 1981,
+   "rating": 6.5,
+   "votes": 6903,
+   "score": 6.496325926050338
+  },
+  {
+   "tconst": "tt0082111",
+   "title": "Buddy Buddy",
+   "year": 1981,
+   "rating": 6.5,
+   "votes": 5591,
+   "score": 6.49569091287395
+  },
+  {
+   "tconst": "tt0082835",
+   "title": "Buddy Goes West",
+   "year": 1981,
+   "rating": 6.5,
+   "votes": 4123,
+   "score": 6.494657801670124
+  },
+  {
+   "tconst": "tt0082770",
+   "title": "Montenegro",
+   "year": 1981,
+   "rating": 6.5,
+   "votes": 2260,
+   "score": 6.492321530428677
+  },
+  {
+   "tconst": "tt0082034",
+   "title": "Ace",
+   "year": 1981,
+   "rating": 6.4,
+   "votes": 2568,
+   "score": 6.436622092737776
+  },
+  {
+   "tconst": "tt0082935",
+   "title": "To Kill a Cop",
+   "year": 1981,
+   "rating": 6.4,
+   "votes": 2583,
+   "score": 6.436502229898792
+  },
+  {
+   "tconst": "tt0081964",
+   "title": "...All the Marbles",
+   "year": 1981,
+   "rating": 6.4,
+   "votes": 2679,
+   "score": 6.435753306182125
+  },
+  {
+   "tconst": "tt0083276",
+   "title": "Beware of the Jonsson Gang!",
+   "year": 1981,
+   "rating": 6.4,
+   "votes": 5011,
+   "score": 6.423861035462298
+  },
+  {
+   "tconst": "tt0083015",
+   "title": "S.O.B.",
+   "year": 1981,
+   "rating": 6.4,
+   "votes": 6967,
+   "score": 6.418656152517695
+  },
+  {
+   "tconst": "tt0083366",
+   "title": "Zorro: The Gay Blade",
+   "year": 1981,
+   "rating": 6.3,
+   "votes": 5318,
+   "score": 6.350189904294366
+  },
+  {
+   "tconst": "tt0082622",
+   "title": "Knightriders",
+   "year": 1981,
+   "rating": 6.3,
+   "votes": 6189,
+   "score": 6.344851595997822
+  },
+  {
+   "tconst": "tt0082813",
+   "title": "Butcher, Baker, Nightmare Maker",
+   "year": 1981,
+   "rating": 6.3,
+   "votes": 6746,
+   "score": 6.341995165747331
+  },
+  {
+   "tconst": "tt0488834",
+   "title": "The Chaos Class: Bye Bye",
+   "year": 1981,
+   "rating": 6.3,
+   "votes": 6929,
+   "score": 6.341134474143371
+  },
+  {
+   "tconst": "tt0083064",
+   "title": "Sharky's Machine",
+   "year": 1981,
+   "rating": 6.3,
+   "votes": 7419,
+   "score": 6.338994555645627
+  },
+  {
+   "tconst": "tt0082964",
+   "title": "Quartet",
+   "year": 1981,
+   "rating": 6.2,
+   "votes": 2226,
+   "score": 6.334237983820674
+  },
+  {
+   "tconst": "tt0083232",
+   "title": "True Confessions",
+   "year": 1981,
+   "rating": 6.3,
+   "votes": 10412,
+   "score": 6.329591501742359
+  },
+  {
+   "tconst": "tt0082449",
+   "title": "Ghost Story",
+   "year": 1981,
+   "rating": 6.3,
+   "votes": 11217,
+   "score": 6.327789189651673
+  },
+  {
+   "tconst": "tt0083336",
+   "title": "Wolfen",
+   "year": 1981,
+   "rating": 6.3,
+   "votes": 12965,
+   "score": 6.324543248889152
+  },
+  {
+   "tconst": "tt0082817",
+   "title": "Nighthawks",
+   "year": 1981,
+   "rating": 6.3,
+   "votes": 23897,
+   "score": 6.31418271304113
+  },
+  {
+   "tconst": "tt0082782",
+   "title": "My Bloody Valentine",
+   "year": 1981,
+   "rating": 6.3,
+   "votes": 28408,
+   "score": 6.312078720061371
+  },
+  {
+   "tconst": "tt0082136",
+   "title": "The Cannonball Run",
+   "year": 1981,
+   "rating": 6.3,
+   "votes": 44225,
+   "score": 6.307945694313168
+  },
+  {
+   "tconst": "tt0083189",
+   "title": "They All Laughed",
+   "year": 1981,
+   "rating": 6.2,
+   "votes": 3655,
+   "score": 6.300316484460861
+  },
+  {
+   "tconst": "tt0082200",
+   "title": "Continental Divide",
+   "year": 1981,
+   "rating": 6.2,
+   "votes": 6139,
+   "score": 6.269700174422677
+  },
+  {
+   "tconst": "tt0082121",
+   "title": "Bustin' Loose",
+   "year": 1981,
+   "rating": 6.1,
+   "votes": 4128,
+   "score": 6.225210463385471
+  },
+  {
+   "tconst": "tt0083624",
+   "title": "Basket Case",
+   "year": 1981,
+   "rating": 6.2,
+   "votes": 24416,
+   "score": 6.22147523166362
+  },
+  {
+   "tconst": "tt0082118",
+   "title": "The Burning",
+   "year": 1981,
+   "rating": 6.2,
+   "votes": 25527,
+   "score": 6.220608483293717
+  },
+  {
+   "tconst": "tt0084522",
+   "title": "Porky's",
+   "year": 1981,
+   "rating": 6.2,
+   "votes": 49379,
+   "score": 6.211041276000432
+  },
+  {
+   "tconst": "tt0083001",
+   "title": "Roar",
+   "year": 1981,
+   "rating": 6.1,
+   "votes": 5409,
+   "score": 6.203561846352566
+  },
+  {
+   "tconst": "tt0082677",
+   "title": "Looker",
+   "year": 1981,
+   "rating": 6.1,
+   "votes": 7086,
+   "score": 6.184447470793106
+  },
+  {
+   "tconst": "tt0082163",
+   "title": "Nice Dreams",
+   "year": 1981,
+   "rating": 6.1,
+   "votes": 8662,
+   "score": 6.171964895856889
+  },
+  {
+   "tconst": "tt0082352",
+   "title": "Eyes of a Stranger",
+   "year": 1981,
+   "rating": 6,
+   "votes": 3708,
+   "score": 6.169462109254759
+  },
+  {
+   "tconst": "tt0085872",
+   "title": "The Loveless",
+   "year": 1981,
+   "rating": 6,
+   "votes": 3845,
+   "score": 6.165490114563928
+  },
+  {
+   "tconst": "tt0082966",
+   "title": "The House by the Cemetery",
+   "year": 1981,
+   "rating": 6.1,
+   "votes": 18189,
+   "score": 6.138005335560264
+  },
+  {
+   "tconst": "tt0082992",
+   "title": "Rich and Famous",
+   "year": 1981,
+   "rating": 5.8,
+   "votes": 2292,
+   "score": 6.118567036259591
+  },
+  {
+   "tconst": "tt0082418",
+   "title": "Friday the 13th: Part 2",
+   "year": 1981,
+   "rating": 6.1,
+   "votes": 88778,
+   "score": 6.108452375240986
+  },
+  {
+   "tconst": "tt0082592",
+   "title": "Just Before Dawn",
+   "year": 1981,
+   "rating": 6,
+   "votes": 8002,
+   "score": 6.096709630036608
+  },
+  {
+   "tconst": "tt0082528",
+   "title": "Hot Bubblegum",
+   "year": 1981,
+   "rating": 5.7,
+   "votes": 2206,
+   "score": 6.072631887690481
+  },
+  {
+   "tconst": "tt0082498",
+   "title": "Happy Birthday to Me",
+   "year": 1981,
+   "rating": 6,
+   "votes": 12675,
+   "score": 6.065914120587814
+  },
+  {
+   "tconst": "tt0081178",
+   "title": "The Monster Club",
+   "year": 1981,
+   "rating": 5.9,
+   "votes": 5245,
+   "score": 6.061116593461168
+  },
+  {
+   "tconst": "tt0082362",
+   "title": "The Fan",
+   "year": 1981,
+   "rating": 5.8,
+   "votes": 3343,
+   "score": 6.055902998245585
+  },
+  {
+   "tconst": "tt0082353",
+   "title": "Eyewitness",
+   "year": 1981,
+   "rating": 5.9,
+   "votes": 6358,
+   "score": 6.039661368703777
+  },
+  {
+   "tconst": "tt0084854",
+   "title": "Venom",
+   "year": 1981,
+   "rating": 5.8,
+   "votes": 3765,
+   "score": 6.037170809995866
+  },
+  {
+   "tconst": "tt0080440",
+   "title": "The Black Cat",
+   "year": 1981,
+   "rating": 5.8,
+   "votes": 4874,
+   "score": 5.998907436663685
+  },
+  {
+   "tconst": "tt0082490",
+   "title": "Who Pulled the Plug?",
+   "year": 1981,
+   "rating": 5.8,
+   "votes": 4879,
+   "score": 5.998762860826598
+  },
+  {
+   "tconst": "tt0083805",
+   "title": "Death Valley",
+   "year": 1981,
+   "rating": 5.5,
+   "votes": 2165,
+   "score": 5.972338468097519
+  },
+  {
+   "tconst": "tt0082951",
+   "title": "The Prowler",
+   "year": 1981,
+   "rating": 5.9,
+   "votes": 14542,
+   "score": 5.970565210955517
+  },
+  {
+   "tconst": "tt0082138",
+   "title": "Carbon Copy",
+   "year": 1981,
+   "rating": 5.7,
+   "votes": 3806,
+   "score": 5.969943113955591
+  },
+  {
+   "tconst": "tt0082001",
+   "title": "All Night Long",
+   "year": 1981,
+   "rating": 5.5,
+   "votes": 2206,
+   "score": 5.967734122593001
+  },
+  {
+   "tconst": "tt0082812",
+   "title": "Night School",
+   "year": 1981,
+   "rating": 5.7,
+   "votes": 3897,
+   "score": 5.965777466445001
+  },
+  {
+   "tconst": "tt0082243",
+   "title": "Strange Behavior",
+   "year": 1981,
+   "rating": 5.6,
+   "votes": 2884,
+   "score": 5.961852931946389
+  },
+  {
+   "tconst": "tt0086113",
+   "title": "The Pit",
+   "year": 1981,
+   "rating": 5.7,
+   "votes": 4059,
+   "score": 5.958671351646503
+  },
+  {
+   "tconst": "tt0082427",
+   "title": "The Funhouse",
+   "year": 1981,
+   "rating": 5.9,
+   "votes": 18666,
+   "score": 5.9564835826781275
+  },
+  {
+   "tconst": "tt0082146",
+   "title": "Caveman",
+   "year": 1981,
+   "rating": 5.8,
+   "votes": 9446,
+   "score": 5.919455680554443
+  },
+  {
+   "tconst": "tt0082199",
+   "title": "Condorman",
+   "year": 1981,
+   "rating": 5.7,
+   "votes": 5841,
+   "score": 5.899883907617161
+  },
+  {
+   "tconst": "tt0083067",
+   "title": "Shock Treatment",
+   "year": 1981,
+   "rating": 5.7,
+   "votes": 5928,
+   "score": 5.8976904288125835
+  },
+  {
+   "tconst": "tt0093468",
+   "title": "Madhouse",
+   "year": 1981,
+   "rating": 5.5,
+   "votes": 3086,
+   "score": 5.886804899651231
+  },
+  {
+   "tconst": "tt0082084",
+   "title": "Bloody Birthday",
+   "year": 1981,
+   "rating": 5.7,
+   "votes": 6401,
+   "score": 5.886559899967405
+  },
+  {
+   "tconst": "tt0082818",
+   "title": "Nightmare",
+   "year": 1981,
+   "rating": 5.6,
+   "votes": 5002,
+   "score": 5.852397846276229
+  },
+  {
+   "tconst": "tt0084133",
+   "title": "The Incubus",
+   "year": 1981,
+   "rating": 5.5,
+   "votes": 3609,
+   "score": 5.850738049496552
+  },
+  {
+   "tconst": "tt0082422",
+   "title": "Fruits of Passion",
+   "year": 1981,
+   "rating": 5.3,
+   "votes": 2299,
+   "score": 5.850660553530162
+  },
+  {
+   "tconst": "tt0082094",
+   "title": "The Boogens",
+   "year": 1981,
+   "rating": 5.5,
+   "votes": 3693,
+   "score": 5.84556292282209
+  },
+  {
+   "tconst": "tt0082350",
+   "title": "An Eye for an Eye",
+   "year": 1981,
+   "rating": 5.6,
+   "votes": 5305,
+   "score": 5.841928777498448
+  },
+  {
+   "tconst": "tt0083113",
+   "title": "Sphinx",
+   "year": 1981,
+   "rating": 5.2,
+   "votes": 2023,
+   "score": 5.838153049869789
+  },
+  {
+   "tconst": "tt0082346",
+   "title": "Evilspeak",
+   "year": 1981,
+   "rating": 5.6,
+   "votes": 5719,
+   "score": 5.8289531959614145
+  },
+  {
+   "tconst": "tt0083591",
+   "title": "Attack Force Z",
+   "year": 1981,
+   "rating": 5.4,
+   "votes": 3206,
+   "score": 5.816306131315052
+  },
+  {
+   "tconst": "tt0081248",
+   "title": "Burial Ground",
+   "year": 1981,
+   "rating": 5.6,
+   "votes": 7336,
+   "score": 5.7892983847071715
+  },
+  {
+   "tconst": "tt0082558",
+   "title": "The Incredible Shrinking Woman",
+   "year": 1981,
+   "rating": 5.5,
+   "votes": 5566,
+   "score": 5.760017145073508
+  },
+  {
+   "tconst": "tt0083156",
+   "title": "Bloody Moon",
+   "year": 1981,
+   "rating": 5.3,
+   "votes": 3261,
+   "score": 5.749969534238009
+  },
+  {
+   "tconst": "tt0082511",
+   "title": "Hell Night",
+   "year": 1981,
+   "rating": 5.6,
+   "votes": 9980,
+   "score": 5.7475200099854895
+  },
+  {
+   "tconst": "tt0083254",
+   "title": "Under the Rainbow",
+   "year": 1981,
+   "rating": 5.3,
+   "votes": 3343,
+   "score": 5.7430637693479625
+  },
+  {
+   "tconst": "tt0082497",
+   "title": "The Hand",
+   "year": 1981,
+   "rating": 5.5,
+   "votes": 7606,
+   "score": 5.7047980137024945
+  },
+  {
+   "tconst": "tt0082245",
+   "title": "Deadly Blessing",
+   "year": 1981,
+   "rating": 5.5,
+   "votes": 8125,
+   "score": 5.694300219222337
+  },
+  {
+   "tconst": "tt0084028",
+   "title": "Absurd",
+   "year": 1981,
+   "rating": 5.3,
+   "votes": 4222,
+   "score": 5.680470864613655
+  },
+  {
+   "tconst": "tt0082801",
+   "title": "Neighbors",
+   "year": 1981,
+   "rating": 5.5,
+   "votes": 9534,
+   "score": 5.670564393933255
+  },
+  {
+   "tconst": "tt0083133",
+   "title": "Student Bodies",
+   "year": 1981,
+   "rating": 5.4,
+   "votes": 6073,
+   "score": 5.668461503731719
+  },
+  {
+   "tconst": "tt0082640",
+   "title": "Lady Chatterley's Lover",
+   "year": 1981,
+   "rating": 5.2,
+   "votes": 3814,
+   "score": 5.641570299213306
+  },
+  {
+   "tconst": "tt0082648",
+   "title": "The Legend of the Lone Ranger",
+   "year": 1981,
+   "rating": 5,
+   "votes": 2822,
+   "score": 5.615364935633796
+  },
+  {
+   "tconst": "tt0082332",
+   "title": "Enter the Ninja",
+   "year": 1981,
+   "rating": 5.3,
+   "votes": 6325,
+   "score": 5.584359125480621
+  },
+  {
+   "tconst": "tt0082367",
+   "title": "Fear No Evil",
+   "year": 1981,
+   "rating": 4.7,
+   "votes": 2036,
+   "score": 5.58386762131471
+  },
+  {
+   "tconst": "tt0082377",
+   "title": "The Final Conflict",
+   "year": 1981,
+   "rating": 5.5,
+   "votes": 26046,
+   "score": 5.570145108736582
+  },
+  {
+   "tconst": "tt0082257",
+   "title": "Demonoid",
+   "year": 1981,
+   "rating": 4.7,
+   "votes": 2209,
+   "score": 5.547538541132374
+  },
+  {
+   "tconst": "tt0082948",
+   "title": "Private Lessons",
+   "year": 1981,
+   "rating": 5.1,
+   "votes": 4899,
+   "score": 5.501114613657945
+  },
+  {
+   "tconst": "tt0082527",
+   "title": "X-Ray",
+   "year": 1981,
+   "rating": 5,
+   "votes": 4040,
+   "score": 5.491273132388438
+  },
+  {
+   "tconst": "tt0082696",
+   "title": "Madman",
+   "year": 1981,
+   "rating": 5.1,
+   "votes": 7940,
+   "score": 5.378399368171646
+  }
+ ]
+}

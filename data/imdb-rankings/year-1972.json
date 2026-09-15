@@ -1,0 +1,1608 @@
+{
+ "tag": "year-1972",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.512,
+ "minVotes": 1000,
+ "items": [
+  {
+   "tconst": "tt0068646",
+   "title": "The Godfather",
+   "year": 1972,
+   "rating": 9.2,
+   "votes": 2255691,
+   "score": 9.198808983993802
+  },
+  {
+   "tconst": "tt0069090",
+   "title": "Pink Floyd: Live at Pompeii",
+   "year": 1972,
+   "rating": 8.6,
+   "votes": 11680,
+   "score": 8.43535054400309
+  },
+  {
+   "tconst": "tt0232152",
+   "title": "Nagara Haavu",
+   "year": 1972,
+   "rating": 9,
+   "votes": 1267,
+   "score": 7.902622363457953
+  },
+  {
+   "tconst": "tt0069293",
+   "title": "Solaris",
+   "year": 1972,
+   "rating": 7.9,
+   "votes": 105222,
+   "score": 7.886935332586086
+  },
+  {
+   "tconst": "tt0069281",
+   "title": "Sleuth",
+   "year": 1972,
+   "rating": 7.9,
+   "votes": 53308,
+   "score": 7.874446580576696
+  },
+  {
+   "tconst": "tt0069467",
+   "title": "Cries & Whispers",
+   "year": 1972,
+   "rating": 7.9,
+   "votes": 40260,
+   "score": 7.866365605864257
+  },
+  {
+   "tconst": "tt0068257",
+   "title": "Bawarchi",
+   "year": 1972,
+   "rating": 8.1,
+   "votes": 4873,
+   "score": 7.829651778981641
+  },
+  {
+   "tconst": "tt0068814",
+   "title": "The Goat Horn",
+   "year": 1972,
+   "rating": 8.2,
+   "votes": 3083,
+   "score": 7.786638476110501
+  },
+  {
+   "tconst": "tt0069035",
+   "title": "The New Land",
+   "year": 1972,
+   "rating": 8,
+   "votes": 5954,
+   "score": 7.78605764997975
+  },
+  {
+   "tconst": "tt0315255",
+   "title": "Bangarada Manushya",
+   "year": 1972,
+   "rating": 8.9,
+   "votes": 1136,
+   "score": 7.782137124512724
+  },
+  {
+   "tconst": "tt0068182",
+   "title": "Aguirre, the Wrath of God",
+   "year": 1972,
+   "rating": 7.8,
+   "votes": 69035,
+   "score": 7.781612692196176
+  },
+  {
+   "tconst": "tt0068327",
+   "title": "Cabaret",
+   "year": 1972,
+   "rating": 7.8,
+   "votes": 64369,
+   "score": 7.780300217197129
+  },
+  {
+   "tconst": "tt0068161",
+   "title": "The Dawns Here Are Quiet",
+   "year": 1972,
+   "rating": 8,
+   "votes": 5390,
+   "score": 7.767174475423971
+  },
+  {
+   "tconst": "tt0215911",
+   "title": "Koshish",
+   "year": 1972,
+   "rating": 8.4,
+   "votes": 1904,
+   "score": 7.749946590206328
+  },
+  {
+   "tconst": "tt0068816",
+   "title": "Lone Wolf and Cub: Baby Cart at the River Styx",
+   "year": 1972,
+   "rating": 7.9,
+   "votes": 7586,
+   "score": 7.738370009079802
+  },
+  {
+   "tconst": "tt0069452",
+   "title": "Walter Defends Sarajevo",
+   "year": 1972,
+   "rating": 8.1,
+   "votes": 3307,
+   "score": 7.731354747610674
+  },
+  {
+   "tconst": "tt0175075",
+   "title": "Propala hramota",
+   "year": 1972,
+   "rating": 8.3,
+   "votes": 1892,
+   "score": 7.681827419764584
+  },
+  {
+   "tconst": "tt0068361",
+   "title": "The Discreet Charm of the Bourgeoisie",
+   "year": 1972,
+   "rating": 7.7,
+   "votes": 50976,
+   "score": 7.677148008657057
+  },
+  {
+   "tconst": "tt0066758",
+   "title": "Amar Prem",
+   "year": 1972,
+   "rating": 8.1,
+   "votes": 2221,
+   "score": 7.607061439912815
+  },
+  {
+   "tconst": "tt0326098",
+   "title": "S detza na more",
+   "year": 1972,
+   "rating": 8.5,
+   "votes": 1219,
+   "score": 7.604211310481829
+  },
+  {
+   "tconst": "tt0068473",
+   "title": "Deliverance",
+   "year": 1972,
+   "rating": 7.6,
+   "votes": 130151,
+   "score": 7.591706086098917
+  },
+  {
+   "tconst": "tt0158560",
+   "title": "The Concert for Bangladesh",
+   "year": 1972,
+   "rating": 8.2,
+   "votes": 1774,
+   "score": 7.5915807130350315
+  },
+  {
+   "tconst": "tt0068762",
+   "title": "Jeremiah Johnson",
+   "year": 1972,
+   "rating": 7.6,
+   "votes": 40190,
+   "score": 7.573591767369729
+  },
+  {
+   "tconst": "tt0069097",
+   "title": "Play It Again, Sam",
+   "year": 1972,
+   "rating": 7.6,
+   "votes": 29852,
+   "score": 7.564742801048851
+  },
+  {
+   "tconst": "tt0069495",
+   "title": "What's Up, Doc?",
+   "year": 1972,
+   "rating": 7.6,
+   "votes": 29647,
+   "score": 7.5645069630945665
+  },
+  {
+   "tconst": "tt0070959",
+   "title": "State of Siege",
+   "year": 1972,
+   "rating": 7.7,
+   "votes": 6822,
+   "score": 7.548151994113932
+  },
+  {
+   "tconst": "tt0068205",
+   "title": "Love in the Afternoon",
+   "year": 1972,
+   "rating": 7.6,
+   "votes": 10574,
+   "score": 7.506017357694762
+  },
+  {
+   "tconst": "tt0068156",
+   "title": "1776",
+   "year": 1972,
+   "rating": 7.6,
+   "votes": 10350,
+   "score": 7.504162546075698
+  },
+  {
+   "tconst": "tt0068815",
+   "title": "Lone Wolf and Cub: Sword of Vengeance",
+   "year": 1972,
+   "rating": 7.6,
+   "votes": 9949,
+   "score": 7.500652561691403
+  },
+  {
+   "tconst": "tt0165629",
+   "title": "Tonight We'll Dance at Home",
+   "year": 1972,
+   "rating": 8.3,
+   "votes": 1054,
+   "score": 7.429622637760067
+  },
+  {
+   "tconst": "tt0068278",
+   "title": "The Bitter Tears of Petra von Kant",
+   "year": 1972,
+   "rating": 7.5,
+   "votes": 12606,
+   "score": 7.427402976477964
+  },
+  {
+   "tconst": "tt0068611",
+   "title": "Frenzy",
+   "year": 1972,
+   "rating": 7.4,
+   "votes": 53845,
+   "score": 7.3838133813102225
+  },
+  {
+   "tconst": "tt0289782",
+   "title": "Under the Flag of the Rising Sun",
+   "year": 1972,
+   "rating": 8,
+   "votes": 1352,
+   "score": 7.367451062057473
+  },
+  {
+   "tconst": "tt0068817",
+   "title": "Lone Wolf and Cub: Baby Cart to Hades",
+   "year": 1972,
+   "rating": 7.5,
+   "votes": 6249,
+   "score": 7.3637391223560735
+  },
+  {
+   "tconst": "tt0204058",
+   "title": "Winter Soldier",
+   "year": 1972,
+   "rating": 8.1,
+   "votes": 1140,
+   "score": 7.358058363532326
+  },
+  {
+   "tconst": "tt0068421",
+   "title": "The Cowboys",
+   "year": 1972,
+   "rating": 7.4,
+   "votes": 17636,
+   "score": 7.352363430884266
+  },
+  {
+   "tconst": "tt0143348",
+   "title": "Lone Wolf and Cub: Baby Cart in Peril",
+   "year": 1972,
+   "rating": 7.5,
+   "votes": 5526,
+   "score": 7.348643104192335
+  },
+  {
+   "tconst": "tt0069303",
+   "title": "Sounder",
+   "year": 1972,
+   "rating": 7.5,
+   "votes": 5391,
+   "score": 7.345445923636236
+  },
+  {
+   "tconst": "tt0068346",
+   "title": "The Mattei Affair",
+   "year": 1972,
+   "rating": 7.6,
+   "votes": 2910,
+   "score": 7.321801764183933
+  },
+  {
+   "tconst": "tt0068638",
+   "title": "The Getaway",
+   "year": 1972,
+   "rating": 7.3,
+   "votes": 37841,
+   "score": 7.27971846497153
+  },
+  {
+   "tconst": "tt0069478",
+   "title": "Vuk samotnjak",
+   "year": 1972,
+   "rating": 8,
+   "votes": 1052,
+   "score": 7.274973147153595
+  },
+  {
+   "tconst": "tt0263283",
+   "title": "The Return",
+   "year": 1972,
+   "rating": 7.8,
+   "votes": 1432,
+   "score": 7.270495435016109
+  },
+  {
+   "tconst": "tt0067429",
+   "title": "Caliber 9",
+   "year": 1972,
+   "rating": 7.4,
+   "votes": 5571,
+   "score": 7.264898021299525
+  },
+  {
+   "tconst": "tt0069191",
+   "title": "Roma",
+   "year": 1972,
+   "rating": 7.3,
+   "votes": 15021,
+   "score": 7.250829841954882
+  },
+  {
+   "tconst": "tt0069235",
+   "title": "The Scopone Game",
+   "year": 1972,
+   "rating": 7.5,
+   "votes": 2895,
+   "score": 7.246404338372061
+  },
+  {
+   "tconst": "tt0126449",
+   "title": "Then I Sentenced Them All to Death",
+   "year": 1972,
+   "rating": 7.9,
+   "votes": 1115,
+   "score": 7.243851015583536
+  },
+  {
+   "tconst": "tt0068431",
+   "title": "With Clean Hands",
+   "year": 1972,
+   "rating": 7.7,
+   "votes": 1314,
+   "score": 7.186709117527735
+  },
+  {
+   "tconst": "tt0067227",
+   "title": "The Merchant of Four Seasons",
+   "year": 1972,
+   "rating": 7.3,
+   "votes": 5779,
+   "score": 7.183794792441241
+  },
+  {
+   "tconst": "tt0069289",
+   "title": "Snoopy Come Home",
+   "year": 1972,
+   "rating": 7.3,
+   "votes": 5701,
+   "score": 7.182442157582328
+  },
+  {
+   "tconst": "tt0068767",
+   "title": "Fist of Fury",
+   "year": 1972,
+   "rating": 7.2,
+   "votes": 37730,
+   "score": 7.182242315981388
+  },
+  {
+   "tconst": "tt0068537",
+   "title": "Elvis on Tour",
+   "year": 1972,
+   "rating": 7.5,
+   "votes": 2043,
+   "score": 7.175400886611627
+  },
+  {
+   "tconst": "tt0068528",
+   "title": "The Effect of Gamma Rays on Man-in-the-Moon Marigolds",
+   "year": 1972,
+   "rating": 7.4,
+   "votes": 2949,
+   "score": 7.175194960232762
+  },
+  {
+   "tconst": "tt0068950",
+   "title": "The Seduction of Mimi",
+   "year": 1972,
+   "rating": 7.3,
+   "votes": 4683,
+   "score": 7.161383934182505
+  },
+  {
+   "tconst": "tt0068441",
+   "title": "Cesar & Rosalie",
+   "year": 1972,
+   "rating": 7.3,
+   "votes": 4293,
+   "score": 7.151170394475567
+  },
+  {
+   "tconst": "tt0069172",
+   "title": "Reminiscences of a Journey to Lithuania",
+   "year": 1972,
+   "rating": 7.6,
+   "votes": 1403,
+   "score": 7.147334539308854
+  },
+  {
+   "tconst": "tt0068575",
+   "title": "Fat City",
+   "year": 1972,
+   "rating": 7.2,
+   "votes": 11907,
+   "score": 7.146714565581404
+  },
+  {
+   "tconst": "tt0068655",
+   "title": "The Tall Blond Man with One Black Shoe",
+   "year": 1972,
+   "rating": 7.2,
+   "votes": 10332,
+   "score": 7.139308586124177
+  },
+  {
+   "tconst": "tt0069198",
+   "title": "The Ruling Class",
+   "year": 1972,
+   "rating": 7.2,
+   "votes": 7376,
+   "score": 7.117889792019959
+  },
+  {
+   "tconst": "tt0070641",
+   "title": "Slap the Monster on Page One",
+   "year": 1972,
+   "rating": 7.4,
+   "votes": 2091,
+   "score": 7.112793561293813
+  },
+  {
+   "tconst": "tt0068326",
+   "title": "Butterflies Are Free",
+   "year": 1972,
+   "rating": 7.2,
+   "votes": 6537,
+   "score": 7.108749488915905
+  },
+  {
+   "tconst": "tt0070463",
+   "title": "New Mischief by Emil",
+   "year": 1972,
+   "rating": 7.3,
+   "votes": 2951,
+   "score": 7.100618804849196
+  },
+  {
+   "tconst": "tt0068924",
+   "title": "Marjoe",
+   "year": 1972,
+   "rating": 7.4,
+   "votes": 1948,
+   "score": 7.098861905684931
+  },
+  {
+   "tconst": "tt0226872",
+   "title": "Female Prisoner #701: Scorpion",
+   "year": 1972,
+   "rating": 7.2,
+   "votes": 5761,
+   "score": 7.098276127489895
+  },
+  {
+   "tconst": "tt0069824",
+   "title": "Brother Sun, Sister Moon",
+   "year": 1972,
+   "rating": 7.2,
+   "votes": 5389,
+   "score": 7.092353247450177
+  },
+  {
+   "tconst": "tt0069393",
+   "title": "Tomorrow",
+   "year": 1972,
+   "rating": 7.4,
+   "votes": 1866,
+   "score": 7.0902459518350245
+  },
+  {
+   "tconst": "tt0069113",
+   "title": "The Poseidon Adventure",
+   "year": 1972,
+   "rating": 7.1,
+   "votes": 54686,
+   "score": 7.0894451908551375
+  },
+  {
+   "tconst": "tt0068935",
+   "title": "The Way of the Dragon",
+   "year": 1972,
+   "rating": 7.1,
+   "votes": 44495,
+   "score": 7.0870808857667695
+  },
+  {
+   "tconst": "tt0216067",
+   "title": "Parichay",
+   "year": 1972,
+   "rating": 7.6,
+   "votes": 1084,
+   "score": 7.078044576755843
+  },
+  {
+   "tconst": "tt0067789",
+   "title": "Grandads-Robbers",
+   "year": 1972,
+   "rating": 7.3,
+   "votes": 2429,
+   "score": 7.070266811886608
+  },
+  {
+   "tconst": "tt0068240",
+   "title": "Avanti!",
+   "year": 1972,
+   "rating": 7.1,
+   "votes": 13369,
+   "score": 7.059095615419248
+  },
+  {
+   "tconst": "tt0068687",
+   "title": "The Heartbreak Kid",
+   "year": 1972,
+   "rating": 7.1,
+   "votes": 6676,
+   "score": 7.023429507290148
+  },
+  {
+   "tconst": "tt0067464",
+   "title": "The Girl on a Broomstick",
+   "year": 1972,
+   "rating": 7.3,
+   "votes": 1806,
+   "score": 7.019260476820804
+  },
+  {
+   "tconst": "tt0068375",
+   "title": "Chung Kuo: China",
+   "year": 1972,
+   "rating": 7.5,
+   "votes": 1039,
+   "score": 7.015568856282089
+  },
+  {
+   "tconst": "tt0069027",
+   "title": "We Won't Grow Old Together",
+   "year": 1972,
+   "rating": 7.2,
+   "votes": 2505,
+   "score": 7.0037788581909215
+  },
+  {
+   "tconst": "tt0070800",
+   "title": "Five Fingers of Death",
+   "year": 1972,
+   "rating": 7.1,
+   "votes": 4772,
+   "score": 6.998171326742755
+  },
+  {
+   "tconst": "tt0068983",
+   "title": "My Childhood",
+   "year": 1972,
+   "rating": 7.3,
+   "votes": 1565,
+   "score": 6.992883001153675
+  },
+  {
+   "tconst": "tt0226874",
+   "title": "Female Prisoner Scorpion: Jailhouse 41",
+   "year": 1972,
+   "rating": 7.1,
+   "votes": 3873,
+   "score": 6.979385367937447
+  },
+  {
+   "tconst": "tt0069120",
+   "title": "Indian Summer",
+   "year": 1972,
+   "rating": 7.1,
+   "votes": 3667,
+   "score": 6.974061473743127
+  },
+  {
+   "tconst": "tt0067546",
+   "title": "Pakeezah",
+   "year": 1972,
+   "rating": 7.2,
+   "votes": 2039,
+   "score": 6.97369032509351
+  },
+  {
+   "tconst": "tt0068334",
+   "title": "The Candidate",
+   "year": 1972,
+   "rating": 7,
+   "votes": 13650,
+   "score": 6.966706136379466
+  },
+  {
+   "tconst": "tt0068902",
+   "title": "The Italian Connection",
+   "year": 1972,
+   "rating": 7.1,
+   "votes": 3360,
+   "score": 6.965193783935591
+  },
+  {
+   "tconst": "tt0069019",
+   "title": "Don't Torture a Duckling",
+   "year": 1972,
+   "rating": 7,
+   "votes": 12912,
+   "score": 6.964939972538756
+  },
+  {
+   "tconst": "tt0067900",
+   "title": "A Cop",
+   "year": 1972,
+   "rating": 7,
+   "votes": 12442,
+   "score": 6.963714097452699
+  },
+  {
+   "tconst": "tt0253791",
+   "title": "Sweet Talker",
+   "year": 1972,
+   "rating": 7.1,
+   "votes": 3071,
+   "score": 6.955623900260176
+  },
+  {
+   "tconst": "tt0068732",
+   "title": "Images",
+   "year": 1972,
+   "rating": 7,
+   "votes": 8823,
+   "score": 6.950345607040535
+  },
+  {
+   "tconst": "tt0068168",
+   "title": "Across 110th Street",
+   "year": 1972,
+   "rating": 7,
+   "votes": 8534,
+   "score": 6.948840454998864
+  },
+  {
+   "tconst": "tt0069436",
+   "title": "Ulzana's Raid",
+   "year": 1972,
+   "rating": 7,
+   "votes": 7302,
+   "score": 6.9412484820476
+  },
+  {
+   "tconst": "tt0068828",
+   "title": "Lady Sings the Blues",
+   "year": 1972,
+   "rating": 7,
+   "votes": 5277,
+   "score": 6.922294869835778
+  },
+  {
+   "tconst": "tt0124012",
+   "title": "Morgiana",
+   "year": 1972,
+   "rating": 7.1,
+   "votes": 2031,
+   "score": 6.906085416680693
+  },
+  {
+   "tconst": "tt0068997",
+   "title": "The New Centurions",
+   "year": 1972,
+   "rating": 7,
+   "votes": 3876,
+   "score": 6.899968190721735
+  },
+  {
+   "tconst": "tt0067649",
+   "title": "Downpour",
+   "year": 1972,
+   "rating": 7.2,
+   "votes": 1267,
+   "score": 6.896623245681155
+  },
+  {
+   "tconst": "tt0095012",
+   "title": "The Devil",
+   "year": 1972,
+   "rating": 7,
+   "votes": 3667,
+   "score": 6.895488514668776
+  },
+  {
+   "tconst": "tt0068744",
+   "title": "Intimate Confessions of a Chinese Courtesan",
+   "year": 1972,
+   "rating": 7.1,
+   "votes": 1477,
+   "score": 6.862714936600394
+  },
+  {
+   "tconst": "tt0068629",
+   "title": "Street Mobster",
+   "year": 1972,
+   "rating": 7.1,
+   "votes": 1408,
+   "score": 6.855915655298663
+  },
+  {
+   "tconst": "tt0068416",
+   "title": "What Have You Done to Solange?",
+   "year": 1972,
+   "rating": 6.9,
+   "votes": 6619,
+   "score": 6.849106824774798
+  },
+  {
+   "tconst": "tt0068245",
+   "title": "Bad Company",
+   "year": 1972,
+   "rating": 6.9,
+   "votes": 5219,
+   "score": 6.83764992731294
+  },
+  {
+   "tconst": "tt0068310",
+   "title": "The Boxer from Shantung",
+   "year": 1972,
+   "rating": 7,
+   "votes": 1798,
+   "score": 6.8256772330089985
+  },
+  {
+   "tconst": "tt0066798",
+   "title": "Money Money Money",
+   "year": 1972,
+   "rating": 6.9,
+   "votes": 2876,
+   "score": 6.799959983993596
+  },
+  {
+   "tconst": "tt0070849",
+   "title": "Last Tango in Paris",
+   "year": 1972,
+   "rating": 6.8,
+   "votes": 63231,
+   "score": 6.795519996543089
+  },
+  {
+   "tconst": "tt0070698",
+   "title": "Sisters",
+   "year": 1972,
+   "rating": 6.8,
+   "votes": 23856,
+   "score": 6.788423113049532
+  },
+  {
+   "tconst": "tt0078222",
+   "title": "Seeta Aur Geeta",
+   "year": 1972,
+   "rating": 6.9,
+   "votes": 2405,
+   "score": 6.786121849620905
+  },
+  {
+   "tconst": "tt0068931",
+   "title": "The Mechanic",
+   "year": 1972,
+   "rating": 6.8,
+   "votes": 18423,
+   "score": 6.7851848271615705
+  },
+  {
+   "tconst": "tt0069280",
+   "title": "Slaughterhouse-Five",
+   "year": 1972,
+   "rating": 6.8,
+   "votes": 15019,
+   "score": 6.78203663761528
+  },
+  {
+   "tconst": "tt0069341",
+   "title": "Tales from the Crypt",
+   "year": 1972,
+   "rating": 6.8,
+   "votes": 14833,
+   "score": 6.7818256109365995
+  },
+  {
+   "tconst": "tt0068435",
+   "title": "The Culpepper Cattle Co.",
+   "year": 1972,
+   "rating": 6.9,
+   "votes": 2105,
+   "score": 6.775119129777513
+  },
+  {
+   "tconst": "tt0068853",
+   "title": "The Life and Times of Judge Roy Bean",
+   "year": 1972,
+   "rating": 6.8,
+   "votes": 10361,
+   "score": 6.774671674848973
+  },
+  {
+   "tconst": "tt0069225",
+   "title": "Savage Messiah",
+   "year": 1972,
+   "rating": 6.9,
+   "votes": 1964,
+   "score": 6.769178440607011
+  },
+  {
+   "tconst": "tt0068718",
+   "title": "The Hot Rock",
+   "year": 1972,
+   "rating": 6.8,
+   "votes": 7939,
+   "score": 6.767809027627159
+  },
+  {
+   "tconst": "tt0069050",
+   "title": "The Other",
+   "year": 1972,
+   "rating": 6.8,
+   "votes": 7902,
+   "score": 6.767675230056074
+  },
+  {
+   "tconst": "tt0070155",
+   "title": "The Harder They Come",
+   "year": 1972,
+   "rating": 6.8,
+   "votes": 7721,
+   "score": 6.767004345597887
+  },
+  {
+   "tconst": "tt0069214",
+   "title": "Sambizanga",
+   "year": 1972,
+   "rating": 7,
+   "votes": 1091,
+   "score": 6.7667359626777515
+  },
+  {
+   "tconst": "tt0069109",
+   "title": "Execution Squad",
+   "year": 1972,
+   "rating": 7,
+   "votes": 1011,
+   "score": 6.757456438567468
+  },
+  {
+   "tconst": "tt0068676",
+   "title": "Lady Kung Fu",
+   "year": 1972,
+   "rating": 6.9,
+   "votes": 1205,
+   "score": 6.724147346013233
+  },
+  {
+   "tconst": "tt0068233",
+   "title": "The French Conspiracy",
+   "year": 1972,
+   "rating": 6.9,
+   "votes": 1060,
+   "score": 6.711769367941349
+  },
+  {
+   "tconst": "tt0068200",
+   "title": "The Amazing Mr. Blunden",
+   "year": 1972,
+   "rating": 6.8,
+   "votes": 1964,
+   "score": 6.702916632239939
+  },
+  {
+   "tconst": "tt0068555",
+   "title": "Everything You Always Wanted to Know About Sex * But Were Afraid to Ask",
+   "year": 1972,
+   "rating": 6.7,
+   "votes": 44248,
+   "score": 6.695850532575124
+  },
+  {
+   "tconst": "tt0067009",
+   "title": "One-Armed Boxer",
+   "year": 1972,
+   "rating": 6.8,
+   "votes": 1695,
+   "score": 6.693226307220474
+  },
+  {
+   "tconst": "tt0069460",
+   "title": "The Annuity",
+   "year": 1972,
+   "rating": 6.8,
+   "votes": 1433,
+   "score": 6.681728277007472
+  },
+  {
+   "tconst": "tt0068939",
+   "title": "Days of '36",
+   "year": 1972,
+   "rating": 6.8,
+   "votes": 1366,
+   "score": 6.678379077751131
+  },
+  {
+   "tconst": "tt0068786",
+   "title": "Junior Bonner",
+   "year": 1972,
+   "rating": 6.7,
+   "votes": 7529,
+   "score": 6.677986270132393
+  },
+  {
+   "tconst": "tt0069121",
+   "title": "Prime Cut",
+   "year": 1972,
+   "rating": 6.7,
+   "votes": 6967,
+   "score": 6.676433400019979
+  },
+  {
+   "tconst": "tt0201922",
+   "title": "Zatoichi in Desperation",
+   "year": 1972,
+   "rating": 6.8,
+   "votes": 1316,
+   "score": 6.675753410172356
+  },
+  {
+   "tconst": "tt0202153",
+   "title": "Zatoichi at Large",
+   "year": 1972,
+   "rating": 6.8,
+   "votes": 1260,
+   "score": 6.672674733610256
+  },
+  {
+   "tconst": "tt0132378",
+   "title": "Olsen-banden tar gull",
+   "year": 1972,
+   "rating": 6.8,
+   "votes": 1252,
+   "score": 6.6722224236053185
+  },
+  {
+   "tconst": "tt0070170",
+   "title": "Henry VIII and His Six Wives",
+   "year": 1972,
+   "rating": 6.8,
+   "votes": 1203,
+   "score": 6.66938034405773
+  },
+  {
+   "tconst": "tt0069528",
+   "title": "Young Winston",
+   "year": 1972,
+   "rating": 6.7,
+   "votes": 3359,
+   "score": 6.656927024078729
+  },
+  {
+   "tconst": "tt0067467",
+   "title": "Red Psalm",
+   "year": 1972,
+   "rating": 6.7,
+   "votes": 2221,
+   "score": 6.641709064874007
+  },
+  {
+   "tconst": "tt0069042",
+   "title": "The Olsen Gang's Big Score",
+   "year": 1972,
+   "rating": 6.7,
+   "votes": 2102,
+   "score": 6.639472887801153
+  },
+  {
+   "tconst": "tt0069414",
+   "title": "Trouble Man",
+   "year": 1972,
+   "rating": 6.7,
+   "votes": 1825,
+   "score": 6.633538016976701
+  },
+  {
+   "tconst": "tt0066939",
+   "title": "Cut-Throats Nine",
+   "year": 1972,
+   "rating": 6.7,
+   "votes": 1718,
+   "score": 6.630921596011471
+  },
+  {
+   "tconst": "tt0068306",
+   "title": "Bone",
+   "year": 1972,
+   "rating": 6.7,
+   "votes": 1629,
+   "score": 6.628583072635671
+  },
+  {
+   "tconst": "tt0068305",
+   "title": "Bombay to Goa",
+   "year": 1972,
+   "rating": 6.7,
+   "votes": 1388,
+   "score": 6.621375585410042
+  },
+  {
+   "tconst": "tt0068420",
+   "title": "...And Hope to Die",
+   "year": 1972,
+   "rating": 6.7,
+   "votes": 1036,
+   "score": 6.607782366384665
+  },
+  {
+   "tconst": "tt0067756",
+   "title": "Silent Running",
+   "year": 1972,
+   "rating": 6.6,
+   "votes": 34013,
+   "score": 6.597493642303121
+  },
+  {
+   "tconst": "tt0069095",
+   "title": "All the Way Boys",
+   "year": 1972,
+   "rating": 6.6,
+   "votes": 8365,
+   "score": 6.590629460540222
+  },
+  {
+   "tconst": "tt0066907",
+   "title": "Chato's Land",
+   "year": 1972,
+   "rating": 6.6,
+   "votes": 7464,
+   "score": 6.58963195864357
+  },
+  {
+   "tconst": "tt0069390",
+   "title": "They're Coming to Get You!",
+   "year": 1972,
+   "rating": 6.6,
+   "votes": 5472,
+   "score": 6.5864408062359665
+  },
+  {
+   "tconst": "tt0069421",
+   "title": "Your Vice Is a Locked Room and Only I Have the Key",
+   "year": 1972,
+   "rating": 6.6,
+   "votes": 5443,
+   "score": 6.586379776184879
+  },
+  {
+   "tconst": "tt0068909",
+   "title": "Man of La Mancha",
+   "year": 1972,
+   "rating": 6.6,
+   "votes": 5295,
+   "score": 6.586059554878345
+  },
+  {
+   "tconst": "tt0068323",
+   "title": "Buck and the Preacher",
+   "year": 1972,
+   "rating": 6.6,
+   "votes": 3195,
+   "score": 6.579081024543307
+  },
+  {
+   "tconst": "tt0827739",
+   "title": "Sev Kardesim",
+   "year": 1972,
+   "rating": 6.6,
+   "votes": 1899,
+   "score": 6.5697291817727415
+  },
+  {
+   "tconst": "tt0069273",
+   "title": "Sitting Target",
+   "year": 1972,
+   "rating": 6.6,
+   "votes": 1614,
+   "score": 6.566428805646204
+  },
+  {
+   "tconst": "tt0070689",
+   "title": "Siddhartha",
+   "year": 1972,
+   "rating": 6.6,
+   "votes": 1380,
+   "score": 6.563128108386209
+  },
+  {
+   "tconst": "tt0068005",
+   "title": "You'll Like My Mother",
+   "year": 1972,
+   "rating": 6.5,
+   "votes": 1128,
+   "score": 6.5057541813717945
+  },
+  {
+   "tconst": "tt0068189",
+   "title": "Alfredo, Alfredo",
+   "year": 1972,
+   "rating": 6.5,
+   "votes": 1278,
+   "score": 6.505375284442132
+  },
+  {
+   "tconst": "tt0070083",
+   "title": "The Outside Man",
+   "year": 1972,
+   "rating": 6.5,
+   "votes": 1674,
+   "score": 6.504579243814202
+  },
+  {
+   "tconst": "tt0068916",
+   "title": "The Man Who Quit Smoking",
+   "year": 1972,
+   "rating": 6.5,
+   "votes": 1721,
+   "score": 6.504500146254751
+  },
+  {
+   "tconst": "tt0069017",
+   "title": "The Night of the Devils",
+   "year": 1972,
+   "rating": 6.5,
+   "votes": 1899,
+   "score": 6.504223835101476
+  },
+  {
+   "tconst": "tt0069311",
+   "title": "Steptoe & Son",
+   "year": 1972,
+   "rating": 6.5,
+   "votes": 1977,
+   "score": 6.504113166932878
+  },
+  {
+   "tconst": "tt0068650",
+   "title": "Hanzo the Razor: Sword of Justice",
+   "year": 1972,
+   "rating": 6.5,
+   "votes": 2138,
+   "score": 6.503902134467553
+  },
+  {
+   "tconst": "tt0066773",
+   "title": "The Goalie's Anxiety at the Penalty Kick",
+   "year": 1972,
+   "rating": 6.5,
+   "votes": 2690,
+   "score": 6.503318400530942
+  },
+  {
+   "tconst": "tt0069442",
+   "title": "A Gorgeous Girl Like Me",
+   "year": 1972,
+   "rating": 6.5,
+   "votes": 3002,
+   "score": 6.503059694642474
+  },
+  {
+   "tconst": "tt0068524",
+   "title": "Man of the East",
+   "year": 1972,
+   "rating": 6.5,
+   "votes": 3661,
+   "score": 6.502627096751594
+  },
+  {
+   "tconst": "tt0068444",
+   "title": "The Red Queen Kills Seven Times",
+   "year": 1972,
+   "rating": 6.5,
+   "votes": 3806,
+   "score": 6.502547835613646
+  },
+  {
+   "tconst": "tt0069398",
+   "title": "All's Well",
+   "year": 1972,
+   "rating": 6.5,
+   "votes": 4205,
+   "score": 6.502352526024818
+  },
+  {
+   "tconst": "tt0069847",
+   "title": "Carry on Abroad",
+   "year": 1972,
+   "rating": 6.5,
+   "votes": 4779,
+   "score": 6.502118861041561
+  },
+  {
+   "tconst": "tt0068230",
+   "title": "Asylum",
+   "year": 1972,
+   "rating": 6.5,
+   "votes": 9367,
+   "score": 6.5011811418886065
+  },
+  {
+   "tconst": "tt0068713",
+   "title": "Horror Express",
+   "year": 1972,
+   "rating": 6.5,
+   "votes": 14880,
+   "score": 6.50077108929214
+  },
+  {
+   "tconst": "tt0067434",
+   "title": "My Dear Killer",
+   "year": 1972,
+   "rating": 6.4,
+   "votes": 2058,
+   "score": 6.436705329613859
+  },
+  {
+   "tconst": "tt0069124",
+   "title": "Private Parts",
+   "year": 1972,
+   "rating": 6.4,
+   "votes": 2101,
+   "score": 6.436196355356072
+  },
+  {
+   "tconst": "tt0068367",
+   "title": "Who Saw Her Die?",
+   "year": 1972,
+   "rating": 6.4,
+   "votes": 3435,
+   "score": 6.425308883418079
+  },
+  {
+   "tconst": "tt0069073",
+   "title": "The Case of the Bloody Iris",
+   "year": 1972,
+   "rating": 6.4,
+   "votes": 3943,
+   "score": 6.422707849071248
+  },
+  {
+   "tconst": "tt0068657",
+   "title": "The Grand Duel",
+   "year": 1972,
+   "rating": 6.4,
+   "votes": 4028,
+   "score": 6.422323965385676
+  },
+  {
+   "tconst": "tt0068341",
+   "title": "The Valachi Papers",
+   "year": 1972,
+   "rating": 6.4,
+   "votes": 5149,
+   "score": 6.4182541710780905
+  },
+  {
+   "tconst": "tt0068805",
+   "title": "The King of Marvin Gardens",
+   "year": 1972,
+   "rating": 6.4,
+   "votes": 6558,
+   "score": 6.4148511375971395
+  },
+  {
+   "tconst": "tt0069332",
+   "title": "Super Fly",
+   "year": 1972,
+   "rating": 6.4,
+   "votes": 9434,
+   "score": 6.410757609541804
+  },
+  {
+   "tconst": "tt0068768",
+   "title": "Joe Kidd",
+   "year": 1972,
+   "rating": 6.4,
+   "votes": 23125,
+   "score": 6.404652638257375
+  },
+  {
+   "tconst": "tt0068868",
+   "title": "Liza",
+   "year": 1972,
+   "rating": 6.3,
+   "votes": 1052,
+   "score": 6.40343318613995
+  },
+  {
+   "tconst": "tt0069086",
+   "title": "The Pied Piper",
+   "year": 1972,
+   "rating": 6.3,
+   "votes": 1075,
+   "score": 6.402286697811652
+  },
+  {
+   "tconst": "tt0069080",
+   "title": "Pete 'n' Tillie",
+   "year": 1972,
+   "rating": 6.3,
+   "votes": 1337,
+   "score": 6.3908193829521505
+  },
+  {
+   "tconst": "tt0069158",
+   "title": "Rage",
+   "year": 1972,
+   "rating": 6.3,
+   "votes": 1547,
+   "score": 6.383331330176356
+  },
+  {
+   "tconst": "tt0069451",
+   "title": "The Valley (Obscured by Clouds)",
+   "year": 1972,
+   "rating": 6.3,
+   "votes": 1583,
+   "score": 6.38216991790909
+  },
+  {
+   "tconst": "tt0068698",
+   "title": "Hickey & Boggs",
+   "year": 1972,
+   "rating": 6.3,
+   "votes": 1706,
+   "score": 6.378434921640495
+  },
+  {
+   "tconst": "tt0069466",
+   "title": "The Visitors",
+   "year": 1972,
+   "rating": 6.3,
+   "votes": 1782,
+   "score": 6.376292199122638
+  },
+  {
+   "tconst": "tt0274933",
+   "title": "Tarkan: Altin Madalyon",
+   "year": 1972,
+   "rating": 6.3,
+   "votes": 1840,
+   "score": 6.374734118999711
+  },
+  {
+   "tconst": "tt0067732",
+   "title": "The Cannibal Man",
+   "year": 1972,
+   "rating": 6.3,
+   "votes": 2154,
+   "score": 6.367293880139245
+  },
+  {
+   "tconst": "tt0069291",
+   "title": "Snowball Express",
+   "year": 1972,
+   "rating": 6.3,
+   "votes": 2312,
+   "score": 6.364083604456273
+  },
+  {
+   "tconst": "tt0068971",
+   "title": "Death Walks at Midnight",
+   "year": 1972,
+   "rating": 6.3,
+   "votes": 2469,
+   "score": 6.3611833087227385
+  },
+  {
+   "tconst": "tt0068576",
+   "title": "Fear Is the Key",
+   "year": 1972,
+   "rating": 6.3,
+   "votes": 2652,
+   "score": 6.358117441938439
+  },
+  {
+   "tconst": "tt0083677",
+   "title": "Bonnie's Kids",
+   "year": 1972,
+   "rating": 6.2,
+   "votes": 1002,
+   "score": 6.355966482497092
+  },
+  {
+   "tconst": "tt0069404",
+   "title": "Travels with My Aunt",
+   "year": 1972,
+   "rating": 6.3,
+   "votes": 2965,
+   "score": 6.3535296085647355
+  },
+  {
+   "tconst": "tt0067696",
+   "title": "Seven Blood-Stained Orchids",
+   "year": 1972,
+   "rating": 6.3,
+   "votes": 3230,
+   "score": 6.350176098808316
+  },
+  {
+   "tconst": "tt0069358",
+   "title": "Ecstasy of the Angels",
+   "year": 1972,
+   "rating": 6.2,
+   "votes": 1169,
+   "score": 6.343957998137012
+  },
+  {
+   "tconst": "tt0067385",
+   "title": "The Troubles of Alfred",
+   "year": 1972,
+   "rating": 6.2,
+   "votes": 1231,
+   "score": 6.339957372460412
+  },
+  {
+   "tconst": "tt0067924",
+   "title": "Vampire Circus",
+   "year": 1972,
+   "rating": 6.3,
+   "votes": 5656,
+   "score": 6.3318877551020405
+  },
+  {
+   "tconst": "tt0068285",
+   "title": "Bless This House",
+   "year": 1972,
+   "rating": 6.2,
+   "votes": 1380,
+   "score": 6.331195335276966
+  },
+  {
+   "tconst": "tt0069371",
+   "title": "They Only Kill Their Masters",
+   "year": 1972,
+   "rating": 6.2,
+   "votes": 1446,
+   "score": 6.327655313965322
+  },
+  {
+   "tconst": "tt0068503",
+   "title": "Dr. Phibes Rises Again",
+   "year": 1972,
+   "rating": 6.3,
+   "votes": 7986,
+   "score": 6.323619507896637
+  },
+  {
+   "tconst": "tt0067647",
+   "title": "The Canterbury Tales",
+   "year": 1972,
+   "rating": 6.3,
+   "votes": 9209,
+   "score": 6.32078997923001
+  },
+  {
+   "tconst": "tt1184952",
+   "title": "Battal Gazi'nin Intikami",
+   "year": 1972,
+   "rating": 6.2,
+   "votes": 1627,
+   "score": 6.3188598774111835
+  },
+  {
+   "tconst": "tt0068206",
+   "title": "Amuck!",
+   "year": 1972,
+   "rating": 6.2,
+   "votes": 1855,
+   "score": 6.309367740090781
+  },
+  {
+   "tconst": "tt0068337",
+   "title": "The Carey Treatment",
+   "year": 1972,
+   "rating": 6.2,
+   "votes": 1952,
+   "score": 6.305774016923841
+  },
+  {
+   "tconst": "tt0068369",
+   "title": "Child's Play",
+   "year": 1972,
+   "rating": 6.2,
+   "votes": 1958,
+   "score": 6.305559465165375
+  },
+  {
+   "tconst": "tt0392396",
+   "title": "Malkoçoglu Ölüm Fedaileri",
+   "year": 1972,
+   "rating": 6.1,
+   "votes": 1008,
+   "score": 6.305301244003575
+  },
+  {
+   "tconst": "tt0197485",
+   "title": "Stadium Nuts",
+   "year": 1972,
+   "rating": 6.1,
+   "votes": 1033,
+   "score": 6.30277663451017
+  },
+  {
+   "tconst": "tt0069301",
+   "title": "Smile Before Death",
+   "year": 1972,
+   "rating": 6.1,
+   "votes": 1062,
+   "score": 6.299924780775547
+  },
+  {
+   "tconst": "tt0069031",
+   "title": "Now You See Him, Now You Don't",
+   "year": 1972,
+   "rating": 6.2,
+   "votes": 2537,
+   "score": 6.288279586643816
+  },
+  {
+   "tconst": "tt0068990",
+   "title": "Napoleon and Samantha",
+   "year": 1972,
+   "rating": 6.1,
+   "votes": 1212,
+   "score": 6.286367494556591
+  },
+  {
+   "tconst": "tt0069253",
+   "title": "The Crimes of the Black Cat",
+   "year": 1972,
+   "rating": 6.1,
+   "votes": 1224,
+   "score": 6.2853619145499895
+  },
+  {
+   "tconst": "tt0069029",
+   "title": "The Blood Spattered Bride",
+   "year": 1972,
+   "rating": 6.2,
+   "votes": 2810,
+   "score": 6.281954041459102
+  }
+ ]
+}

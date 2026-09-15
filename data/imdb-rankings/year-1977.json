@@ -1,0 +1,1608 @@
+{
+ "tag": "year-1977",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.401,
+ "minVotes": 1000,
+ "items": [
+  {
+   "tconst": "tt0076759",
+   "title": "Star Wars: Episode IV - A New Hope",
+   "year": 1977,
+   "rating": 8.6,
+   "votes": 1588442,
+   "score": 8.598616390741741
+  },
+  {
+   "tconst": "tt0253614",
+   "title": "Saban, Son of Saban",
+   "year": 1977,
+   "rating": 8.7,
+   "votes": 20255,
+   "score": 8.59182937348075
+  },
+  {
+   "tconst": "tt0252489",
+   "title": "The Chaos Class Is on Vacation",
+   "year": 1977,
+   "rating": 8.6,
+   "votes": 20511,
+   "score": 8.497765484325848
+  },
+  {
+   "tconst": "tt0253997",
+   "title": "The King of the Street Cleaners",
+   "year": 1977,
+   "rating": 8.5,
+   "votes": 23257,
+   "score": 8.413461406329445
+  },
+  {
+   "tconst": "tt0263975",
+   "title": "The Girl with the Red Scarf",
+   "year": 1977,
+   "rating": 8.4,
+   "votes": 18404,
+   "score": 8.296971414828558
+  },
+  {
+   "tconst": "tt0289967",
+   "title": "Smiling Eyes",
+   "year": 1977,
+   "rating": 8.4,
+   "votes": 8444,
+   "score": 8.188313567697303
+  },
+  {
+   "tconst": "tt0075404",
+   "title": "The Ascent",
+   "year": 1977,
+   "rating": 8.2,
+   "votes": 12627,
+   "score": 8.067970450820674
+  },
+  {
+   "tconst": "tt0076727",
+   "title": "Office Romance",
+   "year": 1977,
+   "rating": 8.2,
+   "votes": 11877,
+   "score": 8.06028060366027
+  },
+  {
+   "tconst": "tt0076085",
+   "title": "A Special Day",
+   "year": 1977,
+   "rating": 8.1,
+   "votes": 18973,
+   "score": 8.01492681787079
+  },
+  {
+   "tconst": "tt0075686",
+   "title": "Annie Hall",
+   "year": 1977,
+   "rating": 7.9,
+   "votes": 292805,
+   "score": 7.894897409279397
+  },
+  {
+   "tconst": "tt0253621",
+   "title": "Shakir the Clumsy",
+   "year": 1977,
+   "rating": 8,
+   "votes": 10331,
+   "score": 7.858868002235754
+  },
+  {
+   "tconst": "tt0076391",
+   "title": "Mimino",
+   "year": 1977,
+   "rating": 8,
+   "votes": 7945,
+   "score": 7.821222284330166
+  },
+  {
+   "tconst": "tt0075824",
+   "title": "That Obscure Object of Desire",
+   "year": 1977,
+   "rating": 7.8,
+   "votes": 27237,
+   "score": 7.750449174251277
+  },
+  {
+   "tconst": "tt0076744",
+   "title": "Special Education",
+   "year": 1977,
+   "rating": 8.3,
+   "votes": 2241,
+   "score": 7.714018307106859
+  },
+  {
+   "tconst": "tt0079672",
+   "title": "Opening Night",
+   "year": 1977,
+   "rating": 7.8,
+   "votes": 14306,
+   "score": 7.708587046474149
+  },
+  {
+   "tconst": "tt0142632",
+   "title": "Mattie the Goose-Boy",
+   "year": 1977,
+   "rating": 8.2,
+   "votes": 2488,
+   "score": 7.684183868501528
+  },
+  {
+   "tconst": "tt0076740",
+   "title": "Sorcerer",
+   "year": 1977,
+   "rating": 7.7,
+   "votes": 37800,
+   "score": 7.666516323024055
+  },
+  {
+   "tconst": "tt0259261",
+   "title": "Daana Veera Soora Karna",
+   "year": 1977,
+   "rating": 8.8,
+   "votes": 1073,
+   "score": 7.642659591574207
+  },
+  {
+   "tconst": "tt0075612",
+   "title": "3 Women",
+   "year": 1977,
+   "rating": 7.7,
+   "votes": 20164,
+   "score": 7.638614313614314
+  },
+  {
+   "tconst": "tt0075276",
+   "title": "Stroszek",
+   "year": 1977,
+   "rating": 7.7,
+   "votes": 16768,
+   "score": 7.626881659912953
+  },
+  {
+   "tconst": "tt0075860",
+   "title": "Close Encounters of the Third Kind",
+   "year": 1977,
+   "rating": 7.6,
+   "votes": 238624,
+   "score": 7.594995632045761
+  },
+  {
+   "tconst": "tt0077222",
+   "title": "White Bim Black Ear",
+   "year": 1977,
+   "rating": 8,
+   "votes": 2723,
+   "score": 7.5704628883516865
+  },
+  {
+   "tconst": "tt0076734",
+   "title": "Soldier of Orange",
+   "year": 1977,
+   "rating": 7.6,
+   "votes": 13637,
+   "score": 7.518072920225
+  },
+  {
+   "tconst": "tt0129794",
+   "title": "An Average Little Man",
+   "year": 1977,
+   "rating": 7.8,
+   "votes": 3574,
+   "score": 7.494104357965311
+  },
+  {
+   "tconst": "tt0076363",
+   "title": "The Many Adventures of Winnie the Pooh",
+   "year": 1977,
+   "rating": 7.5,
+   "votes": 43387,
+   "score": 7.475236743490962
+  },
+  {
+   "tconst": "tt0076446",
+   "title": "Unfinished Piece for the Player Piano",
+   "year": 1977,
+   "rating": 7.7,
+   "votes": 4159,
+   "score": 7.448174710861277
+  },
+  {
+   "tconst": "tt0075902",
+   "title": "Man of Marble",
+   "year": 1977,
+   "rating": 7.6,
+   "votes": 5388,
+   "score": 7.41227823001461
+  },
+  {
+   "tconst": "tt0075784",
+   "title": "A Bridge Too Far",
+   "year": 1977,
+   "rating": 7.4,
+   "votes": 68617,
+   "score": 7.385647662687754
+  },
+  {
+   "tconst": "tt0074695",
+   "title": "Cross of Iron",
+   "year": 1977,
+   "rating": 7.4,
+   "votes": 31914,
+   "score": 7.369643110327925
+  },
+  {
+   "tconst": "tt0075968",
+   "title": "The Duellists",
+   "year": 1977,
+   "rating": 7.4,
+   "votes": 28979,
+   "score": 7.366671114224402
+  },
+  {
+   "tconst": "tt0075675",
+   "title": "The American Friend",
+   "year": 1977,
+   "rating": 7.4,
+   "votes": 21544,
+   "score": 7.355679264253608
+  },
+  {
+   "tconst": "tt0076208",
+   "title": "Iphigenia",
+   "year": 1977,
+   "rating": 7.7,
+   "votes": 2766,
+   "score": 7.355027438484687
+  },
+  {
+   "tconst": "tt0076095",
+   "title": "The Goodbye Girl",
+   "year": 1977,
+   "rating": 7.4,
+   "votes": 17860,
+   "score": 7.347021915871333
+  },
+  {
+   "tconst": "tt0140448",
+   "title": "Pathinaru Vayathinile",
+   "year": 1977,
+   "rating": 8,
+   "votes": 1425,
+   "score": 7.340549828178693
+  },
+  {
+   "tconst": "tt0075669",
+   "title": "Amar Akbar Anthony",
+   "year": 1977,
+   "rating": 7.4,
+   "votes": 9106,
+   "score": 7.301131341117488
+  },
+  {
+   "tconst": "tt0076696",
+   "title": "The Chess Players",
+   "year": 1977,
+   "rating": 7.5,
+   "votes": 4439,
+   "score": 7.297910155053012
+  },
+  {
+   "tconst": "tt0076786",
+   "title": "Suspiria",
+   "year": 1977,
+   "rating": 7.3,
+   "votes": 116596,
+   "score": 7.2923537648672845
+  },
+  {
+   "tconst": "tt0076578",
+   "title": "Pumping Iron",
+   "year": 1977,
+   "rating": 7.3,
+   "votes": 26882,
+   "score": 7.267750998254549
+  },
+  {
+   "tconst": "tt0191182",
+   "title": "Hitler: A Career",
+   "year": 1977,
+   "rating": 7.5,
+   "votes": 3340,
+   "score": 7.24673579109063
+  },
+  {
+   "tconst": "tt0076104",
+   "title": "The Grateful Dead Movie",
+   "year": 1977,
+   "rating": 8,
+   "votes": 1108,
+   "score": 7.241382036685641
+  },
+  {
+   "tconst": "tt0074447",
+   "title": "Twenty Days Without War",
+   "year": 1977,
+   "rating": 7.7,
+   "votes": 1795,
+   "score": 7.235181872391173
+  },
+  {
+   "tconst": "tt0371667",
+   "title": "Etharkum Thuninthavan",
+   "year": 1977,
+   "rating": 7.9,
+   "votes": 1157,
+   "score": 7.204976046978826
+  },
+  {
+   "tconst": "tt0076155",
+   "title": "The Man Who Loved Women",
+   "year": 1977,
+   "rating": 7.3,
+   "votes": 8235,
+   "score": 7.202634903447031
+  },
+  {
+   "tconst": "tt0074486",
+   "title": "Eraserhead",
+   "year": 1977,
+   "rating": 7.2,
+   "votes": 145649,
+   "score": 7.1945504799441755
+  },
+  {
+   "tconst": "tt0076574",
+   "title": "Providence",
+   "year": 1977,
+   "rating": 7.4,
+   "votes": 3774,
+   "score": 7.190706605222734
+  },
+  {
+   "tconst": "tt0076723",
+   "title": "Slap Shot",
+   "year": 1977,
+   "rating": 7.2,
+   "votes": 45693,
+   "score": 7.182884657943018
+  },
+  {
+   "tconst": "tt0076162",
+   "title": "House",
+   "year": 1977,
+   "rating": 7.2,
+   "votes": 40473,
+   "score": 7.180730435062169
+  },
+  {
+   "tconst": "tt0076042",
+   "title": "A Grin Without A Cat",
+   "year": 1977,
+   "rating": 7.8,
+   "votes": 1215,
+   "score": 7.1683220466516175
+  },
+  {
+   "tconst": "tt0076855",
+   "title": "One Sings, the Other Doesn't",
+   "year": 1977,
+   "rating": 7.4,
+   "votes": 3300,
+   "score": 7.167635658914729
+  },
+  {
+   "tconst": "tt0075932",
+   "title": "The Lacemaker",
+   "year": 1977,
+   "rating": 7.4,
+   "votes": 3236,
+   "score": 7.164124960654705
+  },
+  {
+   "tconst": "tt0193171",
+   "title": "A Sunday in Hell: Paris-Roubaix",
+   "year": 1977,
+   "rating": 7.7,
+   "votes": 1074,
+   "score": 7.073593699774991
+  },
+  {
+   "tconst": "tt0077879",
+   "title": "Lude godine",
+   "year": 1977,
+   "rating": 7.4,
+   "votes": 2019,
+   "score": 7.069040521143865
+  },
+  {
+   "tconst": "tt0076252",
+   "title": "The Year of the Hare",
+   "year": 1977,
+   "rating": 7.5,
+   "votes": 1516,
+   "score": 7.063129305776364
+  },
+  {
+   "tconst": "tt0076517",
+   "title": "Padre Padrone",
+   "year": 1977,
+   "rating": 7.2,
+   "votes": 4779,
+   "score": 7.061711945549979
+  },
+  {
+   "tconst": "tt0074442",
+   "title": "Crime Busters",
+   "year": 1977,
+   "rating": 7.1,
+   "votes": 14414,
+   "score": 7.054640802733445
+  },
+  {
+   "tconst": "tt0076591",
+   "title": "Race for Your Life, Charlie Brown",
+   "year": 1977,
+   "rating": 7.2,
+   "votes": 4328,
+   "score": 7.050006256256255
+  },
+  {
+   "tconst": "tt0074161",
+   "title": "Aty-baty, shli soldaty...",
+   "year": 1977,
+   "rating": 7.6,
+   "votes": 1159,
+   "score": 7.044573104832482
+  },
+  {
+   "tconst": "tt0075995",
+   "title": "Equus",
+   "year": 1977,
+   "rating": 7.1,
+   "votes": 9337,
+   "score": 7.032362710006126
+  },
+  {
+   "tconst": "tt0075790",
+   "title": "The Brothers Lionheart",
+   "year": 1977,
+   "rating": 7.1,
+   "votes": 7646,
+   "score": 7.019134088981417
+  },
+  {
+   "tconst": "tt0075730",
+   "title": "Camouflage",
+   "year": 1977,
+   "rating": 7.3,
+   "votes": 1975,
+   "score": 6.997759103641455
+  },
+  {
+   "tconst": "tt0076752",
+   "title": "The Spy Who Loved Me",
+   "year": 1977,
+   "rating": 7,
+   "votes": 126583,
+   "score": 6.995303710786965
+  },
+  {
+   "tconst": "tt0076729",
+   "title": "Smokey and the Bandit",
+   "year": 1977,
+   "rating": 7,
+   "votes": 63720,
+   "score": 6.990742171405026
+  },
+  {
+   "tconst": "tt0263273",
+   "title": "Madam Dila",
+   "year": 1977,
+   "rating": 7.3,
+   "votes": 1780,
+   "score": 6.976558752997601
+  },
+  {
+   "tconst": "tt0076245",
+   "title": "Julia",
+   "year": 1977,
+   "rating": 7,
+   "votes": 11501,
+   "score": 6.952070501026585
+  },
+  {
+   "tconst": "tt0076286",
+   "title": "The Hunters",
+   "year": 1977,
+   "rating": 7.4,
+   "votes": 1221,
+   "score": 6.950127570163589
+  },
+  {
+   "tconst": "tt0077878",
+   "title": "Lucio Flavio",
+   "year": 1977,
+   "rating": 7.4,
+   "votes": 1178,
+   "score": 6.941245791245789
+  },
+  {
+   "tconst": "tt0076935",
+   "title": "The Yellow Handkerchief",
+   "year": 1977,
+   "rating": 7.3,
+   "votes": 1494,
+   "score": 6.939468056669338
+  },
+  {
+   "tconst": "tt0076348",
+   "title": "Madame Rosa",
+   "year": 1977,
+   "rating": 7.2,
+   "votes": 1987,
+   "score": 6.932451735297398
+  },
+  {
+   "tconst": "tt0075936",
+   "title": "Desperate Living",
+   "year": 1977,
+   "rating": 7,
+   "votes": 6813,
+   "score": 6.923311574725885
+  },
+  {
+   "tconst": "tt0075938",
+   "title": "The Devil, Probably",
+   "year": 1977,
+   "rating": 7,
+   "votes": 5620,
+   "score": 6.909491440080563
+  },
+  {
+   "tconst": "tt0180802",
+   "title": "Beloved Love",
+   "year": 1977,
+   "rating": 7.3,
+   "votes": 1217,
+   "score": 6.894421891444893
+  },
+  {
+   "tconst": "tt0076618",
+   "title": "The Rescuers",
+   "year": 1977,
+   "rating": 6.9,
+   "votes": 76165,
+   "score": 6.893531177779218
+  },
+  {
+   "tconst": "tt0075983",
+   "title": "Elisa, My Life",
+   "year": 1977,
+   "rating": 7.3,
+   "votes": 1091,
+   "score": 6.869982464530526
+  },
+  {
+   "tconst": "tt0076637",
+   "title": "Rolling Thunder",
+   "year": 1977,
+   "rating": 6.9,
+   "votes": 14845,
+   "score": 6.868496897023245
+  },
+  {
+   "tconst": "tt0077914",
+   "title": "Martin",
+   "year": 1977,
+   "rating": 6.9,
+   "votes": 14239,
+   "score": 6.86724413237964
+  },
+  {
+   "tconst": "tt0076299",
+   "title": "The Last Wave",
+   "year": 1977,
+   "rating": 6.9,
+   "votes": 12578,
+   "score": 6.863237099229145
+  },
+  {
+   "tconst": "tt0077403",
+   "title": "The Cycle",
+   "year": 1977,
+   "rating": 7.3,
+   "votes": 1021,
+   "score": 6.855088240145141
+  },
+  {
+   "tconst": "tt0213322",
+   "title": "Tomorrow I'll Wake Up and Scald Myself with Tea",
+   "year": 1977,
+   "rating": 7.1,
+   "votes": 1700,
+   "score": 6.841049382716047
+  },
+  {
+   "tconst": "tt0078012",
+   "title": "Viva Italia!",
+   "year": 1977,
+   "rating": 7,
+   "votes": 2483,
+   "score": 6.827973968800841
+  },
+  {
+   "tconst": "tt0075939",
+   "title": "Peppermint Soda",
+   "year": 1977,
+   "rating": 7,
+   "votes": 2016,
+   "score": 6.801337312113173
+  },
+  {
+   "tconst": "tt0077814",
+   "title": "Love or Leave",
+   "year": 1977,
+   "rating": 7,
+   "votes": 1969,
+   "score": 6.798192432917929
+  },
+  {
+   "tconst": "tt0076666",
+   "title": "Saturday Night Fever",
+   "year": 1977,
+   "rating": 6.8,
+   "votes": 95911,
+   "score": 6.795881100528664
+  },
+  {
+   "tconst": "tt0076706",
+   "title": "Short Eyes",
+   "year": 1977,
+   "rating": 7,
+   "votes": 1763,
+   "score": 6.78314633852093
+  },
+  {
+   "tconst": "tt0075765",
+   "title": "Black Sunday",
+   "year": 1977,
+   "rating": 6.8,
+   "votes": 10001,
+   "score": 6.763715419810319
+  },
+  {
+   "tconst": "tt0075614",
+   "title": "The Psychic",
+   "year": 1977,
+   "rating": 6.8,
+   "votes": 7790,
+   "score": 6.75458854759196
+  },
+  {
+   "tconst": "tt0076843",
+   "title": "The Turning Point",
+   "year": 1977,
+   "rating": 6.8,
+   "votes": 5654,
+   "score": 6.740011020939786
+  },
+  {
+   "tconst": "tt0076939",
+   "title": "The Invincible Armour",
+   "year": 1977,
+   "rating": 7,
+   "votes": 1253,
+   "score": 6.734058292646839
+  },
+  {
+   "tconst": "tt0076301",
+   "title": "The Late Show",
+   "year": 1977,
+   "rating": 6.8,
+   "votes": 3845,
+   "score": 6.717612659098727
+  },
+  {
+   "tconst": "tt0077188",
+   "title": "Hitch-Hike",
+   "year": 1977,
+   "rating": 6.8,
+   "votes": 3633,
+   "score": 6.71384272249802
+  },
+  {
+   "tconst": "tt0182666",
+   "title": "The 7 Grandmasters",
+   "year": 1977,
+   "rating": 7,
+   "votes": 1075,
+   "score": 6.711244979919677
+  },
+  {
+   "tconst": "tt0075682",
+   "title": "The Forbidden Room",
+   "year": 1977,
+   "rating": 6.9,
+   "votes": 1617,
+   "score": 6.709259966883199
+  },
+  {
+   "tconst": "tt0076410",
+   "title": "Death of a Corrupt Man",
+   "year": 1977,
+   "rating": 6.8,
+   "votes": 3209,
+   "score": 6.705163538449353
+  },
+  {
+   "tconst": "tt0076168",
+   "title": "Executioners from Shaolin",
+   "year": 1977,
+   "rating": 6.8,
+   "votes": 2168,
+   "score": 6.674000420875419
+  },
+  {
+   "tconst": "tt0076327",
+   "title": "Looking for Mr. Goodbar",
+   "year": 1977,
+   "rating": 6.7,
+   "votes": 10112,
+   "score": 6.673077153827693
+  },
+  {
+   "tconst": "tt0076341",
+   "title": "Perfumed Nightmare",
+   "year": 1977,
+   "rating": 6.9,
+   "votes": 1157,
+   "score": 6.668582908360375
+  },
+  {
+   "tconst": "tt0076513",
+   "title": "Outrageous!",
+   "year": 1977,
+   "rating": 6.9,
+   "votes": 1102,
+   "score": 6.6625277513479215
+  },
+  {
+   "tconst": "tt0075885",
+   "title": "Le Crabe-Tambour",
+   "year": 1977,
+   "rating": 6.9,
+   "votes": 1061,
+   "score": 6.657803655183566
+  },
+  {
+   "tconst": "tt0075807",
+   "title": "Candleshoe",
+   "year": 1977,
+   "rating": 6.7,
+   "votes": 5488,
+   "score": 6.653889231401561
+  },
+  {
+   "tconst": "tt0076845",
+   "title": "Twilight's Last Gleaming",
+   "year": 1977,
+   "rating": 6.7,
+   "votes": 4249,
+   "score": 6.643005016828601
+  },
+  {
+   "tconst": "tt0076470",
+   "title": "Pardon Mon Affaire, Too!",
+   "year": 1977,
+   "rating": 6.8,
+   "votes": 1525,
+   "score": 6.641914191419141
+  },
+  {
+   "tconst": "tt0076098",
+   "title": "The Report",
+   "year": 1977,
+   "rating": 6.8,
+   "votes": 1494,
+   "score": 6.63994921144079
+  },
+  {
+   "tconst": "tt0302282",
+   "title": "Aslan Bacanak",
+   "year": 1977,
+   "rating": 6.8,
+   "votes": 1472,
+   "score": 6.638524811218985
+  },
+  {
+   "tconst": "tt0076593",
+   "title": "Raggedy Ann & Andy: A Musical Adventure",
+   "year": 1977,
+   "rating": 6.8,
+   "votes": 1342,
+   "score": 6.629561628237971
+  },
+  {
+   "tconst": "tt0076527",
+   "title": "Parvarish",
+   "year": 1977,
+   "rating": 6.8,
+   "votes": 1180,
+   "score": 6.616896024464831
+  },
+  {
+   "tconst": "tt0076495",
+   "title": "The Olsen Gang Outta Sight",
+   "year": 1977,
+   "rating": 6.7,
+   "votes": 1926,
+   "score": 6.597755753018911
+  },
+  {
+   "tconst": "tt0076788",
+   "title": "Sweeney!",
+   "year": 1977,
+   "rating": 6.7,
+   "votes": 1833,
+   "score": 6.594399341098951
+  },
+  {
+   "tconst": "tt0076141",
+   "title": "High Anxiety",
+   "year": 1977,
+   "rating": 6.6,
+   "votes": 26154,
+   "score": 6.592665291792492
+  },
+  {
+   "tconst": "tt0076451",
+   "title": "New York, New York",
+   "year": 1977,
+   "rating": 6.6,
+   "votes": 24086,
+   "score": 6.592060644715511
+  },
+  {
+   "tconst": "tt0076489",
+   "title": "Oh, God!",
+   "year": 1977,
+   "rating": 6.6,
+   "votes": 11766,
+   "score": 6.584398663115566
+  },
+  {
+   "tconst": "tt0075852",
+   "title": "The Cynic, the Rat and the Fist",
+   "year": 1977,
+   "rating": 6.7,
+   "votes": 1506,
+   "score": 6.5806198457036436
+  },
+  {
+   "tconst": "tt0076686",
+   "title": "The Serpent's Egg",
+   "year": 1977,
+   "rating": 6.6,
+   "votes": 6931,
+   "score": 6.5748875719749496
+  },
+  {
+   "tconst": "tt0076808",
+   "title": "Dear Inspector",
+   "year": 1977,
+   "rating": 6.7,
+   "votes": 1318,
+   "score": 6.57093758987633
+  },
+  {
+   "tconst": "tt0075742",
+   "title": "Berlinguer: I Love You",
+   "year": 1977,
+   "rating": 6.7,
+   "votes": 1129,
+   "score": 6.559480194144355
+  },
+  {
+   "tconst": "tt0213611",
+   "title": "Dharam Veer",
+   "year": 1977,
+   "rating": 6.7,
+   "votes": 1075,
+   "score": 6.55582329317269
+  },
+  {
+   "tconst": "tt0075744",
+   "title": "Between the Lines",
+   "year": 1977,
+   "rating": 6.6,
+   "votes": 1754,
+   "score": 6.527680948922778
+  },
+  {
+   "tconst": "tt0077309",
+   "title": "Outsiders",
+   "year": 1977,
+   "rating": 6.6,
+   "votes": 1344,
+   "score": 6.515031285551762
+  },
+  {
+   "tconst": "tt0076659",
+   "title": "Iron Fisted Monk",
+   "year": 1977,
+   "rating": 6.6,
+   "votes": 1169,
+   "score": 6.508175810665436
+  },
+  {
+   "tconst": "tt0076384",
+   "title": "La Menace",
+   "year": 1977,
+   "rating": 6.6,
+   "votes": 1035,
+   "score": 6.5021294021294
+  },
+  {
+   "tconst": "tt0076804",
+   "title": "Telefon",
+   "year": 1977,
+   "rating": 6.5,
+   "votes": 6882,
+   "score": 6.487418590882179
+  },
+  {
+   "tconst": "tt0076342",
+   "title": "MacArthur",
+   "year": 1977,
+   "rating": 6.5,
+   "votes": 5705,
+   "score": 6.485210042257022
+  },
+  {
+   "tconst": "tt0075617",
+   "title": "ABBA: The Movie",
+   "year": 1977,
+   "rating": 6.5,
+   "votes": 4202,
+   "score": 6.480936819172113
+  },
+  {
+   "tconst": "tt0075683",
+   "title": "Animal",
+   "year": 1977,
+   "rating": 6.5,
+   "votes": 3699,
+   "score": 6.4788962190536985
+  },
+  {
+   "tconst": "tt0076500",
+   "title": "One on One",
+   "year": 1977,
+   "rating": 6.5,
+   "votes": 2239,
+   "score": 6.469383554595038
+  },
+  {
+   "tconst": "tt0076360",
+   "title": "A Man Called Blade",
+   "year": 1977,
+   "rating": 6.5,
+   "votes": 2209,
+   "score": 6.469097330424845
+  },
+  {
+   "tconst": "tt0076211",
+   "title": "Islands in the Stream",
+   "year": 1977,
+   "rating": 6.5,
+   "votes": 1795,
+   "score": 6.464519976147882
+  },
+  {
+   "tconst": "tt0076543",
+   "title": "A Piece of the Action",
+   "year": 1977,
+   "rating": 6.5,
+   "votes": 1756,
+   "score": 6.4640179003386535
+  },
+  {
+   "tconst": "tt0074114",
+   "title": "Alice or The Last Escapade",
+   "year": 1977,
+   "rating": 6.5,
+   "votes": 1542,
+   "score": 6.460988722790452
+  },
+  {
+   "tconst": "tt0076398",
+   "title": "Operation Thunderbolt",
+   "year": 1977,
+   "rating": 6.5,
+   "votes": 1177,
+   "score": 6.45444801714898
+  },
+  {
+   "tconst": "tt0076877",
+   "title": "The Heroin Busters",
+   "year": 1977,
+   "rating": 6.5,
+   "votes": 1124,
+   "score": 6.453311362209666
+  },
+  {
+   "tconst": "tt0076123",
+   "title": "Citizens Band",
+   "year": 1977,
+   "rating": 6.4,
+   "votes": 1007,
+   "score": 6.400415213419697
+  },
+  {
+   "tconst": "tt0074510",
+   "title": "Scalpel",
+   "year": 1977,
+   "rating": 6.4,
+   "votes": 1127,
+   "score": 6.400391788120983
+  },
+  {
+   "tconst": "tt0076172",
+   "title": "I Never Promised You a Rose Garden",
+   "year": 1977,
+   "rating": 6.4,
+   "votes": 1754,
+   "score": 6.40030259017187
+  },
+  {
+   "tconst": "tt0076106",
+   "title": "Greased Lightning",
+   "year": 1977,
+   "rating": 6.4,
+   "votes": 2247,
+   "score": 6.400256647161482
+  },
+  {
+   "tconst": "tt0076059",
+   "title": "Fun with Dick and Jane",
+   "year": 1977,
+   "rating": 6.4,
+   "votes": 5284,
+   "score": 6.400132611924464
+  },
+  {
+   "tconst": "tt0076716",
+   "title": "Sinbad and the Eye of the Tiger",
+   "year": 1977,
+   "rating": 6.4,
+   "votes": 9809,
+   "score": 6.400077096246955
+  },
+  {
+   "tconst": "tt0076257",
+   "title": "The Kentucky Fried Movie",
+   "year": 1977,
+   "rating": 6.4,
+   "votes": 21874,
+   "score": 6.400036431465129
+  },
+  {
+   "tconst": "tt0076070",
+   "title": "The Gauntlet",
+   "year": 1977,
+   "rating": 6.4,
+   "votes": 27639,
+   "score": 6.4000290978502505
+  },
+  {
+   "tconst": "tt0076538",
+   "title": "Pete's Dragon",
+   "year": 1977,
+   "rating": 6.4,
+   "votes": 28408,
+   "score": 6.400028336960464
+  },
+  {
+   "tconst": "tt0076154",
+   "title": "L'homme pressé",
+   "year": 1977,
+   "rating": 6.3,
+   "votes": 1227,
+   "score": 6.34527765304595
+  },
+  {
+   "tconst": "tt0146289",
+   "title": "The Bishop's Bedroom",
+   "year": 1977,
+   "rating": 6.3,
+   "votes": 1328,
+   "score": 6.343313287514317
+  },
+  {
+   "tconst": "tt0076684",
+   "title": "The Seventh Company Outdoors",
+   "year": 1977,
+   "rating": 6.3,
+   "votes": 1868,
+   "score": 6.335158066015806
+  },
+  {
+   "tconst": "tt0076023",
+   "title": "Fight for Your Life",
+   "year": 1977,
+   "rating": 6.3,
+   "votes": 1941,
+   "score": 6.33428539045676
+  },
+  {
+   "tconst": "tt0076725",
+   "title": "Sleeping Dogs",
+   "year": 1977,
+   "rating": 6.3,
+   "votes": 1993,
+   "score": 6.333689720458848
+  },
+  {
+   "tconst": "tt0077381",
+   "title": "Crossed Swords",
+   "year": 1977,
+   "rating": 6.3,
+   "votes": 2444,
+   "score": 6.329277971351141
+  },
+  {
+   "tconst": "tt0076175",
+   "title": "March or Die",
+   "year": 1977,
+   "rating": 6.3,
+   "votes": 4562,
+   "score": 6.3181289703943415
+  },
+  {
+   "tconst": "tt0076636",
+   "title": "Rollercoaster",
+   "year": 1977,
+   "rating": 6.3,
+   "votes": 7600,
+   "score": 6.31172480620155
+  },
+  {
+   "tconst": "tt0075931",
+   "title": "Demon Seed",
+   "year": 1977,
+   "rating": 6.3,
+   "votes": 11460,
+   "score": 6.308092562867843
+  },
+  {
+   "tconst": "tt0076683",
+   "title": "The Sentinel",
+   "year": 1977,
+   "rating": 6.3,
+   "votes": 13754,
+   "score": 6.30683430482129
+  },
+  {
+   "tconst": "tt0076929",
+   "title": "Wizards",
+   "year": 1977,
+   "rating": 6.3,
+   "votes": 14891,
+   "score": 6.306345310762905
+  },
+  {
+   "tconst": "tt0075925",
+   "title": "The Deep",
+   "year": 1977,
+   "rating": 6.3,
+   "votes": 15615,
+   "score": 6.306068813321296
+  },
+  {
+   "tconst": "tt0076590",
+   "title": "Rabid",
+   "year": 1977,
+   "rating": 6.3,
+   "votes": 23974,
+   "score": 6.304037532366995
+  },
+  {
+   "tconst": "tt0077681",
+   "title": "The Hills Have Eyes",
+   "year": 1977,
+   "rating": 6.3,
+   "votes": 43173,
+   "score": 6.302282691538571
+  },
+  {
+   "tconst": "tt0076913",
+   "title": "Which Way Is Up?",
+   "year": 1977,
+   "rating": 6.2,
+   "votes": 2245,
+   "score": 6.261890087313814
+  },
+  {
+   "tconst": "tt0076630",
+   "title": "Rituals",
+   "year": 1977,
+   "rating": 6.2,
+   "votes": 3640,
+   "score": 6.243283045977011
+  },
+  {
+   "tconst": "tt0074611",
+   "title": "The Haunting of Julia",
+   "year": 1977,
+   "rating": 6.2,
+   "votes": 3660,
+   "score": 6.243097281831187
+  },
+  {
+   "tconst": "tt0075666",
+   "title": "Alucarda",
+   "year": 1977,
+   "rating": 6.2,
+   "votes": 5128,
+   "score": 6.232773063533507
+  },
+  {
+   "tconst": "tt0075651",
+   "title": "Shock",
+   "year": 1977,
+   "rating": 6.2,
+   "votes": 5511,
+   "score": 6.2308452362668305
+  },
+  {
+   "tconst": "tt0076915",
+   "title": "The White Buffalo",
+   "year": 1977,
+   "rating": 6.2,
+   "votes": 6204,
+   "score": 6.227878030723671
+  },
+  {
+   "tconst": "tt0075809",
+   "title": "The Car",
+   "year": 1977,
+   "rating": 6.2,
+   "votes": 13184,
+   "score": 6.214159146456101
+  },
+  {
+   "tconst": "tt0076715",
+   "title": "Silver Bears",
+   "year": 1977,
+   "rating": 6.1,
+   "votes": 1754,
+   "score": 6.209235052045509
+  },
+  {
+   "tconst": "tt0078078",
+   "title": "Petey Wheatstraw",
+   "year": 1977,
+   "rating": 6.1,
+   "votes": 1793,
+   "score": 6.207709750566892
+  },
+  {
+   "tconst": "tt0076138",
+   "title": "Heroes",
+   "year": 1977,
+   "rating": 6.1,
+   "votes": 2425,
+   "score": 6.187834549878344
+  },
+  {
+   "tconst": "tt0076044",
+   "title": "For the Love of Benji",
+   "year": 1977,
+   "rating": 6,
+   "votes": 1336,
+   "score": 6.171589611872145
+  },
+  {
+   "tconst": "tt0075696",
+   "title": "Are You Being Served?",
+   "year": 1977,
+   "rating": 6.1,
+   "votes": 3264,
+   "score": 6.17055190744215
+  },
+  {
+   "tconst": "tt0075740",
+   "title": "Beast with a Gun",
+   "year": 1977,
+   "rating": 6,
+   "votes": 1404,
+   "score": 6.16673599556295
+  },
+  {
+   "tconst": "tt0293271",
+   "title": "Ibo ile Güllüsah",
+   "year": 1977,
+   "rating": 6.1,
+   "votes": 3910,
+   "score": 6.161269517990495
+  },
+  {
+   "tconst": "tt0075679",
+   "title": "Bad",
+   "year": 1977,
+   "rating": 5.9,
+   "votes": 1019,
+   "score": 6.148060095756974
+  },
+  {
+   "tconst": "tt0074979",
+   "title": "Nine Guests for a Crime",
+   "year": 1977,
+   "rating": 5.9,
+   "votes": 1059,
+   "score": 6.143241055528573
+  },
+  {
+   "tconst": "tt0076507",
+   "title": "The Other Side of Midnight",
+   "year": 1977,
+   "rating": 6,
+   "votes": 2162,
+   "score": 6.126765760067467
+  },
+  {
+   "tconst": "tt0076221",
+   "title": "Jabberwocky",
+   "year": 1977,
+   "rating": 6.1,
+   "votes": 17317,
+   "score": 6.116423722953176
+  },
+  {
+   "tconst": "tt0076868",
+   "title": "Valentino",
+   "year": 1977,
+   "rating": 6,
+   "votes": 2605,
+   "score": 6.111188164586222
+  },
+  {
+   "tconst": "tt0076297",
+   "title": "The Last Remake of Beau Geste",
+   "year": 1977,
+   "rating": 6,
+   "votes": 2791,
+   "score": 6.105732876110085
+  },
+  {
+   "tconst": "tt0076516",
+   "title": "The Pack",
+   "year": 1977,
+   "rating": 5.9,
+   "votes": 1477,
+   "score": 6.102193513658995
+  },
+  {
+   "tconst": "tt0076068",
+   "title": "Watch Me When I Kill",
+   "year": 1977,
+   "rating": 5.9,
+   "votes": 1705,
+   "score": 6.085150955021565
+  },
+  {
+   "tconst": "tt0076111",
+   "title": "The Greatest",
+   "year": 1977,
+   "rating": 5.9,
+   "votes": 1788,
+   "score": 6.079638928742228
+  },
+  {
+   "tconst": "tt0076028",
+   "title": "Final Chapter: Walking Tall",
+   "year": 1977,
+   "rating": 5.8,
+   "votes": 1267,
+   "score": 6.065034553742095
+  },
+  {
+   "tconst": "tt0074226",
+   "title": "Blue Sunshine",
+   "year": 1977,
+   "rating": 5.9,
+   "votes": 3609,
+   "score": 6.008664207709553
+  },
+  {
+   "tconst": "tt0078227",
+   "title": "Semi-Tough",
+   "year": 1977,
+   "rating": 5.9,
+   "votes": 3984,
+   "score": 6.000488228999465
+  },
+  {
+   "tconst": "tt0078437",
+   "title": "Last Cannibal World",
+   "year": 1977,
+   "rating": 5.9,
+   "votes": 4673,
+   "score": 5.988283682942593
+  },
+  {
+   "tconst": "tt0075921",
+   "title": "Death Game",
+   "year": 1977,
+   "rating": 5.8,
+   "votes": 2367,
+   "score": 5.978447678447678
+  },
+  {
+   "tconst": "tt0076933",
+   "title": "The World's Greatest Lover",
+   "year": 1977,
+   "rating": 5.8,
+   "votes": 2372,
+   "score": 5.978183076314747
+  },
+  {
+   "tconst": "tt0076853",
+   "title": "The Uncanny",
+   "year": 1977,
+   "rating": 5.8,
+   "votes": 2726,
+   "score": 5.9612542494185
+  },
+  {
+   "tconst": "tt0075849",
+   "title": "Cinderella",
+   "year": 1977,
+   "rating": 5.6,
+   "votes": 1226,
+   "score": 5.959763402216231
+  },
+  {
+   "tconst": "tt0077319",
+   "title": "Charleston",
+   "year": 1977,
+   "rating": 5.6,
+   "votes": 1227,
+   "score": 5.959601856009578
+  },
+  {
+   "tconst": "tt0076210",
+   "title": "The Island of Dr. Moreau",
+   "year": 1977,
+   "rating": 5.9,
+   "votes": 8082,
+   "score": 5.95514570946194
+  },
+  {
+   "tconst": "tt0075774",
+   "title": "Bobby Deerfield",
+   "year": 1977,
+   "rating": 5.8,
+   "votes": 5285,
+   "score": 5.895597984619464
+  },
+  {
+   "tconst": "tt0075704",
+   "title": "Audrey Rose",
+   "year": 1977,
+   "rating": 5.8,
+   "votes": 7511,
+   "score": 5.8705949163827205
+  },
+  {
+   "tconst": "tt0075845",
+   "title": "The Choirboys",
+   "year": 1977,
+   "rating": 5.6,
+   "votes": 2111,
+   "score": 5.857419907853851
+  },
+  {
+   "tconst": "tt0075950",
+   "title": "The Domino Principle",
+   "year": 1977,
+   "rating": 5.7,
+   "votes": 3685,
+   "score": 5.849590892920669
+  },
+  {
+   "tconst": "tt0075648",
+   "title": "Airport '77",
+   "year": 1977,
+   "rating": 5.8,
+   "votes": 14082,
+   "score": 5.8398377757149795
+  },
+  {
+   "tconst": "tt0075718",
+   "title": "The Bad News Bears in Breaking Training",
+   "year": 1977,
+   "rating": 5.7,
+   "votes": 4059,
+   "score": 5.838531989194175
+  },
+  {
+   "tconst": "tt0076504",
+   "title": "Orca",
+   "year": 1977,
+   "rating": 5.8,
+   "votes": 15157,
+   "score": 5.837187184089455
+  },
+  {
+   "tconst": "tt0077332",
+   "title": "The Chosen",
+   "year": 1977,
+   "rating": 5.5,
+   "votes": 1971,
+   "score": 5.803208796140468
+  },
+  {
+   "tconst": "tt0076271",
+   "title": "Kingdom of the Spiders",
+   "year": 1977,
+   "rating": 5.7,
+   "votes": 7177,
+   "score": 5.785707879825527
+  },
+  {
+   "tconst": "tt0076417",
+   "title": "Mr. Billion",
+   "year": 1977,
+   "rating": 5.4,
+   "votes": 1645,
+   "score": 5.778386893509766
+  },
+  {
+   "tconst": "tt0076137",
+   "title": "Herbie Goes to Monte Carlo",
+   "year": 1977,
+   "rating": 5.7,
+   "votes": 8929,
+   "score": 5.770584483163796
+  },
+  {
+   "tconst": "tt0076294",
+   "title": "The Last Dinosaur",
+   "year": 1977,
+   "rating": 5.2,
+   "votes": 1162,
+   "score": 5.755427073697193
+  },
+  {
+   "tconst": "tt0076312",
+   "title": "Love Letters of a Portuguese Nun",
+   "year": 1977,
+   "rating": 5.3,
+   "votes": 1489,
+   "score": 5.742279362528457
+  },
+  {
+   "tconst": "tt0075830",
+   "title": "Chatterbox!",
+   "year": 1977,
+   "rating": 5.1,
+   "votes": 1035,
+   "score": 5.739230139230138
+  },
+  {
+   "tconst": "tt0076749",
+   "title": "Playing with Love",
+   "year": 1977,
+   "rating": 5.5,
+   "votes": 2895,
+   "score": 5.731279418057338
+  }
+ ]
+}

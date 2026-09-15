@@ -1,0 +1,1608 @@
+{
+ "tag": "year-1974",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.491,
+ "minVotes": 1000,
+ "items": [
+  {
+   "tconst": "tt0071562",
+   "title": "The Godfather Part II",
+   "year": 1974,
+   "rating": 9,
+   "votes": 1512860,
+   "score": 8.99834249858491
+  },
+  {
+   "tconst": "tt0252619",
+   "title": "From the Village to the City",
+   "year": 1974,
+   "rating": 8.3,
+   "votes": 13062,
+   "score": 8.171339418841495
+  },
+  {
+   "tconst": "tt6725014",
+   "title": "Scenes from a Marriage",
+   "year": 1974,
+   "rating": 8.3,
+   "votes": 10655,
+   "score": 8.144768331853204
+  },
+  {
+   "tconst": "tt0071315",
+   "title": "Chinatown",
+   "year": 1974,
+   "rating": 8.1,
+   "votes": 380085,
+   "score": 8.095777254176232
+  },
+  {
+   "tconst": "tt0072431",
+   "title": "Young Frankenstein",
+   "year": 1974,
+   "rating": 8,
+   "votes": 181723,
+   "score": 7.991740366060918
+  },
+  {
+   "tconst": "tt0071604",
+   "title": "Hearts and Minds",
+   "year": 1974,
+   "rating": 8.2,
+   "votes": 6675,
+   "score": 7.977299662247436
+  },
+  {
+   "tconst": "tt0070861",
+   "title": "Only Old Men Are Going to Battle",
+   "year": 1974,
+   "rating": 8.2,
+   "votes": 6545,
+   "score": 7.9734625457586565
+  },
+  {
+   "tconst": "tt0072417",
+   "title": "A Woman Under the Influence",
+   "year": 1974,
+   "rating": 8,
+   "votes": 34096,
+   "score": 7.956997233523738
+  },
+  {
+   "tconst": "tt0071141",
+   "title": "Fear Eats the Soul",
+   "year": 1974,
+   "rating": 8,
+   "votes": 26311,
+   "score": 7.944739295805685
+  },
+  {
+   "tconst": "tt0071143",
+   "title": "Beautiful People",
+   "year": 1974,
+   "rating": 8.2,
+   "votes": 4453,
+   "score": 7.886553256510008
+  },
+  {
+   "tconst": "tt0072190",
+   "title": "The Golden Fortress",
+   "year": 1974,
+   "rating": 8.3,
+   "votes": 3210,
+   "score": 7.870255322505719
+  },
+  {
+   "tconst": "tt0075793",
+   "title": "We All Loved Each Other So Much",
+   "year": 1974,
+   "rating": 8,
+   "votes": 9057,
+   "score": 7.849932873396547
+  },
+  {
+   "tconst": "tt0253622",
+   "title": "The Stupid Millionaire",
+   "year": 1974,
+   "rating": 7.9,
+   "votes": 8645,
+   "score": 7.753890607335312
+  },
+  {
+   "tconst": "tt0069687",
+   "title": "Alice in the Cities",
+   "year": 1974,
+   "rating": 7.8,
+   "votes": 15370,
+   "score": 7.720022902122729
+  },
+  {
+   "tconst": "tt0175157",
+   "title": "Sherekilebi",
+   "year": 1974,
+   "rating": 8.5,
+   "votes": 1561,
+   "score": 7.7154529120457145
+  },
+  {
+   "tconst": "tt0071230",
+   "title": "Blazing Saddles",
+   "year": 1974,
+   "rating": 7.7,
+   "votes": 166648,
+   "score": 7.692787118890467
+  },
+  {
+   "tconst": "tt0071360",
+   "title": "The Conversation",
+   "year": 1974,
+   "rating": 7.7,
+   "votes": 137585,
+   "score": 7.691274487915352
+  },
+  {
+   "tconst": "tt0252695",
+   "title": "The Blue Bead",
+   "year": 1974,
+   "rating": 7.8,
+   "votes": 10535,
+   "score": 7.686499775270835
+  },
+  {
+   "tconst": "tt0071487",
+   "title": "The Phantom of Liberty",
+   "year": 1974,
+   "rating": 7.7,
+   "votes": 18681,
+   "score": 7.638558757570706
+  },
+  {
+   "tconst": "tt0192718",
+   "title": "The Man Who Sleeps",
+   "year": 1974,
+   "rating": 7.8,
+   "votes": 5853,
+   "score": 7.608955918247348
+  },
+  {
+   "tconst": "tt0072272",
+   "title": "That's Entertainment!",
+   "year": 1974,
+   "rating": 7.8,
+   "votes": 5732,
+   "score": 7.605522119392317
+  },
+  {
+   "tconst": "tt0072251",
+   "title": "The Taking of Pelham One Two Three",
+   "year": 1974,
+   "rating": 7.6,
+   "votes": 41914,
+   "score": 7.574152372366805
+  },
+  {
+   "tconst": "tt0071691",
+   "title": "The Enigma of Kaspar Hauser",
+   "year": 1974,
+   "rating": 7.6,
+   "votes": 20551,
+   "score": 7.548530226335162
+  },
+  {
+   "tconst": "tt0071956",
+   "title": "Written Off",
+   "year": 1974,
+   "rating": 8.2,
+   "votes": 1444,
+   "score": 7.500644397606004
+  },
+  {
+   "tconst": "tt0074565",
+   "title": "The Deer",
+   "year": 1974,
+   "rating": 7.8,
+   "votes": 3260,
+   "score": 7.492670166138281
+  },
+  {
+   "tconst": "tt0071733",
+   "title": "Lacombe, Lucien",
+   "year": 1974,
+   "rating": 7.6,
+   "votes": 8510,
+   "score": 7.483362240562467
+  },
+  {
+   "tconst": "tt0071746",
+   "title": "Lenny",
+   "year": 1974,
+   "rating": 7.5,
+   "votes": 19834,
+   "score": 7.451558745692093
+  },
+  {
+   "tconst": "tt0072271",
+   "title": "The Texas Chain Saw Massacre",
+   "year": 1974,
+   "rating": 7.4,
+   "votes": 215920,
+   "score": 7.395808477354551
+  },
+  {
+   "tconst": "tt0071680",
+   "title": "Italianamerican",
+   "year": 1974,
+   "rating": 7.6,
+   "votes": 4426,
+   "score": 7.395572227745867
+  },
+  {
+   "tconst": "tt0071406",
+   "title": "Pastoral: To Die in the Country",
+   "year": 1974,
+   "rating": 7.7,
+   "votes": 2930,
+   "score": 7.392309136831826
+  },
+  {
+   "tconst": "tt0073817",
+   "title": "Swept Away",
+   "year": 1974,
+   "rating": 7.5,
+   "votes": 7607,
+   "score": 7.382743686272693
+  },
+  {
+   "tconst": "tt0070439",
+   "title": "Unbelievable Adventures of Italians in Russia",
+   "year": 1974,
+   "rating": 7.5,
+   "votes": 7034,
+   "score": 7.374380745301105
+  },
+  {
+   "tconst": "tt0072021",
+   "title": "The Deluge",
+   "year": 1974,
+   "rating": 7.6,
+   "votes": 3712,
+   "score": 7.364595693495135
+  },
+  {
+   "tconst": "tt0071249",
+   "title": "Bring Me the Head of Alfredo Garcia",
+   "year": 1974,
+   "rating": 7.4,
+   "votes": 23598,
+   "score": 7.363036625243884
+  },
+  {
+   "tconst": "tt0072037",
+   "title": "Scent of a Woman",
+   "year": 1974,
+   "rating": 7.5,
+   "votes": 5816,
+   "score": 7.351932938343468
+  },
+  {
+   "tconst": "tt0071145",
+   "title": "Ankur",
+   "year": 1974,
+   "rating": 7.8,
+   "votes": 1867,
+   "score": 7.34334667169483
+  },
+  {
+   "tconst": "tt0071949",
+   "title": "Orderers",
+   "year": 1974,
+   "rating": 8,
+   "votes": 1290,
+   "score": 7.340949741375143
+  },
+  {
+   "tconst": "tt0071115",
+   "title": "Alice Doesn't Live Here Anymore",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 30654,
+   "score": 7.27443529752161
+  },
+  {
+   "tconst": "tt0071994",
+   "title": "Phantom of the Paradise",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 26588,
+   "score": 7.270667497018598
+  },
+  {
+   "tconst": "tt0071275",
+   "title": "Rabid Dogs",
+   "year": 1974,
+   "rating": 7.4,
+   "votes": 5990,
+   "score": 7.269924879506306
+  },
+  {
+   "tconst": "tt0070136",
+   "title": "The Great Ecstasy of Woodcarver Steiner",
+   "year": 1974,
+   "rating": 7.5,
+   "votes": 3364,
+   "score": 7.268738521482374
+  },
+  {
+   "tconst": "tt0071524",
+   "title": "The Front Page",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 16828,
+   "score": 7.254609317239684
+  },
+  {
+   "tconst": "tt0069697",
+   "title": "Watch Out, We're Mad",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 15767,
+   "score": 7.251737037499199
+  },
+  {
+   "tconst": "tt0071859",
+   "title": "The Traveler",
+   "year": 1974,
+   "rating": 7.5,
+   "votes": 2626,
+   "score": 7.221669858728371
+  },
+  {
+   "tconst": "tt0253623",
+   "title": "Salako",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 7205,
+   "score": 7.201374150853026
+  },
+  {
+   "tconst": "tt0071907",
+   "title": "Nie ma mocnych",
+   "year": 1974,
+   "rating": 7.5,
+   "votes": 2374,
+   "score": 7.200881715396882
+  },
+  {
+   "tconst": "tt0070262",
+   "title": "The Red Snowball Tree",
+   "year": 1974,
+   "rating": 7.5,
+   "votes": 2331,
+   "score": 7.197020386595339
+  },
+  {
+   "tconst": "tt0071598",
+   "title": "Harry and Tonto",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 6848,
+   "score": 7.196887730345193
+  },
+  {
+   "tconst": "tt0071877",
+   "title": "Murder on the Orient Express",
+   "year": 1974,
+   "rating": 7.2,
+   "votes": 75463,
+   "score": 7.1907245976190985
+  },
+  {
+   "tconst": "tt0071585",
+   "title": "Conversation Piece",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 5881,
+   "score": 7.182397167235733
+  },
+  {
+   "tconst": "tt0072248",
+   "title": "Still Life",
+   "year": 1974,
+   "rating": 7.6,
+   "votes": 1574,
+   "score": 7.169065620726136
+  },
+  {
+   "tconst": "tt0071695",
+   "title": "Lone Wolf and Cub: White Heaven in Hell",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 4813,
+   "score": 7.160790453767259
+  },
+  {
+   "tconst": "tt0071682",
+   "title": "Joachim, Put It in the Machine",
+   "year": 1974,
+   "rating": 7.6,
+   "votes": 1507,
+   "score": 7.157548826385751
+  },
+  {
+   "tconst": "tt0071976",
+   "title": "Rebellion in Patagonia",
+   "year": 1974,
+   "rating": 7.6,
+   "votes": 1492,
+   "score": 7.154885597010063
+  },
+  {
+   "tconst": "tt0073918",
+   "title": "The Yakuza",
+   "year": 1974,
+   "rating": 7.2,
+   "votes": 11825,
+   "score": 7.144699797875171
+  },
+  {
+   "tconst": "tt0072231",
+   "title": "At Home Among Strangers, a Stranger Among His Own",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 3966,
+   "score": 7.137046900473031
+  },
+  {
+   "tconst": "tt0070506",
+   "title": "Bread and Chocolate",
+   "year": 1974,
+   "rating": 7.4,
+   "votes": 2193,
+   "score": 7.11524425548045
+  },
+  {
+   "tconst": "tt0071381",
+   "title": "Celine and Julie Go Boating",
+   "year": 1974,
+   "rating": 7.2,
+   "votes": 7205,
+   "score": 7.113561841285689
+  },
+  {
+   "tconst": "tt0071899",
+   "title": "The Immortals",
+   "year": 1974,
+   "rating": 7.7,
+   "votes": 1040,
+   "score": 7.107242601837783
+  },
+  {
+   "tconst": "tt0072368",
+   "title": "Vincent, François, Paul and the Others",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 3015,
+   "score": 7.098449541157926
+  },
+  {
+   "tconst": "tt0071334",
+   "title": "Claudine",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 2942,
+   "score": 7.094717125253443
+  },
+  {
+   "tconst": "tt0071222",
+   "title": "Black Christmas",
+   "year": 1974,
+   "rating": 7.1,
+   "votes": 56854,
+   "score": 7.0894696115696245
+  },
+  {
+   "tconst": "tt0071970",
+   "title": "The Parallax View",
+   "year": 1974,
+   "rating": 7.1,
+   "votes": 25130,
+   "score": 7.07668484147528
+  },
+  {
+   "tconst": "tt0071771",
+   "title": "The Longest Yard",
+   "year": 1974,
+   "rating": 7.1,
+   "votes": 23528,
+   "score": 7.075162055925842
+  },
+  {
+   "tconst": "tt0071358",
+   "title": "Conrack",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 2460,
+   "score": 7.066119915534415
+  },
+  {
+   "tconst": "tt0072979",
+   "title": "Female Trouble",
+   "year": 1974,
+   "rating": 7.1,
+   "votes": 11918,
+   "score": 7.052839054632998
+  },
+  {
+   "tconst": "tt0072353",
+   "title": "Going Places",
+   "year": 1974,
+   "rating": 7.1,
+   "votes": 10872,
+   "score": 7.048683870261883
+  },
+  {
+   "tconst": "tt0071544",
+   "title": "General Idi Amin Dada: A Self Portrait",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 2145,
+   "score": 7.042694724244539
+  },
+  {
+   "tconst": "tt0071269",
+   "title": "California Split",
+   "year": 1974,
+   "rating": 7.1,
+   "votes": 9449,
+   "score": 7.041695368719406
+  },
+  {
+   "tconst": "tt0069909",
+   "title": "Un comisar acuza",
+   "year": 1974,
+   "rating": 7.5,
+   "votes": 1174,
+   "score": 7.0357750265635115
+  },
+  {
+   "tconst": "tt0071532",
+   "title": "The Gambler",
+   "year": 1974,
+   "rating": 7.1,
+   "votes": 7375,
+   "score": 7.027256705402874
+  },
+  {
+   "tconst": "tt0071908",
+   "title": "A Jungle Book of Regulations",
+   "year": 1974,
+   "rating": 7.4,
+   "votes": 1375,
+   "score": 7.017168382210137
+  },
+  {
+   "tconst": "tt0202604",
+   "title": "The Castle of Sand",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 1826,
+   "score": 7.013650002742065
+  },
+  {
+   "tconst": "tt0072308",
+   "title": "The Towering Inferno",
+   "year": 1974,
+   "rating": 7,
+   "votes": 53513,
+   "score": 6.990658648537947
+  },
+  {
+   "tconst": "tt0072288",
+   "title": "Thunderbolt and Lightfoot",
+   "year": 1974,
+   "rating": 7,
+   "votes": 33501,
+   "score": 6.985240280216488
+  },
+  {
+   "tconst": "tt0071587",
+   "title": "The Mouth Agape",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 1522,
+   "score": 6.979133587529372
+  },
+  {
+   "tconst": "tt0071696",
+   "title": "Police Tactics",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 1521,
+   "score": 6.979006310094833
+  },
+  {
+   "tconst": "tt0226018",
+   "title": "Final Episode",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 1439,
+   "score": 6.968214394321064
+  },
+  {
+   "tconst": "tt0071935",
+   "title": "The Odessa File",
+   "year": 1974,
+   "rating": 7,
+   "votes": 13654,
+   "score": 6.9652500960658585
+  },
+  {
+   "tconst": "tt0072030",
+   "title": "Cousin Angelica",
+   "year": 1974,
+   "rating": 7.3,
+   "votes": 1393,
+   "score": 6.961836568219422
+  },
+  {
+   "tconst": "tt0071840",
+   "title": "Almost Human",
+   "year": 1974,
+   "rating": 7.1,
+   "votes": 3392,
+   "score": 6.961287547301702
+  },
+  {
+   "tconst": "tt0071622",
+   "title": "The Clockmaker",
+   "year": 1974,
+   "rating": 7.1,
+   "votes": 3193,
+   "score": 6.95470424701862
+  },
+  {
+   "tconst": "tt0071939",
+   "title": "The Last Exploits of the Olsen Gang",
+   "year": 1974,
+   "rating": 7.1,
+   "votes": 2208,
+   "score": 6.910091928849463
+  },
+  {
+   "tconst": "tt0072401",
+   "title": "Where the Lilies Bloom",
+   "year": 1974,
+   "rating": 7.2,
+   "votes": 1320,
+   "score": 6.894299529202188
+  },
+  {
+   "tconst": "tt0071402",
+   "title": "Death Wish",
+   "year": 1974,
+   "rating": 6.9,
+   "votes": 48743,
+   "score": 6.891773212467062
+  },
+  {
+   "tconst": "tt0071833",
+   "title": "My Little Loves",
+   "year": 1974,
+   "rating": 7.1,
+   "votes": 1835,
+   "score": 6.885105787565811
+  },
+  {
+   "tconst": "tt0071797",
+   "title": "Mahler",
+   "year": 1974,
+   "rating": 7,
+   "votes": 3374,
+   "score": 6.883579082704408
+  },
+  {
+   "tconst": "tt0074705",
+   "title": "Jack and the Beanstalk",
+   "year": 1974,
+   "rating": 7.2,
+   "votes": 1155,
+   "score": 6.8708932286538635
+  },
+  {
+   "tconst": "tt0073012",
+   "title": "The Four Musketeers",
+   "year": 1974,
+   "rating": 6.9,
+   "votes": 12890,
+   "score": 6.87053815030591
+  },
+  {
+   "tconst": "tt0071688",
+   "title": "Jacob the Liar",
+   "year": 1974,
+   "rating": 7.1,
+   "votes": 1563,
+   "score": 6.86230000302344
+  },
+  {
+   "tconst": "tt0073756",
+   "title": "The Street Fighter",
+   "year": 1974,
+   "rating": 6.9,
+   "votes": 6255,
+   "score": 6.843594060337571
+  },
+  {
+   "tconst": "tt0072274",
+   "title": "Thieves Like Us",
+   "year": 1974,
+   "rating": 6.9,
+   "votes": 5787,
+   "score": 6.839704568697374
+  },
+  {
+   "tconst": "tt0071737",
+   "title": "Lancelot of the Lake",
+   "year": 1974,
+   "rating": 6.9,
+   "votes": 4767,
+   "score": 6.829040212892159
+  },
+  {
+   "tconst": "tt0072325",
+   "title": "Truck Turner",
+   "year": 1974,
+   "rating": 6.9,
+   "votes": 4346,
+   "score": 6.823452096473826
+  },
+  {
+   "tconst": "tt0072402",
+   "title": "Where the Red Fern Grows",
+   "year": 1974,
+   "rating": 6.9,
+   "votes": 4151,
+   "score": 6.820554243399161
+  },
+  {
+   "tconst": "tt0071159",
+   "title": "Friend",
+   "year": 1974,
+   "rating": 7,
+   "votes": 1742,
+   "score": 6.814286983132414
+  },
+  {
+   "tconst": "tt0071207",
+   "title": "The Best of Benny Hill",
+   "year": 1974,
+   "rating": 7.1,
+   "votes": 1120,
+   "score": 6.812629673466545
+  },
+  {
+   "tconst": "tt0071458",
+   "title": "Effi Briest",
+   "year": 1974,
+   "rating": 6.9,
+   "votes": 3085,
+   "score": 6.799822498836983
+  },
+  {
+   "tconst": "tt0072007",
+   "title": "What Have They Done to Your Daughters?",
+   "year": 1974,
+   "rating": 6.9,
+   "votes": 3023,
+   "score": 6.798278624844414
+  },
+  {
+   "tconst": "tt0069690",
+   "title": "Allonsanfan",
+   "year": 1974,
+   "rating": 7,
+   "votes": 1490,
+   "score": 6.795491930822921
+  },
+  {
+   "tconst": "tt0071338",
+   "title": "Cockfighter",
+   "year": 1974,
+   "rating": 6.9,
+   "votes": 2906,
+   "score": 6.795231671210722
+  },
+  {
+   "tconst": "tt0072226",
+   "title": "The Sugarland Express",
+   "year": 1974,
+   "rating": 6.8,
+   "votes": 22524,
+   "score": 6.786854910208683
+  },
+  {
+   "tconst": "tt0072241",
+   "title": "Electra, My Love",
+   "year": 1974,
+   "rating": 7,
+   "votes": 1162,
+   "score": 6.76446572976368
+  },
+  {
+   "tconst": "tt0071448",
+   "title": "Dunderklumpen!",
+   "year": 1974,
+   "rating": 6.9,
+   "votes": 1996,
+   "score": 6.763409515270052
+  },
+  {
+   "tconst": "tt0072403",
+   "title": "The White Dawn",
+   "year": 1974,
+   "rating": 7,
+   "votes": 1087,
+   "score": 6.756001393267406
+  },
+  {
+   "tconst": "tt0071258",
+   "title": "Buster and Billie",
+   "year": 1974,
+   "rating": 6.9,
+   "votes": 1078,
+   "score": 6.703067809311394
+  },
+  {
+   "tconst": "tt0071330",
+   "title": "Street Law",
+   "year": 1974,
+   "rating": 6.8,
+   "votes": 2049,
+   "score": 6.6985814718757215
+  },
+  {
+   "tconst": "tt0071807",
+   "title": "The Man with the Golden Gun",
+   "year": 1974,
+   "rating": 6.7,
+   "votes": 123087,
+   "score": 6.698313883869778
+  },
+  {
+   "tconst": "tt0071866",
+   "title": "Mr. Majestyk",
+   "year": 1974,
+   "rating": 6.7,
+   "votes": 11604,
+   "score": 6.6834001037566715
+  },
+  {
+   "tconst": "tt0071431",
+   "title": "Let Sleeping Corpses Lie",
+   "year": 1974,
+   "rating": 6.7,
+   "votes": 10670,
+   "score": 6.68207154308047
+  },
+  {
+   "tconst": "tt0070755",
+   "title": "Supermarket",
+   "year": 1974,
+   "rating": 6.8,
+   "votes": 1221,
+   "score": 6.6607721331603225
+  },
+  {
+   "tconst": "tt0072362",
+   "title": "A Very Natural Thing",
+   "year": 1974,
+   "rating": 6.8,
+   "votes": 1208,
+   "score": 6.6599524038718645
+  },
+  {
+   "tconst": "tt0071155",
+   "title": "The Apprenticeship of Duddy Kravitz",
+   "year": 1974,
+   "rating": 6.7,
+   "votes": 2965,
+   "score": 6.6472320069985065
+  },
+  {
+   "tconst": "tt0072100",
+   "title": "Roti Kapada Aur Makaan",
+   "year": 1974,
+   "rating": 6.8,
+   "votes": 1023,
+   "score": 6.6471452831186735
+  },
+  {
+   "tconst": "tt0071864",
+   "title": "Love at the Top",
+   "year": 1974,
+   "rating": 6.7,
+   "votes": 2324,
+   "score": 6.637056229768073
+  },
+  {
+   "tconst": "tt0074797",
+   "title": "The Life and Times of Grizzly Adams",
+   "year": 1974,
+   "rating": 6.7,
+   "votes": 1111,
+   "score": 6.600888160942244
+  },
+  {
+   "tconst": "tt0072131",
+   "title": "The Secret",
+   "year": 1974,
+   "rating": 6.7,
+   "votes": 1085,
+   "score": 6.59965223393241
+  },
+  {
+   "tconst": "tt0071910",
+   "title": "The Night Porter",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 16697,
+   "score": 6.593828044739168
+  },
+  {
+   "tconst": "tt0071502",
+   "title": "Arabian Nights",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 10110,
+   "score": 6.590168758573274
+  },
+  {
+   "tconst": "tt0071424",
+   "title": "Dirty Mary Crazy Larry",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 8669,
+   "score": 6.588703579248017
+  },
+  {
+   "tconst": "tt0071706",
+   "title": "Juggernaut",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 7396,
+   "score": 6.5869908179786885
+  },
+  {
+   "tconst": "tt0068457",
+   "title": "Dead of Night",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 6979,
+   "score": 6.586310929658989
+  },
+  {
+   "tconst": "tt0070078",
+   "title": "From Beyond the Grave",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 6136,
+   "score": 6.584693793126271
+  },
+  {
+   "tconst": "tt0072080",
+   "title": "The Return of the Tall Blond Man",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 4533,
+   "score": 6.580259336300212
+  },
+  {
+   "tconst": "tt0071521",
+   "title": "Freebie and the Bean",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 4089,
+   "score": 6.578537022548452
+  },
+  {
+   "tconst": "tt0071690",
+   "title": "I, You, He, She",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 3998,
+   "score": 6.578146240045833
+  },
+  {
+   "tconst": "tt0072351",
+   "title": "Uptown Saturday Night",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 3179,
+   "score": 6.573863342366373
+  },
+  {
+   "tconst": "tt0224077",
+   "title": "School of the Holy Beast",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 1930,
+   "score": 6.562721811518456
+  },
+  {
+   "tconst": "tt0072991",
+   "title": "Five Shaolin Masters",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 1612,
+   "score": 6.558183349061668
+  },
+  {
+   "tconst": "tt0072228",
+   "title": "The Super Cops",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 1237,
+   "score": 6.5511734053415625
+  },
+  {
+   "tconst": "tt0071890",
+   "title": "The Nada Gang",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 1218,
+   "score": 6.550755143259277
+  },
+  {
+   "tconst": "tt0283693",
+   "title": "Zero Woman: Red Handcuffs",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 1207,
+   "score": 6.550509699931617
+  },
+  {
+   "tconst": "tt0072010",
+   "title": "Shoot First, Die Later",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 1154,
+   "score": 6.549291972028355
+  },
+  {
+   "tconst": "tt0070413",
+   "title": "Moscow: Cassiopea",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 1048,
+   "score": 6.546667435424354
+  },
+  {
+   "tconst": "tt0071880",
+   "title": "The Last 4 Days",
+   "year": 1974,
+   "rating": 6.6,
+   "votes": 1014,
+   "score": 6.545767084284546
+  },
+  {
+   "tconst": "tt0071762",
+   "title": "The Little Prince",
+   "year": 1974,
+   "rating": 6.5,
+   "votes": 4400,
+   "score": 6.4982916495831615
+  },
+  {
+   "tconst": "tt0070565",
+   "title": "The Perfume of the Lady in Black",
+   "year": 1974,
+   "rating": 6.5,
+   "votes": 3593,
+   "score": 6.497991488732652
+  },
+  {
+   "tconst": "tt0072204",
+   "title": "Stavisky",
+   "year": 1974,
+   "rating": 6.5,
+   "votes": 2786,
+   "score": 6.497563367075826
+  },
+  {
+   "tconst": "tt0071788",
+   "title": "Macon County Line",
+   "year": 1974,
+   "rating": 6.5,
+   "votes": 1965,
+   "score": 6.49688867040441
+  },
+  {
+   "tconst": "tt0072195",
+   "title": "Space Is the Place",
+   "year": 1974,
+   "rating": 6.5,
+   "votes": 1774,
+   "score": 6.496674444033553
+  },
+  {
+   "tconst": "tt0072201",
+   "title": "Stardust",
+   "year": 1974,
+   "rating": 6.5,
+   "votes": 1315,
+   "score": 6.496015078941285
+  },
+  {
+   "tconst": "tt2355953",
+   "title": "Uyanik Kardesler",
+   "year": 1974,
+   "rating": 6.5,
+   "votes": 1267,
+   "score": 6.495930704785653
+  },
+  {
+   "tconst": "tt0132384",
+   "title": "Olsen-banden møter kongen og knekten",
+   "year": 1974,
+   "rating": 6.5,
+   "votes": 1180,
+   "score": 6.495768306306916
+  },
+  {
+   "tconst": "tt0174708",
+   "title": "Hanzo the Razor: Who's Got the Gold?",
+   "year": 1974,
+   "rating": 6.5,
+   "votes": 1087,
+   "score": 6.495579735385278
+  },
+  {
+   "tconst": "tt0072233",
+   "title": "Swallows and Amazons",
+   "year": 1974,
+   "rating": 6.4,
+   "votes": 1260,
+   "score": 6.440165888384547
+  },
+  {
+   "tconst": "tt0072409",
+   "title": "Willie Dynamite",
+   "year": 1974,
+   "rating": 6.4,
+   "votes": 1470,
+   "score": 6.436750974797197
+  },
+  {
+   "tconst": "tt0072435",
+   "title": "Zandy's Bride",
+   "year": 1974,
+   "rating": 6.4,
+   "votes": 1518,
+   "score": 6.43605040021806
+  },
+  {
+   "tconst": "tt0071838",
+   "title": "The Midnight Man",
+   "year": 1974,
+   "rating": 6.4,
+   "votes": 1583,
+   "score": 6.435143208574943
+  },
+  {
+   "tconst": "tt0071863",
+   "title": "I'm Losing My Temper",
+   "year": 1974,
+   "rating": 6.4,
+   "votes": 1749,
+   "score": 6.4330210650233095
+  },
+  {
+   "tconst": "tt0073714",
+   "title": "Sister Street Fighter",
+   "year": 1974,
+   "rating": 6.4,
+   "votes": 1819,
+   "score": 6.432201102429612
+  },
+  {
+   "tconst": "tt0072239",
+   "title": "Symptoms",
+   "year": 1974,
+   "rating": 6.4,
+   "votes": 2056,
+   "score": 6.429703831069723
+  },
+  {
+   "tconst": "tt0072198",
+   "title": "The Spikes Gang",
+   "year": 1974,
+   "rating": 6.4,
+   "votes": 2318,
+   "score": 6.42735832059948
+  },
+  {
+   "tconst": "tt0071259",
+   "title": "Busting",
+   "year": 1974,
+   "rating": 6.4,
+   "votes": 2560,
+   "score": 6.425498569592437
+  },
+  {
+   "tconst": "tt0072253",
+   "title": "The Tamarind Seed",
+   "year": 1974,
+   "rating": 6.4,
+   "votes": 2897,
+   "score": 6.42329353547577
+  },
+  {
+   "tconst": "tt0071361",
+   "title": "Coonskin",
+   "year": 1974,
+   "rating": 6.4,
+   "votes": 4456,
+   "score": 6.416637629719406
+  },
+  {
+   "tconst": "tt0071276",
+   "title": "Captain Kronos: Vampire Hunter",
+   "year": 1974,
+   "rating": 6.4,
+   "votes": 6633,
+   "score": 6.411892428632134
+  },
+  {
+   "tconst": "tt0070531",
+   "title": "Phase IV",
+   "year": 1974,
+   "rating": 6.4,
+   "votes": 11046,
+   "score": 6.407535688838543
+  },
+  {
+   "tconst": "tt0071517",
+   "title": "Foxy Brown",
+   "year": 1974,
+   "rating": 6.4,
+   "votes": 14409,
+   "score": 6.405891031718417
+  },
+  {
+   "tconst": "tt0071577",
+   "title": "The Great Gatsby",
+   "year": 1974,
+   "rating": 6.4,
+   "votes": 29203,
+   "score": 6.403005493088404
+  },
+  {
+   "tconst": "tt0071308",
+   "title": "Evil of Dracula",
+   "year": 1974,
+   "rating": 6.3,
+   "votes": 1018,
+   "score": 6.394536624256233
+  },
+  {
+   "tconst": "tt0071550",
+   "title": "The Slap",
+   "year": 1974,
+   "rating": 6.3,
+   "votes": 1382,
+   "score": 6.380090221557127
+  },
+  {
+   "tconst": "tt0072349",
+   "title": "Puzzle",
+   "year": 1974,
+   "rating": 6.3,
+   "votes": 1465,
+   "score": 6.3773934717034795
+  },
+  {
+   "tconst": "tt0072209",
+   "title": "Stone",
+   "year": 1974,
+   "rating": 6.3,
+   "votes": 2103,
+   "score": 6.361480795278465
+  },
+  {
+   "tconst": "tt0069786",
+   "title": "Billy Two Hats",
+   "year": 1974,
+   "rating": 6.3,
+   "votes": 2179,
+   "score": 6.360010980732644
+  },
+  {
+   "tconst": "tt0073623",
+   "title": "Return of the Street Fighter",
+   "year": 1974,
+   "rating": 6.3,
+   "votes": 2584,
+   "score": 6.353229605956773
+  },
+  {
+   "tconst": "tt0071241",
+   "title": "Borsalino and Co.",
+   "year": 1974,
+   "rating": 6.3,
+   "votes": 2896,
+   "score": 6.348966865438674
+  },
+  {
+   "tconst": "tt0072320",
+   "title": "The Infernal Trio",
+   "year": 1974,
+   "rating": 6.2,
+   "votes": 1034,
+   "score": 6.3429571817842065
+  },
+  {
+   "tconst": "tt0072725",
+   "title": "Boss Nigger",
+   "year": 1974,
+   "rating": 6.3,
+   "votes": 3514,
+   "score": 6.3422629392443675
+  },
+  {
+   "tconst": "tt0071229",
+   "title": "The Black Windmill",
+   "year": 1974,
+   "rating": 6.3,
+   "votes": 3738,
+   "score": 6.340264860225639
+  },
+  {
+   "tconst": "tt0072157",
+   "title": "Lady Snowblood 2: Love Song of Vengeance",
+   "year": 1974,
+   "rating": 6.3,
+   "votes": 4913,
+   "score": 6.332263640749041
+  },
+  {
+   "tconst": "tt0072012",
+   "title": "Turn the Other Cheek",
+   "year": 1974,
+   "rating": 6.3,
+   "votes": 5541,
+   "score": 6.329166015555584
+  },
+  {
+   "tconst": "tt0071408",
+   "title": "Deranged",
+   "year": 1974,
+   "rating": 6.3,
+   "votes": 6684,
+   "score": 6.324827551763283
+  },
+  {
+   "tconst": "tt0071663",
+   "title": "The Internecine Project",
+   "year": 1974,
+   "rating": 6.2,
+   "votes": 1400,
+   "score": 6.321156211562116
+  },
+  {
+   "tconst": "tt0071396",
+   "title": "Messiah of Evil",
+   "year": 1974,
+   "rating": 6.3,
+   "votes": 8316,
+   "score": 6.32047819962957
+  },
+  {
+   "tconst": "tt0071080",
+   "title": "11 Harrowhouse",
+   "year": 1974,
+   "rating": 6.2,
+   "votes": 1474,
+   "score": 6.3175322990093274
+  },
+  {
+   "tconst": "tt0071571",
+   "title": "Gone in 60 Seconds",
+   "year": 1974,
+   "rating": 6.3,
+   "votes": 10964,
+   "score": 6.315945746217743
+  },
+  {
+   "tconst": "tt0072284",
+   "title": "Three the Hard Way",
+   "year": 1974,
+   "rating": 6.2,
+   "votes": 2044,
+   "score": 6.295523951297331
+  },
+  {
+   "tconst": "tt0072305",
+   "title": "Don't Touch the White Woman!",
+   "year": 1974,
+   "rating": 6.1,
+   "votes": 1040,
+   "score": 6.291556327327978
+  },
+  {
+   "tconst": "tt0071385",
+   "title": "Daisy Miller",
+   "year": 1974,
+   "rating": 6.2,
+   "votes": 2326,
+   "score": 6.287424806899903
+  },
+  {
+   "tconst": "tt0071514",
+   "title": "For Pete's Sake",
+   "year": 1974,
+   "rating": 6.2,
+   "votes": 2921,
+   "score": 6.274158354437408
+  },
+  {
+   "tconst": "tt0071221",
+   "title": "Black Belt Jones",
+   "year": 1974,
+   "rating": 6.2,
+   "votes": 2989,
+   "score": 6.272894185948628
+  },
+  {
+   "tconst": "tt0071523",
+   "title": "Frightmare",
+   "year": 1974,
+   "rating": 6.2,
+   "votes": 3041,
+   "score": 6.271956176131917
+  },
+  {
+   "tconst": "tt0071671",
+   "title": "The Island at the Top of the World",
+   "year": 1974,
+   "rating": 6.2,
+   "votes": 3589,
+   "score": 6.263363457779271
+  },
+  {
+   "tconst": "tt0070116",
+   "title": "Successive Slidings of Pleasure",
+   "year": 1974,
+   "rating": 6.1,
+   "votes": 1610,
+   "score": 6.24972218687704
+  },
+  {
+   "tconst": "tt0071519",
+   "title": "Frankenstein and the Monster from Hell",
+   "year": 1974,
+   "rating": 6.2,
+   "votes": 5168,
+   "score": 6.247142494771252
+  },
+  {
+   "tconst": "tt0071790",
+   "title": "Madhouse",
+   "year": 1974,
+   "rating": 6.2,
+   "votes": 5282,
+   "score": 6.246286995821248
+  },
+  {
+   "tconst": "tt0077525",
+   "title": "Massacre Mafia Style",
+   "year": 1974,
+   "rating": 6,
+   "votes": 1051,
+   "score": 6.239285669307204
+  },
+  {
+   "tconst": "tt0071824",
+   "title": "McQ",
+   "year": 1974,
+   "rating": 6.2,
+   "votes": 6614,
+   "score": 6.23818950719058
+  },
+  {
+   "tconst": "tt0392225",
+   "title": "Kara Murat: Ölüm Emri",
+   "year": 1974,
+   "rating": 6,
+   "votes": 1116,
+   "score": 6.231935211601643
+  },
+  {
+   "tconst": "tt0071565",
+   "title": "Godzilla vs. Mechagodzilla",
+   "year": 1974,
+   "rating": 6.2,
+   "votes": 9203,
+   "score": 6.228498961849366
+  },
+  {
+   "tconst": "tt0069041",
+   "title": "House of Psychotic Women",
+   "year": 1974,
+   "rating": 6,
+   "votes": 1426,
+   "score": 6.202297983408522
+  },
+  {
+   "tconst": "tt0072206",
+   "title": "Steppenwolf",
+   "year": 1974,
+   "rating": 6,
+   "votes": 1452,
+   "score": 6.200152898755741
+  },
+  {
+   "tconst": "tt0073755",
+   "title": "The Street Fighter's Last Revenge",
+   "year": 1974,
+   "rating": 6,
+   "votes": 1714,
+   "score": 6.180830842943654
+  },
+  {
+   "tconst": "tt0182764",
+   "title": "Battal Gazi'nin Oglu",
+   "year": 1974,
+   "rating": 6,
+   "votes": 1843,
+   "score": 6.172625715001434
+  },
+  {
+   "tconst": "tt0071412",
+   "title": "The Destructors",
+   "year": 1974,
+   "rating": 6,
+   "votes": 1930,
+   "score": 6.167499968515044
+  },
+  {
+   "tconst": "tt0071206",
+   "title": "Benji",
+   "year": 1974,
+   "rating": 6.1,
+   "votes": 5579,
+   "score": 6.159397310799373
+  },
+  {
+   "tconst": "tt0071442",
+   "title": "The Driver's Seat",
+   "year": 1974,
+   "rating": 5.9,
+   "votes": 1356,
+   "score": 6.150753356429998
+  },
+  {
+   "tconst": "tt0071233",
+   "title": "Blood for Dracula",
+   "year": 1974,
+   "rating": 6.1,
+   "votes": 7694,
+   "score": 6.144947654445488
+  },
+  {
+   "tconst": "tt0072196",
+   "title": "Spasmo",
+   "year": 1974,
+   "rating": 6,
+   "votes": 2518,
+   "score": 6.139503953311278
+  },
+  {
+   "tconst": "tt0071288",
+   "title": "The Castaway Cowboy",
+   "year": 1974,
+   "rating": 5.8,
+   "votes": 1133,
+   "score": 6.12385133977922
+  }
+ ]
+}

@@ -1,0 +1,48 @@
+# Monthly IMDb rankings refresh (00:30 UTC on the 1st):
+#   - Streams IMDb's official bulk datasets (title.basics + title.ratings),
+#     nothing saved to disk except the small output JSONs
+#   - Rebuilds data/imdb-rankings/year-*.json for 1960..current year
+#     (Bayesian-weighted, adaptive 10K→1K vote floor per year)
+#   - Commits + pushes; Vercel auto-deploys. Fresh builtAt in the JSONs
+#     versions the DB poster-cache keys, so new order goes live immediately.
+#
+# No repo secrets needed — uses the built-in GITHUB_TOKEN for push.
+# Runtime ~10-20 min (two streaming passes over the IMDb dumps).
+
+name: IMDb rankings refresh
+
+on:
+  schedule:
+    - cron: "30 0 1 * *" # 00:30 UTC on the 1st of every month
+  workflow_dispatch: # manual run from Actions tab
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+
+      - name: Rebuild year rankings
+        run: npx tsx scripts/imdb-year-rankings.ts --all --limit 200
+
+      - name: Commit + push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/imdb-rankings/
+          if git diff --cached --quiet; then
+            echo "No ranking changes — nothing to commit."
+            exit 0
+          fi
+          MONTH=$(date -u +%Y-%m)
+          git commit -m "chore: monthly IMDb rankings refresh (${MONTH})"
+          git push

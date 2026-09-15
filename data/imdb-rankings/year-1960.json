@@ -1,0 +1,1456 @@
+{
+ "tag": "year-1960",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.693,
+ "minVotes": 1000,
+ "items": [
+  {
+   "tconst": "tt0054215",
+   "title": "Psycho",
+   "year": 1960,
+   "rating": 8.5,
+   "votes": 794117,
+   "score": 8.497727844035213
+  },
+  {
+   "tconst": "tt0054407",
+   "title": "Le Trou",
+   "year": 1960,
+   "rating": 8.5,
+   "votes": 24205,
+   "score": 8.428322561624514
+  },
+  {
+   "tconst": "tt0053604",
+   "title": "The Apartment",
+   "year": 1960,
+   "rating": 8.3,
+   "votes": 223072,
+   "score": 8.292829850073842
+  },
+  {
+   "tconst": "tt0054248",
+   "title": "Rocco and His Brothers",
+   "year": 1960,
+   "rating": 8.2,
+   "votes": 26121,
+   "score": 8.144447850954826
+  },
+  {
+   "tconst": "tt0053946",
+   "title": "Inherit the Wind",
+   "year": 1960,
+   "rating": 8.1,
+   "votes": 35927,
+   "score": 8.06190782261613
+  },
+  {
+   "tconst": "tt0054042",
+   "title": "Macario",
+   "year": 1960,
+   "rating": 8.3,
+   "votes": 5370,
+   "score": 8.047781815658691
+  },
+  {
+   "tconst": "tt0053779",
+   "title": "La Dolce Vita",
+   "year": 1960,
+   "rating": 8,
+   "votes": 86607,
+   "score": 7.985085326124007
+  },
+  {
+   "tconst": "tt0054098",
+   "title": "Mughal-E-Azam",
+   "year": 1960,
+   "rating": 8.1,
+   "votes": 9756,
+   "score": 7.969223704513374
+  },
+  {
+   "tconst": "tt0053976",
+   "title": "The Virgin Spring",
+   "year": 1960,
+   "rating": 8,
+   "votes": 34143,
+   "score": 7.962819627400787
+  },
+  {
+   "tconst": "tt0054331",
+   "title": "Spartacus",
+   "year": 1960,
+   "rating": 7.9,
+   "votes": 152382,
+   "score": 7.892133171856841
+  },
+  {
+   "tconst": "tt0056049",
+   "title": "The Naked Island",
+   "year": 1960,
+   "rating": 8,
+   "votes": 6888,
+   "score": 7.834352201539789
+  },
+  {
+   "tconst": "tt0054460",
+   "title": "The Bad Sleep Well",
+   "year": 1960,
+   "rating": 7.9,
+   "votes": 15743,
+   "score": 7.827932280101885
+  },
+  {
+   "tconst": "tt0054144",
+   "title": "When a Woman Ascends the Stairs",
+   "year": 1960,
+   "rating": 8,
+   "votes": 5443,
+   "score": 7.797201639879848
+  },
+  {
+   "tconst": "tt0053579",
+   "title": "Late Autumn",
+   "year": 1960,
+   "rating": 7.9,
+   "votes": 6811,
+   "score": 7.745521721385976
+  },
+  {
+   "tconst": "tt0054047",
+   "title": "The Magnificent Seven",
+   "year": 1960,
+   "rating": 7.7,
+   "votes": 111858,
+   "score": 7.691080562882081
+  },
+  {
+   "tconst": "tt0053619",
+   "title": "L'Avventura",
+   "year": 1960,
+   "rating": 7.7,
+   "votes": 37439,
+   "score": 7.673812278304479
+  },
+  {
+   "tconst": "tt0054189",
+   "title": "Purple Noon",
+   "year": 1960,
+   "rating": 7.7,
+   "votes": 24498,
+   "score": 7.660521223850728
+  },
+  {
+   "tconst": "tt0053793",
+   "title": "Elmer Gantry",
+   "year": 1960,
+   "rating": 7.7,
+   "votes": 14676,
+   "score": 7.635785287429565
+  },
+  {
+   "tconst": "tt0054749",
+   "title": "Two Women",
+   "year": 1960,
+   "rating": 7.7,
+   "votes": 13956,
+   "score": 7.632693913195097
+  },
+  {
+   "tconst": "tt0053106",
+   "title": "Letter Never Sent",
+   "year": 1960,
+   "rating": 7.8,
+   "votes": 4959,
+   "score": 7.614292694369166
+  },
+  {
+   "tconst": "tt0053472",
+   "title": "Breathless",
+   "year": 1960,
+   "rating": 7.6,
+   "votes": 96518,
+   "score": 7.590702948847862
+  },
+  {
+   "tconst": "tt0054167",
+   "title": "Peeping Tom",
+   "year": 1960,
+   "rating": 7.6,
+   "votes": 44346,
+   "score": 7.580006398927046
+  },
+  {
+   "tconst": "tt0053459",
+   "title": "Eyes Without a Face",
+   "year": 1960,
+   "rating": 7.6,
+   "votes": 39699,
+   "score": 7.577723535363175
+  },
+  {
+   "tconst": "tt0054073",
+   "title": "The Cloud-Capped Star",
+   "year": 1960,
+   "rating": 7.8,
+   "votes": 3745,
+   "score": 7.5667798031076625
+  },
+  {
+   "tconst": "tt0053765",
+   "title": "The Goddess",
+   "year": 1960,
+   "rating": 7.8,
+   "votes": 3519,
+   "score": 7.555116212822718
+  },
+  {
+   "tconst": "tt0054387",
+   "title": "The Time Machine",
+   "year": 1960,
+   "rating": 7.5,
+   "votes": 47784,
+   "score": 7.483465278897709
+  },
+  {
+   "tconst": "tt0366623",
+   "title": "Rumor of Love",
+   "year": 1960,
+   "rating": 8,
+   "votes": 1510,
+   "score": 7.4794303449186685
+  },
+  {
+   "tconst": "tt0054452",
+   "title": "The Truth",
+   "year": 1960,
+   "rating": 7.6,
+   "votes": 5610,
+   "score": 7.462839661988783
+  },
+  {
+   "tconst": "tt0054269",
+   "title": "Saturday Night and Sunday Morning",
+   "year": 1960,
+   "rating": 7.5,
+   "votes": 10137,
+   "score": 7.427572071989392
+  },
+  {
+   "tconst": "tt0052784",
+   "title": "Skeleton of Mrs. Morales",
+   "year": 1960,
+   "rating": 7.7,
+   "votes": 2675,
+   "score": 7.4260871199308465
+  },
+  {
+   "tconst": "tt0054001",
+   "title": "Inspector Palmu's Error",
+   "year": 1960,
+   "rating": 7.7,
+   "votes": 2330,
+   "score": 7.39770875848224
+  },
+  {
+   "tconst": "tt0054476",
+   "title": "Wild River",
+   "year": 1960,
+   "rating": 7.5,
+   "votes": 6724,
+   "score": 7.395568379822094
+  },
+  {
+   "tconst": "tt0180782",
+   "title": "The Yellow Gloves",
+   "year": 1960,
+   "rating": 7.8,
+   "votes": 1613,
+   "score": 7.376490687235307
+  },
+  {
+   "tconst": "tt0052961",
+   "title": "Kapo",
+   "year": 1960,
+   "rating": 7.6,
+   "votes": 2972,
+   "score": 7.371744754719501
+  },
+  {
+   "tconst": "tt0054412",
+   "title": "Tunes of Glory",
+   "year": 1960,
+   "rating": 7.5,
+   "votes": 5213,
+   "score": 7.370170636688534
+  },
+  {
+   "tconst": "tt0054389",
+   "title": "Shoot the Piano Player",
+   "year": 1960,
+   "rating": 7.4,
+   "votes": 22052,
+   "score": 7.369346267818231
+  },
+  {
+   "tconst": "tt0054195",
+   "title": "Pollyanna",
+   "year": 1960,
+   "rating": 7.4,
+   "votes": 12713,
+   "score": 7.348470076988687
+  },
+  {
+   "tconst": "tt0054413",
+   "title": "Everybody Go Home!",
+   "year": 1960,
+   "rating": 7.7,
+   "votes": 1711,
+   "score": 7.328686892565791
+  },
+  {
+   "tconst": "tt0054292",
+   "title": "Sergeant Rutledge",
+   "year": 1960,
+   "rating": 7.4,
+   "votes": 6227,
+   "score": 7.302223628856491
+  },
+  {
+   "tconst": "tt0052698",
+   "title": "The Big Risk",
+   "year": 1960,
+   "rating": 7.4,
+   "votes": 5176,
+   "score": 7.285584547562477
+  },
+  {
+   "tconst": "tt0054443",
+   "title": "Village of the Damned",
+   "year": 1960,
+   "rating": 7.3,
+   "votes": 21586,
+   "score": 7.273141333823867
+  },
+  {
+   "tconst": "tt0053917",
+   "title": "Home from the Hill",
+   "year": 1960,
+   "rating": 7.4,
+   "votes": 4403,
+   "score": 7.269215281463236
+  },
+  {
+   "tconst": "tt0053570",
+   "title": "Adua and Her Friends",
+   "year": 1960,
+   "rating": 7.6,
+   "votes": 1580,
+   "score": 7.248593087498395
+  },
+  {
+   "tconst": "tt0053967",
+   "title": "The Young One",
+   "year": 1960,
+   "rating": 7.4,
+   "votes": 3349,
+   "score": 7.237519007989391
+  },
+  {
+   "tconst": "tt0198698",
+   "title": "Makrykostas and Kondogiorgis",
+   "year": 1960,
+   "rating": 7.7,
+   "votes": 1174,
+   "score": 7.236968797491195
+  },
+  {
+   "tconst": "tt0054198",
+   "title": "Never on Sunday",
+   "year": 1960,
+   "rating": 7.3,
+   "votes": 6678,
+   "score": 7.220991165114073
+  },
+  {
+   "tconst": "tt0054116",
+   "title": "Never Take Candy from a Stranger",
+   "year": 1960,
+   "rating": 7.4,
+   "votes": 2408,
+   "score": 7.192655565066273
+  },
+  {
+   "tconst": "tt0054279",
+   "title": "School for Scoundrels",
+   "year": 1960,
+   "rating": 7.3,
+   "votes": 4357,
+   "score": 7.186759411190192
+  },
+  {
+   "tconst": "tt0054310",
+   "title": "Sink the Bismarck!",
+   "year": 1960,
+   "rating": 7.2,
+   "votes": 9304,
+   "score": 7.150831731924093
+  },
+  {
+   "tconst": "tt0150980",
+   "title": "The Housemaid",
+   "year": 1960,
+   "rating": 7.2,
+   "votes": 6784,
+   "score": 7.134913947295203
+  },
+  {
+   "tconst": "tt0052997",
+   "title": "The League of Gentlemen",
+   "year": 1960,
+   "rating": 7.2,
+   "votes": 5970,
+   "score": 7.127312792789937
+  },
+  {
+   "tconst": "tt0054495",
+   "title": "Bad Luck",
+   "year": 1960,
+   "rating": 7.4,
+   "votes": 1490,
+   "score": 7.116212917970224
+  },
+  {
+   "tconst": "tt0053643",
+   "title": "Bell' Antonio",
+   "year": 1960,
+   "rating": 7.3,
+   "votes": 2237,
+   "score": 7.11259504656962
+  },
+  {
+   "tconst": "tt0054119",
+   "title": "Innocent Sorcerers",
+   "year": 1960,
+   "rating": 7.3,
+   "votes": 1900,
+   "score": 7.090817298533054
+  },
+  {
+   "tconst": "tt0053724",
+   "title": "El cochecito",
+   "year": 1960,
+   "rating": 7.3,
+   "votes": 1867,
+   "score": 7.088409545080523
+  },
+  {
+   "tconst": "tt0053666",
+   "title": "The Good Girls",
+   "year": 1960,
+   "rating": 7.2,
+   "votes": 3502,
+   "score": 7.087465607673447
+  },
+  {
+   "tconst": "tt0054067",
+   "title": "Black Sunday",
+   "year": 1960,
+   "rating": 7.1,
+   "votes": 20357,
+   "score": 7.080960348632572
+  },
+  {
+   "tconst": "tt0054357",
+   "title": "Swiss Family Robinson",
+   "year": 1960,
+   "rating": 7.1,
+   "votes": 20232,
+   "score": 7.0808482557340735
+  },
+  {
+   "tconst": "tt0054353",
+   "title": "The Sundowners",
+   "year": 1960,
+   "rating": 7.1,
+   "votes": 5351,
+   "score": 7.035973888481477
+  },
+  {
+   "tconst": "tt0053772",
+   "title": "The Devil's Eye",
+   "year": 1960,
+   "rating": 7.1,
+   "votes": 5156,
+   "score": 7.033945770913881
+  },
+  {
+   "tconst": "tt0053746",
+   "title": "The Lady with the Dog",
+   "year": 1960,
+   "rating": 7.3,
+   "votes": 1224,
+   "score": 7.027234786756232
+  },
+  {
+   "tconst": "tt0053796",
+   "title": "The Entertainer",
+   "year": 1960,
+   "rating": 7.1,
+   "votes": 4201,
+   "score": 7.021816990145329
+  },
+  {
+   "tconst": "tt0054377",
+   "title": "Testament of Orpheus",
+   "year": 1960,
+   "rating": 7.1,
+   "votes": 4184,
+   "score": 7.021560602960235
+  },
+  {
+   "tconst": "tt0053602",
+   "title": "The Angry Silence",
+   "year": 1960,
+   "rating": 7.2,
+   "votes": 1744,
+   "score": 7.015368136204759
+  },
+  {
+   "tconst": "tt0054442",
+   "title": "Il vigile",
+   "year": 1960,
+   "rating": 7.2,
+   "votes": 1740,
+   "score": 7.015098600637175
+  },
+  {
+   "tconst": "tt0054242",
+   "title": "The Passionate Thief",
+   "year": 1960,
+   "rating": 7.3,
+   "votes": 1041,
+   "score": 7.002778131183664
+  },
+  {
+   "tconst": "tt0054345",
+   "title": "Strangers When We Meet",
+   "year": 1960,
+   "rating": 7.1,
+   "votes": 2959,
+   "score": 6.997289761491755
+  },
+  {
+   "tconst": "tt0053849",
+   "title": "The Gallant Hours",
+   "year": 1960,
+   "rating": 7.1,
+   "votes": 2314,
+   "score": 6.977299386163507
+  },
+  {
+   "tconst": "tt0052832",
+   "title": "The Fugitive Kind",
+   "year": 1960,
+   "rating": 7,
+   "votes": 8410,
+   "score": 6.967414470323683
+  },
+  {
+   "tconst": "tt0054326",
+   "title": "Sons and Lovers",
+   "year": 1960,
+   "rating": 7.1,
+   "votes": 2015,
+   "score": 6.965131066582373
+  },
+  {
+   "tconst": "tt0152066",
+   "title": "The Adventures of Buratino",
+   "year": 1960,
+   "rating": 7.2,
+   "votes": 1107,
+   "score": 6.959549200638756
+  },
+  {
+   "tconst": "tt0054115",
+   "title": "Never Let Go",
+   "year": 1960,
+   "rating": 7.1,
+   "votes": 1873,
+   "score": 6.958465076834618
+  },
+  {
+   "tconst": "tt2017464",
+   "title": "Intimidation",
+   "year": 1960,
+   "rating": 7.2,
+   "votes": 1037,
+   "score": 6.951286286571358
+  },
+  {
+   "tconst": "tt0053729",
+   "title": "Comanche Station",
+   "year": 1960,
+   "rating": 7,
+   "votes": 5077,
+   "score": 6.949542564710525
+  },
+  {
+   "tconst": "tt0054205",
+   "title": "Primary",
+   "year": 1960,
+   "rating": 7.1,
+   "votes": 1688,
+   "score": 6.948724019994739
+  },
+  {
+   "tconst": "tt0053636",
+   "title": "The Baroness from the Gas Station",
+   "year": 1960,
+   "rating": 7.1,
+   "votes": 1370,
+   "score": 6.928426230272514
+  },
+  {
+   "tconst": "tt0054403",
+   "title": "The Trials of Oscar Wilde",
+   "year": 1960,
+   "rating": 7.1,
+   "votes": 1280,
+   "score": 6.921653581467481
+  },
+  {
+   "tconst": "tt0054068",
+   "title": "Love and Larceny",
+   "year": 1960,
+   "rating": 7.1,
+   "votes": 1037,
+   "score": 6.90037808824048
+  },
+  {
+   "tconst": "tt0053900",
+   "title": "Hell Is a City",
+   "year": 1960,
+   "rating": 7,
+   "votes": 1784,
+   "score": 6.889859973328253
+  },
+  {
+   "tconst": "tt0053925",
+   "title": "House of Usher",
+   "year": 1960,
+   "rating": 6.9,
+   "votes": 17632,
+   "score": 6.888909948784128
+  },
+  {
+   "tconst": "tt0054127",
+   "title": "North to Alaska",
+   "year": 1960,
+   "rating": 6.9,
+   "votes": 9317,
+   "score": 6.879971907118916
+  },
+  {
+   "tconst": "tt0054494",
+   "title": "Zazie in the Metro",
+   "year": 1960,
+   "rating": 6.9,
+   "votes": 7342,
+   "score": 6.875230180501781
+  },
+  {
+   "tconst": "tt0054049",
+   "title": "Make Mine Mink",
+   "year": 1960,
+   "rating": 7,
+   "votes": 1247,
+   "score": 6.86353812449749
+  },
+  {
+   "tconst": "tt0054371",
+   "title": "The 1,000 Eyes of Dr. Mabuse",
+   "year": 1960,
+   "rating": 6.9,
+   "votes": 4348,
+   "score": 6.861363157394513
+  },
+  {
+   "tconst": "tt0053645",
+   "title": "Bells Are Ringing",
+   "year": 1960,
+   "rating": 6.9,
+   "votes": 4189,
+   "score": 6.8601792572260285
+  },
+  {
+   "tconst": "tt0054483",
+   "title": "The World of Suzie Wong",
+   "year": 1960,
+   "rating": 6.9,
+   "votes": 3098,
+   "score": 6.849577883295719
+  },
+  {
+   "tconst": "tt0054286",
+   "title": "Cruel Story of Youth",
+   "year": 1960,
+   "rating": 6.9,
+   "votes": 2921,
+   "score": 6.847301751019092
+  },
+  {
+   "tconst": "tt0052811",
+   "title": "The Flesh and the Fiends",
+   "year": 1960,
+   "rating": 6.9,
+   "votes": 2788,
+   "score": 6.8454514693098885
+  },
+  {
+   "tconst": "tt0054004",
+   "title": "Knights of the Teutonic Order",
+   "year": 1960,
+   "rating": 6.9,
+   "votes": 2458,
+   "score": 6.840245854755888
+  },
+  {
+   "tconst": "tt0053879",
+   "title": "The Great Impostor",
+   "year": 1960,
+   "rating": 6.9,
+   "votes": 1871,
+   "score": 6.828028619207892
+  },
+  {
+   "tconst": "tt0053901",
+   "title": "Hell to Eternity",
+   "year": 1960,
+   "rating": 6.9,
+   "votes": 1741,
+   "score": 6.824615164445771
+  },
+  {
+   "tconst": "tt0057238",
+   "title": "The Warped Ones",
+   "year": 1960,
+   "rating": 6.9,
+   "votes": 1163,
+   "score": 6.804470719253749
+  },
+  {
+   "tconst": "tt0054390",
+   "title": "Toby Tyler or Ten Weeks with a Circus",
+   "year": 1960,
+   "rating": 6.9,
+   "votes": 1149,
+   "score": 6.803848378662568
+  },
+  {
+   "tconst": "tt0054366",
+   "title": "The Sun's Burial",
+   "year": 1960,
+   "rating": 6.9,
+   "votes": 1115,
+   "score": 6.8023026788396495
+  },
+  {
+   "tconst": "tt0053580",
+   "title": "The Alamo",
+   "year": 1960,
+   "rating": 6.8,
+   "votes": 19862,
+   "score": 6.794888800965673
+  },
+  {
+   "tconst": "tt0054084",
+   "title": "Midnight Lace",
+   "year": 1960,
+   "rating": 6.8,
+   "votes": 6711,
+   "score": 6.7861717242570165
+  },
+  {
+   "tconst": "tt0054417",
+   "title": "Two Way Stretch",
+   "year": 1960,
+   "rating": 6.8,
+   "votes": 3101,
+   "score": 6.7739990650441015
+  },
+  {
+   "tconst": "tt0053244",
+   "title": "The Savage Innocents",
+   "year": 1960,
+   "rating": 6.8,
+   "votes": 2140,
+   "score": 6.76604145405919
+  },
+  {
+   "tconst": "tt0053740",
+   "title": "The Concrete Jungle",
+   "year": 1960,
+   "rating": 6.8,
+   "votes": 1983,
+   "score": 6.764254162167569
+  },
+  {
+   "tconst": "tt0054354",
+   "title": "Sunrise at Campobello",
+   "year": 1960,
+   "rating": 6.8,
+   "votes": 1644,
+   "score": 6.759671015788902
+  },
+  {
+   "tconst": "tt0054296",
+   "title": "Seven Ways from Sundown",
+   "year": 1960,
+   "rating": 6.8,
+   "votes": 1492,
+   "score": 6.757211141952592
+  },
+  {
+   "tconst": "tt0054091",
+   "title": "Seven Days... Seven Nights",
+   "year": 1960,
+   "rating": 6.8,
+   "votes": 1486,
+   "score": 6.75710787037243
+  },
+  {
+   "tconst": "tt0053804",
+   "title": "Exodus",
+   "year": 1960,
+   "rating": 6.7,
+   "votes": 13062,
+   "score": 6.699528528356269
+  },
+  {
+   "tconst": "tt0053719",
+   "title": "Horror Hotel",
+   "year": 1960,
+   "rating": 6.7,
+   "votes": 9863,
+   "score": 6.6993896866193365
+  },
+  {
+   "tconst": "tt0154683",
+   "title": "The Sinners of Hell",
+   "year": 1960,
+   "rating": 6.7,
+   "votes": 5113,
+   "score": 6.6989154532546795
+  },
+  {
+   "tconst": "tt0053841",
+   "title": "From the Terrace",
+   "year": 1960,
+   "rating": 6.7,
+   "votes": 3494,
+   "score": 6.698524736481054
+  },
+  {
+   "tconst": "tt0054469",
+   "title": "Where the Boys Are",
+   "year": 1960,
+   "rating": 6.7,
+   "votes": 3491,
+   "score": 6.698523751001082
+  },
+  {
+   "tconst": "tt0054016",
+   "title": "The Last Voyage",
+   "year": 1960,
+   "rating": 6.7,
+   "votes": 2811,
+   "score": 6.69826034262552
+  },
+  {
+   "tconst": "tt0054343",
+   "title": "The Story of Ruth",
+   "year": 1960,
+   "rating": 6.7,
+   "votes": 1706,
+   "score": 6.697549950386497
+  },
+  {
+   "tconst": "tt0054243",
+   "title": "The Rise and Fall of Legs Diamond",
+   "year": 1960,
+   "rating": 6.7,
+   "votes": 1595,
+   "score": 6.697445150576439
+  },
+  {
+   "tconst": "tt0054209",
+   "title": "Private Property",
+   "year": 1960,
+   "rating": 6.7,
+   "votes": 1528,
+   "score": 6.697377438981748
+  },
+  {
+   "tconst": "tt0053752",
+   "title": "The Day They Robbed the Bank of England",
+   "year": 1960,
+   "rating": 6.6,
+   "votes": 1141,
+   "score": 6.643610539815907
+  },
+  {
+   "tconst": "tt0055119",
+   "title": "Madalena",
+   "year": 1960,
+   "rating": 6.6,
+   "votes": 1308,
+   "score": 6.640455011155051
+  },
+  {
+   "tconst": "tt0053899",
+   "title": "Hell Bent for Leather",
+   "year": 1960,
+   "rating": 6.6,
+   "votes": 1455,
+   "score": 6.638032654071633
+  },
+  {
+   "tconst": "tt0054325",
+   "title": "Take Aim at the Police Van",
+   "year": 1960,
+   "rating": 6.6,
+   "votes": 1491,
+   "score": 6.6374830051167635
+  },
+  {
+   "tconst": "tt0054230",
+   "title": "The Rat Race",
+   "year": 1960,
+   "rating": 6.6,
+   "votes": 1730,
+   "score": 6.634201525914233
+  },
+  {
+   "tconst": "tt0054102",
+   "title": "Murder, Inc.",
+   "year": 1960,
+   "rating": 6.6,
+   "votes": 1895,
+   "score": 6.632252216147101
+  },
+  {
+   "tconst": "tt0052607",
+   "title": "The Battle of the Sexes",
+   "year": 1960,
+   "rating": 6.6,
+   "votes": 2006,
+   "score": 6.631061266049853
+  },
+  {
+   "tconst": "tt0053677",
+   "title": "The Brides of Dracula",
+   "year": 1960,
+   "rating": 6.6,
+   "votes": 10218,
+   "score": 6.608323245297366
+  },
+  {
+   "tconst": "tt0053994",
+   "title": "Kidnapped",
+   "year": 1960,
+   "rating": 6.5,
+   "votes": 1771,
+   "score": 6.569783531485333
+  },
+  {
+   "tconst": "tt0054473",
+   "title": "Who Was That Lady?",
+   "year": 1960,
+   "rating": 6.5,
+   "votes": 2001,
+   "score": 6.564435243500785
+  },
+  {
+   "tconst": "tt0054295",
+   "title": "Seven Thieves",
+   "year": 1960,
+   "rating": 6.5,
+   "votes": 2017,
+   "score": 6.564093525272078
+  },
+  {
+   "tconst": "tt0054099",
+   "title": "Mill of the Stone Women",
+   "year": 1960,
+   "rating": 6.5,
+   "votes": 2497,
+   "score": 6.555296015369133
+  },
+  {
+   "tconst": "tt0053825",
+   "title": "Flaming Star",
+   "year": 1960,
+   "rating": 6.5,
+   "votes": 4536,
+   "score": 6.534929581962764
+  },
+  {
+   "tconst": "tt0053644",
+   "title": "The Bellboy",
+   "year": 1960,
+   "rating": 6.5,
+   "votes": 5400,
+   "score": 6.53021408839779
+  },
+  {
+   "tconst": "tt0054428",
+   "title": "The Unforgiven",
+   "year": 1960,
+   "rating": 6.5,
+   "votes": 11121,
+   "score": 6.515953317857096
+  },
+  {
+   "tconst": "tt0053802",
+   "title": "Blood and Roses",
+   "year": 1960,
+   "rating": 6.4,
+   "votes": 1682,
+   "score": 6.509384849271386
+  },
+  {
+   "tconst": "tt0054135",
+   "title": "Ocean's Eleven",
+   "year": 1960,
+   "rating": 6.5,
+   "votes": 26397,
+   "score": 6.5070580781014655
+  },
+  {
+   "tconst": "tt0053696",
+   "title": "Captain Blood",
+   "year": 1960,
+   "rating": 6.3,
+   "votes": 1151,
+   "score": 6.482877808343031
+  },
+  {
+   "tconst": "tt0053882",
+   "title": "The 3 Worlds of Gulliver",
+   "year": 1960,
+   "rating": 6.4,
+   "votes": 3411,
+   "score": 6.466508765755126
+  },
+  {
+   "tconst": "tt0053715",
+   "title": "Cimarron",
+   "year": 1960,
+   "rating": 6.4,
+   "votes": 3908,
+   "score": 6.459773872401357
+  },
+  {
+   "tconst": "tt0054188",
+   "title": "Please Don't Eat the Daisies",
+   "year": 1960,
+   "rating": 6.4,
+   "votes": 5451,
+   "score": 6.445476695976726
+  },
+  {
+   "tconst": "tt0052680",
+   "title": "Cash McCall",
+   "year": 1960,
+   "rating": 6.3,
+   "votes": 1810,
+   "score": 6.439989382827708
+  },
+  {
+   "tconst": "tt0053877",
+   "title": "The Grass Is Greener",
+   "year": 1960,
+   "rating": 6.4,
+   "votes": 6496,
+   "score": 6.439136895110174
+  },
+  {
+   "tconst": "tt0053810",
+   "title": "The Facts of Life",
+   "year": 1960,
+   "rating": 6.3,
+   "votes": 1984,
+   "score": 6.431826463051562
+  },
+  {
+   "tconst": "tt0054022",
+   "title": "Let's Make Love",
+   "year": 1960,
+   "rating": 6.4,
+   "votes": 8792,
+   "score": 6.429960188495289
+  },
+  {
+   "tconst": "tt0053638",
+   "title": "The Battle of Austerlitz",
+   "year": 1960,
+   "rating": 6.2,
+   "votes": 1151,
+   "score": 6.429367812992032
+  },
+  {
+   "tconst": "tt0054197",
+   "title": "Portrait in Black",
+   "year": 1960,
+   "rating": 6.3,
+   "votes": 2120,
+   "score": 6.4260801813288015
+  },
+  {
+   "tconst": "tt0054095",
+   "title": "The Mountain Road",
+   "year": 1960,
+   "rating": 6.2,
+   "votes": 1271,
+   "score": 6.417247981394038
+  },
+  {
+   "tconst": "tt0053690",
+   "title": "Can-Can",
+   "year": 1960,
+   "rating": 6.3,
+   "votes": 2763,
+   "score": 6.404536318295471
+  },
+  {
+   "tconst": "tt0054453",
+   "title": "The Wackiest Ship in the Army",
+   "year": 1960,
+   "rating": 6.3,
+   "votes": 2886,
+   "score": 6.401227525925337
+  },
+  {
+   "tconst": "tt0054324",
+   "title": "Song Without End",
+   "year": 1960,
+   "rating": 6.1,
+   "votes": 1076,
+   "score": 6.38582377926101
+  },
+  {
+   "tconst": "tt0053957",
+   "title": "It Started in Naples",
+   "year": 1960,
+   "rating": 6.3,
+   "votes": 3716,
+   "score": 6.38341182479768
+  },
+  {
+   "tconst": "tt0054416",
+   "title": "The Two Faces of Dr. Jekyll",
+   "year": 1960,
+   "rating": 6.3,
+   "votes": 3847,
+   "score": 6.3811574511544995
+  },
+  {
+   "tconst": "tt0053571",
+   "title": "The Adventures of Huckleberry Finn",
+   "year": 1960,
+   "rating": 6.2,
+   "votes": 1725,
+   "score": 6.381053271833343
+  },
+  {
+   "tconst": "tt0053622",
+   "title": "BUtterfield 8",
+   "year": 1960,
+   "rating": 6.3,
+   "votes": 8070,
+   "score": 6.343370470313765
+  },
+  {
+   "tconst": "tt0055342",
+   "title": "The Pure Hell of St. Trinian's",
+   "year": 1960,
+   "rating": 6,
+   "votes": 1092,
+   "score": 6.331438893759971
+  },
+  {
+   "tconst": "tt0053699",
+   "title": "Carry on Constable",
+   "year": 1960,
+   "rating": 6.2,
+   "votes": 3188,
+   "score": 6.317805674724417
+  },
+  {
+   "tconst": "tt0054901",
+   "title": "Stop Me Before I Kill!",
+   "year": 1960,
+   "rating": 6,
+   "votes": 1206,
+   "score": 6.31431104521571
+  },
+  {
+   "tconst": "tt0053848",
+   "title": "G.I. Blues",
+   "year": 1960,
+   "rating": 6.2,
+   "votes": 4899,
+   "score": 6.28363623762432
+  },
+  {
+   "tconst": "tt0055779",
+   "title": "Wild for Kicks",
+   "year": 1960,
+   "rating": 5.9,
+   "votes": 1353,
+   "score": 6.237173891094713
+  },
+  {
+   "tconst": "tt0054367",
+   "title": "Tall Story",
+   "year": 1960,
+   "rating": 5.9,
+   "votes": 1425,
+   "score": 6.2271629549467455
+  },
+  {
+   "tconst": "tt0054033",
+   "title": "The Little Shop of Horrors",
+   "year": 1960,
+   "rating": 6.2,
+   "votes": 21499,
+   "score": 6.221928537523707
+  },
+  {
+   "tconst": "tt0053931",
+   "title": "The Hypnotic Eye",
+   "year": 1960,
+   "rating": 5.8,
+   "votes": 1175,
+   "score": 6.210744903791199
+  },
+  {
+   "tconst": "tt0053902",
+   "title": "Heller in Pink Tights",
+   "year": 1960,
+   "rating": 5.9,
+   "votes": 1595,
+   "score": 6.205730314352932
+  },
+  {
+   "tconst": "tt0054446",
+   "title": "Visit to a Small Planet",
+   "year": 1960,
+   "rating": 5.9,
+   "votes": 1613,
+   "score": 6.203624250189767
+  },
+  {
+   "tconst": "tt0053717",
+   "title": "Circus of Horrors",
+   "year": 1960,
+   "rating": 6,
+   "votes": 2881,
+   "score": 6.178657605190894
+  },
+  {
+   "tconst": "tt0053742",
+   "title": "The Crowded Sky",
+   "year": 1960,
+   "rating": 5.7,
+   "votes": 1141,
+   "score": 6.163974855556216
+  },
+  {
+   "tconst": "tt0053559",
+   "title": "13 Ghosts",
+   "year": 1960,
+   "rating": 6.1,
+   "votes": 8405,
+   "score": 6.163090926714073
+  },
+  {
+   "tconst": "tt0054358",
+   "title": "Sword of Sherwood Forest",
+   "year": 1960,
+   "rating": 5.8,
+   "votes": 1605,
+   "score": 6.1429444014379495
+  },
+  {
+   "tconst": "tt0053675",
+   "title": "A Breath of Scandal",
+   "year": 1960,
+   "rating": 5.6,
+   "votes": 1078,
+   "score": 6.126164661090403
+  },
+  {
+   "tconst": "tt0053800",
+   "title": "Esther and the King",
+   "year": 1960,
+   "rating": 5.5,
+   "votes": 1080,
+   "score": 6.073735656608585
+  },
+  {
+   "tconst": "tt0053716",
+   "title": "Cinderfella",
+   "year": 1960,
+   "rating": 5.9,
+   "votes": 4108,
+   "score": 6.055319139730983
+  },
+  {
+   "tconst": "tt0054172",
+   "title": "Pepe",
+   "year": 1960,
+   "rating": 5.5,
+   "votes": 1263,
+   "score": 6.027339887647308
+  },
+  {
+   "tconst": "tt0054086",
+   "title": "The Millionairess",
+   "year": 1960,
+   "rating": 5.4,
+   "votes": 2251,
+   "score": 5.7978376394173665
+  },
+  {
+   "tconst": "tt0053651",
+   "title": "Beyond the Time Barrier",
+   "year": 1960,
+   "rating": 5.3,
+   "votes": 2535,
+   "score": 5.694164120437301
+  },
+  {
+   "tconst": "tt0054038",
+   "title": "The Lost World",
+   "year": 1960,
+   "rating": 5.5,
+   "votes": 5154,
+   "score": 5.693917803988602
+  },
+  {
+   "tconst": "tt0053768",
+   "title": "Dinosaurus!",
+   "year": 1960,
+   "rating": 4.9,
+   "votes": 2026,
+   "score": 5.492653722982769
+  },
+  {
+   "tconst": "tt0054020",
+   "title": "The Leech Woman",
+   "year": 1960,
+   "rating": 4.8,
+   "votes": 2494,
+   "score": 5.341891861976491
+  },
+  {
+   "tconst": "tt0054393",
+   "title": "Tormented",
+   "year": 1960,
+   "rating": 4.9,
+   "votes": 3311,
+   "score": 5.315998646658747
+  },
+  {
+   "tconst": "tt0054017",
+   "title": "Last Woman on Earth",
+   "year": 1960,
+   "rating": 4.7,
+   "votes": 2413,
+   "score": 5.284052202093719
+  },
+  {
+   "tconst": "tt0053250",
+   "title": "First Spaceship on Venus",
+   "year": 1960,
+   "rating": 4.7,
+   "votes": 3692,
+   "score": 5.124844451352485
+  },
+  {
+   "tconst": "tt0054330",
+   "title": "Assignment: Outer Space",
+   "year": 1960,
+   "rating": 3.7,
+   "votes": 1157,
+   "score": 5.087746947494603
+  },
+  {
+   "tconst": "tt0054285",
+   "title": "Atom Age Vampire",
+   "year": 1960,
+   "rating": 3.9,
+   "votes": 1872,
+   "score": 4.872621924006218
+  },
+  {
+   "tconst": "tt0053593",
+   "title": "The Amazing Transparent Man",
+   "year": 1960,
+   "rating": 4.2,
+   "votes": 3019,
+   "score": 4.820395662041767
+  },
+  {
+   "tconst": "tt0052849",
+   "title": "The Girl in Lovers Lane",
+   "year": 1960,
+   "rating": 3.2,
+   "votes": 1215,
+   "score": 4.777142287018447
+  },
+  {
+   "tconst": "tt0053598",
+   "title": "The Loves of Hercules",
+   "year": 1960,
+   "rating": 3.3,
+   "votes": 1386,
+   "score": 4.7222004047551795
+  },
+  {
+   "tconst": "tt0054415",
+   "title": "12 to the Moon",
+   "year": 1960,
+   "rating": 3.4,
+   "votes": 1560,
+   "score": 4.686472720994476
+  },
+  {
+   "tconst": "tt0055452",
+   "title": "The Sinister Urge",
+   "year": 1960,
+   "rating": 2.7,
+   "votes": 1813,
+   "score": 4.11961257225235
+  },
+  {
+   "tconst": "tt0055380",
+   "title": "Rocket Attack U.S.A.",
+   "year": 1960,
+   "rating": 1.8,
+   "votes": 1234,
+   "score": 3.990407415284628
+  },
+  {
+   "tconst": "tt0054333",
+   "title": "Horrors of Spider Island",
+   "year": 1960,
+   "rating": 2.7,
+   "votes": 4417,
+   "score": 3.437192203386719
+  }
+ ]
+}

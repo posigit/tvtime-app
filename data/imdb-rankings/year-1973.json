@@ -1,0 +1,1608 @@
+{
+ "tag": "year-1973",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.426,
+ "minVotes": 1000,
+ "items": [
+  {
+   "tconst": "tt0267351",
+   "title": "My Dear Brother",
+   "year": 1973,
+   "rating": 8.6,
+   "votes": 11396,
+   "score": 8.42465379563603
+  },
+  {
+   "tconst": "tt0070735",
+   "title": "The Sting",
+   "year": 1973,
+   "rating": 8.2,
+   "votes": 305786,
+   "score": 8.194218798937056
+  },
+  {
+   "tconst": "tt0070233",
+   "title": "Ivan Vasilyevich Changes His Profession",
+   "year": 1973,
+   "rating": 8.2,
+   "votes": 20725,
+   "score": 8.118361723852898
+  },
+  {
+   "tconst": "tt0070047",
+   "title": "The Exorcist",
+   "year": 1973,
+   "rating": 8.1,
+   "votes": 504744,
+   "score": 8.096690832616313
+  },
+  {
+   "tconst": "tt0070510",
+   "title": "Paper Moon",
+   "year": 1973,
+   "rating": 8.1,
+   "votes": 58298,
+   "score": 8.07177659365753
+  },
+  {
+   "tconst": "tt0070511",
+   "title": "Papillon",
+   "year": 1973,
+   "rating": 8,
+   "votes": 146987,
+   "score": 7.9893666906600185
+  },
+  {
+   "tconst": "tt0070460",
+   "title": "Day for Night",
+   "year": 1973,
+   "rating": 8,
+   "votes": 26679,
+   "score": 7.943148540435139
+  },
+  {
+   "tconst": "tt0069947",
+   "title": "The Day of the Jackal",
+   "year": 1973,
+   "rating": 7.8,
+   "votes": 53669,
+   "score": 7.774874397752002
+  },
+  {
+   "tconst": "tt0071129",
+   "title": "Amarcord",
+   "year": 1973,
+   "rating": 7.8,
+   "votes": 51900,
+   "score": 7.77403418621369
+  },
+  {
+   "tconst": "tt0070666",
+   "title": "Serpico",
+   "year": 1973,
+   "rating": 7.7,
+   "votes": 147497,
+   "score": 7.6914234526670855
+  },
+  {
+   "tconst": "tt0069762",
+   "title": "Badlands",
+   "year": 1973,
+   "rating": 7.7,
+   "votes": 85493,
+   "score": 7.685275206672266
+  },
+  {
+   "tconst": "tt0071615",
+   "title": "The Holy Mountain",
+   "year": 1973,
+   "rating": 7.7,
+   "votes": 53269,
+   "score": 7.676531877327833
+  },
+  {
+   "tconst": "tt0070040",
+   "title": "The Spirit of the Beehive",
+   "year": 1973,
+   "rating": 7.7,
+   "votes": 22999,
+   "score": 7.646931474257437
+  },
+  {
+   "tconst": "tt0072962",
+   "title": "F for Fake",
+   "year": 1973,
+   "rating": 7.7,
+   "votes": 19942,
+   "score": 7.639184817625071
+  },
+  {
+   "tconst": "tt0070034",
+   "title": "Enter the Dragon",
+   "year": 1973,
+   "rating": 7.6,
+   "votes": 121507,
+   "score": 7.590420208238747
+  },
+  {
+   "tconst": "tt0070544",
+   "title": "Fantastic Planet",
+   "year": 1973,
+   "rating": 7.6,
+   "votes": 43382,
+   "score": 7.573557037778924
+  },
+  {
+   "tconst": "tt0070359",
+   "title": "The Mother and the Whore",
+   "year": 1973,
+   "rating": 7.7,
+   "votes": 7829,
+   "score": 7.555749059995948
+  },
+  {
+   "tconst": "tt0158714",
+   "title": "Lady Snowblood",
+   "year": 1973,
+   "rating": 7.6,
+   "votes": 19424,
+   "score": 7.542538604127703
+  },
+  {
+   "tconst": "tt0070832",
+   "title": "Three Wishes for Cinderella",
+   "year": 1973,
+   "rating": 7.6,
+   "votes": 13765,
+   "score": 7.520515303129307
+  },
+  {
+   "tconst": "tt0070608",
+   "title": "Robin Hood",
+   "year": 1973,
+   "rating": 7.5,
+   "votes": 151944,
+   "score": 7.492980492537819
+  },
+  {
+   "tconst": "tt0070917",
+   "title": "The Wicker Man",
+   "year": 1973,
+   "rating": 7.5,
+   "votes": 106666,
+   "score": 7.490028499718613
+  },
+  {
+   "tconst": "tt0070464",
+   "title": "O Lucky Man!",
+   "year": 1973,
+   "rating": 7.6,
+   "votes": 9351,
+   "score": 7.486620466689616
+  },
+  {
+   "tconst": "tt0069671",
+   "title": "Abhimaan",
+   "year": 1973,
+   "rating": 7.8,
+   "votes": 3304,
+   "score": 7.480856982040944
+  },
+  {
+   "tconst": "tt0070334",
+   "title": "The Long Goodbye",
+   "year": 1973,
+   "rating": 7.5,
+   "votes": 44990,
+   "score": 7.4766559784888935
+  },
+  {
+   "tconst": "tt0180033",
+   "title": "Truckers",
+   "year": 1973,
+   "rating": 8.4,
+   "votes": 1121,
+   "score": 7.469499505282521
+  },
+  {
+   "tconst": "tt0070290",
+   "title": "The Last Detail",
+   "year": 1973,
+   "rating": 7.5,
+   "votes": 31471,
+   "score": 7.466936911419551
+  },
+  {
+   "tconst": "tt0070061",
+   "title": "Love & Anarchy",
+   "year": 1973,
+   "rating": 7.7,
+   "votes": 3954,
+   "score": 7.442916522144575
+  },
+  {
+   "tconst": "tt0069865",
+   "title": "Charley Varrick",
+   "year": 1973,
+   "rating": 7.5,
+   "votes": 16117,
+   "score": 7.437279222451612
+  },
+  {
+   "tconst": "tt0069737",
+   "title": "Distant Thunder",
+   "year": 1973,
+   "rating": 7.9,
+   "votes": 1904,
+   "score": 7.392564893493191
+  },
+  {
+   "tconst": "tt0069704",
+   "title": "American Graffiti",
+   "year": 1973,
+   "rating": 7.4,
+   "votes": 106688,
+   "score": 7.39095914540807
+  },
+  {
+   "tconst": "tt0068699",
+   "title": "High Plains Drifter",
+   "year": 1973,
+   "rating": 7.4,
+   "votes": 74207,
+   "score": 7.3870545088981645
+  },
+  {
+   "tconst": "tt0070239",
+   "title": "Jesus Christ Superstar",
+   "year": 1973,
+   "rating": 7.4,
+   "votes": 33016,
+   "score": 7.371378423409697
+  },
+  {
+   "tconst": "tt0068883",
+   "title": "Ludwig",
+   "year": 1973,
+   "rating": 7.5,
+   "votes": 6684,
+   "score": 7.36028220337119
+  },
+  {
+   "tconst": "tt0069747",
+   "title": "The Mad Adventures of Rabbi Jacob",
+   "year": 1973,
+   "rating": 7.4,
+   "votes": 16530,
+   "score": 7.34446140620104
+  },
+  {
+   "tconst": "tt0070077",
+   "title": "The Friends of Eddie Coyle",
+   "year": 1973,
+   "rating": 7.4,
+   "votes": 13954,
+   "score": 7.334894239046692
+  },
+  {
+   "tconst": "tt0143428",
+   "title": "Lone Wolf and Cub: Baby Cart in the Land of Demons",
+   "year": 1973,
+   "rating": 7.5,
+   "votes": 5131,
+   "score": 7.324891282124324
+  },
+  {
+   "tconst": "tt0070947",
+   "title": "Zanjeer",
+   "year": 1973,
+   "rating": 7.5,
+   "votes": 4564,
+   "score": 7.307046809975597
+  },
+  {
+   "tconst": "tt0217590",
+   "title": "The Adventures of Mowgli",
+   "year": 1973,
+   "rating": 7.6,
+   "votes": 2759,
+   "score": 7.287791553792026
+  },
+  {
+   "tconst": "tt0070242",
+   "title": "Jimi Hendrix",
+   "year": 1973,
+   "rating": 7.7,
+   "votes": 2040,
+   "score": 7.281055411415863
+  },
+  {
+   "tconst": "tt0070215",
+   "title": "My Name Is Nobody",
+   "year": 1973,
+   "rating": 7.3,
+   "votes": 31287,
+   "score": 7.272942932161682
+  },
+  {
+   "tconst": "tt0070099",
+   "title": "The Bride",
+   "year": 1973,
+   "rating": 7.7,
+   "votes": 1945,
+   "score": 7.267541069848633
+  },
+  {
+   "tconst": "tt0070628",
+   "title": "The Hourglass Sanatorium",
+   "year": 1973,
+   "rating": 7.4,
+   "votes": 6344,
+   "score": 7.267430344594802
+  },
+  {
+   "tconst": "tt0070246",
+   "title": "Battles Without Honor and Humanity",
+   "year": 1973,
+   "rating": 7.4,
+   "votes": 4876,
+   "score": 7.234310491951026
+  },
+  {
+   "tconst": "tt0068348",
+   "title": "The Castle of Purity",
+   "year": 1973,
+   "rating": 7.5,
+   "votes": 2869,
+   "score": 7.222514461283077
+  },
+  {
+   "tconst": "tt0070557",
+   "title": "Man - Woman Wanted",
+   "year": 1973,
+   "rating": 7.5,
+   "votes": 2847,
+   "score": 7.220927593112614
+  },
+  {
+   "tconst": "tt0071203",
+   "title": "Belladonna of Sadness",
+   "year": 1973,
+   "rating": 7.3,
+   "votes": 9684,
+   "score": 7.218233662551874
+  },
+  {
+   "tconst": "tt0070355",
+   "title": "Magnum Force",
+   "year": 1973,
+   "rating": 7.2,
+   "votes": 72431,
+   "score": 7.189465054959135
+  },
+  {
+   "tconst": "tt0069967",
+   "title": "Two Men in Town",
+   "year": 1973,
+   "rating": 7.3,
+   "votes": 6095,
+   "score": 7.176872227019623
+  },
+  {
+   "tconst": "tt0070518",
+   "title": "Pat Garrett & Billy the Kid",
+   "year": 1973,
+   "rating": 7.2,
+   "votes": 23489,
+   "score": 7.168410651749939
+  },
+  {
+   "tconst": "tt0070643",
+   "title": "Scarecrow",
+   "year": 1973,
+   "rating": 7.2,
+   "votes": 22309,
+   "score": 7.166811465558549
+  },
+  {
+   "tconst": "tt0070291",
+   "title": "The Last of Sheila",
+   "year": 1973,
+   "rating": 7.2,
+   "votes": 10381,
+   "score": 7.132027805175664
+  },
+  {
+   "tconst": "tt0070509",
+   "title": "The Paper Chase",
+   "year": 1973,
+   "rating": 7.2,
+   "votes": 9434,
+   "score": 7.125858582586183
+  },
+  {
+   "tconst": "tt0070902",
+   "title": "Wattstax",
+   "year": 1973,
+   "rating": 7.7,
+   "votes": 1205,
+   "score": 7.122407460636837
+  },
+  {
+   "tconst": "tt0070030",
+   "title": "Emperor of the North",
+   "year": 1973,
+   "rating": 7.2,
+   "votes": 7843,
+   "score": 7.112519331754408
+  },
+  {
+   "tconst": "tt0070245",
+   "title": "Hiroshima Death Match",
+   "year": 1973,
+   "rating": 7.4,
+   "votes": 2236,
+   "score": 7.099137345705879
+  },
+  {
+   "tconst": "tt0070379",
+   "title": "Mean Streets",
+   "year": 1973,
+   "rating": 7.1,
+   "votes": 129753,
+   "score": 7.094848366390861
+  },
+  {
+   "tconst": "tt0069995",
+   "title": "Don't Look Now",
+   "year": 1973,
+   "rating": 7.1,
+   "votes": 69310,
+   "score": 7.090419690665684
+  },
+  {
+   "tconst": "tt0070707",
+   "title": "Sleeper",
+   "year": 1973,
+   "rating": 7.1,
+   "votes": 45691,
+   "score": 7.085573417804378
+  },
+  {
+   "tconst": "tt0121431",
+   "title": "Johnny Corncob",
+   "year": 1973,
+   "rating": 7.5,
+   "votes": 1554,
+   "score": 7.0796430895474645
+  },
+  {
+   "tconst": "tt0072281",
+   "title": "The Three Musketeers",
+   "year": 1973,
+   "rating": 7.1,
+   "votes": 20792,
+   "score": 7.069089961944944
+  },
+  {
+   "tconst": "tt0070791",
+   "title": "Theater of Blood",
+   "year": 1973,
+   "rating": 7.1,
+   "votes": 13884,
+   "score": 7.054743916333259
+  },
+  {
+   "tconst": "tt0070842",
+   "title": "Turkish Delight",
+   "year": 1973,
+   "rating": 7.1,
+   "votes": 12886,
+   "score": 7.051491318644983
+  },
+  {
+   "tconst": "tt0182503",
+   "title": "Turist Ömer: Uzay Yolunda",
+   "year": 1973,
+   "rating": 7.2,
+   "votes": 3902,
+   "score": 7.042188586434971
+  },
+  {
+   "tconst": "tt0070935",
+   "title": "Procession of Memories",
+   "year": 1973,
+   "rating": 7.3,
+   "votes": 2332,
+   "score": 7.037817662276178
+  },
+  {
+   "tconst": "tt0253377",
+   "title": "Oh Olsun",
+   "year": 1973,
+   "rating": 7.2,
+   "votes": 3638,
+   "score": 7.033205789285085
+  },
+  {
+   "tconst": "tt0069815",
+   "title": "Happy New Year",
+   "year": 1973,
+   "rating": 7.3,
+   "votes": 2242,
+   "score": 7.030539312370212
+  },
+  {
+   "tconst": "tt0070354",
+   "title": "Le Magnifique",
+   "year": 1973,
+   "rating": 7.1,
+   "votes": 7186,
+   "score": 7.017714201161033
+  },
+  {
+   "tconst": "tt0072931",
+   "title": "Emil and the Piglet",
+   "year": 1973,
+   "rating": 7.2,
+   "votes": 3143,
+   "score": 7.0132774440512256
+  },
+  {
+   "tconst": "tt0070723",
+   "title": "Soylent Green",
+   "year": 1973,
+   "rating": 7,
+   "votes": 74959,
+   "score": 6.992448669028084
+  },
+  {
+   "tconst": "tt0070424",
+   "title": "My Ain Folk",
+   "year": 1973,
+   "rating": 7.5,
+   "votes": 1113,
+   "score": 6.991911240276491
+  },
+  {
+   "tconst": "tt0070244",
+   "title": "Proxy War",
+   "year": 1973,
+   "rating": 7.3,
+   "votes": 1806,
+   "score": 6.988670153494022
+  },
+  {
+   "tconst": "tt0070903",
+   "title": "The Way We Were",
+   "year": 1973,
+   "rating": 7,
+   "votes": 31217,
+   "score": 6.982195997476619
+  },
+  {
+   "tconst": "tt0069823",
+   "title": "A Brief Vacation",
+   "year": 1973,
+   "rating": 7.5,
+   "votes": 1070,
+   "score": 6.98135673947064
+  },
+  {
+   "tconst": "tt0070130",
+   "title": "The Big Feast",
+   "year": 1973,
+   "rating": 7,
+   "votes": 16222,
+   "score": 6.966694254482883
+  },
+  {
+   "tconst": "tt0068207",
+   "title": "Anna and the Wolves",
+   "year": 1973,
+   "rating": 7.2,
+   "votes": 2228,
+   "score": 6.960349582002548
+  },
+  {
+   "tconst": "tt0070212",
+   "title": "The Iceman Cometh",
+   "year": 1973,
+   "rating": 7.2,
+   "votes": 2122,
+   "score": 6.952212828540752
+  },
+  {
+   "tconst": "tt0070434",
+   "title": "Namak Haraam",
+   "year": 1973,
+   "rating": 7.2,
+   "votes": 1968,
+   "score": 6.939355947002771
+  },
+  {
+   "tconst": "tt0070726",
+   "title": "The Spook Who Sat by the Door",
+   "year": 1973,
+   "rating": 7.2,
+   "votes": 1958,
+   "score": 6.938474797398317
+  },
+  {
+   "tconst": "tt0070022",
+   "title": "Electra Glide in Blue",
+   "year": 1973,
+   "rating": 7,
+   "votes": 7242,
+   "score": 6.930406266768288
+  },
+  {
+   "tconst": "tt0071960",
+   "title": "The Outfit",
+   "year": 1973,
+   "rating": 7,
+   "votes": 6718,
+   "score": 6.92568132297282
+  },
+  {
+   "tconst": "tt0069822",
+   "title": "Breezy",
+   "year": 1973,
+   "rating": 7,
+   "votes": 6586,
+   "score": 6.924388142723995
+  },
+  {
+   "tconst": "tt0253960",
+   "title": "Yalanci Yarim",
+   "year": 1973,
+   "rating": 7.1,
+   "votes": 2673,
+   "score": 6.91660997841117
+  },
+  {
+   "tconst": "tt0070809",
+   "title": "A River Called Titas",
+   "year": 1973,
+   "rating": 7.2,
+   "votes": 1605,
+   "score": 6.9030358735908735
+  },
+  {
+   "tconst": "tt0070909",
+   "title": "Westworld",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 68165,
+   "score": 6.893152728268695
+  },
+  {
+   "tconst": "tt0072934",
+   "title": "A Pain in the Ass",
+   "year": 1973,
+   "rating": 7,
+   "votes": 4115,
+   "score": 6.887860889678245
+  },
+  {
+   "tconst": "tt0070217",
+   "title": "The Illumination",
+   "year": 1973,
+   "rating": 7.1,
+   "votes": 2167,
+   "score": 6.887309267667896
+  },
+  {
+   "tconst": "tt0070016",
+   "title": "Charlotte's Web",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 23082,
+   "score": 6.8803342102277325
+  },
+  {
+   "tconst": "tt0068918",
+   "title": "Manson",
+   "year": 1973,
+   "rating": 7.2,
+   "votes": 1235,
+   "score": 6.853874027160728
+  },
+  {
+   "tconst": "tt0070895",
+   "title": "Walking Tall",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 7674,
+   "score": 6.845401020371711
+  },
+  {
+   "tconst": "tt0069976",
+   "title": "Dillinger",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 6603,
+   "score": 6.837709910654245
+  },
+  {
+   "tconst": "tt0070568",
+   "title": "Property Is No Longer a Theft",
+   "year": 1973,
+   "rating": 7.1,
+   "votes": 1539,
+   "score": 6.834702028634984
+  },
+  {
+   "tconst": "tt0070640",
+   "title": "Save the Tiger",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 6193,
+   "score": 6.834159384221358
+  },
+  {
+   "tconst": "tt0070474",
+   "title": "The Olsen Gang Runs Amok",
+   "year": 1973,
+   "rating": 7,
+   "votes": 2394,
+   "score": 6.830998364968835
+  },
+  {
+   "tconst": "tt0070109",
+   "title": "Giordano Bruno",
+   "year": 1973,
+   "rating": 7.2,
+   "votes": 1094,
+   "score": 6.830567550479573
+  },
+  {
+   "tconst": "tt0070820",
+   "title": "Journey of the Hyena",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 5129,
+   "score": 6.822729393164338
+  },
+  {
+   "tconst": "tt0070942",
+   "title": "The Fate of Lee Khan",
+   "year": 1973,
+   "rating": 7.2,
+   "votes": 1039,
+   "score": 6.820602477049645
+  },
+  {
+   "tconst": "tt0261668",
+   "title": "The Wedding",
+   "year": 1973,
+   "rating": 7.1,
+   "votes": 1174,
+   "score": 6.790160280912707
+  },
+  {
+   "tconst": "tt0069067",
+   "title": "Payday",
+   "year": 1973,
+   "rating": 7.1,
+   "votes": 1143,
+   "score": 6.785678231779853
+  },
+  {
+   "tconst": "tt0070356",
+   "title": "Now Where Did the Seventh Company Get to?",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 2925,
+   "score": 6.779339732663496
+  },
+  {
+   "tconst": "tt0069897",
+   "title": "Coffy",
+   "year": 1973,
+   "rating": 6.8,
+   "votes": 15176,
+   "score": 6.776904577813069
+  },
+  {
+   "tconst": "tt0071569",
+   "title": "The Golden Voyage of Sinbad",
+   "year": 1973,
+   "rating": 6.8,
+   "votes": 12170,
+   "score": 6.771633139764938
+  },
+  {
+   "tconst": "tt0069818",
+   "title": "The Boss",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 2682,
+   "score": 6.771376548262961
+  },
+  {
+   "tconst": "tt0073626",
+   "title": "Revolver",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 2586,
+   "score": 6.767933198746298
+  },
+  {
+   "tconst": "tt0226875",
+   "title": "Female Prisoner Scorpion: Beast Stable",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 2529,
+   "score": 6.765800071041152
+  },
+  {
+   "tconst": "tt0070453",
+   "title": "Wedding in Blood",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 2512,
+   "score": 6.765150470018287
+  },
+  {
+   "tconst": "tt0070468",
+   "title": "The Offence",
+   "year": 1973,
+   "rating": 6.8,
+   "votes": 9217,
+   "score": 6.763434320319489
+  },
+  {
+   "tconst": "tt0070672",
+   "title": "The Seven-Ups",
+   "year": 1973,
+   "rating": 6.8,
+   "votes": 7752,
+   "score": 6.757313579833664
+  },
+  {
+   "tconst": "tt0069810",
+   "title": "Bobby",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 2204,
+   "score": 6.752187406586836
+  },
+  {
+   "tconst": "tt0072439",
+   "title": "Zatoichi's Conspiracy",
+   "year": 1973,
+   "rating": 7,
+   "votes": 1251,
+   "score": 6.745183674235552
+  },
+  {
+   "tconst": "tt0070826",
+   "title": "The Last Train",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 2010,
+   "score": 6.742660614851903
+  },
+  {
+   "tconst": "tt0069369",
+   "title": "Themroc",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 1875,
+   "score": 6.735272504592774
+  },
+  {
+   "tconst": "tt0069492",
+   "title": "Wesele",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 1540,
+   "score": 6.713546634135523
+  },
+  {
+   "tconst": "tt0174707",
+   "title": "Hanzo the Razor: The Snare",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 1470,
+   "score": 6.708262530649483
+  },
+  {
+   "tconst": "tt0070328",
+   "title": "Live and Let Die",
+   "year": 1973,
+   "rating": 6.7,
+   "votes": 125988,
+   "score": 6.697845532260562
+  },
+  {
+   "tconst": "tt0070238",
+   "title": "Jeremy",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 1238,
+   "score": 6.688386260368286
+  },
+  {
+   "tconst": "tt0069270",
+   "title": "Escape to Nowhere",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 1199,
+   "score": 6.6846332199655425
+  },
+  {
+   "tconst": "tt0070766",
+   "title": "Experience",
+   "year": 1973,
+   "rating": 6.9,
+   "votes": 1157,
+   "score": 6.680439708254161
+  },
+  {
+   "tconst": "tt0070758",
+   "title": "The Battle of Sutjeska",
+   "year": 1973,
+   "rating": 6.8,
+   "votes": 2028,
+   "score": 6.676621020708133
+  },
+  {
+   "tconst": "tt0069765",
+   "title": "Bang the Drum Slowly",
+   "year": 1973,
+   "rating": 6.7,
+   "votes": 6877,
+   "score": 6.665267037032401
+  },
+  {
+   "tconst": "tt0070534",
+   "title": "The Knock Out Cop",
+   "year": 1973,
+   "rating": 6.7,
+   "votes": 4685,
+   "score": 6.651874837414992
+  },
+  {
+   "tconst": "tt0070552",
+   "title": "High Crime",
+   "year": 1973,
+   "rating": 6.8,
+   "votes": 1419,
+   "score": 6.645559508352305
+  },
+  {
+   "tconst": "tt0070299",
+   "title": "The Legend of Paul and Paula",
+   "year": 1973,
+   "rating": 6.8,
+   "votes": 1393,
+   "score": 6.643881508860938
+  },
+  {
+   "tconst": "tt0070046",
+   "title": "Executive Action",
+   "year": 1973,
+   "rating": 6.7,
+   "votes": 3826,
+   "score": 6.643308837692546
+  },
+  {
+   "tconst": "tt0069013",
+   "title": "No Way Out",
+   "year": 1973,
+   "rating": 6.7,
+   "votes": 3056,
+   "score": 6.632546462205184
+  },
+  {
+   "tconst": "tt0069883",
+   "title": "Cinderella Liberty",
+   "year": 1973,
+   "rating": 6.7,
+   "votes": 2682,
+   "score": 6.625694853531837
+  },
+  {
+   "tconst": "tt0071786",
+   "title": "The Earth Is a Sinful Song",
+   "year": 1973,
+   "rating": 6.8,
+   "votes": 1037,
+   "score": 6.616597177567121
+  },
+  {
+   "tconst": "tt0070734",
+   "title": "Steptoe and Son Ride Again",
+   "year": 1973,
+   "rating": 6.7,
+   "votes": 1540,
+   "score": 6.592286791615837
+  },
+  {
+   "tconst": "tt0070294",
+   "title": "The Legend of Hell House",
+   "year": 1973,
+   "rating": 6.6,
+   "votes": 15377,
+   "score": 6.589400283977787
+  },
+  {
+   "tconst": "tt0070868",
+   "title": "The Vault of Horror",
+   "year": 1973,
+   "rating": 6.6,
+   "votes": 7147,
+   "score": 6.57869258017727
+  },
+  {
+   "tconst": "tt0070121",
+   "title": "Godspell",
+   "year": 1973,
+   "rating": 6.6,
+   "votes": 4123,
+   "score": 6.5661152548710175
+  },
+  {
+   "tconst": "tt0070235",
+   "title": "I Will Walk Like a Crazy Horse",
+   "year": 1973,
+   "rating": 6.7,
+   "votes": 1030,
+   "score": 6.565225837785333
+  },
+  {
+   "tconst": "tt0070085",
+   "title": "Sex & Fury",
+   "year": 1973,
+   "rating": 6.6,
+   "votes": 3920,
+   "score": 6.564717164777281
+  },
+  {
+   "tconst": "tt0070350",
+   "title": "The Mack",
+   "year": 1973,
+   "rating": 6.6,
+   "votes": 3631,
+   "score": 6.56251532081715
+  },
+  {
+   "tconst": "tt0070133",
+   "title": "The Burned Barns",
+   "year": 1973,
+   "rating": 6.6,
+   "votes": 1554,
+   "score": 6.532031499884191
+  },
+  {
+   "tconst": "tt0070788",
+   "title": "That'll Be the Day",
+   "year": 1973,
+   "rating": 6.6,
+   "votes": 1542,
+   "score": 6.531710641504415
+  },
+  {
+   "tconst": "tt0068850",
+   "title": "Love and Pain and the Whole Damn Thing",
+   "year": 1973,
+   "rating": 6.6,
+   "votes": 1167,
+   "score": 6.519893147533098
+  },
+  {
+   "tconst": "tt0070180",
+   "title": "The Hireling",
+   "year": 1973,
+   "rating": 6.6,
+   "votes": 1073,
+   "score": 6.516260709456934
+  },
+  {
+   "tconst": "tt0132377",
+   "title": "Olsen-banden og Dynamitt-Harry går amok",
+   "year": 1973,
+   "rating": 6.6,
+   "votes": 1038,
+   "score": 6.514822596027589
+  },
+  {
+   "tconst": "tt0069920",
+   "title": "Torso",
+   "year": 1973,
+   "rating": 6.5,
+   "votes": 9311,
+   "score": 6.492862811628767
+  },
+  {
+   "tconst": "tt0069834",
+   "title": "Cahill U.S. Marshal",
+   "year": 1973,
+   "rating": 6.5,
+   "votes": 7923,
+   "score": 6.491752600101337
+  },
+  {
+   "tconst": "tt0070165",
+   "title": "Heavy Traffic",
+   "year": 1973,
+   "rating": 6.5,
+   "votes": 4247,
+   "score": 6.485974547494611
+  },
+  {
+   "tconst": "tt0070819",
+   "title": "A Touch of Class",
+   "year": 1973,
+   "rating": 6.5,
+   "votes": 3899,
+   "score": 6.484978250807149
+  },
+  {
+   "tconst": "tt0070184",
+   "title": "Hitler: The Last Ten Days",
+   "year": 1973,
+   "rating": 6.5,
+   "votes": 2143,
+   "score": 6.476585571334466
+  },
+  {
+   "tconst": "tt0070592",
+   "title": "Massacre in Rome",
+   "year": 1973,
+   "rating": 6.5,
+   "votes": 1730,
+   "score": 6.473043388536346
+  },
+  {
+   "tconst": "tt0274935",
+   "title": "Tarkan and the Armless Hero",
+   "year": 1973,
+   "rating": 6.5,
+   "votes": 1588,
+   "score": 6.471564316346301
+  },
+  {
+   "tconst": "tt0070393",
+   "title": "The Violent Professionals",
+   "year": 1973,
+   "rating": 6.5,
+   "votes": 1136,
+   "score": 6.465547027483251
+  },
+  {
+   "tconst": "tt0069958",
+   "title": "A Delicate Balance",
+   "year": 1973,
+   "rating": 6.5,
+   "votes": 1076,
+   "score": 6.464551276832478
+  },
+  {
+   "tconst": "tt0070332",
+   "title": "Lolly-Madonna XXX",
+   "year": 1973,
+   "rating": 6.4,
+   "votes": 1013,
+   "score": 6.413118952163053
+  },
+  {
+   "tconst": "tt0142998",
+   "title": "Female Yakuza Tale: Inquisition and Torture",
+   "year": 1973,
+   "rating": 6.4,
+   "votes": 1096,
+   "score": 6.4125994516718645
+  },
+  {
+   "tconst": "tt0069922",
+   "title": "The Corruption of Chris Miller",
+   "year": 1973,
+   "rating": 6.4,
+   "votes": 1127,
+   "score": 6.412415820735413
+  },
+  {
+   "tconst": "tt0069987",
+   "title": "A Doll's House",
+   "year": 1973,
+   "rating": 6.4,
+   "votes": 1504,
+   "score": 6.410546505872295
+  },
+  {
+   "tconst": "tt0071782",
+   "title": "Lucky Luciano",
+   "year": 1973,
+   "rating": 6.4,
+   "votes": 1754,
+   "score": 6.409589125164933
+  },
+  {
+   "tconst": "tt0069840",
+   "title": "The Candy Snatchers",
+   "year": 1973,
+   "rating": 6.4,
+   "votes": 2001,
+   "score": 6.408799883606873
+  },
+  {
+   "tconst": "tt0070287",
+   "title": "The Last American Hero",
+   "year": 1973,
+   "rating": 6.4,
+   "votes": 2566,
+   "score": 6.407405622743753
+  },
+  {
+   "tconst": "tt0070814",
+   "title": "Tom Sawyer",
+   "year": 1973,
+   "rating": 6.4,
+   "votes": 2962,
+   "score": 6.4066654343019245
+  },
+  {
+   "tconst": "tt0070292",
+   "title": "The Laughing Policeman",
+   "year": 1973,
+   "rating": 6.4,
+   "votes": 3818,
+   "score": 6.4054812060407285
+  },
+  {
+   "tconst": "tt0069792",
+   "title": "Black Caesar",
+   "year": 1973,
+   "rating": 6.4,
+   "votes": 4557,
+   "score": 6.404752285532522
+  },
+  {
+   "tconst": "tt0070653",
+   "title": "Scorpio",
+   "year": 1973,
+   "rating": 6.4,
+   "votes": 6240,
+   "score": 6.40364757606412
+  },
+  {
+   "tconst": "tt0070915",
+   "title": "White Lightning",
+   "year": 1973,
+   "rating": 6.4,
+   "votes": 6932,
+   "score": 6.403329355862863
+  },
+  {
+   "tconst": "tt0070825",
+   "title": "The Train Robbers",
+   "year": 1973,
+   "rating": 6.4,
+   "votes": 7570,
+   "score": 6.403081499498743
+  },
+  {
+   "tconst": "tt0072285",
+   "title": "Thriller: A Cruel Picture",
+   "year": 1973,
+   "rating": 6.4,
+   "votes": 9677,
+   "score": 6.4024733961510005
+  },
+  {
+   "tconst": "tt0070128",
+   "title": "The Big Store",
+   "year": 1973,
+   "rating": 6.3,
+   "votes": 1088,
+   "score": 6.360540445739571
+  },
+  {
+   "tconst": "tt0069966",
+   "title": "Detroit 9000",
+   "year": 1973,
+   "rating": 6.3,
+   "votes": 1282,
+   "score": 6.355393711965041
+  },
+  {
+   "tconst": "tt0068724",
+   "title": "The Inheritor",
+   "year": 1973,
+   "rating": 6.3,
+   "votes": 1612,
+   "score": 6.34839527209197
+  },
+  {
+   "tconst": "tt0070158",
+   "title": "Harry in Your Pocket",
+   "year": 1973,
+   "rating": 6.3,
+   "votes": 1712,
+   "score": 6.3466107856579
+  },
+  {
+   "tconst": "tt0070472",
+   "title": "Oklahoma Crude",
+   "year": 1973,
+   "rating": 6.3,
+   "votes": 1745,
+   "score": 6.346050437415018
+  },
+  {
+   "tconst": "tt0070957",
+   "title": "Tenderness of the Wolves",
+   "year": 1973,
+   "rating": 6.3,
+   "votes": 1798,
+   "score": 6.345178145355334
+  },
+  {
+   "tconst": "tt0226873",
+   "title": "Female Prisoner Scorpion: #701's Grudge Song",
+   "year": 1973,
+   "rating": 6.3,
+   "votes": 1945,
+   "score": 6.342923073244219
+  },
+  {
+   "tconst": "tt0070444",
+   "title": "Night Watch",
+   "year": 1973,
+   "rating": 6.3,
+   "votes": 2744,
+   "score": 6.333762940893221
+  },
+  {
+   "tconst": "tt0070358",
+   "title": "Malicious",
+   "year": 1973,
+   "rating": 6.3,
+   "votes": 4120,
+   "score": 6.324689150528169
+  },
+  {
+   "tconst": "tt0070351",
+   "title": "The MacKintosh Man",
+   "year": 1973,
+   "rating": 6.3,
+   "votes": 5829,
+   "score": 6.31851053605275
+  },
+  {
+   "tconst": "tt0070267",
+   "title": "Kid Blue",
+   "year": 1973,
+   "rating": 6.2,
+   "votes": 1139,
+   "score": 6.305847803040779
+  },
+  {
+   "tconst": "tt0263404",
+   "title": "Güllü Geliyor Güllü",
+   "year": 1973,
+   "rating": 6.2,
+   "votes": 1266,
+   "score": 6.299915468095422
+  },
+  {
+   "tconst": "tt0069251",
+   "title": "The Serpent",
+   "year": 1973,
+   "rating": 6.2,
+   "votes": 1384,
+   "score": 6.294969987711504
+  },
+  {
+   "tconst": "tt0069808",
+   "title": "Blume in Love",
+   "year": 1973,
+   "rating": 6.2,
+   "votes": 1407,
+   "score": 6.29406250548576
+  },
+  {
+   "tconst": "tt0069989",
+   "title": "The Don Is Dead",
+   "year": 1973,
+   "rating": 6.2,
+   "votes": 1654,
+   "score": 6.285308383837312
+  },
+  {
+   "tconst": "tt0282140",
+   "title": "Savulun Battal Gazi Geliyor",
+   "year": 1973,
+   "rating": 6.2,
+   "votes": 1715,
+   "score": 6.283391694550359
+  },
+  {
+   "tconst": "tt0069282",
+   "title": "Slither",
+   "year": 1973,
+   "rating": 6.2,
+   "votes": 1839,
+   "score": 6.2797493662219885
+  },
+  {
+   "tconst": "tt0070363",
+   "title": "The Man Who Loved Cat Dancing",
+   "year": 1973,
+   "rating": 6.2,
+   "votes": 1868,
+   "score": 6.278942974443593
+  },
+  {
+   "tconst": "tt0070183",
+   "title": "Hit!",
+   "year": 1973,
+   "rating": 6.1,
+   "votes": 1032,
+   "score": 6.260634080070977
+  },
+  {
+   "tconst": "tt0068772",
+   "title": "Hunchback of the Morgue",
+   "year": 1973,
+   "rating": 6.1,
+   "votes": 1062,
+   "score": 6.258297017800303
+  },
+  {
+   "tconst": "tt0068619",
+   "title": "Ganja & Hess",
+   "year": 1973,
+   "rating": 6.2,
+   "votes": 3203,
+   "score": 6.253868296622466
+  },
+  {
+   "tconst": "tt0068725",
+   "title": "Hotel Monterey",
+   "year": 1973,
+   "rating": 6.1,
+   "votes": 1175,
+   "score": 6.250072850898494
+  },
+  {
+   "tconst": "tt0069713",
+   "title": "Even Angels Eat Beans",
+   "year": 1973,
+   "rating": 6.2,
+   "votes": 3732,
+   "score": 6.247846249092187
+  },
+  {
+   "tconst": "tt0070794",
+   "title": "The Thief Who Came to Dinner",
+   "year": 1973,
+   "rating": 6.1,
+   "votes": 1448,
+   "score": 6.233336785418393
+  },
+  {
+   "tconst": "tt0068863",
+   "title": "Lisa and the Devil",
+   "year": 1973,
+   "rating": 6.2,
+   "votes": 6130,
+   "score": 6.231754340912233
+  },
+  {
+   "tconst": "tt0183338",
+   "title": "Kara Murat: Fatih'in Fermani",
+   "year": 1973,
+   "rating": 6.1,
+   "votes": 1503,
+   "score": 6.230406892011276
+  },
+  {
+   "tconst": "tt0070270",
+   "title": "The Killing Kind",
+   "year": 1973,
+   "rating": 6.1,
+   "votes": 1511,
+   "score": 6.229991418042303
+  },
+  {
+   "tconst": "tt0069969",
+   "title": "The Devil in Miss Jones",
+   "year": 1973,
+   "rating": 6.1,
+   "votes": 1794,
+   "score": 6.216824785506165
+  },
+  {
+   "tconst": "tt0069536",
+   "title": "White Fang",
+   "year": 1973,
+   "rating": 6,
+   "votes": 1091,
+   "score": 6.203925610092886
+  },
+  {
+   "tconst": "tt0070827",
+   "title": "Shock Treatment",
+   "year": 1973,
+   "rating": 6.1,
+   "votes": 2168,
+   "score": 6.203032970550576
+  },
+  {
+   "tconst": "tt0070300",
+   "title": "Lemora: A Child's Tale of the Supernatural",
+   "year": 1973,
+   "rating": 6.1,
+   "votes": 2851,
+   "score": 6.184759400338672
+  },
+  {
+   "tconst": "tt0070736",
+   "title": "The Stone Killer",
+   "year": 1973,
+   "rating": 6.1,
+   "votes": 4356,
+   "score": 6.160942578548212
+  },
+  {
+   "tconst": "tt0068424",
+   "title": "The Creeping Flesh",
+   "year": 1973,
+   "rating": 6.1,
+   "votes": 5055,
+   "score": 6.153907258580384
+  },
+  {
+   "tconst": "tt0069754",
+   "title": "The Baby",
+   "year": 1973,
+   "rating": 6.1,
+   "votes": 5230,
+   "score": 6.1523930097438555
+  },
+  {
+   "tconst": "tt0070680",
+   "title": "Shamus",
+   "year": 1973,
+   "rating": 6,
+   "votes": 1871,
+   "score": 6.1485226230248085
+  },
+  {
+   "tconst": "tt0070860",
+   "title": "Uuno Turhapuro",
+   "year": 1973,
+   "rating": 5.9,
+   "votes": 1231,
+   "score": 6.1359517932336285
+  },
+  {
+   "tconst": "tt0070687",
+   "title": "Showdown",
+   "year": 1973,
+   "rating": 5.9,
+   "votes": 1397,
+   "score": 6.119611368670933
+  },
+  {
+   "tconst": "tt0069895",
+   "title": "The Crazies",
+   "year": 1973,
+   "rating": 6.1,
+   "votes": 16420,
+   "score": 6.118737568926764
+  },
+  {
+   "tconst": "tt0126004",
+   "title": "The Iron Rose",
+   "year": 1973,
+   "rating": 6,
+   "votes": 2720,
+   "score": 6.114625927608662
+  }
+ ]
+}

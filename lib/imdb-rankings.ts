@@ -36,6 +36,8 @@ export type ImdbRankedEntry = {
 
 type RankedFile = {
   tag: string;
+  /** ISO timestamp of the dataset build — versions the DB cache key. */
+  builtAt?: string;
   mean: number;
   minVotes: number;
   items: ImdbRankedEntry[];
@@ -120,8 +122,8 @@ async function resolveSlice(entries: ImdbRankedEntry[]): Promise<TmdbMovieCard[]
     .map((p) => toCard(p.entry, p.found));
 }
 
-function cacheKey(kind: "year" | "decade", value: string, page: number) {
-  return `imdb-ranked:${kind}:${value}:p${page}`;
+function cacheKey(kind: "year" | "decade", value: string, page: number, version: string) {
+  return `imdb-ranked:v${version}:${kind}:${value}:p${page}`;
 }
 
 async function readCache(key: string): Promise<TmdbMovieCard[] | null> {
@@ -169,11 +171,12 @@ async function pageFromEntries(
   kind: "year" | "decade",
   value: string,
   entries: ImdbRankedEntry[],
-  page: number
+  page: number,
+  version: string
 ): Promise<ImdbPage> {
   const totalResults = entries.length;
   const totalPages = Math.max(1, Math.ceil(totalResults / PAGE_SIZE));
-  const key = cacheKey(kind, value, page);
+  const key = cacheKey(kind, value, page, version);
   const cached = await readCache(key);
   if (cached) return { items: cached, totalPages, totalResults };
 
@@ -188,13 +191,19 @@ async function pageFromEntries(
 export async function getImdbYearPage(year: number, page: number): Promise<ImdbPage | null> {
   const file = await loadYearFile(year);
   if (!file || file.items.length === 0) return null;
-  return pageFromEntries("year", String(year), file.items, page);
+  const version = (file.builtAt ?? "2026-09-15").slice(0, 10);
+  return pageFromEntries("year", String(year), file.items, page, version);
 }
 
 /**
  * IMDb-ordered page for a decade. Needs files for every year from
  * start through min(start+9, current year) — partial decades fall back
  * to TMDB so the ranking never silently covers half the decade.
+ *
+ * Year files carry per-year adaptive floors, so their stored scores aren't
+ * cross-comparable. The merge re-weights every film with a unified m=10K
+ * against the decade mean — decade pages are the strictest view, not the
+ * loosest. Pure math on stored rating/votes, no rebuild needed.
  */
 export async function getImdbDecadePage(start: number, page: number): Promise<ImdbPage | null> {
   const now = new Date().getFullYear();
@@ -205,9 +214,16 @@ export async function getImdbDecadePage(start: number, page: number): Promise<Im
     if (!f) return null;
     files.push(f);
   }
-  const merged = files
-    .flatMap((f) => f.items)
+  const all = files.flatMap((f) => f.items);
+  if (all.length === 0) return null;
+  const M = 10000;
+  const C = all.reduce((s, r) => s + r.rating, 0) / all.length;
+  const merged = all
+    .map((r) => ({
+      ...r,
+      score: (r.votes / (r.votes + M)) * r.rating + (M / (r.votes + M)) * C,
+    }))
     .sort((a, b) => b.score - a.score);
-  if (merged.length === 0) return null;
-  return pageFromEntries("decade", `${start}s`, merged, page);
+  const version = files.map((f) => f.builtAt ?? "2026-09-15").sort().pop()!.slice(0, 10);
+  return pageFromEntries("decade", `${start}s`, merged, page, version);
 }

@@ -1,0 +1,1608 @@
+{
+ "tag": "year-1970",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.562,
+ "minVotes": 1000,
+ "items": [
+  {
+   "tconst": "tt0989831",
+   "title": "Jibon Theke Neya",
+   "year": 1970,
+   "rating": 9.3,
+   "votes": 2377,
+   "score": 8.489169596132982
+  },
+  {
+   "tconst": "tt0066580",
+   "title": "Woodstock",
+   "year": 1970,
+   "rating": 8.1,
+   "votes": 19633,
+   "score": 8.02545076945384
+  },
+  {
+   "tconst": "tt0066461",
+   "title": "One Song a Day Takes Mischief Away",
+   "year": 1970,
+   "rating": 8.5,
+   "votes": 2863,
+   "score": 7.998272256314025
+  },
+  {
+   "tconst": "tt0065889",
+   "title": "Investigation of a Citizen Above Suspicion",
+   "year": 1970,
+   "rating": 8,
+   "votes": 15756,
+   "score": 7.914169594541721
+  },
+  {
+   "tconst": "tt0066206",
+   "title": "Patton",
+   "year": 1970,
+   "rating": 7.9,
+   "votes": 114210,
+   "score": 7.8883849121269085
+  },
+  {
+   "tconst": "tt0123391",
+   "title": "Brigade Miscellaneous Steps In",
+   "year": 1970,
+   "rating": 8.5,
+   "votes": 2094,
+   "score": 7.873570047233703
+  },
+  {
+   "tconst": "tt0065571",
+   "title": "The Conformist",
+   "year": 1970,
+   "rating": 7.9,
+   "votes": 39721,
+   "score": 7.867137981045188
+  },
+  {
+   "tconst": "tt0065531",
+   "title": "The Red Circle",
+   "year": 1970,
+   "rating": 7.9,
+   "votes": 32214,
+   "score": 7.8597105355013275
+  },
+  {
+   "tconst": "tt0065908",
+   "title": "How I Unleashed World War II",
+   "year": 1970,
+   "rating": 8,
+   "votes": 4238,
+   "score": 7.725434464708109
+  },
+  {
+   "tconst": "tt0065780",
+   "title": "Gimme Shelter",
+   "year": 1970,
+   "rating": 7.8,
+   "votes": 13907,
+   "score": 7.716940076886099
+  },
+  {
+   "tconst": "tt0066070",
+   "title": "My Name Is Joker",
+   "year": 1970,
+   "rating": 7.9,
+   "votes": 5969,
+   "score": 7.707981880634392
+  },
+  {
+   "tconst": "tt0065687",
+   "title": "Elvis: That's the Way It Is",
+   "year": 1970,
+   "rating": 8,
+   "votes": 3523,
+   "score": 7.682030892359292
+  },
+  {
+   "tconst": "tt0065417",
+   "title": "Days and Nights in the Forest",
+   "year": 1970,
+   "rating": 8,
+   "votes": 3500,
+   "score": 7.680405716920239
+  },
+  {
+   "tconst": "tt0066500",
+   "title": "Hope",
+   "year": 1970,
+   "rating": 7.9,
+   "votes": 4703,
+   "score": 7.665356080333346
+  },
+  {
+   "tconst": "tt0064038",
+   "title": "The Land",
+   "year": 1970,
+   "rating": 8,
+   "votes": 2893,
+   "score": 7.6305742938970145
+  },
+  {
+   "tconst": "tt0066237",
+   "title": "The Adversary",
+   "year": 1970,
+   "rating": 8.1,
+   "votes": 2135,
+   "score": 7.609354298609594
+  },
+  {
+   "tconst": "tt0065439",
+   "title": "The Confession",
+   "year": 1970,
+   "rating": 7.8,
+   "votes": 5432,
+   "score": 7.607497780805515
+  },
+  {
+   "tconst": "tt0065938",
+   "title": "Kelly's Heroes",
+   "year": 1970,
+   "rating": 7.6,
+   "votes": 59215,
+   "score": 7.582758876129553
+  },
+  {
+   "tconst": "tt0065976",
+   "title": "Let It Be",
+   "year": 1970,
+   "rating": 7.6,
+   "votes": 8824,
+   "score": 7.494322651276575
+  },
+  {
+   "tconst": "tt0064553",
+   "title": "King Lear",
+   "year": 1970,
+   "rating": 8,
+   "votes": 1837,
+   "score": 7.493065113197419
+  },
+  {
+   "tconst": "tt0065988",
+   "title": "Little Big Man",
+   "year": 1970,
+   "rating": 7.5,
+   "votes": 40762,
+   "score": 7.477535216851231
+  },
+  {
+   "tconst": "tt0066473",
+   "title": "Tora! Tora! Tora!",
+   "year": 1970,
+   "rating": 7.5,
+   "votes": 40204,
+   "score": 7.477230990344168
+  },
+  {
+   "tconst": "tt0065488",
+   "title": "The Boys in the Band",
+   "year": 1970,
+   "rating": 7.6,
+   "votes": 6580,
+   "score": 7.463037694741567
+  },
+  {
+   "tconst": "tt0064546",
+   "title": "Witchhammer",
+   "year": 1970,
+   "rating": 7.7,
+   "votes": 3444,
+   "score": 7.443885176899433
+  },
+  {
+   "tconst": "tt0066344",
+   "title": "Scrooge",
+   "year": 1970,
+   "rating": 7.5,
+   "votes": 14058,
+   "score": 7.437695957374224
+  },
+  {
+   "tconst": "tt0066498",
+   "title": "The Ear",
+   "year": 1970,
+   "rating": 7.6,
+   "votes": 3798,
+   "score": 7.383623536086093
+  },
+  {
+   "tconst": "tt0293475",
+   "title": "Original Cast Album: Company",
+   "year": 1970,
+   "rating": 8,
+   "votes": 1317,
+   "score": 7.379294659534345
+  },
+  {
+   "tconst": "tt0067355",
+   "title": "They Call Me Trinity",
+   "year": 1970,
+   "rating": 7.4,
+   "votes": 28842,
+   "score": 7.3719129323148955
+  },
+  {
+   "tconst": "tt0066491",
+   "title": "Tristana",
+   "year": 1970,
+   "rating": 7.4,
+   "votes": 13978,
+   "score": 7.344039639881231
+  },
+  {
+   "tconst": "tt0065772",
+   "title": "Claire's Knee",
+   "year": 1970,
+   "rating": 7.4,
+   "votes": 13765,
+   "score": 7.343232355309251
+  },
+  {
+   "tconst": "tt0066319",
+   "title": "Ryan's Daughter",
+   "year": 1970,
+   "rating": 7.4,
+   "votes": 11780,
+   "score": 7.334415158539991
+  },
+  {
+   "tconst": "tt0065651",
+   "title": "Bed & Board",
+   "year": 1970,
+   "rating": 7.4,
+   "votes": 11724,
+   "score": 7.334126511013917
+  },
+  {
+   "tconst": "tt0064285",
+   "title": "The Wild Child",
+   "year": 1970,
+   "rating": 7.4,
+   "votes": 9632,
+   "score": 7.321164947906422
+  },
+  {
+   "tconst": "tt0066289",
+   "title": "The Cruise",
+   "year": 1970,
+   "rating": 7.5,
+   "votes": 4001,
+   "score": 7.312402664695277
+  },
+  {
+   "tconst": "tt0066026",
+   "title": "M*A*S*H",
+   "year": 1970,
+   "rating": 7.3,
+   "votes": 83679,
+   "score": 7.291282676060664
+  },
+  {
+   "tconst": "tt0064165",
+   "title": "The Things of Life",
+   "year": 1970,
+   "rating": 7.4,
+   "votes": 6419,
+   "score": 7.287023281593353
+  },
+  {
+   "tconst": "tt0065724",
+   "title": "Five Easy Pieces",
+   "year": 1970,
+   "rating": 7.3,
+   "votes": 45095,
+   "score": 7.2839858059689995
+  },
+  {
+   "tconst": "tt0066511",
+   "title": "Many Wars Ago",
+   "year": 1970,
+   "rating": 7.6,
+   "votes": 2236,
+   "score": 7.279179767039889
+  },
+  {
+   "tconst": "tt0064839",
+   "title": "Crime and Punishment",
+   "year": 1970,
+   "rating": 7.7,
+   "votes": 1663,
+   "score": 7.2725969681340885
+  },
+  {
+   "tconst": "tt0066549",
+   "title": "Waterloo",
+   "year": 1970,
+   "rating": 7.3,
+   "votes": 14882,
+   "score": 7.253521327675424
+  },
+  {
+   "tconst": "tt0064106",
+   "title": "The Butcher",
+   "year": 1970,
+   "rating": 7.3,
+   "votes": 10552,
+   "score": 7.236099872415259
+  },
+  {
+   "tconst": "tt0065649",
+   "title": "Dodes'ka-den",
+   "year": 1970,
+   "rating": 7.3,
+   "votes": 8465,
+   "score": 7.222010113696891
+  },
+  {
+   "tconst": "tt0065872",
+   "title": "I Never Sang for My Father",
+   "year": 1970,
+   "rating": 7.4,
+   "votes": 3540,
+   "score": 7.215380115890104
+  },
+  {
+   "tconst": "tt0066279",
+   "title": "The Railway Children",
+   "year": 1970,
+   "rating": 7.3,
+   "votes": 6406,
+   "score": 7.200327535260745
+  },
+  {
+   "tconst": "tt0128364",
+   "title": "This Transient Life",
+   "year": 1970,
+   "rating": 7.6,
+   "votes": 1544,
+   "score": 7.191912628200109
+  },
+  {
+   "tconst": "tt0066124",
+   "title": "The Beginning",
+   "year": 1970,
+   "rating": 7.7,
+   "votes": 1200,
+   "score": 7.182648057336854
+  },
+  {
+   "tconst": "tt0151035",
+   "title": "Once Upon a Time There Was a Singing Blackbird",
+   "year": 1970,
+   "rating": 7.6,
+   "votes": 1485,
+   "score": 7.182223632249931
+  },
+  {
+   "tconst": "tt0067866",
+   "title": "El Topo",
+   "year": 1970,
+   "rating": 7.2,
+   "votes": 33611,
+   "score": 7.1815615187697865
+  },
+  {
+   "tconst": "tt0065782",
+   "title": "Sunflower",
+   "year": 1970,
+   "rating": 7.3,
+   "votes": 5162,
+   "score": 7.180205408331885
+  },
+  {
+   "tconst": "tt0065666",
+   "title": "Pero the Lump's Gang",
+   "year": 1970,
+   "rating": 7.7,
+   "votes": 1142,
+   "score": 7.16863946131703
+  },
+  {
+   "tconst": "tt0065446",
+   "title": "The Ballad of Cable Hogue",
+   "year": 1970,
+   "rating": 7.2,
+   "votes": 11482,
+   "score": 7.148872434396818
+  },
+  {
+   "tconst": "tt0065777",
+   "title": "The Garden of the Finzi-Continis",
+   "year": 1970,
+   "rating": 7.2,
+   "votes": 8507,
+   "score": 7.132873222482495
+  },
+  {
+   "tconst": "tt0065955",
+   "title": "A Love Story",
+   "year": 1970,
+   "rating": 7.2,
+   "votes": 8301,
+   "score": 7.131386488134725
+  },
+  {
+   "tconst": "tt0066612",
+   "title": "Compañeros",
+   "year": 1970,
+   "rating": 7.2,
+   "votes": 5551,
+   "score": 7.102583685871024
+  },
+  {
+   "tconst": "tt0065421",
+   "title": "The Aristocats",
+   "year": 1970,
+   "rating": 7.1,
+   "votes": 126865,
+   "score": 7.095791074384242
+  },
+  {
+   "tconst": "tt0065143",
+   "title": "The Bird with the Crystal Plumage",
+   "year": 1970,
+   "rating": 7.1,
+   "votes": 27480,
+   "score": 7.081103431395403
+  },
+  {
+   "tconst": "tt0065528",
+   "title": "Catch-22",
+   "year": 1970,
+   "rating": 7.1,
+   "votes": 27324,
+   "score": 7.080999354827745
+  },
+  {
+   "tconst": "tt0064177",
+   "title": "Colossus: The Forbin Project",
+   "year": 1970,
+   "rating": 7.1,
+   "votes": 11870,
+   "score": 7.058183817104979
+  },
+  {
+   "tconst": "tt0066193",
+   "title": "The Out of Towners",
+   "year": 1970,
+   "rating": 7.1,
+   "votes": 10193,
+   "score": 7.05191867472001
+  },
+  {
+   "tconst": "tt0066122",
+   "title": "Deep End",
+   "year": 1970,
+   "rating": 7.1,
+   "votes": 8857,
+   "score": 7.045401818620379
+  },
+  {
+   "tconst": "tt0066546",
+   "title": "Why Does Herr R. Run Amok?",
+   "year": 1970,
+   "rating": 7.2,
+   "votes": 3055,
+   "score": 7.042620401021228
+  },
+  {
+   "tconst": "tt0067961",
+   "title": "Wanda",
+   "year": 1970,
+   "rating": 7.1,
+   "votes": 7138,
+   "score": 7.033868975932794
+  },
+  {
+   "tconst": "tt0164982",
+   "title": "Zatoichi Goes to the Fire Festival",
+   "year": 1970,
+   "rating": 7.3,
+   "votes": 1773,
+   "score": 7.033799396372547
+  },
+  {
+   "tconst": "tt0065396",
+   "title": "Reconstruction",
+   "year": 1970,
+   "rating": 7.3,
+   "votes": 1725,
+   "score": 7.02911035821691
+  },
+  {
+   "tconst": "tt0065489",
+   "title": "Brancaleone at the Crusades",
+   "year": 1970,
+   "rating": 7.2,
+   "votes": 2167,
+   "score": 6.998492493255788
+  },
+  {
+   "tconst": "tt0154685",
+   "title": "Johny Mera Naam",
+   "year": 1970,
+   "rating": 7.4,
+   "votes": 1080,
+   "score": 6.997031599106288
+  },
+  {
+   "tconst": "tt0065134",
+   "title": "Two Mules for Sister Sara",
+   "year": 1970,
+   "rating": 7,
+   "votes": 33319,
+   "score": 6.987232312309248
+  },
+  {
+   "tconst": "tt0229371",
+   "title": "An Evening of Edgar Allan Poe",
+   "year": 1970,
+   "rating": 7.3,
+   "votes": 1270,
+   "score": 6.974813095216334
+  },
+  {
+   "tconst": "tt0066249",
+   "title": "The Private Life of Sherlock Holmes",
+   "year": 1970,
+   "rating": 7,
+   "votes": 15054,
+   "score": 6.972706224376547
+  },
+  {
+   "tconst": "tt0066516",
+   "title": "Valerie and Her Week of Wonders",
+   "year": 1970,
+   "rating": 7,
+   "votes": 13812,
+   "score": 6.970417615861536
+  },
+  {
+   "tconst": "tt0065662",
+   "title": "The Pizza Triangle",
+   "year": 1970,
+   "rating": 7.1,
+   "votes": 2886,
+   "score": 6.961509450885507
+  },
+  {
+   "tconst": "tt0062285",
+   "title": "Oh, Sun",
+   "year": 1970,
+   "rating": 7.3,
+   "votes": 1138,
+   "score": 6.954736073966828
+  },
+  {
+   "tconst": "tt0065867",
+   "title": "Husbands",
+   "year": 1970,
+   "rating": 7,
+   "votes": 8263,
+   "score": 6.95269628912243
+  },
+  {
+   "tconst": "tt0065593",
+   "title": "Cromwell",
+   "year": 1970,
+   "rating": 7,
+   "votes": 8184,
+   "score": 6.952289386557172
+  },
+  {
+   "tconst": "tt0066207",
+   "title": "Donkey Skin",
+   "year": 1970,
+   "rating": 7,
+   "votes": 8050,
+   "score": 6.95158295316476
+  },
+  {
+   "tconst": "tt0122371",
+   "title": "Adelheid",
+   "year": 1970,
+   "rating": 7.3,
+   "votes": 1075,
+   "score": 6.944253361995701
+  },
+  {
+   "tconst": "tt0065788",
+   "title": "Goin' Down the Road",
+   "year": 1970,
+   "rating": 7.3,
+   "votes": 1058,
+   "score": 6.941314735734245
+  },
+  {
+   "tconst": "tt0066318",
+   "title": "The Breach",
+   "year": 1970,
+   "rating": 7.1,
+   "votes": 2308,
+   "score": 6.937311283597666
+  },
+  {
+   "tconst": "tt0065936",
+   "title": "Kati Patang",
+   "year": 1970,
+   "rating": 7.2,
+   "votes": 1323,
+   "score": 6.925280123177391
+  },
+  {
+   "tconst": "tt0191625",
+   "title": "Barbara the Fair with the Silken Hair",
+   "year": 1970,
+   "rating": 7.2,
+   "votes": 1220,
+   "score": 6.912534110874359
+  },
+  {
+   "tconst": "tt0066093",
+   "title": "Monte Walsh",
+   "year": 1970,
+   "rating": 7,
+   "votes": 3386,
+   "score": 6.900097064783647
+  },
+  {
+   "tconst": "tt0066603",
+   "title": "Zatoichi Meets Yojimbo",
+   "year": 1970,
+   "rating": 7,
+   "votes": 3158,
+   "score": 6.894618981755911
+  },
+  {
+   "tconst": "tt0066011",
+   "title": "Love Story",
+   "year": 1970,
+   "rating": 6.9,
+   "votes": 40703,
+   "score": 6.891890888572551
+  },
+  {
+   "tconst": "tt0066601",
+   "title": "Zabriskie Point",
+   "year": 1970,
+   "rating": 6.9,
+   "votes": 18580,
+   "score": 6.882728586626206
+  },
+  {
+   "tconst": "tt0065636",
+   "title": "Diary of a Mad Housewife",
+   "year": 1970,
+   "rating": 7,
+   "votes": 2649,
+   "score": 6.879919354930413
+  },
+  {
+   "tconst": "tt0065547",
+   "title": "Chisum",
+   "year": 1970,
+   "rating": 6.9,
+   "votes": 12116,
+   "score": 6.874216661035458
+  },
+  {
+   "tconst": "tt0232114",
+   "title": "The Most Beautiful Wife",
+   "year": 1970,
+   "rating": 7.1,
+   "votes": 1346,
+   "score": 6.870599201253656
+  },
+  {
+   "tconst": "tt0066390",
+   "title": "Soldier Blue",
+   "year": 1970,
+   "rating": 6.9,
+   "votes": 7402,
+   "score": 6.859750741030836
+  },
+  {
+   "tconst": "tt0064437",
+   "title": "The Honeymoon Killers",
+   "year": 1970,
+   "rating": 6.9,
+   "votes": 6515,
+   "score": 6.85500009662556
+  },
+  {
+   "tconst": "tt0066227",
+   "title": "Pippi in the South Seas",
+   "year": 1970,
+   "rating": 6.9,
+   "votes": 6111,
+   "score": 6.852443499668272
+  },
+  {
+   "tconst": "tt0065963",
+   "title": "The Landlord",
+   "year": 1970,
+   "rating": 6.9,
+   "votes": 3500,
+   "score": 6.824850161364685
+  },
+  {
+   "tconst": "tt0065797",
+   "title": "The Great White Hope",
+   "year": 1970,
+   "rating": 6.9,
+   "votes": 3095,
+   "score": 6.817417759741411
+  },
+  {
+   "tconst": "tt0263534",
+   "title": "My Black Eyed",
+   "year": 1970,
+   "rating": 7,
+   "votes": 1312,
+   "score": 6.810478255251332
+  },
+  {
+   "tconst": "tt0066392",
+   "title": "Something for Everyone",
+   "year": 1970,
+   "rating": 7,
+   "votes": 1267,
+   "score": 6.806716244438058
+  },
+  {
+   "tconst": "tt0064225",
+   "title": "Last Known Address",
+   "year": 1970,
+   "rating": 6.9,
+   "votes": 2220,
+   "score": 6.794976933584186
+  },
+  {
+   "tconst": "tt0066401",
+   "title": "Spring and Port Wine",
+   "year": 1970,
+   "rating": 7,
+   "votes": 1116,
+   "score": 6.792923311030755
+  },
+  {
+   "tconst": "tt0066049",
+   "title": "A Man Called Horse",
+   "year": 1970,
+   "rating": 6.8,
+   "votes": 10321,
+   "score": 6.778961728305015
+  },
+  {
+   "tconst": "tt0065492",
+   "title": "Brewster McCloud",
+   "year": 1970,
+   "rating": 6.8,
+   "votes": 6615,
+   "score": 6.768723010655427
+  },
+  {
+   "tconst": "tt0066448",
+   "title": "There Was a Crooked Man...",
+   "year": 1970,
+   "rating": 6.8,
+   "votes": 5765,
+   "score": 6.764793159813907
+  },
+  {
+   "tconst": "tt0065486",
+   "title": "Borsalino",
+   "year": 1970,
+   "rating": 6.8,
+   "votes": 5758,
+   "score": 6.764756692237508
+  },
+  {
+   "tconst": "tt0065542",
+   "title": "The Cheyenne Social Club",
+   "year": 1970,
+   "rating": 6.8,
+   "votes": 5595,
+   "score": 6.763885629437616
+  },
+  {
+   "tconst": "tt0064462",
+   "title": "I Start Counting",
+   "year": 1970,
+   "rating": 6.9,
+   "votes": 1473,
+   "score": 6.763253427473141
+  },
+  {
+   "tconst": "tt0065916",
+   "title": "Joe",
+   "year": 1970,
+   "rating": 6.8,
+   "votes": 5239,
+   "score": 6.761824928055951
+  },
+  {
+   "tconst": "tt0066090",
+   "title": "The Molly Maguires",
+   "year": 1970,
+   "rating": 6.8,
+   "votes": 4884,
+   "score": 6.759521707365921
+  },
+  {
+   "tconst": "tt0066265",
+   "title": "Pippi on the Run",
+   "year": 1970,
+   "rating": 6.8,
+   "votes": 4415,
+   "score": 6.756015831235656
+  },
+  {
+   "tconst": "tt0064806",
+   "title": "The Phantom Tollbooth",
+   "year": 1970,
+   "rating": 6.8,
+   "votes": 3900,
+   "score": 6.751393005334914
+  },
+  {
+   "tconst": "tt0066413",
+   "title": "The Spider's Stratagem",
+   "year": 1970,
+   "rating": 6.8,
+   "votes": 3481,
+   "score": 6.746847963878839
+  },
+  {
+   "tconst": "tt0068321",
+   "title": "The Birch Wood",
+   "year": 1970,
+   "rating": 6.9,
+   "votes": 1096,
+   "score": 6.73865731209021
+  },
+  {
+   "tconst": "tt0066536",
+   "title": "The Crook",
+   "year": 1970,
+   "rating": 6.9,
+   "votes": 1069,
+   "score": 6.736551825104435
+  },
+  {
+   "tconst": "tt0065839",
+   "title": "Hoffman",
+   "year": 1970,
+   "rating": 6.8,
+   "votes": 1945,
+   "score": 6.719125883239755
+  },
+  {
+   "tconst": "tt0065979",
+   "title": "The Liberation of L.B. Jones",
+   "year": 1970,
+   "rating": 6.8,
+   "votes": 1435,
+   "score": 6.70218715652611
+  },
+  {
+   "tconst": "tt0066301",
+   "title": "Rio Lobo",
+   "year": 1970,
+   "rating": 6.7,
+   "votes": 15433,
+   "score": 6.691591658622349
+  },
+  {
+   "tconst": "tt0066214",
+   "title": "Performance",
+   "year": 1970,
+   "rating": 6.7,
+   "votes": 12351,
+   "score": 6.689650642359455
+  },
+  {
+   "tconst": "tt0065408",
+   "title": "The Anonymous Venetian",
+   "year": 1970,
+   "rating": 6.8,
+   "votes": 1140,
+   "score": 6.688703610346297
+  },
+  {
+   "tconst": "tt0064294",
+   "title": "Horse",
+   "year": 1970,
+   "rating": 6.8,
+   "votes": 1121,
+   "score": 6.687706612984949
+  },
+  {
+   "tconst": "tt0065999",
+   "title": "The Hammer of God",
+   "year": 1970,
+   "rating": 6.8,
+   "votes": 1073,
+   "score": 6.68510647667201
+  },
+  {
+   "tconst": "tt0065436",
+   "title": "Even Dwarfs Started Small",
+   "year": 1970,
+   "rating": 6.7,
+   "votes": 6822,
+   "score": 6.682335173375233
+  },
+  {
+   "tconst": "tt0066550",
+   "title": "Watermelon Man",
+   "year": 1970,
+   "rating": 6.7,
+   "votes": 3324,
+   "score": 6.668044802530313
+  },
+  {
+   "tconst": "tt0064273",
+   "title": "And God Said to Cain...",
+   "year": 1970,
+   "rating": 6.7,
+   "votes": 2087,
+   "score": 6.65523995015908
+  },
+  {
+   "tconst": "tt0469636",
+   "title": "Turist Ömer: Yamyamlar Arasinda",
+   "year": 1970,
+   "rating": 6.7,
+   "votes": 1774,
+   "score": 6.650189519156841
+  },
+  {
+   "tconst": "tt0065360",
+   "title": "Tick, Tick, Tick",
+   "year": 1970,
+   "rating": 6.7,
+   "votes": 1527,
+   "score": 6.645320825540593
+  },
+  {
+   "tconst": "tt0064781",
+   "title": "Fruit of Paradise",
+   "year": 1970,
+   "rating": 6.7,
+   "votes": 1435,
+   "score": 6.643254918333092
+  },
+  {
+   "tconst": "tt0067681",
+   "title": "The Road to Salina",
+   "year": 1970,
+   "rating": 6.7,
+   "votes": 1222,
+   "score": 6.637815358299315
+  },
+  {
+   "tconst": "tt0065377",
+   "title": "Airport",
+   "year": 1970,
+   "rating": 6.6,
+   "votes": 25144,
+   "score": 6.598539845706131
+  },
+  {
+   "tconst": "tt0065398",
+   "title": "And Soon the Darkness",
+   "year": 1970,
+   "rating": 6.6,
+   "votes": 4982,
+   "score": 6.593618476452871
+  },
+  {
+   "tconst": "tt0064791",
+   "title": "Rider on the Rain",
+   "year": 1970,
+   "rating": 6.6,
+   "votes": 4487,
+   "score": 6.593042778593233
+  },
+  {
+   "tconst": "tt0066471",
+   "title": "Too Late the Hero",
+   "year": 1970,
+   "rating": 6.6,
+   "votes": 4363,
+   "score": 6.592881917982673
+  },
+  {
+   "tconst": "tt0066415",
+   "title": "The Strawberry Statement",
+   "year": 1970,
+   "rating": 6.6,
+   "votes": 1962,
+   "score": 6.5871119939706535
+  },
+  {
+   "tconst": "tt0066600",
+   "title": "The Vampire Doll",
+   "year": 1970,
+   "rating": 6.6,
+   "votes": 1588,
+   "score": 6.585249507782487
+  },
+  {
+   "tconst": "tt0066016",
+   "title": "Lovers and Other Strangers",
+   "year": 1970,
+   "rating": 6.6,
+   "votes": 1566,
+   "score": 6.585123042143834
+  },
+  {
+   "tconst": "tt0318028",
+   "title": "Reza, the Motorcyclist",
+   "year": 1970,
+   "rating": 6.6,
+   "votes": 1308,
+   "score": 6.583460019991801
+  },
+  {
+   "tconst": "tt0066262",
+   "title": "Puzzle of a Downfall Child",
+   "year": 1970,
+   "rating": 6.6,
+   "votes": 1098,
+   "score": 6.581804445253136
+  },
+  {
+   "tconst": "tt0065499",
+   "title": "Have a Good Funeral, My Friend... Sartana Will Pay",
+   "year": 1970,
+   "rating": 6.5,
+   "votes": 1085,
+   "score": 6.52965262644656
+  },
+  {
+   "tconst": "tt0132376",
+   "title": "Olsen-banden og Dynamitt-Harry",
+   "year": 1970,
+   "rating": 6.5,
+   "votes": 1192,
+   "score": 6.528205167035162
+  },
+  {
+   "tconst": "tt0066256",
+   "title": "Pufnstuf",
+   "year": 1970,
+   "rating": 6.5,
+   "votes": 1345,
+   "score": 6.526364915198754
+  },
+  {
+   "tconst": "tt0065932",
+   "title": "Blind Woman's Curse",
+   "year": 1970,
+   "rating": 6.5,
+   "votes": 1831,
+   "score": 6.521838829438742
+  },
+  {
+   "tconst": "tt0065720",
+   "title": "Figures in a Landscape",
+   "year": 1970,
+   "rating": 6.5,
+   "votes": 1942,
+   "score": 6.521014862726403
+  },
+  {
+   "tconst": "tt0066064",
+   "title": "The McKenzie Break",
+   "year": 1970,
+   "rating": 6.5,
+   "votes": 2008,
+   "score": 6.520553765339454
+  },
+  {
+   "tconst": "tt0065391",
+   "title": "The American Soldier",
+   "year": 1970,
+   "rating": 6.5,
+   "votes": 2084,
+   "score": 6.520047252315525
+  },
+  {
+   "tconst": "tt0065874",
+   "title": "I Walk the Line",
+   "year": 1970,
+   "rating": 6.5,
+   "votes": 2675,
+   "score": 6.516823326841109
+  },
+  {
+   "tconst": "tt0065579",
+   "title": "Cotton Comes to Harlem",
+   "year": 1970,
+   "rating": 6.5,
+   "votes": 3273,
+   "score": 6.514468927250428
+  },
+  {
+   "tconst": "tt0067454",
+   "title": "Multiple Maniacs",
+   "year": 1970,
+   "rating": 6.5,
+   "votes": 5322,
+   "score": 6.509779456839778
+  },
+  {
+   "tconst": "tt0065769",
+   "title": "The Gendarme Takes Off",
+   "year": 1970,
+   "rating": 6.5,
+   "votes": 8305,
+   "score": 6.506644355308015
+  },
+  {
+   "tconst": "tt0066943",
+   "title": "Connecting Rooms",
+   "year": 1970,
+   "rating": 6.4,
+   "votes": 1015,
+   "score": 6.480310534065051
+  },
+  {
+   "tconst": "tt0066212",
+   "title": "Perfect Friday",
+   "year": 1970,
+   "rating": 6.4,
+   "votes": 1351,
+   "score": 6.468832720604457
+  },
+  {
+   "tconst": "tt0065911",
+   "title": "Jane Eyre",
+   "year": 1970,
+   "rating": 6.4,
+   "votes": 1352,
+   "score": 6.468803454991955
+  },
+  {
+   "tconst": "tt0066167",
+   "title": "Light the Fuse... Sartana Is Coming",
+   "year": 1970,
+   "rating": 6.4,
+   "votes": 1441,
+   "score": 6.466294848890241
+  },
+  {
+   "tconst": "tt0065808",
+   "title": "Gods of the Plague",
+   "year": 1970,
+   "rating": 6.4,
+   "votes": 1670,
+   "score": 6.4606088861951605
+  },
+  {
+   "tconst": "tt0065620",
+   "title": "Deadlock",
+   "year": 1970,
+   "rating": 6.4,
+   "votes": 1691,
+   "score": 6.460135907150159
+  },
+  {
+   "tconst": "tt0274934",
+   "title": "Tarkan: Gümüs Eyer",
+   "year": 1970,
+   "rating": 6.4,
+   "votes": 1725,
+   "score": 6.459385587574708
+  },
+  {
+   "tconst": "tt0064704",
+   "title": "Girly",
+   "year": 1970,
+   "rating": 6.4,
+   "votes": 1877,
+   "score": 6.456248079993424
+  },
+  {
+   "tconst": "tt0066563",
+   "title": "Where's Poppa?",
+   "year": 1970,
+   "rating": 6.4,
+   "votes": 2626,
+   "score": 6.44462926810289
+  },
+  {
+   "tconst": "tt0066053",
+   "title": "The Man Who Haunted Himself",
+   "year": 1970,
+   "rating": 6.4,
+   "votes": 3390,
+   "score": 6.436862352196146
+  },
+  {
+   "tconst": "tt0066402",
+   "title": "Start the Revolution Without Me",
+   "year": 1970,
+   "rating": 6.4,
+   "votes": 3486,
+   "score": 6.436073501146027
+  },
+  {
+   "tconst": "tt0066181",
+   "title": "On a Clear Day You Can See Forever",
+   "year": 1970,
+   "rating": 6.4,
+   "votes": 4707,
+   "score": 6.428355655535497
+  },
+  {
+   "tconst": "tt0066195",
+   "title": "The Owl and the Pussycat",
+   "year": 1970,
+   "rating": 6.4,
+   "votes": 4782,
+   "score": 6.427987846098423
+  },
+  {
+   "tconst": "tt0066495",
+   "title": "The Twelve Chairs",
+   "year": 1970,
+   "rating": 6.4,
+   "votes": 7940,
+   "score": 6.41810131164889
+  },
+  {
+   "tconst": "tt0066518",
+   "title": "The Vampire Lovers",
+   "year": 1970,
+   "rating": 6.4,
+   "votes": 9345,
+   "score": 6.415642892812091
+  },
+  {
+   "tconst": "tt0067040",
+   "title": "Eden and After",
+   "year": 1970,
+   "rating": 6.3,
+   "votes": 1574,
+   "score": 6.401719396325205
+  },
+  {
+   "tconst": "tt0064787",
+   "title": "A Quiet Place to Kill",
+   "year": 1970,
+   "rating": 6.3,
+   "votes": 1715,
+   "score": 6.396436731543675
+  },
+  {
+   "tconst": "tt0065775",
+   "title": "Getting Straight",
+   "year": 1970,
+   "rating": 6.3,
+   "votes": 1800,
+   "score": 6.393509187907528
+  },
+  {
+   "tconst": "tt0066080",
+   "title": "The Mind of Mr. Soames",
+   "year": 1970,
+   "rating": 6.2,
+   "votes": 1027,
+   "score": 6.378503071603886
+  },
+  {
+   "tconst": "tt0065451",
+   "title": "Barquero",
+   "year": 1970,
+   "rating": 6.3,
+   "votes": 2375,
+   "score": 6.377577992930689
+  },
+  {
+   "tconst": "tt0066585",
+   "title": "Wuthering Heights",
+   "year": 1970,
+   "rating": 6.3,
+   "votes": 2656,
+   "score": 6.371615351789135
+  },
+  {
+   "tconst": "tt0065509",
+   "title": "Sartana's Here... Trade Your Pistol for a Coffin",
+   "year": 1970,
+   "rating": 6.2,
+   "votes": 1224,
+   "score": 6.362691423624586
+  },
+  {
+   "tconst": "tt0065856",
+   "title": "House of Dark Shadows",
+   "year": 1970,
+   "rating": 6.3,
+   "votes": 3834,
+   "score": 6.3541633690817285
+  },
+  {
+   "tconst": "tt0064904",
+   "title": "Hatchet for the Honeymoon",
+   "year": 1970,
+   "rating": 6.3,
+   "votes": 4952,
+   "score": 6.34398953732209
+  },
+  {
+   "tconst": "tt0065820",
+   "title": "The Hawaiians",
+   "year": 1970,
+   "rating": 6.2,
+   "votes": 1657,
+   "score": 6.336178293617267
+  },
+  {
+   "tconst": "tt0065073",
+   "title": "Taste the Blood of Dracula",
+   "year": 1970,
+   "rating": 6.3,
+   "votes": 7728,
+   "score": 6.329998364589949
+  },
+  {
+   "tconst": "tt0065702",
+   "title": "Chariots of the Gods",
+   "year": 1970,
+   "rating": 6.2,
+   "votes": 1907,
+   "score": 6.3244670540560985
+  },
+  {
+   "tconst": "tt0072884",
+   "title": "Distracted",
+   "year": 1970,
+   "rating": 6.2,
+   "votes": 1966,
+   "score": 6.32199114165242
+  },
+  {
+   "tconst": "tt0066445",
+   "title": "Tell Me That You Love Me, Junie Moon",
+   "year": 1970,
+   "rating": 6.1,
+   "votes": 1160,
+   "score": 6.3138082065467955
+  },
+  {
+   "tconst": "tt0065677",
+   "title": "The Forbidden Photos of a Lady Above Suspicion",
+   "year": 1970,
+   "rating": 6.2,
+   "votes": 2479,
+   "score": 6.3040027956714795
+  },
+  {
+   "tconst": "tt0065737",
+   "title": "Fragment of Fear",
+   "year": 1970,
+   "rating": 6.1,
+   "votes": 1295,
+   "score": 6.301231253220513
+  },
+  {
+   "tconst": "tt0065950",
+   "title": "The Kremlin Letter",
+   "year": 1970,
+   "rating": 6.2,
+   "votes": 2579,
+   "score": 6.3010968779382726
+  },
+  {
+   "tconst": "tt0065848",
+   "title": "The One Man Band",
+   "year": 1970,
+   "rating": 6.2,
+   "votes": 3972,
+   "score": 6.272772672192494
+  },
+  {
+   "tconst": "tt0065588",
+   "title": "Cleopatra",
+   "year": 1970,
+   "rating": 6,
+   "votes": 1077,
+   "score": 6.270498664487761
+  },
+  {
+   "tconst": "tt0065555",
+   "title": "Violent City",
+   "year": 1970,
+   "rating": 6.2,
+   "votes": 4288,
+   "score": 6.268423927031217
+  },
+  {
+   "tconst": "tt0068428",
+   "title": "The Cross and the Switchblade",
+   "year": 1970,
+   "rating": 6,
+   "votes": 1346,
+   "score": 6.239482406709751
+  },
+  {
+   "tconst": "tt0065922",
+   "title": "Julius Caesar",
+   "year": 1970,
+   "rating": 6.1,
+   "votes": 2368,
+   "score": 6.237121652654714
+  },
+  {
+   "tconst": "tt0062690",
+   "title": "The Awakening of the Beast",
+   "year": 1970,
+   "rating": 6,
+   "votes": 1449,
+   "score": 6.229410259755443
+  },
+  {
+   "tconst": "tt0065611",
+   "title": "Darling Lili",
+   "year": 1970,
+   "rating": 6.1,
+   "votes": 2663,
+   "score": 6.226078549315064
+  },
+  {
+   "tconst": "tt0065570",
+   "title": "El Condor",
+   "year": 1970,
+   "rating": 6,
+   "votes": 1582,
+   "score": 6.217593232432641
+  },
+  {
+   "tconst": "tt0066482",
+   "title": "Trash",
+   "year": 1970,
+   "rating": 6.1,
+   "votes": 3041,
+   "score": 6.214285010180914
+  },
+  {
+   "tconst": "tt0065491",
+   "title": "Mark of the Devil",
+   "year": 1970,
+   "rating": 6.1,
+   "votes": 4571,
+   "score": 6.182898173782279
+  },
+  {
+   "tconst": "tt0065836",
+   "title": "Hi, Mom!",
+   "year": 1970,
+   "rating": 6.1,
+   "votes": 7138,
+   "score": 6.1567492905064
+  },
+  {
+   "tconst": "tt0067713",
+   "title": "Scars of Dracula",
+   "year": 1970,
+   "rating": 6.1,
+   "votes": 7406,
+   "score": 6.154940010247571
+  },
+  {
+   "tconst": "tt0065989",
+   "title": "Little Fauss and Big Halsy",
+   "year": 1970,
+   "rating": 5.9,
+   "votes": 1692,
+   "score": 6.14584908103309
+  },
+  {
+   "tconst": "tt0066050",
+   "title": "A Man Called Sledge",
+   "year": 1970,
+   "rating": 5.9,
+   "votes": 1750,
+   "score": 6.140663900414937
+  },
+  {
+   "tconst": "tt0065850",
+   "title": "Hornets' Nest",
+   "year": 1970,
+   "rating": 5.8,
+   "votes": 1283,
+   "score": 6.133695018020621
+  },
+  {
+   "tconst": "tt0065466",
+   "title": "Beyond the Valley of the Dolls",
+   "year": 1970,
+   "rating": 6.1,
+   "votes": 13130,
+   "score": 6.13268405705174
+  },
+  {
+   "tconst": "tt0065525",
+   "title": "Carry on Up the Jungle",
+   "year": 1970,
+   "rating": 6,
+   "votes": 3491,
+   "score": 6.125100362088862
+  },
+  {
+   "tconst": "tt0066928",
+   "title": "The Wind's Fierce",
+   "year": 1970,
+   "rating": 5.7,
+   "votes": 1087,
+   "score": 6.1129495573268215
+  },
+  {
+   "tconst": "tt0065981",
+   "title": "The Lickerish Quartet",
+   "year": 1970,
+   "rating": 5.8,
+   "votes": 1461,
+   "score": 6.109559417367361
+  },
+  {
+   "tconst": "tt0065656",
+   "title": "Dorian Gray",
+   "year": 1970,
+   "rating": 5.8,
+   "votes": 1494,
+   "score": 6.105463402622725
+  },
+  {
+   "tconst": "tt0066184",
+   "title": "The Only Game in Town",
+   "year": 1970,
+   "rating": 5.7,
+   "votes": 1183,
+   "score": 6.094789613440714
+  },
+  {
+   "tconst": "tt0066450",
+   "title": "They Call Me Mister Tibbs!",
+   "year": 1970,
+   "rating": 6,
+   "votes": 5014,
+   "score": 6.093419641859175
+  },
+  {
+   "tconst": "tt0066001",
+   "title": "The Looking Glass War",
+   "year": 1970,
+   "rating": 5.8,
+   "votes": 1620,
+   "score": 6.090773177916442
+  },
+  {
+   "tconst": "tt0179890",
+   "title": "Ypolohagos Natassa",
+   "year": 1970,
+   "rating": 5.7,
+   "votes": 1236,
+   "score": 6.085431898989748
+  },
+  {
+   "tconst": "tt0066745",
+   "title": "Adiós, Sabata",
+   "year": 1970,
+   "rating": 5.9,
+   "votes": 2623,
+   "score": 6.082673399431708
+  }
+ ]
+}

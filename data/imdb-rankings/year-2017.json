@@ -1,0 +1,1608 @@
+{
+ "tag": "year-2017",
+ "builtAt": "2026-09-15T22:46:38.707Z",
+ "mean": 6.403,
+ "minVotes": 10000,
+ "items": [
+  {
+   "tconst": "tt2380307",
+   "title": "Coco",
+   "year": 2017,
+   "rating": 8.4,
+   "votes": 726792,
+   "score": 8.372893676417444
+  },
+  {
+   "tconst": "tt3315342",
+   "title": "Logan",
+   "year": 2017,
+   "rating": 8.1,
+   "votes": 940555,
+   "score": 8.082145459899701
+  },
+  {
+   "tconst": "tt4849438",
+   "title": "Baahubali 2: The Conclusion",
+   "year": 2017,
+   "rating": 8.2,
+   "votes": 136729,
+   "score": 8.077517584355931
+  },
+  {
+   "tconst": "tt5027774",
+   "title": "Three Billboards Outside Ebbing, Missouri",
+   "year": 2017,
+   "rating": 8.1,
+   "votes": 616002,
+   "score": 8.07288870903761
+  },
+  {
+   "tconst": "tt1856101",
+   "title": "Blade Runner 2049",
+   "year": 2017,
+   "rating": 8,
+   "votes": 768719,
+   "score": 7.97948974872189
+  },
+  {
+   "tconst": "tt6148156",
+   "title": "Vikram Vedha",
+   "year": 2017,
+   "rating": 8.2,
+   "votes": 56114,
+   "score": 7.928170699624307
+  },
+  {
+   "tconst": "tt6316138",
+   "title": "Ayla: The Daughter of War",
+   "year": 2017,
+   "rating": 8.2,
+   "votes": 49165,
+   "score": 7.896244023239438
+  },
+  {
+   "tconst": "tt3501632",
+   "title": "Thor: Ragnarok",
+   "year": 2017,
+   "rating": 7.9,
+   "votes": 912934,
+   "score": 7.883778122417163
+  },
+  {
+   "tconst": "tt2543472",
+   "title": "Wonder",
+   "year": 2017,
+   "rating": 7.9,
+   "votes": 199325,
+   "score": 7.828476186002443
+  },
+  {
+   "tconst": "tt5052448",
+   "title": "Get Out",
+   "year": 2017,
+   "rating": 7.8,
+   "votes": 837361,
+   "score": 7.7835114875890685
+  },
+  {
+   "tconst": "tt5013056",
+   "title": "Dunkirk",
+   "year": 2017,
+   "rating": 7.8,
+   "votes": 826930,
+   "score": 7.78330598453271
+  },
+  {
+   "tconst": "tt5726616",
+   "title": "Call Me by Your Name",
+   "year": 2017,
+   "rating": 7.8,
+   "votes": 364602,
+   "score": 7.762702488601133
+  },
+  {
+   "tconst": "tt4468740",
+   "title": "Paddington 2",
+   "year": 2017,
+   "rating": 7.8,
+   "votes": 116329,
+   "score": 7.689402097974031
+  },
+  {
+   "tconst": "tt6333060",
+   "title": "Icarus",
+   "year": 2017,
+   "rating": 7.9,
+   "votes": 58631,
+   "score": 7.681851898339838
+  },
+  {
+   "tconst": "tt5362988",
+   "title": "Wind River",
+   "year": 2017,
+   "rating": 7.7,
+   "votes": 320412,
+   "score": 7.6607407649690735
+  },
+  {
+   "tconst": "tt3262342",
+   "title": "Loving Vincent",
+   "year": 2017,
+   "rating": 7.8,
+   "votes": 68922,
+   "score": 7.622967963748529
+  },
+  {
+   "tconst": "tt7060460",
+   "title": "Theeran Adhigaram Ondru",
+   "year": 2017,
+   "rating": 8.2,
+   "votes": 19925,
+   "score": 7.59944119080907
+  },
+  {
+   "tconst": "tt6878038",
+   "title": "A Taxi Driver",
+   "year": 2017,
+   "rating": 7.9,
+   "votes": 39204,
+   "score": 7.595721437992062
+  },
+  {
+   "tconst": "tt3896198",
+   "title": "Guardians of the Galaxy: Vol. 2",
+   "year": 2017,
+   "rating": 7.6,
+   "votes": 846320,
+   "score": 7.586019569360708
+  },
+  {
+   "tconst": "tt5764096",
+   "title": "Hindi Medium",
+   "year": 2017,
+   "rating": 7.9,
+   "votes": 36564,
+   "score": 7.5784700119182515
+  },
+  {
+   "tconst": "tt7286916",
+   "title": "The Dawn Wall",
+   "year": 2017,
+   "rating": 8.1,
+   "votes": 22536,
+   "score": 7.578370962471153
+  },
+  {
+   "tconst": "tt4481414",
+   "title": "Gifted",
+   "year": 2017,
+   "rating": 7.6,
+   "votes": 162002,
+   "score": 7.53039777232219
+  },
+  {
+   "tconst": "tt7294534",
+   "title": "Arjun Reddy",
+   "year": 2017,
+   "rating": 7.9,
+   "votes": 30498,
+   "score": 7.530309586521839
+  },
+  {
+   "tconst": "tt5649144",
+   "title": "The Florida Project",
+   "year": 2017,
+   "rating": 7.6,
+   "votes": 149434,
+   "score": 7.524911108263992
+  },
+  {
+   "tconst": "tt3829920",
+   "title": "Only the Brave",
+   "year": 2017,
+   "rating": 7.6,
+   "votes": 93833,
+   "score": 7.48470214320073
+  },
+  {
+   "tconst": "tt3890160",
+   "title": "Baby Driver",
+   "year": 2017,
+   "rating": 7.5,
+   "votes": 695020,
+   "score": 7.484437714724351
+  },
+  {
+   "tconst": "tt1485796",
+   "title": "The Greatest Showman",
+   "year": 2017,
+   "rating": 7.5,
+   "votes": 353461,
+   "score": 7.469813205914696
+  },
+  {
+   "tconst": "tt5580036",
+   "title": "I, Tonya",
+   "year": 2017,
+   "rating": 7.5,
+   "votes": 263848,
+   "score": 7.45993499180188
+  },
+  {
+   "tconst": "tt5462602",
+   "title": "The Big Sick",
+   "year": 2017,
+   "rating": 7.5,
+   "votes": 151614,
+   "score": 7.432111559858438
+  },
+  {
+   "tconst": "tt6108090",
+   "title": "Secret Superstar",
+   "year": 2017,
+   "rating": 7.7,
+   "votes": 32700,
+   "score": 7.396212590982703
+  },
+  {
+   "tconst": "tt2250912",
+   "title": "Spider-Man: Homecoming",
+   "year": 2017,
+   "rating": 7.4,
+   "votes": 837693,
+   "score": 7.388236634766315
+  },
+  {
+   "tconst": "tt3901826",
+   "title": "The Breadwinner",
+   "year": 2017,
+   "rating": 7.7,
+   "votes": 31305,
+   "score": 7.3859527329611785
+  },
+  {
+   "tconst": "tt4425200",
+   "title": "John Wick: Chapter 2",
+   "year": 2017,
+   "rating": 7.4,
+   "votes": 578818,
+   "score": 7.383064847941064
+  },
+  {
+   "tconst": "tt4925292",
+   "title": "Lady Bird",
+   "year": 2017,
+   "rating": 7.4,
+   "votes": 369050,
+   "score": 7.373692857498909
+  },
+  {
+   "tconst": "tt5635086",
+   "title": "God's Own Country",
+   "year": 2017,
+   "rating": 7.6,
+   "votes": 42288,
+   "score": 7.371042641427506
+  },
+  {
+   "tconst": "tt3450958",
+   "title": "War for the Planet of the Apes",
+   "year": 2017,
+   "rating": 7.4,
+   "votes": 330242,
+   "score": 7.370692265020079
+  },
+  {
+   "tconst": "tt4555426",
+   "title": "Darkest Hour",
+   "year": 2017,
+   "rating": 7.4,
+   "votes": 245900,
+   "score": 7.361032737924821
+  },
+  {
+   "tconst": "tt4209788",
+   "title": "Molly's Game",
+   "year": 2017,
+   "rating": 7.4,
+   "votes": 205985,
+   "score": 7.35383141252847
+  },
+  {
+   "tconst": "tt6304162",
+   "title": "Loveless",
+   "year": 2017,
+   "rating": 7.6,
+   "votes": 38026,
+   "score": 7.350724141818212
+  },
+  {
+   "tconst": "tt5776858",
+   "title": "Phantom Thread",
+   "year": 2017,
+   "rating": 7.4,
+   "votes": 164090,
+   "score": 7.342720877907757
+  },
+  {
+   "tconst": "tt7914416",
+   "title": "One Cut of the Dead",
+   "year": 2017,
+   "rating": 7.6,
+   "votes": 36259,
+   "score": 7.3412023094956975
+  },
+  {
+   "tconst": "tt7642818",
+   "title": "Between Family",
+   "year": 2017,
+   "rating": 7.6,
+   "votes": 29301,
+   "score": 7.295383772294889
+  },
+  {
+   "tconst": "tt7214762",
+   "title": "Jim & Andy: The Great Beyond",
+   "year": 2017,
+   "rating": 7.6,
+   "votes": 29199,
+   "score": 7.294591128216573
+  },
+  {
+   "tconst": "tt6485666",
+   "title": "Mersal",
+   "year": 2017,
+   "rating": 7.5,
+   "votes": 42657,
+   "score": 7.291637913951829
+  },
+  {
+   "tconst": "tt0451279",
+   "title": "Wonder Woman",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 741660,
+   "score": 7.2880641215908275
+  },
+  {
+   "tconst": "tt1396484",
+   "title": "It",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 709731,
+   "score": 7.287534617287516
+  },
+  {
+   "tconst": "tt5580390",
+   "title": "The Shape of Water",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 480311,
+   "score": 7.28170197616403
+  },
+  {
+   "tconst": "tt7057496",
+   "title": "Forgotten",
+   "year": 2017,
+   "rating": 7.4,
+   "votes": 64260,
+   "score": 7.265718793899293
+  },
+  {
+   "tconst": "tt6788942",
+   "title": "Bad Genius",
+   "year": 2017,
+   "rating": 7.6,
+   "votes": 25808,
+   "score": 7.265669058170281
+  },
+  {
+   "tconst": "tt4116284",
+   "title": "The Lego Batman Movie",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 197586,
+   "score": 7.256780696361805
+  },
+  {
+   "tconst": "tt2396589",
+   "title": "Mudbound",
+   "year": 2017,
+   "rating": 7.4,
+   "votes": 58078,
+   "score": 7.253525039439488
+  },
+  {
+   "tconst": "tt3521126",
+   "title": "The Disaster Artist",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 173018,
+   "score": 7.250979016462651
+  },
+  {
+   "tconst": "tt4846232",
+   "title": "Good Time",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 159255,
+   "score": 7.246992866591601
+  },
+  {
+   "tconst": "tt3967856",
+   "title": "Okja",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 143286,
+   "score": 7.241470699443925
+  },
+  {
+   "tconst": "tt5607714",
+   "title": "On Body and Soul",
+   "year": 2017,
+   "rating": 7.5,
+   "votes": 31751,
+   "score": 7.237210549087721
+  },
+  {
+   "tconst": "tt4686844",
+   "title": "The Death of Stalin",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 128321,
+   "score": 7.235138392832335
+  },
+  {
+   "tconst": "tt6484982",
+   "title": "Newton",
+   "year": 2017,
+   "rating": 7.6,
+   "votes": 22592,
+   "score": 7.232679112511089
+  },
+  {
+   "tconst": "tt5598102",
+   "title": "Faces Places",
+   "year": 2017,
+   "rating": 7.8,
+   "votes": 14530,
+   "score": 7.230423058905888
+  },
+  {
+   "tconst": "tt4633690",
+   "title": "Shot Caller",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 115481,
+   "score": 7.228501347892999
+  },
+  {
+   "tconst": "tt6967980",
+   "title": "Seeking True Love",
+   "year": 2017,
+   "rating": 7.5,
+   "votes": 28897,
+   "score": 7.217928828314816
+  },
+  {
+   "tconst": "tt1753383",
+   "title": "A Dog's Purpose",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 87903,
+   "score": 7.208361108801174
+  },
+  {
+   "tconst": "tt7048622",
+   "title": "The Insult",
+   "year": 2017,
+   "rating": 7.6,
+   "votes": 19242,
+   "score": 7.190598373399953
+  },
+  {
+   "tconst": "tt4065552",
+   "title": "The Unknown Soldier",
+   "year": 2017,
+   "rating": 7.7,
+   "votes": 14976,
+   "score": 7.180632512610563
+  },
+  {
+   "tconst": "tt5390504",
+   "title": "Detroit",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 59397,
+   "score": 7.170718873077531
+  },
+  {
+   "tconst": "tt3532216",
+   "title": "American Made",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 236530,
+   "score": 7.167664290897503
+  },
+  {
+   "tconst": "tt6359554",
+   "title": "Raajakumara",
+   "year": 2017,
+   "rating": 7.9,
+   "votes": 10270,
+   "score": 7.161385181793854
+  },
+  {
+   "tconst": "tt6294822",
+   "title": "The Post",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 173783,
+   "score": 7.156624266852545
+  },
+  {
+   "tconst": "tt7469726",
+   "title": "Shaadi Mein Zaroor Aana",
+   "year": 2017,
+   "rating": 7.5,
+   "votes": 20227,
+   "score": 7.137022451283999
+  },
+  {
+   "tconst": "tt5478478",
+   "title": "Hostiles",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 108981,
+   "score": 7.133000038955475
+  },
+  {
+   "tconst": "tt5093026",
+   "title": "Papillon",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 97273,
+   "score": 7.125687522815261
+  },
+  {
+   "tconst": "tt6217608",
+   "title": "The Rider",
+   "year": 2017,
+   "rating": 7.4,
+   "votes": 22348,
+   "score": 7.091736046585924
+  },
+  {
+   "tconst": "tt3300980",
+   "title": "The 12th Man",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 32692,
+   "score": 7.089850033611951
+  },
+  {
+   "tconst": "tt2771200",
+   "title": "Beauty and the Beast",
+   "year": 2017,
+   "rating": 7.1,
+   "votes": 362810,
+   "score": 7.081299529612836
+  },
+  {
+   "tconst": "tt6299040",
+   "title": "The Ghazi Attack",
+   "year": 2017,
+   "rating": 7.5,
+   "votes": 16201,
+   "score": 7.081247953702585
+  },
+  {
+   "tconst": "tt5301662",
+   "title": "Marshall",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 29318,
+   "score": 7.071816410676064
+  },
+  {
+   "tconst": "tt5859238",
+   "title": "Lucky",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 28817,
+   "score": 7.0688713098632405
+  },
+  {
+   "tconst": "tt3750872",
+   "title": "The Wife",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 45351,
+   "score": 7.055978711043367
+  },
+  {
+   "tconst": "tt2763304",
+   "title": "T2 Trainspotting",
+   "year": 2017,
+   "rating": 7.1,
+   "votes": 142898,
+   "score": 7.054402789015954
+  },
+  {
+   "tconst": "tt6135348",
+   "title": "120 BPM (Beats Per Minute)",
+   "year": 2017,
+   "rating": 7.4,
+   "votes": 17799,
+   "score": 7.041292047734142
+  },
+  {
+   "tconst": "tt6763252",
+   "title": "The Captain",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 24474,
+   "score": 7.039753948916906
+  },
+  {
+   "tconst": "tt5657856",
+   "title": "Brawl in Cell Block 99",
+   "year": 2017,
+   "rating": 7.1,
+   "votes": 84070,
+   "score": 7.025887930636349
+  },
+  {
+   "tconst": "tt4995790",
+   "title": "The Square",
+   "year": 2017,
+   "rating": 7.1,
+   "votes": 83576,
+   "score": 7.025496683283763
+  },
+  {
+   "tconst": "tt5460276",
+   "title": "Kaabil",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 33632,
+   "score": 7.017296425443744
+  },
+  {
+   "tconst": "tt1987680",
+   "title": "The Upside",
+   "year": 2017,
+   "rating": 7.1,
+   "votes": 70956,
+   "score": 7.013882573681523
+  },
+  {
+   "tconst": "tt6053438",
+   "title": "First Reformed",
+   "year": 2017,
+   "rating": 7.1,
+   "votes": 68448,
+   "score": 7.01112938041711
+  },
+  {
+   "tconst": "tt5982852",
+   "title": "Jolly LLB 2",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 31308,
+   "score": 7.0070174696175425
+  },
+  {
+   "tconst": "tt5541848",
+   "title": "What the Health",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 31167,
+   "score": 7.006356490270397
+  },
+  {
+   "tconst": "tt5805752",
+   "title": "Brigsby Bear",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 18965,
+   "score": 6.990256434833814
+  },
+  {
+   "tconst": "tt6002232",
+   "title": "Custody",
+   "year": 2017,
+   "rating": 7.5,
+   "votes": 11481,
+   "score": 6.989235958985216
+  },
+  {
+   "tconst": "tt5716464",
+   "title": "Breathe",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 26835,
+   "score": 6.983582941087592
+  },
+  {
+   "tconst": "tt5785170",
+   "title": "Toilet: A Love Story",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 26312,
+   "score": 6.980465896534518
+  },
+  {
+   "tconst": "tt5715874",
+   "title": "The Killing of a Sacred Deer",
+   "year": 2017,
+   "rating": 7,
+   "votes": 218746,
+   "score": 6.973893653375191
+  },
+  {
+   "tconst": "tt5990474",
+   "title": "Columbus",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 24851,
+   "score": 6.971262736649205
+  },
+  {
+   "tconst": "tt5439796",
+   "title": "Logan Lucky",
+   "year": 2017,
+   "rating": 7,
+   "votes": 178437,
+   "score": 6.968309183626153
+  },
+  {
+   "tconst": "tt2378507",
+   "title": "The Glass Castle",
+   "year": 2017,
+   "rating": 7.1,
+   "votes": 41592,
+   "score": 6.964868150778442
+  },
+  {
+   "tconst": "tt1615160",
+   "title": "The Foreigner",
+   "year": 2017,
+   "rating": 7,
+   "votes": 133741,
+   "score": 6.958454982468199
+  },
+  {
+   "tconst": "tt7160070",
+   "title": "Along with the Gods: The Two Worlds",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 22593,
+   "score": 6.955416121098439
+  },
+  {
+   "tconst": "tt5723272",
+   "title": "In the Fade",
+   "year": 2017,
+   "rating": 7.1,
+   "votes": 38103,
+   "score": 6.955066786582155
+  },
+  {
+   "tconst": "tt4882376",
+   "title": "First They Killed My Father",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 22450,
+   "score": 6.954338293835483
+  },
+  {
+   "tconst": "tt5258850",
+   "title": "See You Up There",
+   "year": 2017,
+   "rating": 7.4,
+   "votes": 12316,
+   "score": 6.953158166112271
+  },
+  {
+   "tconst": "tt1653665",
+   "title": "Goodbye Christopher Robin",
+   "year": 2017,
+   "rating": 7.1,
+   "votes": 32043,
+   "score": 6.934176382155446
+  },
+  {
+   "tconst": "tt4899370",
+   "title": "Megan Leavey",
+   "year": 2017,
+   "rating": 7.1,
+   "votes": 30470,
+   "score": 6.927731100443821
+  },
+  {
+   "tconst": "tt6442978",
+   "title": "Mommy Dead and Dearest",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 13775,
+   "score": 6.922640489377978
+  },
+  {
+   "tconst": "tt5639354",
+   "title": "A Fantastic Woman",
+   "year": 2017,
+   "rating": 7.1,
+   "votes": 28669,
+   "score": 6.919707715093782
+  },
+  {
+   "tconst": "tt6692354",
+   "title": "Ittefaq",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 17394,
+   "score": 6.908997504379114
+  },
+  {
+   "tconst": "tt7468056",
+   "title": "The Outlaws",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 17047,
+   "score": 6.905264082336727
+  },
+  {
+   "tconst": "tt1730768",
+   "title": "The Zookeeper's Wife",
+   "year": 2017,
+   "rating": 7,
+   "votes": 49525,
+   "score": 6.8996770707259385
+  },
+  {
+   "tconst": "tt7056732",
+   "title": "Midnight Runners",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 12069,
+   "score": 6.89346946553815
+  },
+  {
+   "tconst": "tt2283362",
+   "title": "Jumanji: Welcome to the Jungle",
+   "year": 2017,
+   "rating": 6.9,
+   "votes": 512035,
+   "score": 6.890476266217709
+  },
+  {
+   "tconst": "tt5729348",
+   "title": "Memoir of a Murderer",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 15694,
+   "score": 6.889743817037497
+  },
+  {
+   "tconst": "tt6225520",
+   "title": "The Man Who Invented Christmas",
+   "year": 2017,
+   "rating": 7.1,
+   "votes": 22214,
+   "score": 6.883580978300163
+  },
+  {
+   "tconst": "tt1959563",
+   "title": "The Hitman's Bodyguard",
+   "year": 2017,
+   "rating": 6.9,
+   "votes": 264931,
+   "score": 6.881916472260173
+  },
+  {
+   "tconst": "tt5222918",
+   "title": "The Other Side of Hope",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 14949,
+   "score": 6.880479283136056
+  },
+  {
+   "tconst": "tt5690142",
+   "title": "Mom",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 13459,
+   "score": 6.860184902807513
+  },
+  {
+   "tconst": "tt5544384",
+   "title": "Sword Art Online the Movie: Ordinal Scale",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 10282,
+   "score": 6.857651002611254
+  },
+  {
+   "tconst": "tt6537238",
+   "title": "Salyut-7: The True Story of the Soviet 'Apollo 13'",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 13177,
+   "score": 6.856050292745456
+  },
+  {
+   "tconst": "tt5871080",
+   "title": "The Whiskey Bandit",
+   "year": 2017,
+   "rating": 7.3,
+   "votes": 10117,
+   "score": 6.854022848086764
+  },
+  {
+   "tconst": "tt6133130",
+   "title": "Professor Marston & the Wonder Women",
+   "year": 2017,
+   "rating": 7,
+   "votes": 30722,
+   "score": 6.8533539029262185
+  },
+  {
+   "tconst": "tt5710514",
+   "title": "I Don't Feel at Home in This World Anymore",
+   "year": 2017,
+   "rating": 6.9,
+   "votes": 68164,
+   "score": 6.836393705989477
+  },
+  {
+   "tconst": "tt7399470",
+   "title": "Qarib Qarib Single",
+   "year": 2017,
+   "rating": 7.2,
+   "votes": 11847,
+   "score": 6.835111348695997
+  },
+  {
+   "tconst": "tt5536736",
+   "title": "The Meyerowitz Stories",
+   "year": 2017,
+   "rating": 6.9,
+   "votes": 57128,
+   "score": 6.825936682680274
+  },
+  {
+   "tconst": "tt3881784",
+   "title": "Stronger",
+   "year": 2017,
+   "rating": 6.9,
+   "votes": 54727,
+   "score": 6.8231893589222645
+  },
+  {
+   "tconst": "tt5340300",
+   "title": "Lean on Pete",
+   "year": 2017,
+   "rating": 7.1,
+   "votes": 14982,
+   "score": 6.820930175124547
+  },
+  {
+   "tconst": "tt6304046",
+   "title": "Thelma",
+   "year": 2017,
+   "rating": 6.9,
+   "votes": 40248,
+   "score": 6.801056313384841
+  },
+  {
+   "tconst": "tt2527336",
+   "title": "Star Wars: Episode VIII - The Last Jedi",
+   "year": 2017,
+   "rating": 6.8,
+   "votes": 727100,
+   "score": 6.794611691269789
+  },
+  {
+   "tconst": "tt5727282",
+   "title": "Borg vs. McEnroe",
+   "year": 2017,
+   "rating": 6.9,
+   "votes": 36757,
+   "score": 6.793668918770697
+  },
+  {
+   "tconst": "tt6018306",
+   "title": "Last Flag Flying",
+   "year": 2017,
+   "rating": 6.9,
+   "votes": 31099,
+   "score": 6.779030575803826
+  },
+  {
+   "tconst": "tt1536537",
+   "title": "What Happened to Monday",
+   "year": 2017,
+   "rating": 6.8,
+   "votes": 146267,
+   "score": 6.774583742152608
+  },
+  {
+   "tconst": "tt5294550",
+   "title": "All the Money in the World",
+   "year": 2017,
+   "rating": 6.8,
+   "votes": 97255,
+   "score": 6.762969350006633
+  },
+  {
+   "tconst": "tt6265828",
+   "title": "A Ghost Story",
+   "year": 2017,
+   "rating": 6.8,
+   "votes": 87590,
+   "score": 6.75930195342721
+  },
+  {
+   "tconst": "tt7291268",
+   "title": "Gaga: Five Foot Two",
+   "year": 2017,
+   "rating": 7,
+   "votes": 14289,
+   "score": 6.754138813247208
+  },
+  {
+   "tconst": "tt7063210",
+   "title": "The Place",
+   "year": 2017,
+   "rating": 7,
+   "votes": 13823,
+   "score": 6.749329540148657
+  },
+  {
+   "tconst": "tt1880399",
+   "title": "Kodachrome",
+   "year": 2017,
+   "rating": 6.9,
+   "votes": 21904,
+   "score": 6.744166174616394
+  },
+  {
+   "tconst": "tt5816682",
+   "title": "Victoria & Abdul",
+   "year": 2017,
+   "rating": 6.8,
+   "votes": 40334,
+   "score": 6.721092653772031
+  },
+  {
+   "tconst": "tt5034266",
+   "title": "Our Souls at Night",
+   "year": 2017,
+   "rating": 6.9,
+   "votes": 16961,
+   "score": 6.715595772966932
+  },
+  {
+   "tconst": "tt6101820",
+   "title": "Perfect Strangers",
+   "year": 2017,
+   "rating": 6.9,
+   "votes": 16640,
+   "score": 6.713373785096151
+  },
+  {
+   "tconst": "tt4080956",
+   "title": "A Prayer Before Dawn",
+   "year": 2017,
+   "rating": 6.8,
+   "votes": 29438,
+   "score": 6.699291993381039
+  },
+  {
+   "tconst": "tt5699154",
+   "title": "C'est la vie!",
+   "year": 2017,
+   "rating": 6.9,
+   "votes": 14017,
+   "score": 6.692991532454572
+  },
+  {
+   "tconst": "tt4649466",
+   "title": "Kingsman: The Golden Circle",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 406035,
+   "score": 6.692857037592899
+  },
+  {
+   "tconst": "tt3731562",
+   "title": "Kong: Skull Island",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 378852,
+   "score": 6.6923577032777555
+  },
+  {
+   "tconst": "tt1972591",
+   "title": "King Arthur: Legend of the Sword",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 249852,
+   "score": 6.688563788752681
+  },
+  {
+   "tconst": "tt2406566",
+   "title": "Atomic Blonde",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 222147,
+   "score": 6.6871989628768045
+  },
+  {
+   "tconst": "tt3444312",
+   "title": "Abducted in Plain Sight",
+   "year": 2017,
+   "rating": 6.8,
+   "votes": 25079,
+   "score": 6.686777776873953
+  },
+  {
+   "tconst": "tt3606752",
+   "title": "Cars 3",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 157474,
+   "score": 6.682255619588483
+  },
+  {
+   "tconst": "tt6060156",
+   "title": "Toc Toc",
+   "year": 2017,
+   "rating": 6.8,
+   "votes": 23382,
+   "score": 6.681022036875005
+  },
+  {
+   "tconst": "tt5742374",
+   "title": "You Were Never Really Here",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 136496,
+   "score": 6.679714651833234
+  },
+  {
+   "tconst": "tt6971752",
+   "title": "Shubh Mangal Savdhan",
+   "year": 2017,
+   "rating": 6.9,
+   "votes": 12314,
+   "score": 6.677192687772764
+  },
+  {
+   "tconst": "tt6336356",
+   "title": "Mary and the Witch's Flower",
+   "year": 2017,
+   "rating": 6.8,
+   "votes": 19659,
+   "score": 6.666087111330841
+  },
+  {
+   "tconst": "tt3758172",
+   "title": "Jungle",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 73422,
+   "score": 6.664377234242304
+  },
+  {
+   "tconst": "tt3411444",
+   "title": "Ferdinand",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 72255,
+   "score": 6.663871833140374
+  },
+  {
+   "tconst": "tt5628302",
+   "title": "Beast",
+   "year": 2017,
+   "rating": 6.8,
+   "votes": 18842,
+   "score": 6.662293794985142
+  },
+  {
+   "tconst": "tt4622512",
+   "title": "Battle of the Sexes",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 64263,
+   "score": 6.6599838093661905
+  },
+  {
+   "tconst": "tt4823434",
+   "title": "Tigers Are Not Afraid",
+   "year": 2017,
+   "rating": 6.9,
+   "votes": 10658,
+   "score": 6.659331863440867
+  },
+  {
+   "tconst": "tt5541240",
+   "title": "To the Bone",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 60018,
+   "score": 6.657557737081342
+  },
+  {
+   "tconst": "tt6958212",
+   "title": "Sweet Country",
+   "year": 2017,
+   "rating": 6.9,
+   "votes": 10183,
+   "score": 6.653667821184237
+  },
+  {
+   "tconst": "tt5886440",
+   "title": "Marrowbone",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 51653,
+   "score": 6.651799225260108
+  },
+  {
+   "tconst": "tt6892400",
+   "title": "The Girl in the Fog",
+   "year": 2017,
+   "rating": 6.8,
+   "votes": 14885,
+   "score": 6.640396931282357
+  },
+  {
+   "tconst": "tt1291566",
+   "title": "The Vanishing of Sidney Hall",
+   "year": 2017,
+   "rating": 6.8,
+   "votes": 13590,
+   "score": 6.631635338489252
+  },
+  {
+   "tconst": "tt6288250",
+   "title": "Patti Cake$",
+   "year": 2017,
+   "rating": 6.8,
+   "votes": 10878,
+   "score": 6.609765189910981
+  },
+  {
+   "tconst": "tt5540188",
+   "title": "The Nile Hilton Incident",
+   "year": 2017,
+   "rating": 6.8,
+   "votes": 10556,
+   "score": 6.606785251749438
+  },
+  {
+   "tconst": "tt5084170",
+   "title": "Blade of the Immortal",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 20806,
+   "score": 6.603534299648167
+  },
+  {
+   "tconst": "tt5442430",
+   "title": "Life",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 280230,
+   "score": 6.593206345432799
+  },
+  {
+   "tconst": "tt4630562",
+   "title": "The Fate of the Furious",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 278651,
+   "score": 6.593169182282276
+  },
+  {
+   "tconst": "tt5109784",
+   "title": "Mother!",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 270800,
+   "score": 6.592978196705703
+  },
+  {
+   "tconst": "tt4652650",
+   "title": "Please Stand By",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 17480,
+   "score": 6.591858720340664
+  },
+  {
+   "tconst": "tt6040662",
+   "title": "The Children Act",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 17100,
+   "score": 6.590342348153559
+  },
+  {
+   "tconst": "tt5308322",
+   "title": "Happy Death Day",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 189014,
+   "score": 6.590092544418792
+  },
+  {
+   "tconst": "tt2568862",
+   "title": "Going in Style",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 100555,
+   "score": 6.582165235719429
+  },
+  {
+   "tconst": "tt3405236",
+   "title": "Raees",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 55359,
+   "score": 6.56983242759163
+  },
+  {
+   "tconst": "tt5962210",
+   "title": "Ingrid Goes West",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 52670,
+   "score": 6.568538018748387
+  },
+  {
+   "tconst": "tt3780500",
+   "title": "Journey's End",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 12573,
+   "score": 6.568350579673124
+  },
+  {
+   "tconst": "tt5649108",
+   "title": "Thoroughbreds",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 49897,
+   "score": 6.567081450405888
+  },
+  {
+   "tconst": "tt5126922",
+   "title": "The Pirates of Somalia",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 12159,
+   "score": 6.565890953335504
+  },
+  {
+   "tconst": "tt4986134",
+   "title": "Rebel in the Rye",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 11691,
+   "score": 6.562997447557118
+  },
+  {
+   "tconst": "tt6108178",
+   "title": "Disobedience",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 40620,
+   "score": 6.561048550670909
+  },
+  {
+   "tconst": "tt5711148",
+   "title": "Film Stars Don't Die in Liverpool",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 11265,
+   "score": 6.5602528866664205
+  },
+  {
+   "tconst": "tt3741632",
+   "title": "The Leisure Seeker",
+   "year": 2017,
+   "rating": 6.7,
+   "votes": 10810,
+   "score": 6.557197387552208
+  },
+  {
+   "tconst": "tt4572792",
+   "title": "The Book of Henry",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 30932,
+   "score": 6.551829317769994
+  },
+  {
+   "tconst": "tt5112578",
+   "title": "Super Dark Times",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 27779,
+   "score": 6.547809037691877
+  },
+  {
+   "tconst": "tt5814592",
+   "title": "The Party",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 23077,
+   "score": 6.540389927592026
+  },
+  {
+   "tconst": "tt6777338",
+   "title": "The Villainess",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 18843,
+   "score": 6.531639483928906
+  },
+  {
+   "tconst": "tt5304464",
+   "title": "Happy End",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 18179,
+   "score": 6.530028660880848
+  },
+  {
+   "tconst": "tt2776878",
+   "title": "Thank You for Your Service",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 17469,
+   "score": 6.528220089372072
+  },
+  {
+   "tconst": "tt5751998",
+   "title": "Small Town Crime",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 13412,
+   "score": 6.515781549417454
+  },
+  {
+   "tconst": "tt5023260",
+   "title": "The Last Word",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 10237,
+   "score": 6.502568445666919
+  },
+  {
+   "tconst": "tt6574146",
+   "title": "Blame!",
+   "year": 2017,
+   "rating": 6.6,
+   "votes": 10202,
+   "score": 6.502399645330236
+  },
+  {
+   "tconst": "tt1790809",
+   "title": "Pirates of the Caribbean: Dead Men Tell No Tales",
+   "year": 2017,
+   "rating": 6.5,
+   "votes": 391691,
+   "score": 6.497580920744954
+  },
+  {
+   "tconst": "tt3402236",
+   "title": "Murder on the Orient Express",
+   "year": 2017,
+   "rating": 6.5,
+   "votes": 324910,
+   "score": 6.497098556731545
+  },
+  {
+   "tconst": "tt5140878",
+   "title": "Annabelle: Creation",
+   "year": 2017,
+   "rating": 6.5,
+   "votes": 172964,
+   "score": 6.494688996933612
+  },
+  {
+   "tconst": "tt3748172",
+   "title": "Gerald's Game",
+   "year": 2017,
+   "rating": 6.5,
+   "votes": 143917,
+   "score": 6.493686711896421
+  },
+  {
+   "tconst": "tt3986820",
+   "title": "The Endless",
+   "year": 2017,
+   "rating": 6.5,
+   "votes": 58326,
+   "score": 6.485778146459055
+  },
+  {
+   "tconst": "tt6000478",
+   "title": "Roman J. Israel, Esq.",
+   "year": 2017,
+   "rating": 6.5,
+   "votes": 49038,
+   "score": 6.4835407302917005
+  },
+  {
+   "tconst": "tt2140507",
+   "title": "The Current War",
+   "year": 2017,
+   "rating": 6.5,
+   "votes": 33637,
+   "score": 6.477731687214094
+  },
+  {
+   "tconst": "tt7549892",
+   "title": "Terrified",
+   "year": 2017,
+   "rating": 6.5,
+   "votes": 31773,
+   "score": 6.476738027792149
+  },
+  {
+   "tconst": "tt5884230",
+   "title": "Brad's Status",
+   "year": 2017,
+   "rating": 6.5,
+   "votes": 20283,
+   "score": 6.4679119517538375
+  },
+  {
+   "tconst": "tt3906082",
+   "title": "Mary Shelley",
+   "year": 2017,
+   "rating": 6.5,
+   "votes": 19919,
+   "score": 6.467521562718053
+  },
+  {
+   "tconst": "tt3127022",
+   "title": "The Bookshop",
+   "year": 2017,
+   "rating": 6.5,
+   "votes": 19078,
+   "score": 6.46658221455951
+  },
+  {
+   "tconst": "tt7076834",
+   "title": "Satan's Slaves",
+   "year": 2017,
+   "rating": 6.5,
+   "votes": 13949,
+   "score": 6.459425346985738
+  },
+  {
+   "tconst": "tt5655222",
+   "title": "The Hero",
+   "year": 2017,
+   "rating": 6.5,
+   "votes": 11009,
+   "score": 6.453747329000021
+  },
+  {
+   "tconst": "tt6113488",
+   "title": "The Case for Christ",
+   "year": 2017,
+   "rating": 6.4,
+   "votes": 12177,
+   "score": 6.401275088378115
+  }
+ ]
+}
