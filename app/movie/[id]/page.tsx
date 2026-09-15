@@ -14,7 +14,6 @@ import {
   getMovieSimilar,
   getMovieVideos,
   getWatchProviders,
-  movieDirectors,
   pickCertification,
   pickMovieLogo,
   pickTrailerKey,
@@ -253,8 +252,14 @@ export default async function MovieDetailPage({
 
   const moreLikeThis = filterNewMedia(similarRaw, ownedIds, 12);
   const recommended = filterNewMedia(recsRaw, ownedIds, 12);
-  const directors = movieDirectors(credits?.crew);
-  const directorLabel = directors.length > 0 ? directors.join(", ") : null;
+  const crewList = credits?.crew ?? [];
+  const seenDirectors = new Set<string>();
+  const directorsWithIds: { name: string; id: number | null }[] = [];
+  for (const c of crewList) {
+    if (c.job !== "Director" || !c.name || seenDirectors.has(c.name)) continue;
+    seenDirectors.add(c.name);
+    directorsWithIds.push({ name: c.name, id: c.id ?? null });
+  }
   const cast = (credits?.cast ?? []).slice(0, 12);
 
   // Fresh details first, cached tmdb_data as fallback for older rows.
@@ -302,6 +307,12 @@ export default async function MovieDetailPage({
   const releaseLabel = formatReleaseDate(movie.releaseDate);
   const runtimeLabel = movie.runtime ? formatRuntime(movie.runtime) : null;
   const metaLine = [releaseLabel, runtimeLabel].filter(Boolean).join("  ·  ");
+  const releaseYear =
+    movie.releaseDate && movie.releaseDate.length >= 4
+      ? movie.releaseDate.slice(0, 4)
+      : null;
+  const yearNum =
+    releaseYear && /^\d{4}$/.test(releaseYear) ? releaseYear : null;
 
   const posterSrc = posterUrl(movie.posterPath, "w342");
   const backdropSrc = backdropUrl(movie.backdropPath, "w780");
@@ -486,7 +497,19 @@ export default async function MovieDetailPage({
 
           {/* Meta: date · runtime · cert · vote */}
           <div className="mt-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5 text-center">
-            {metaLine ? (
+            {metaLine && yearNum && releaseLabel?.includes(yearNum) ? (
+              <span className="text-sm text-white/60">
+                {releaseLabel!.split(yearNum)[0]}
+                <Link
+                  href={`/movie/year/${yearNum}`}
+                  className="font-bold text-white/85 underline-offset-2 hover:text-white hover:underline"
+                >
+                  {yearNum}
+                </Link>
+                {releaseLabel!.split(yearNum)[1]}
+                {runtimeLabel ? `  ·  ${runtimeLabel}` : ""}
+              </span>
+            ) : metaLine ? (
               <span className="text-sm text-white/60">{metaLine}</span>
             ) : null}
             {certification ? (
@@ -689,13 +712,27 @@ export default async function MovieDetailPage({
             Details
           </h2>
           <div className="glass-panel rounded-3xl px-4 py-1.5">
-            {directorLabel && (
+            {directorsWithIds.length > 0 && (
               <div className="flex justify-between gap-3 border-b border-white/[0.06] py-2.5 text-sm last:border-0">
                 <span className="shrink-0 text-white/45">
-                  {directors.length > 1 ? "Directors" : "Director"}
+                  {directorsWithIds.length > 1 ? "Directors" : "Director"}
                 </span>
                 <span className="text-right font-medium text-white">
-                  {directorLabel}
+                  {directorsWithIds.map((d, i) => (
+                    <span key={d.name}>
+                      {i > 0 ? ", " : ""}
+                      {d.id != null ? (
+                        <Link
+                          href={`/person/${d.id}`}
+                          className="underline-offset-2 hover:underline"
+                        >
+                          {d.name}
+                        </Link>
+                      ) : (
+                        d.name
+                      )}
+                    </span>
+                  ))}
                 </span>
               </div>
             )}
@@ -820,7 +857,11 @@ export default async function MovieDetailPage({
               {cast.map((person) => {
                 const photo = posterUrl(person.profile_path, "w185");
                 return (
-                  <div key={person.id} className="w-28 flex-shrink-0">
+                  <Link
+                    key={person.id}
+                    href={`/person/${person.id}`}
+                    className="w-28 flex-shrink-0"
+                  >
                     <div className="relative h-36 overflow-hidden rounded-2xl bg-secondary ring-1 ring-white/10">
                       {photo ? (
                         <Image
@@ -845,7 +886,7 @@ export default async function MovieDetailPage({
                         {person.character}
                       </p>
                     )}
-                  </div>
+                  </Link>
                 );
               })}
             </div>

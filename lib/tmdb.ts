@@ -618,6 +618,105 @@ export async function discoverMoviesByGenre(genreId: number, page = 1) {
   return mapList(data.results ?? [], "movie");
 }
 
+/** Ranked best of a single year — Letterboxd-style year page backend.
+ * vote_average.desc with vote-count floor so the ranking is best-first,
+ * not popularity-first. Recent years get looser floors (votes still
+ * accumulating). Returns page totals for pagination UI. */
+export async function discoverMoviesByYear(
+  year: number,
+  page = 1,
+  opts?: { minVoteAverage?: number; minVoteCount?: number }
+): Promise<{ items: TmdbMovieCard[]; totalPages: number; totalResults: number }> {
+  const currentYear = new Date().getFullYear();
+  const isRecent = year >= currentYear - 1;
+  const data = await tmdbFetch<{
+    results: Array<TmdbListItem & { release_date?: string; overview?: string }>;
+    total_pages?: number;
+    total_results?: number;
+  }>("/discover/movie", {
+    sort_by: "vote_average.desc",
+    primary_release_year: String(year),
+    "vote_count.gte": String(opts?.minVoteCount ?? (isRecent ? 50 : 300)),
+    "vote_average.gte": String(opts?.minVoteAverage ?? (isRecent ? 6.0 : 7.0)),
+    page: String(page),
+    include_adult: "false",
+  });
+  return {
+    items: mapMovieCards(data.results ?? []),
+    totalPages: data.total_pages ?? 1,
+    totalResults: data.total_results ?? 0,
+  };
+}
+
+/** Best of a decade — same ranked engine over a 10-year window. */
+export async function discoverMoviesByDecade(
+  startYear: number,
+  page = 1,
+  opts?: { minVoteAverage?: number; minVoteCount?: number }
+): Promise<{ items: TmdbMovieCard[]; totalPages: number; totalResults: number }> {
+  const data = await tmdbFetch<{
+    results: Array<TmdbListItem & { release_date?: string; overview?: string }>;
+    total_pages?: number;
+    total_results?: number;
+  }>("/discover/movie", {
+    sort_by: "vote_average.desc",
+    "primary_release_date.gte": `${startYear}-01-01`,
+    "primary_release_date.lte": `${startYear + 9}-12-31`,
+    "vote_count.gte": String(opts?.minVoteCount ?? 300),
+    "vote_average.gte": String(opts?.minVoteAverage ?? 7.0),
+    page: String(page),
+    include_adult: "false",
+  });
+  return {
+    items: mapMovieCards(data.results ?? []),
+    totalPages: data.total_pages ?? 1,
+    totalResults: data.total_results ?? 0,
+  };
+}
+
+export type TmdbPersonDetails = {
+  id: number;
+  name: string;
+  biography?: string;
+  birthday?: string | null;
+  deathday?: string | null;
+  place_of_birth?: string | null;
+  profile_path?: string | null;
+  known_for_department?: string;
+  popularity?: number;
+};
+
+export async function getPersonDetails(
+  personId: number
+): Promise<TmdbPersonDetails> {
+  return tmdbFetch<TmdbPersonDetails>(`/person/${personId}`, {}, { revalidate: 86400 });
+}
+
+export type TmdbPersonMovieCredit = {
+  id: number;
+  title?: string;
+  name?: string;
+  poster_path?: string | null;
+  vote_average?: number;
+  vote_count?: number;
+  popularity?: number;
+  release_date?: string;
+  character?: string;
+  job?: string;
+  department?: string;
+};
+
+export async function getPersonMovieCredits(personId: number): Promise<{
+  cast: TmdbPersonMovieCredit[];
+  crew: TmdbPersonMovieCredit[];
+}> {
+  const data = await tmdbFetch<{
+    cast?: TmdbPersonMovieCredit[];
+    crew?: TmdbPersonMovieCredit[];
+  }>(`/person/${personId}/movie_credits`, {}, { revalidate: 86400 });
+  return { cast: data.cast ?? [], crew: data.crew ?? [] };
+}
+
 export type WatchProvider = {
   provider_id: number;
   provider_name: string;
