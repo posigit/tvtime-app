@@ -339,29 +339,39 @@ export default async function MovieDetailPage({
           "--theme": theme.v,
           "--theme-deep": theme.deep,
           backgroundImage:
-            "radial-gradient(110% 34rem at 50% -8rem, rgb(var(--theme) / 0.35), transparent 70%), radial-gradient(90% 28rem at 50% 112%, rgb(var(--theme) / 0.16), transparent 70%), linear-gradient(to bottom, rgb(var(--theme-deep) / 0.6), rgb(var(--theme-deep) / 0.22) 34rem, rgb(var(--theme-deep) / 0.1) 62rem, transparent 92rem)",
+            "radial-gradient(110% 34rem at 50% -8rem, rgb(var(--theme) / 0.38), transparent 70%), radial-gradient(100% 36rem at 50% 108%, rgb(var(--theme) / 0.2), transparent 70%), linear-gradient(to bottom, rgb(var(--theme-deep) / 0.65), rgb(var(--theme-deep) / 0.38) 34rem, rgb(var(--theme-deep) / 0.3) 62rem, rgb(var(--theme-deep) / 0.28))",
         } as CSSProperties
       }
     >
+      {/* ---------- Full-page photographic wash (fixed) ----------
+          The poster's own color lives behind the ENTIRE page — hero, body,
+          footer — so the house gains the movie's shade, not just the hero.
+          Cheap w300 file, painted once; scrims + deep wash keep text safe. */}
+      {ambientSrc ? (
+        <div aria-hidden className="pointer-events-none fixed inset-0">
+          <Image
+            src={ambientSrc}
+            alt=""
+            fill
+            sizes="100vw"
+            className="scale-110 object-cover opacity-40 blur-3xl saturate-150"
+            unoptimized
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/50" />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to bottom, rgb(var(--theme-deep) / 0.3), transparent 38%, transparent 62%, rgb(var(--theme-deep) / 0.42))",
+            }}
+          />
+        </div>
+      ) : null}
+
       {/* ---------- Adaptive hero (reference style) ----------
           Sharp backdrop capped at ~50% viewport; poster + original-font logo
           overlap its fading bottom edge. Blurred ambience tints the page. */}
       <div className="relative overflow-hidden">
-        {/* Whole-page photographic ambience (cheap w300 file, painted once) */}
-        {ambientSrc ? (
-          <div aria-hidden className="pointer-events-none absolute inset-0">
-            <Image
-              src={ambientSrc}
-              alt=""
-              fill
-              sizes="100vw"
-              className="scale-105 object-cover object-top opacity-30 blur-2xl saturate-150"
-              unoptimized
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black" />
-          </div>
-        ) : null}
-
         {/* Backdrop band — sharp, ~32% of the viewport (tightened from 48dvh
             so the poster sits much closer to the top — matches the
             scrolled “better” reference where gap was ~150px not ~300px). */}
