@@ -333,13 +333,14 @@ export default async function MovieDetailPage({
 
   return (
     <div
-      className="min-h-dvh bg-black pb-safe-page"
+      className="min-h-dvh pb-safe-page"
       style={
         {
           "--theme": theme.v,
           "--theme-deep": theme.deep,
+          backgroundColor: "rgb(var(--theme-deep) / 0.45)",
           backgroundImage:
-            "radial-gradient(110% 34rem at 50% -8rem, rgb(var(--theme) / 0.38), transparent 70%), radial-gradient(100% 36rem at 50% 108%, rgb(var(--theme) / 0.2), transparent 70%), linear-gradient(to bottom, rgb(var(--theme-deep) / 0.65), rgb(var(--theme-deep) / 0.38) 34rem, rgb(var(--theme-deep) / 0.3) 62rem, rgb(var(--theme-deep) / 0.28))",
+            "radial-gradient(110% 34rem at 50% -8rem, rgb(var(--theme) / 0.42), transparent 70%), radial-gradient(100% 36rem at 50% 108%, rgb(var(--theme) / 0.24), transparent 70%), linear-gradient(to bottom, rgb(var(--theme-deep) / 0.7), rgb(var(--theme-deep) / 0.45) 34rem, rgb(var(--theme-deep) / 0.38) 62rem, rgb(var(--theme-deep) / 0.35))",
         } as CSSProperties
       }
     >
@@ -357,12 +358,11 @@ export default async function MovieDetailPage({
             className="scale-110 object-cover opacity-40 blur-3xl saturate-150"
             unoptimized
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/50" />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to bottom, rgb(var(--theme-deep) / 0.3), transparent 38%, transparent 62%, rgb(var(--theme-deep) / 0.42))",
+                "linear-gradient(to bottom, rgb(var(--theme-deep) / 0.55), transparent 38%, transparent 60%, rgb(var(--theme-deep) / 0.6)), linear-gradient(to bottom, rgb(var(--theme-deep) / 0.3), transparent 38%, transparent 62%, rgb(var(--theme-deep) / 0.42))",
             }}
           />
         </div>
@@ -400,21 +400,25 @@ export default async function MovieDetailPage({
               className="h-full w-full"
               style={{
                 background:
-                  "linear-gradient(to bottom, rgb(var(--theme) / 0.55), #000)",
+                  "linear-gradient(to bottom, rgb(var(--theme) / 0.55), rgb(var(--theme-deep) / 0.8))",
               }}
             />
           )}
           {/* legibility scrims + theme seam glow */}
           <div
             aria-hidden
-            className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/60 to-transparent"
+            className="absolute inset-x-0 top-0 h-24"
+            style={{
+              backgroundImage:
+                "linear-gradient(to bottom, rgb(var(--theme-deep) / 0.7), transparent)",
+            }}
           />
           <div
             aria-hidden
             className="absolute inset-x-0 bottom-0 h-[65%]"
             style={{
               background:
-                "radial-gradient(90% 100% at 50% 100%, rgb(var(--theme) / 0.4), transparent 70%), linear-gradient(to top, #000 22%, rgb(0 0 0 / 0.65) 52%, transparent)",
+                "radial-gradient(90% 100% at 50% 100%, rgb(var(--theme) / 0.4), transparent 70%), linear-gradient(to top, rgb(var(--theme-deep) / 0.85) 22%, rgb(var(--theme-deep) / 0.45) 52%, transparent)",
             }}
           />
 
@@ -476,7 +480,13 @@ export default async function MovieDetailPage({
                   {movie.title}
                 </div>
               )}
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-white/10" />
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(to top, rgb(var(--theme-deep) / 0.45), transparent 45%, rgba(255, 255, 255, 0.1))",
+                }}
+              />
             </div>
           </div>
 
@@ -667,7 +677,13 @@ export default async function MovieDetailPage({
                   className="object-cover transition duration-300 group-hover:scale-[1.03]"
                   unoptimized
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(to top, rgb(var(--theme-deep) / 0.7), transparent 55%, rgb(var(--theme-deep) / 0.25))",
+                  }}
+                />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="relative flex h-16 w-16 items-center justify-center rounded-full bg-white/[0.18] shadow-[0_12px_32px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.45),0_0_44px_rgb(var(--theme)/0.5)] ring-1 ring-white/50 backdrop-blur-2xl transition group-hover:scale-105">
                     <span

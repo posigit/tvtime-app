@@ -38,7 +38,12 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black pb-safe"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 pb-safe"
+      style={{
+        backgroundColor: "rgb(var(--theme-deep, 10 10 12) / 0.72)",
+        backdropFilter: "blur(20px) saturate(1.4)",
+        WebkitBackdropFilter: "blur(20px) saturate(1.4)",
+      }}
       aria-label="Main"
     >
       <div className="mx-auto flex max-w-md items-center justify-around pt-1">
