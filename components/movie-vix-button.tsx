@@ -38,10 +38,9 @@ export function MovieVixButton({
     const resume = playback
       ? { timeLeft: formatPlaybackTime(playback.timeLeftSeconds) }
       : null;
-    // Theme-tinted liquid-glass hero CTA: picks up the movie's own artwork
-    // color (--theme), same vocabulary as the poster glow, genre chips and
-    // trailer play disc. A neutral white mid-stop floors the tint so dark
-    // posters still lift; states read via icon + copy + meter.
+    // True frosted glass: translucent white fill over the page's deep-theme
+    // wash (refraction does the tinting) + theme bloom in the shadow.
+    // A faint theme pool inside keeps dark-poster buttons from going gray.
     const mode = resume ? "resume" : isWatched ? "rewatch" : "watch";
     return (
       <button
@@ -50,34 +49,43 @@ export function MovieVixButton({
           completionRef.current = false;
           setOpen(true);
         }}
-        className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl px-4 py-2.5 text-center text-white ring-1 ring-white/30 backdrop-blur-2xl transition active:scale-[0.99]"
+        className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl px-4 py-2.5 text-center text-white ring-1 ring-white/35 backdrop-blur-2xl backdrop-saturate-150 transition active:scale-[0.99]"
         style={{
           background:
-            "linear-gradient(160deg, rgb(var(--theme, 255 255 255) / 0.55), rgba(255, 255, 255, 0.12) 55%, rgb(var(--theme, 255 255 255) / 0.35))",
+            "linear-gradient(155deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.05) 48%, rgba(255, 255, 255, 0.1))",
           boxShadow:
-            "0 12px 32px rgba(0, 0, 0, 0.55), 0 0 72px rgb(var(--theme, 255 255 255) / 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.35)",
+            "0 12px 32px rgba(0, 0, 0, 0.5), 0 0 72px rgb(var(--theme, 255 255 255) / 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 -1px 0 rgba(255, 255, 255, 0.08)",
         }}
       >
-        {/* theme color pooling across the top — reads on near-black pages */}
+        {/* theme pool across the top — tints the frost, reads on dark pages */}
         <span
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(120% 130% at 50% 0%, rgb(var(--theme, 255 255 255) / 0.5), transparent 70%)",
+              "radial-gradient(120% 130% at 50% 0%, rgb(var(--theme, 255 255 255) / 0.35), transparent 70%)",
+          }}
+        />
+        {/* diagonal gloss — the light reflection */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(115deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.03) 28%, transparent 45%)",
           }}
         />
         {/* hairline top highlight — the only "sheen", kept faint */}
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent"
+          className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent"
         />
         <span
           aria-hidden
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/[0.24] text-white ring-1 ring-white/60 backdrop-blur-2xl transition group-hover:scale-105"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/[0.22] text-white ring-1 ring-white/60 backdrop-blur-2xl backdrop-saturate-150 transition group-hover:scale-105"
           style={{
             boxShadow:
-              "0 12px 32px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 0 56px rgb(var(--theme, 255 255 255) / 0.75)",
+              "0 12px 32px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 0 56px rgb(var(--theme, 255 255 255) / 0.7)",
           }}
         >
           {mode === "rewatch" ? (

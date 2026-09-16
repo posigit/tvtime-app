@@ -339,7 +339,7 @@ export default async function MovieDetailPage({
           "--theme": theme.v,
           "--theme-deep": theme.deep,
           backgroundImage:
-            "radial-gradient(110% 34rem at 50% -8rem, rgb(var(--theme) / 0.22), transparent 70%)",
+            "radial-gradient(110% 34rem at 50% -8rem, rgb(var(--theme) / 0.35), transparent 70%), radial-gradient(90% 28rem at 50% 112%, rgb(var(--theme) / 0.16), transparent 70%), linear-gradient(to bottom, rgb(var(--theme-deep) / 0.6), rgb(var(--theme-deep) / 0.22) 34rem, rgb(var(--theme-deep) / 0.1) 62rem, transparent 92rem)",
         } as CSSProperties
       }
     >
