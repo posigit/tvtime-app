@@ -40,7 +40,8 @@ export function MovieVixButton({
       : null;
     // Theme-tinted liquid-glass hero CTA: picks up the movie's own artwork
     // color (--theme), same vocabulary as the poster glow, genre chips and
-    // trailer play disc. No yellow — states read via icon + copy + meter.
+    // trailer play disc. A neutral white mid-stop floors the tint so dark
+    // posters still lift; states read via icon + copy + meter.
     const mode = resume ? "resume" : isWatched ? "rewatch" : "watch";
     return (
       <button
@@ -49,12 +50,12 @@ export function MovieVixButton({
           completionRef.current = false;
           setOpen(true);
         }}
-        className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl px-4 py-2.5 text-center text-white ring-1 ring-white/20 backdrop-blur-2xl transition active:scale-[0.99]"
+        className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl px-4 py-2.5 text-center text-white ring-1 ring-white/30 backdrop-blur-2xl transition active:scale-[0.99]"
         style={{
           background:
-            "linear-gradient(160deg, rgb(var(--theme, 255 255 255) / 0.42), rgba(255, 255, 255, 0.07) 55%, rgb(var(--theme, 255 255 255) / 0.26))",
+            "linear-gradient(160deg, rgb(var(--theme, 255 255 255) / 0.55), rgba(255, 255, 255, 0.12) 55%, rgb(var(--theme, 255 255 255) / 0.35))",
           boxShadow:
-            "0 8px 24px rgba(0, 0, 0, 0.45), 0 0 48px rgb(var(--theme, 255 255 255) / 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25)",
+            "0 12px 32px rgba(0, 0, 0, 0.55), 0 0 72px rgb(var(--theme, 255 255 255) / 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.35)",
         }}
       >
         {/* theme color pooling across the top — reads on near-black pages */}
@@ -63,20 +64,20 @@ export function MovieVixButton({
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(120% 130% at 50% 0%, rgb(var(--theme, 255 255 255) / 0.38), transparent 70%)",
+              "radial-gradient(120% 130% at 50% 0%, rgb(var(--theme, 255 255 255) / 0.5), transparent 70%)",
           }}
         />
         {/* hairline top highlight — the only "sheen", kept faint */}
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent"
+          className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent"
         />
         <span
           aria-hidden
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/[0.18] text-white ring-1 ring-white/50 backdrop-blur-2xl transition group-hover:scale-105"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/[0.24] text-white ring-1 ring-white/60 backdrop-blur-2xl transition group-hover:scale-105"
           style={{
             boxShadow:
-              "0 12px 32px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 0 44px rgb(var(--theme, 255 255 255) / 0.65)",
+              "0 12px 32px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 0 56px rgb(var(--theme, 255 255 255) / 0.75)",
           }}
         >
           {mode === "rewatch" ? (
