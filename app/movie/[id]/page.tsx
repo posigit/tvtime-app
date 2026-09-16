@@ -349,7 +349,7 @@ export default async function MovieDetailPage({
           footer — so the house gains the movie's shade, not just the hero.
           Cheap w300 file, painted once; scrims + deep wash keep text safe. */}
       {ambientSrc ? (
-        <div aria-hidden className="pointer-events-none fixed inset-0">
+        <div aria-hidden className="pointer-events-none fixed inset-0 transform-gpu">
           <Image
             src={ambientSrc}
             alt=""
