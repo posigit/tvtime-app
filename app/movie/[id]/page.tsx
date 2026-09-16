@@ -355,7 +355,7 @@ export default async function MovieDetailPage({
             alt=""
             fill
             sizes="100vw"
-            className="scale-110 object-cover opacity-40 blur-3xl saturate-150"
+            className="object-cover opacity-40 blur-2xl"
             unoptimized
           />
           <div
