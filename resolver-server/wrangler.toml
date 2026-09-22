@@ -1,0 +1,6 @@
+# Cloudflare Workers deployment for vix-stream-resolver.
+# Usage: cd resolver-server && npx wrangler login && npx wrangler deploy
+name = "vix-stream-resolver"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+workers_dev = true
