@@ -333,7 +333,7 @@ export default async function MovieDetailPage({
 
   return (
     <div
-      className="min-h-dvh pb-safe-page"
+      className="min-h-dvh bg-[#0b0b0e] pb-safe-page"
       style={
         {
           "--theme": theme.v,
