@@ -1428,6 +1428,7 @@ export function ShowDetailClient({
                   countdown={upNextCount}
                   onPlay={playUpNext}
                   onCancel={cancelUpNext}
+                  showTitle={show.title}
                 />
               )}
 

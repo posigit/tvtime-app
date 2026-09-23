@@ -34,7 +34,7 @@ export function ShowListItem({ show }: { show: ShowListItemData }) {
   if (dismissed) return null;
 
   return (
-    <div className="flex items-center gap-3 rounded-xl bg-[#101011] p-2.5">
+    <div className="flex items-center gap-3 rounded-xl bg-card p-2.5">
       <Link
         href={`/show/${show.tmdbId}`}
         className="relative h-[72px] w-[116px] flex-shrink-0 overflow-hidden rounded-lg bg-[#2c2c2e]"
@@ -46,7 +46,8 @@ export function ShowListItem({ show }: { show: ShowListItemData }) {
             fill
             sizes="116px"
             className="object-cover"
-            unoptimized
+            loading="lazy"
+            decoding="async"
           />
         ) : poster ? (
           <Image
@@ -55,7 +56,8 @@ export function ShowListItem({ show }: { show: ShowListItemData }) {
             fill
             sizes="116px"
             className="object-cover"
-            unoptimized
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
@@ -65,14 +67,14 @@ export function ShowListItem({ show }: { show: ShowListItemData }) {
       </Link>
 
       <Link href={`/show/${show.tmdbId}`} className="min-w-0 flex-1 py-0.5">
-        <div className="mb-1.5 inline-flex max-w-full items-center gap-0.5 rounded-full border border-white/90 px-2.5 py-[3px]">
-          <span className="truncate text-[11px] font-bold uppercase tracking-wide text-white">
+        <div className="mb-1.5 inline-flex max-w-full items-center gap-0.5 rounded-full border border-foreground/30 px-2.5 py-[3px]">
+          <span className="truncate text-[11px] font-bold uppercase tracking-wide text-foreground">
             {show.title}
           </span>
-          <ChevronRight className="h-3 w-3 flex-shrink-0 text-white" strokeWidth={2.5} />
+          <ChevronRight className="h-3 w-3 flex-shrink-0 text-foreground" strokeWidth={2.5} />
         </div>
 
-        <p className="text-[15px] font-bold leading-tight text-white">
+        <p className="text-[15px] font-bold leading-tight text-foreground">
           {hasNext ? (
             <>
               S{String(show.nextEpisode!.seasonNumber).padStart(2, "0")} | E

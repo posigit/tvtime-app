@@ -10,13 +10,14 @@ import { LayoutToggle } from "@/components/layout-toggle";
 import { RatingBadge } from "@/components/star-rating";
 import { PosterBadges } from "@/components/poster-badges";
 import { timed, perfLog, perfStart } from "@/lib/perf";
-import { posterUrl } from "@/lib/tmdb";
+import { posterUrl, discoverUpcomingMovies } from "@/lib/tmdb";
 import {
   isUnreleased,
   splitWatchNextAndLater,
 } from "@/lib/movie-watchlist";
 import { getUnseenGreatMoviesPool } from "@/lib/surprise-movies";
 import { WatchLaterTools } from "@/components/watch-later-tools";
+import { MovieWatchButton } from "@/components/movie-watch-button";
 import {
   LEGACY_LAYOUT_COOKIE,
   layoutCookieName,
@@ -80,9 +81,9 @@ function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center justify-center pt-16 text-center">
-      <h2 className="text-2xl font-bold text-white">{title}</h2>
+      <h2 className="text-2xl font-bold text-foreground">{title}</h2>
       <PopcornIllustration />
-      <p className="mb-8 max-w-xs text-[15px] text-white/80">{description}</p>
+      <p className="mb-8 max-w-xs text-[15px] text-muted-foreground">{description}</p>
       <Link
         href="/explore"
         className="rounded-full bg-primary px-8 py-3.5 text-sm font-black uppercase tracking-wide text-black"
@@ -92,7 +93,7 @@ function EmptyState({
       {secondaryCta && (
         <Link
           href={secondaryCta.href}
-          className="mt-2.5 rounded-full px-8 py-3 text-sm font-bold text-white/70 ring-1 ring-white/20 transition hover:bg-white/10 hover:text-white"
+          className="mt-2.5 rounded-full px-8 py-3 text-sm font-bold text-muted-foreground ring-1 ring-border transition hover:bg-secondary hover:text-foreground"
         >
           {secondaryCta.label}
         </Link>
@@ -127,7 +128,8 @@ function MoviePoster({
             fill
             sizes="(max-width: 768px) 33vw, 200px"
             className="object-cover"
-            unoptimized
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-[#3a7bd5] p-2 text-center">
@@ -208,7 +210,7 @@ function MovieList({ items }: { items: MovieRow[] }) {
           <Link
             key={movie.tmdbId}
             href={`/movie/${movie.tmdbId}`}
-            className="flex items-center gap-3 rounded-xl bg-[#101011] p-2.5 active:scale-[0.99]"
+            className="flex items-center gap-3 rounded-xl bg-card p-2.5 active:scale-[0.99]"
           >
             <div className="relative h-[88px] w-[60px] flex-shrink-0 rounded-lg bg-[#2c2c2e]">
               <div className="absolute inset-0 overflow-hidden rounded-lg">
@@ -219,7 +221,8 @@ function MovieList({ items }: { items: MovieRow[] }) {
                     fill
                     sizes="60px"
                     className="object-cover"
-                    unoptimized
+                    loading="lazy"
+                    decoding="async"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center p-1 text-center text-[9px] text-muted-foreground">
@@ -235,16 +238,16 @@ function MovieList({ items }: { items: MovieRow[] }) {
               />
             </div>
             <div className="min-w-0 flex-1 py-0.5">
-              <div className="mb-1.5 inline-flex max-w-full items-center gap-0.5 rounded-full border border-white/90 px-2.5 py-[3px]">
-                <span className="truncate text-[11px] font-bold uppercase tracking-wide text-white">
+              <div className="mb-1.5 inline-flex max-w-full items-center gap-0.5 rounded-full border border-foreground/30 px-2.5 py-[3px]">
+                <span className="truncate text-[11px] font-bold uppercase tracking-wide text-foreground">
                   {movie.title}
                 </span>
                 <ChevronRight
-                  className="h-3 w-3 flex-shrink-0 text-white"
+                  className="h-3 w-3 flex-shrink-0 text-foreground"
                   strokeWidth={2.5}
                 />
               </div>
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13px] font-semibold text-white/70">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13px] font-semibold text-muted-foreground">
                 {year && <span>{year}</span>}
                 {movie.runtime != null && movie.runtime > 0 && (
                   <span className="inline-flex items-center gap-0.5">
@@ -295,6 +298,56 @@ function UpcomingMovieGrid({
               rewatchCount={movie.rewatchCount}
               rewatchQueued={movie.rewatchQueued}
             />
+          </div>
+          {movie.releaseDate && (
+            <p className="px-1.5 py-1.5 text-center text-[10px] font-bold uppercase tracking-wide text-primary">
+              {formatReleaseDate(movie.releaseDate)}
+            </p>
+          )}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+/** Theatrical upcoming from TMDB (not in library) with quick add-to-watchlist. */
+function DiscoverUpcomingGrid({
+  items,
+}: {
+  items: { tmdbId: number; title: string; posterPath: string | null; releaseDate: string | null }[];
+}) {
+  return (
+    <div className="grid grid-cols-3 gap-x-2 gap-y-4">
+      {items.map((movie) => (
+        <Link
+          key={movie.tmdbId}
+          href={`/movie/${movie.tmdbId}`}
+          className="overflow-visible rounded-md bg-card"
+        >
+          <div className="relative overflow-hidden rounded-md">
+            {movie.posterPath ? (
+              <div style={{ aspectRatio: "2 / 3" }} className="relative w-full bg-secondary">
+                <Image
+                  src={posterUrl(movie.posterPath, "w342") ?? ""}
+                  alt={movie.title}
+                  fill
+                  sizes="(max-width: 768px) 33vw, 200px"
+                  className="object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+            ) : (
+              <div
+                style={{ aspectRatio: "2 / 3" }}
+                className="flex w-full items-center justify-center bg-secondary p-2 text-center"
+              >
+                <span className="text-xs font-medium text-muted-foreground">{movie.title}</span>
+              </div>
+            )}
+            <div className="absolute right-1.5 top-1.5 z-10">
+              <MovieWatchButton tmdbId={movie.tmdbId} initialStatus={null} variant="overlay" />
+            </div>
           </div>
           {movie.releaseDate && (
             <p className="px-1.5 py-1.5 text-center text-[10px] font-bold uppercase tracking-wide text-primary">
@@ -456,6 +509,28 @@ export default async function MoviesPage({
       (a.title || "").localeCompare(b.title || "")
     );
 
+  // Real pipeline: TMDB theatrical upcoming (not in library) so the tab is
+  // useful even when the watchlist has nothing dated in the future.
+  // Best-effort — a TMDB outage must never break the library view.
+  let theatricalUpcoming: { tmdbId: number; title: string; posterPath: string | null; releaseDate: string | null }[] = [];
+  if (currentView === "upcoming") {
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const cards = await timed("movies:theatrical", () => discoverUpcomingMovies(today));
+      theatricalUpcoming = cards
+        .filter((c) => (c.release_date ?? "") >= today && !libraryIds.has(c.id))
+        .slice(0, 18)
+        .map((c) => ({
+          tmdbId: c.id,
+          title: c.title,
+          posterPath: c.poster_path ?? null,
+          releaseDate: c.release_date ?? null,
+        }));
+    } catch {
+      theatricalUpcoming = [];
+    }
+  }
+
   // Group upcoming by release month ("DECEMBER 2026")
   const upcomingGroups = new Map<string, typeof upcomingMovies>();
   for (const m of upcomingMovies) {
@@ -472,7 +547,7 @@ export default async function MoviesPage({
     .sort((a, b) => (b.watchedAt?.getTime() ?? 0) - (a.watchedAt?.getTime() ?? 0));
 
   return (
-    <div className="min-h-dvh bg-black px-4 pb-nav-page">
+    <div className="min-h-dvh bg-background px-4 pb-nav-page">
       <StickyChrome contentClassName="pt-2">
         <ShowTabs
           tabs={[
@@ -547,12 +622,23 @@ export default async function MoviesPage({
                 <UpcomingMovieGrid items={items} />
               </section>
             ))
-          ) : (
+          ) : theatricalUpcoming.length === 0 ? (
             <EmptyState
               title="Your upcoming list is empty!"
               description="Movies you want to watch that haven't released yet will show up here."
               cta="Browse all movies"
             />
+          ) : null}
+          {theatricalUpcoming.length > 0 && (
+            <section className="mb-6">
+              <div className="mb-3 mt-2 flex justify-center">
+                <SectionLabel>COMING TO THEATERS</SectionLabel>
+              </div>
+              <DiscoverUpcomingGrid items={theatricalUpcoming} />
+              <p className="mt-3 text-center text-xs text-muted-foreground">
+                Tap + to add a release to your watchlist.
+              </p>
+            </section>
           )}
         </>
       )}

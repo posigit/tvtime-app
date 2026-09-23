@@ -124,7 +124,7 @@ export function SearchBar() {
 
   return (
     <div className="relative">
-      <div className="flex h-11 w-full items-center gap-3 border-b border-white/15 px-1">
+      <div className="flex h-11 w-full items-center gap-3 border-b border-border px-1">
         <svg
           width="20"
           height="20"
@@ -190,20 +190,20 @@ export function SearchBar() {
             }
           }}
           onBlur={() => setTimeout(() => setFocused(false), 200)}
-          className="w-full bg-transparent text-base text-white placeholder:text-muted-foreground focus:outline-none"
+          className="w-full bg-transparent text-base text-foreground placeholder:text-muted-foreground focus:outline-none"
         />
       </div>
 
       {focused && (
         <div
-          className="absolute left-0 right-0 top-12 z-50 max-h-96 overflow-y-auto rounded-xl border border-white/10 bg-card shadow-xl"
+          className="absolute left-0 right-0 top-12 z-50 max-h-96 overflow-y-auto rounded-xl border border-border bg-card shadow-xl"
           onMouseDown={(e) => {
             // Keep input focus while tapping pills/year inside (blur would
             // otherwise collapse the dropdown before the tap registers).
             e.preventDefault();
           }}
         >
-          <div className="flex items-center gap-1.5 border-b border-white/5 px-3 py-2">
+          <div className="flex items-center gap-1.5 border-b border-border px-3 py-2">
             {(["all", "movie", "tv"] as const).map((t) => (
               <button
                 key={t}
@@ -216,7 +216,7 @@ export function SearchBar() {
                 className={
                   searchType === t
                     ? "rounded-full bg-primary px-3 py-1 text-xs font-bold text-black"
-                    : "rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/70 hover:bg-white/15 hover:text-white"
+                    : "rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-foreground/70 hover:bg-secondary hover:text-foreground"
                 }
               >
                 {t === "all" ? "All" : t === "movie" ? "Movies" : "TV"}
@@ -231,13 +231,13 @@ export function SearchBar() {
               placeholder="Year"
               inputMode="numeric"
               aria-label="Filter by year"
-              className="ml-auto h-8 w-20 rounded-full bg-white/10 px-2.5 text-center text-base font-semibold text-white placeholder:text-white/35 focus:outline-none focus:ring-1 focus:ring-primary/60"
+              className="ml-auto h-8 w-20 rounded-full bg-secondary px-2.5 text-center text-base font-semibold text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/60"
             />
           </div>
           {query.trim().length < 2 && recents.length > 0 && (
             <div className="py-1">
               <div className="flex items-center justify-between px-3.5 pb-0.5 pt-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/40">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-foreground/40">
                   Recent
                 </p>
                 <button
@@ -250,7 +250,7 @@ export function SearchBar() {
                     }
                     setRecents([]);
                   }}
-                  className="text-[10px] font-semibold uppercase tracking-wide text-white/40 hover:text-white/70"
+                  className="text-[10px] font-semibold uppercase tracking-wide text-foreground/40 hover:text-foreground"
                 >
                   Clear
                 </button>
@@ -263,7 +263,7 @@ export function SearchBar() {
                     setQuery(term);
                     setActiveIndex(-1);
                   }}
-                  className="flex w-full items-center px-3.5 py-2 text-left text-sm text-white/80 hover:bg-secondary"
+                  className="flex w-full items-center px-3.5 py-2 text-left text-sm text-foreground/80 hover:bg-secondary"
                 >
                   <span className="truncate">{term}</span>
                 </button>
@@ -300,8 +300,8 @@ export function SearchBar() {
                 onClick={() => setRecents(saveRecentSearch(query))}
                 className={
                   i === activeIndex
-                    ? "flex items-center gap-3 border-b border-white/5 bg-secondary p-2 transition-colors"
-                    : "flex items-center gap-3 border-b border-white/5 p-2 transition-colors hover:bg-secondary"
+                    ? "flex items-center gap-3 border-b border-border bg-secondary p-2 transition-colors"
+                    : "flex items-center gap-3 border-b border-border p-2 transition-colors hover:bg-secondary"
                 }
               >
                 <Link
@@ -328,7 +328,7 @@ export function SearchBar() {
                   <Link
                     href={isMovie ? `/movie/${result.id}` : `/show/${result.id}`}
                   >
-                    <p className="truncate text-sm font-medium text-white">
+                    <p className="truncate text-sm font-medium text-foreground">
                       {title}
                     </p>
                   </Link>

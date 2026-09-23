@@ -181,21 +181,21 @@ export function AddToListButton({
           />
           <div
             ref={sheetRef}
-            className="absolute inset-x-3 bottom-3 max-h-[70dvh] overflow-y-auto rounded-2xl border border-white/15 bg-[#1c1c1e]/95 shadow-2xl backdrop-blur-2xl"
+            className="absolute inset-x-3 bottom-3 max-h-[70dvh] overflow-y-auto rounded-2xl border border-border bg-[#1c1c1e]/95 shadow-2xl backdrop-blur-2xl"
           >
             <div className="flex items-center justify-between px-4 pb-1 pt-3.5">
-              <p className="text-sm font-black text-white">Save to list</p>
+              <p className="text-sm font-black text-foreground">Save to list</p>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Close"
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-foreground/70 hover:bg-secondary"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
             {lists == null ? (
-              <p className="px-4 py-6 text-center text-sm text-white/45">Loading…</p>
+              <p className="px-4 py-6 text-center text-sm text-foreground/45">Loading…</p>
             ) : (
               <>
                 {listsError && (
@@ -205,7 +205,7 @@ export function AddToListButton({
                 )}
               <div className="py-1">
                 {lists.length === 0 && !listsError && !creating && (
-                  <p className="px-4 py-4 text-center text-sm text-white/45">
+                  <p className="px-4 py-4 text-center text-sm text-foreground/45">
                     No lists yet — tap New list below
                   </p>
                 )}
@@ -215,20 +215,20 @@ export function AddToListButton({
                     type="button"
                     disabled={busyId === l.id}
                     onClick={() => void toggle(l)}
-                    className="flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left transition hover:bg-white/10 disabled:opacity-50"
+                    className="flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left transition hover:bg-secondary disabled:opacity-50"
                   >
                     <span className="min-w-0">
-                      <span className="block truncate text-sm font-semibold text-white">
+                      <span className="block truncate text-sm font-semibold text-foreground">
                         {l.name}
                       </span>
-                      <span className="block text-[11px] text-white/40">
+                      <span className="block text-[11px] text-foreground/40">
                         {l.count} {l.count === 1 ? "title" : "titles"}
                       </span>
                     </span>
                     {l.contains ? (
                       <Check className="h-4 w-4 shrink-0 text-primary" />
                     ) : (
-                      <Plus className="h-4 w-4 shrink-0 text-white/40" />
+                      <Plus className="h-4 w-4 shrink-0 text-foreground/40" />
                     )}
                   </button>
                 ))}
@@ -244,7 +244,7 @@ export function AddToListButton({
                       maxLength={60}
                       placeholder="List name"
                       aria-label="New list name"
-                      className="h-9 min-w-0 flex-1 rounded-full bg-white/10 px-3.5 text-base text-white placeholder:text-white/35 focus:outline-none focus:ring-1 focus:ring-primary/60"
+                      className="h-9 min-w-0 flex-1 rounded-full bg-secondary px-3.5 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/60"
                     />
                     <button
                       type="button"
@@ -259,7 +259,7 @@ export function AddToListButton({
                   <button
                     type="button"
                     onClick={() => setCreating(true)}
-                    className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-semibold text-primary transition hover:bg-white/10"
+                    className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-semibold text-primary transition hover:bg-secondary"
                   >
                     <Plus className="h-4 w-4" />
                     New list

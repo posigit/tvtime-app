@@ -55,7 +55,7 @@ export function ListCreateForm({ compact = false }: { compact?: boolean }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex min-h-[120px] w-full flex-col items-center justify-center gap-2 rounded-xl bg-card text-white transition hover:bg-secondary"
+        className="flex min-h-[120px] w-full flex-col items-center justify-center gap-2 rounded-xl bg-card text-foreground transition hover:bg-secondary"
       >
         <Plus className="h-7 w-7" strokeWidth={2.5} />
         <span className="text-xs font-bold uppercase tracking-wide">
@@ -81,7 +81,7 @@ export function ListCreateForm({ compact = false }: { compact?: boolean }) {
         maxLength={60}
         placeholder="List name"
         aria-label="New list name"
-        className="h-10 min-w-0 flex-1 rounded-full bg-white/10 px-4 text-base text-white placeholder:text-white/35 focus:outline-none focus:ring-1 focus:ring-primary/60"
+        className="h-10 min-w-0 flex-1 rounded-full bg-secondary px-4 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/60"
       />
       <button
         type="button"

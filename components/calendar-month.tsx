@@ -92,17 +92,17 @@ export function CalendarMonth({
         <Link
           href={prevHref}
           aria-label="Previous month"
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.06] text-white/70 transition hover:bg-white/10 hover:text-white"
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-foreground/70 transition hover:bg-secondary hover:text-foreground"
         >
           <ChevronLeft className="h-5 w-5" />
         </Link>
-        <h2 className="text-base font-black uppercase tracking-wide text-white">
+        <h2 className="text-base font-black uppercase tracking-wide text-foreground">
           {monthLabel}
         </h2>
         <Link
           href={nextHref}
           aria-label="Next month"
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.06] text-white/70 transition hover:bg-white/10 hover:text-white"
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-foreground/70 transition hover:bg-secondary hover:text-foreground"
         >
           <ChevronRight className="h-5 w-5" />
         </Link>
@@ -113,7 +113,7 @@ export function CalendarMonth({
         {WEEKDAYS.map((d, i) => (
           <p
             key={i}
-            className="text-center text-[10px] font-bold uppercase tracking-wider text-white/30"
+            className="text-center text-[10px] font-bold uppercase tracking-wider text-foreground/30"
           >
             {d}
           </p>

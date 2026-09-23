@@ -570,6 +570,25 @@ export async function getUpcomingMovies() {
   return mapList(data.results ?? [], "movie");
 }
 
+/**
+ * True upcoming pipeline: unreleased movies, most-anticipated first.
+ * NOTE: /movie/upcoming page 1 is mostly already-released holdovers, so we
+ * use discover sorted by popularity with a release-date floor instead.
+ */
+export async function discoverUpcomingMovies(
+  minReleaseDate: string,
+  page = 1
+): Promise<TmdbMovieCard[]> {
+  const data = await tmdbFetch<{
+    results: Array<TmdbListItem & { release_date?: string; overview?: string }>;
+  }>("/discover/movie", {
+    sort_by: "popularity.desc",
+    "primary_release_date.gte": minReleaseDate,
+    page: String(page),
+  });
+  return mapMovieCards(data.results ?? []);
+}
+
 export async function getPopularTv() {
   const data = await tmdbFetch<{ results: TmdbListItem[] }>("/tv/popular");
   return mapList(data.results ?? [], "tv");

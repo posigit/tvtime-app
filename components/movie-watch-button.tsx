@@ -109,7 +109,7 @@ export function MovieWatchButton({
         onClick={() => update("want_to_watch")}
         disabled={pending}
         aria-label="Add to watchlist"
-        className="flex h-7 w-7 items-center justify-center rounded-full bg-card text-white transition-colors hover:bg-secondary"
+        className="flex h-7 w-7 items-center justify-center rounded-full bg-card text-foreground transition-colors hover:bg-secondary"
       >
         <Plus className="h-3.5 w-3.5" strokeWidth={3} />
       </button>

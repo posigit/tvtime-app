@@ -178,14 +178,14 @@ export function DownloadSettingsSheet({
         role="dialog"
         aria-modal="true"
         aria-label="Download settings"
-        className="relative mt-auto flex max-h-[93dvh] w-full flex-col rounded-t-[1.35rem] bg-[#0a0a0c] shadow-[0_-20px_60px_rgba(0,0,0,0.65)] ring-1 ring-white/[0.08]"
+        className="relative mt-auto flex max-h-[93dvh] w-full flex-col rounded-t-[1.35rem] bg-card shadow-[0_-20px_60px_rgba(0,0,0,0.65)] ring-1 ring-border"
       >
         <div className="flex justify-center pb-1 pt-2.5">
-          <div className="h-1 w-10 rounded-full bg-white/15" />
+          <div className="h-1 w-10 rounded-full bg-secondary" />
         </div>
         <div className="flex items-start justify-between gap-3 px-4 pb-3 pt-1">
           <div>
-            <h2 className="text-xl font-black tracking-tight text-white">
+            <h2 className="text-xl font-black tracking-tight text-foreground">
               Library
             </h2>
           </div>
@@ -193,7 +193,7 @@ export function DownloadSettingsSheet({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/[0.06] text-white/70 transition hover:bg-white/10 hover:text-white active:scale-95"
+            className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-secondary text-foreground/70 transition hover:bg-secondary hover:text-foreground active:scale-95"
           >
             <X className="h-4 w-4" />
           </button>
@@ -205,10 +205,10 @@ export function DownloadSettingsSheet({
             type="button"
             onClick={toggleMode}
             aria-pressed={mode}
-            className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-2xl bg-white/[0.04] px-4 py-4 ring-1 ring-white/[0.08] transition active:scale-[0.99]"
+            className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-2xl bg-secondary px-4 py-4 ring-1 ring-border transition active:scale-[0.99]"
           >
             <span className="text-left">
-              <span className="block text-[15px] font-bold text-white">
+              <span className="block text-[15px] font-bold text-foreground">
                 Download mode
               </span>
             </span>
@@ -216,7 +216,7 @@ export function DownloadSettingsSheet({
               aria-hidden
               className={cn(
                 "relative h-8 w-[3.25rem] shrink-0 rounded-full transition-colors",
-                mode ? "bg-success" : "bg-white/15"
+                mode ? "bg-success" : "bg-secondary"
               )}
             >
               <span
@@ -230,10 +230,10 @@ export function DownloadSettingsSheet({
 
           {/* Quality */}
           <div className="mt-5 flex items-baseline justify-between">
-            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/40">
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-foreground/40">
               Download quality
             </p>
-            <p className="text-[11px] text-white/30">applies to new downloads</p>
+            <p className="text-[11px] text-foreground/30">applies to new downloads</p>
           </div>
           <div className="mt-2 grid grid-cols-4 gap-2">
             {QUALITY_OPTIONS.map((q) => (
@@ -246,14 +246,14 @@ export function DownloadSettingsSheet({
                   "cursor-pointer rounded-2xl px-1 py-2.5 ring-1 transition active:scale-95",
                   quality === q.value
                     ? "bg-primary text-black ring-primary"
-                    : "bg-white/[0.05] text-white/60 ring-white/10 hover:text-white"
+                    : "bg-secondary text-foreground/60 ring-border hover:text-foreground"
                 )}
               >
                 <span className="block text-sm font-black">{q.label}</span>
                 <span
                   className={cn(
                     "mt-0.5 block text-[9px] font-semibold leading-tight",
-                    quality === q.value ? "text-black/70" : "text-white/35"
+                    quality === q.value ? "text-black/70" : "text-foreground/35"
                   )}
                 >
                   {q.hint}
@@ -263,7 +263,7 @@ export function DownloadSettingsSheet({
           </div>
 
           {/* Storage cap */}
-          <p className="mb-2 mt-5 text-[10px] font-bold uppercase tracking-[0.12em] text-white/40">
+          <p className="mb-2 mt-5 text-[10px] font-bold uppercase tracking-[0.12em] text-foreground/40">
             Storage cap
           </p>
           <div className="grid grid-cols-4 gap-2">
@@ -277,7 +277,7 @@ export function DownloadSettingsSheet({
                   "cursor-pointer rounded-2xl px-1 py-2.5 text-sm font-black ring-1 transition active:scale-95",
                   capMb === c.value
                     ? "bg-primary text-black ring-primary"
-                    : "bg-white/[0.05] text-white/60 ring-white/10 hover:text-white"
+                    : "bg-secondary text-foreground/60 ring-border hover:text-foreground"
                 )}
               >
                 {c.label}
@@ -286,24 +286,24 @@ export function DownloadSettingsSheet({
           </div>
 
           {/* Storage meter */}
-          <div className="mt-3 rounded-2xl bg-white/[0.04] px-4 py-3.5 ring-1 ring-white/[0.08]">
+          <div className="mt-3 rounded-2xl bg-secondary px-4 py-3.5 ring-1 ring-border">
             <div className="flex items-end justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-sm font-bold text-white">Storage</p>
-                <p className="mt-0.5 truncate text-[11px] tabular-nums text-white/40">
+                <p className="text-sm font-bold text-foreground">Storage</p>
+                <p className="mt-0.5 truncate text-[11px] tabular-nums text-foreground/40">
                   {doneCount} · {formatBytes(capBytes)} cap
                 </p>
               </div>
               <p className="shrink-0 text-right leading-none">
-                <span className="block text-xl font-black text-white">
+                <span className="block text-xl font-black text-foreground">
                   {formatBytes(usedByApp)}
                 </span>
-                <span className="mt-1 block text-[10px] font-bold uppercase tracking-wider text-white/35">
+                <span className="mt-1 block text-[10px] font-bold uppercase tracking-wider text-foreground/35">
                   used
                 </span>
               </p>
             </div>
-            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-secondary">
               <div
                 className="h-full rounded-full bg-primary transition-all"
                 style={{
@@ -312,14 +312,14 @@ export function DownloadSettingsSheet({
               />
             </div>
             {usage != null && quota != null && (
-              <p className="mt-2 text-[11px] font-semibold tabular-nums text-white/35">
+              <p className="mt-2 text-[11px] font-semibold tabular-nums text-foreground/35">
                 {formatBytes(quota - usage)} free on device
               </p>
             )}
           </div>
 
           {/* Library */}
-          <p className="mb-2 mt-5 text-[10px] font-bold uppercase tracking-[0.12em] text-white/40">
+          <p className="mb-2 mt-5 text-[10px] font-bold uppercase tracking-[0.12em] text-foreground/40">
             Library ({items.length})
           </p>
           {items.length === 0 ? (
@@ -329,10 +329,10 @@ export function DownloadSettingsSheet({
                 onClose();
                 toast("Turn on download mode, then tap â†“ on anything");
               }}
-              className="w-full cursor-pointer rounded-2xl bg-white/[0.03] px-4 py-6 text-center ring-1 ring-white/[0.06] transition active:scale-[0.99]"
+              className="w-full cursor-pointer rounded-2xl bg-secondary px-4 py-6 text-center ring-1 ring-border transition active:scale-[0.99]"
             >
-              <Download className="mx-auto h-5 w-5 text-white/30" />
-              <p className="mt-2 text-sm font-semibold text-white/50">
+              <Download className="mx-auto h-5 w-5 text-foreground/30" />
+              <p className="mt-2 text-sm font-semibold text-foreground/50">
                 No downloads yet
               </p>
             </button>

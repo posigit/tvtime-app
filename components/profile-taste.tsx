@@ -62,7 +62,7 @@ export function ProfileTaste({ taste }: { taste: TasteSnapshot }) {
             {taste.genres.map((g) => (
               <div key={g.name}>
                 <div className="mb-0.5 flex items-center justify-between gap-2 text-xs">
-                  <span className="font-medium text-white">{g.name}</span>
+                  <span className="font-medium text-foreground">{g.name}</span>
                   <span className="text-muted-foreground">
                     {g.count}
                     {g.avgScore != null
@@ -70,7 +70,7 @@ export function ProfileTaste({ taste }: { taste: TasteSnapshot }) {
                       : ""}
                   </span>
                 </div>
-                <div className="h-1.5 overflow-hidden rounded-full bg-white/5">
+                <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
                   <div
                     className="h-full rounded-full bg-primary"
                     style={{ width: `${(g.count / maxGenre) * 100}%` }}
@@ -99,7 +99,7 @@ export function ProfileTaste({ taste }: { taste: TasteSnapshot }) {
                   href={t.href}
                   className="w-[5.25rem] shrink-0"
                 >
-                  <div className="relative h-[7.875rem] w-[5.25rem] overflow-hidden rounded-lg bg-[#2c2c2e]">
+                  <div className="relative h-[7.875rem] w-[5.25rem] overflow-hidden rounded-lg bg-secondary">
                     {src ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -109,12 +109,12 @@ export function ProfileTaste({ taste }: { taste: TasteSnapshot }) {
                         loading="lazy"
                       />
                     ) : (
-                      <div className="flex h-full items-center justify-center p-1 text-center text-[10px] text-white">
+                      <div className="flex h-full items-center justify-center p-1 text-center text-[10px] text-foreground">
                         {t.title}
                       </div>
                     )}
                   </div>
-                  <p className="mt-1 truncate text-[11px] font-semibold text-white">
+                  <p className="mt-1 truncate text-[11px] font-semibold text-foreground">
                     {t.title}
                   </p>
                   <p className="truncate text-[10px] font-medium text-primary">

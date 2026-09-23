@@ -252,7 +252,7 @@ export default async function ExplorePage({
   );
 
   return (
-    <div className="min-h-dvh bg-black pb-nav-page">
+    <div className="min-h-dvh bg-background pb-nav-page">
       <StickyChrome contentClassName="px-4 pt-3 pb-1">
         <SearchBar />
       </StickyChrome>

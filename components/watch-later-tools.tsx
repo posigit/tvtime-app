@@ -270,7 +270,7 @@ export function WatchLaterTools({
           type="button"
           onClick={surprise}
           disabled={poolAll.length === 0}
-          className="flex items-center gap-1.5 rounded-full bg-white/[0.1] px-4 py-2 text-xs font-black uppercase tracking-wide text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] ring-1 ring-white/25 backdrop-blur-xl transition active:scale-95 hover:bg-white/[0.16] disabled:opacity-40"
+          className="flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-xs font-black uppercase tracking-wide text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] ring-1 ring-border backdrop-blur-xl transition active:scale-95 hover:bg-secondary disabled:opacity-40"
         >
           <Shuffle className="h-3.5 w-3.5 text-primary" />
           {pick ? "Surprise again" : "Surprise me"}
@@ -304,10 +304,10 @@ export function WatchLaterTools({
                   ? `${pick.badge} · tonight`
                   : "Tonight\u2019s pick"}
               </p>
-              <p className="truncate text-base font-bold text-white">
+              <p className="truncate text-base font-bold text-foreground">
                 {pick.title}
               </p>
-              <div className="mt-1 flex flex-wrap gap-2 text-xs text-white/60">
+              <div className="mt-1 flex flex-wrap gap-2 text-xs text-foreground/60">
                 {pick.voteAverage != null && pick.voteAverage > 0 && (
                   <span className="inline-flex items-center gap-0.5 text-primary">
                     <Star className="h-3 w-3" fill="currentColor" />
@@ -348,7 +348,7 @@ export function WatchLaterTools({
           <div className="mb-3 mt-4 flex flex-wrap items-center justify-center gap-2">
             <SectionLabel>
               Watch Later
-              <span className="ml-1.5 font-semibold normal-case tracking-normal text-white/50">
+              <span className="ml-1.5 font-semibold normal-case tracking-normal text-foreground/50">
                 · {items.length}
               </span>
             </SectionLabel>
@@ -368,8 +368,8 @@ export function WatchLaterTools({
                 onClick={() => setSort(key)}
                 className={
                   sort === key
-                    ? "rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold text-white"
-                    : "rounded-full bg-card px-3 py-1.5 text-xs font-medium text-white/60"
+                    ? "rounded-full bg-secondary px-3 py-1.5 text-xs font-bold text-foreground"
+                    : "rounded-full bg-card px-3 py-1.5 text-xs font-medium text-foreground/60"
                 }
               >
                 {label}

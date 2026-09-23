@@ -23,11 +23,11 @@ export function ProfileYearRecap({ recap }: { recap: YearRecap }) {
 
   return (
     <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-card to-card">
-      <div className="border-b border-white/5 px-4 py-3">
+      <div className="border-b border-border px-4 py-3">
         <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary">
           Year in review
         </p>
-        <h3 className="text-2xl font-black text-white">{recap.year}</h3>
+        <h3 className="text-2xl font-black text-foreground">{recap.year}</h3>
       </div>
 
       <div className="grid grid-cols-2 gap-3 p-4">
@@ -45,11 +45,11 @@ export function ProfileYearRecap({ recap }: { recap: YearRecap }) {
       </div>
 
       {(recap.topShow || recap.topMovie || recap.topGenre) && (
-        <div className="space-y-3 border-t border-white/5 px-4 py-4">
+        <div className="space-y-3 border-t border-border px-4 py-4">
           {recap.topGenre && (
-            <p className="text-sm text-white/80">
+            <p className="text-sm text-foreground/80">
               Top genre:{" "}
-              <span className="font-bold text-white">{recap.topGenre}</span>
+              <span className="font-bold text-foreground">{recap.topGenre}</span>
             </p>
           )}
           <div className="flex gap-3">
@@ -86,7 +86,7 @@ function Metric({ label, value }: { label: string; value: string }) {
       <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
         {label}
       </p>
-      <p className="text-xl font-bold text-white">{value}</p>
+      <p className="text-xl font-bold text-foreground">{value}</p>
     </div>
   );
 }
@@ -105,7 +105,7 @@ function Highlight({
   const src = posterPath ? posterUrl(posterPath, "w185") : null;
   return (
     <div className="flex min-w-0 flex-1 gap-2">
-      <div className="relative h-16 w-11 shrink-0 overflow-hidden rounded-md bg-[#2c2c2e]">
+      <div className="relative h-16 w-11 shrink-0 overflow-hidden rounded-md bg-secondary">
         {src ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={src} alt="" className="h-full w-full object-cover" />
@@ -115,7 +115,7 @@ function Highlight({
         <p className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
           {kind}
         </p>
-        <p className="truncate text-sm font-semibold text-white">{title}</p>
+        <p className="truncate text-sm font-semibold text-foreground">{title}</p>
         <p className="text-[11px] text-primary">{sub}</p>
       </div>
     </div>

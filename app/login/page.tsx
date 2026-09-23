@@ -46,14 +46,14 @@ export default function LoginPage() {
             name="username"
             placeholder="Username"
             required
-            className="h-12 border-white/10 bg-card text-white placeholder:text-muted-foreground"
+            className="h-12 border-border bg-card text-foreground placeholder:text-muted-foreground"
           />
           <Input
             name="password"
             type="password"
             placeholder="Password"
             required
-            className="h-12 border-white/10 bg-card text-white placeholder:text-muted-foreground"
+            className="h-12 border-border bg-card text-foreground placeholder:text-muted-foreground"
           />
           {error && <p className="text-sm text-red-500">{error}</p>}
           <Button

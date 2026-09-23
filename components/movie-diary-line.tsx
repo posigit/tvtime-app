@@ -23,7 +23,7 @@ export function MovieDiaryLine({
 
   return (
     <div className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1.5 px-1">
-      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-white/60">
+      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-foreground/60">
         {count >= 2 ? (
           <RotateCcw className="h-3 w-3 text-success" strokeWidth={3} />
         ) : (
@@ -31,14 +31,14 @@ export function MovieDiaryLine({
         )}
         {count >= 2 ? `Watched ×${count}` : "Watched once"}
       </span>
-      <span className="text-[11px] text-white/30">·</span>
+      <span className="text-[11px] text-foreground/30">·</span>
       {sorted.slice(0, 3).map((d, i) => (
         <span
           key={`${d.getTime()}-${i}`}
           className={
             i === 0
               ? "rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-bold text-success"
-              : "rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-semibold text-white/50"
+              : "rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold text-foreground/50"
           }
         >
           {i === 0 && count >= 2 ? `⟳ ${formatDiaryDate(d)}` : formatDiaryDate(d)}

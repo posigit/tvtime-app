@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Download, History, MoreHorizontal, CalendarDays } from "lucide-react";
 import { DownloadSettingsSheet } from "@/components/download-settings-sheet";
 import { InstallButton } from "@/components/install-button";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 /** Profile "⋯" menu: Watch history, Import data + Sign out */
 export function ProfileMenu() {
@@ -29,17 +30,17 @@ export function ProfileMenu() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex h-10 w-10 items-center justify-center rounded-full text-white"
+        className="flex h-10 w-10 items-center justify-center rounded-full text-foreground"
         aria-label="More"
       >
         <MoreHorizontal className="h-6 w-6" />
       </button>
       {open && (
-        <div className="absolute right-0 top-12 z-30 w-44 overflow-hidden rounded-xl border border-white/10 bg-card shadow-xl">
+        <div className="absolute right-0 top-12 z-30 w-56 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-border bg-card shadow-xl">
           <Link
             href="/profile/history"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-2 px-4 py-3 text-left text-sm font-medium text-white hover:bg-secondary"
+            className="flex items-center gap-2 px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-secondary"
           >
             <History className="h-4 w-4" />
             Watch history
@@ -47,14 +48,14 @@ export function ProfileMenu() {
           <Link
             href="/import"
             onClick={() => setOpen(false)}
-            className="block w-full px-4 py-3 text-left text-sm font-medium text-white hover:bg-secondary"
+            className="block w-full px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-secondary"
           >
             Import data
           </Link>
           <Link
             href="/calendar?back=/profile"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-2 px-4 py-3 text-left text-sm font-medium text-white hover:bg-secondary"
+            className="flex items-center gap-2 px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-secondary"
           >
             <CalendarDays className="h-4 w-4" />
             Calendar
@@ -65,16 +66,22 @@ export function ProfileMenu() {
               setOpen(false);
               setDownloadsOpen(true);
             }}
-            className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-medium text-white hover:bg-secondary"
+            className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-secondary"
           >
             <Download className="h-4 w-4" />
             Library
           </button>
           <InstallButton />
+          <div className="border-t border-border px-2 py-3">
+            <p className="mb-2 px-2 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+              Appearance
+            </p>
+            <ThemeToggle layout="stacked" />
+          </div>
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="w-full px-4 py-3 text-left text-sm font-medium text-white hover:bg-secondary"
+            className="w-full px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-secondary"
           >
             Sign out
           </button>

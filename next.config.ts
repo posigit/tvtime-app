@@ -21,6 +21,14 @@ const nextConfig: NextConfig = {
         pathname: "/vi/**",
       },
     ],
+    // Smaller bytes on poster-heavy grids (AVIF first, WebP fallback).
+    formats: ["image/avif", "image/webp"],
+    // TMDB posters are immutable per path — cache resized output a full day.
+    minimumCacheTTL: 86400,
+  },
+  // lucide-react is fully tree-shaken instead of bundling every icon.
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
   },
   async headers() {
     return [

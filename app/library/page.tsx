@@ -54,13 +54,13 @@ export default function LibraryPage() {
         <Link
           href="/profile"
           aria-label="Back to profile"
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.06] text-white ring-1 ring-white/10 transition hover:bg-white/10"
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-foreground ring-1 ring-border transition hover:bg-secondary"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <div className="min-w-0">
-          <h1 className="truncate text-xl font-black tracking-tight text-white">Library</h1>
-          <p className="text-xs tabular-nums text-white/45">
+          <h1 className="truncate text-xl font-black tracking-tight text-foreground">Library</h1>
+          <p className="text-xs tabular-nums text-foreground/45">
             {doneCount}
             {usedByApp > 0 ? ` · ${formatBytes(usedByApp)}` : ""}
           </p>
@@ -69,11 +69,11 @@ export default function LibraryPage() {
 
       <div className="mt-4 space-y-2">
         {!ready ? (
-          <p className="py-10 text-center text-sm text-white/40">Loading…</p>
+          <p className="py-10 text-center text-sm text-foreground/40">Loading…</p>
         ) : items.length === 0 ? (
-          <div className="rounded-2xl bg-white/[0.03] px-4 py-10 text-center ring-1 ring-white/[0.06]">
-            <Download className="mx-auto h-5 w-5 text-white/30" />
-            <p className="mt-2 text-sm font-semibold text-white/50">
+          <div className="rounded-2xl bg-secondary px-4 py-10 text-center ring-1 ring-border">
+            <Download className="mx-auto h-5 w-5 text-foreground/30" />
+            <p className="mt-2 text-sm font-semibold text-foreground/50">
               No downloads yet
             </p>
           </div>

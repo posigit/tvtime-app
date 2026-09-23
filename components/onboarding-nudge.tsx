@@ -29,8 +29,8 @@ export function OnboardingNudge() {
     setDismissed(true);
   };
   return (
-    <div className="mb-4 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 shadow-lg shadow-black/30 backdrop-blur-xl">
-      <p className="min-w-0 flex-1 text-[13px] font-medium leading-snug text-white/85">
+    <div className="mb-4 flex items-center gap-3 rounded-2xl border border-border bg-secondary px-4 py-3 shadow-lg shadow-black/30 backdrop-blur-xl">
+      <p className="min-w-0 flex-1 text-[13px] font-medium leading-snug text-foreground/85">
         New here?{" "}
         <Link href="/import" className="font-bold text-primary hover:underline">
           Import your data
@@ -41,7 +41,7 @@ export function OnboardingNudge() {
         type="button"
         onClick={dismiss}
         aria-label="Dismiss"
-        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/60 transition hover:bg-white/20 hover:text-white"
+        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground/60 transition hover:bg-secondary hover:text-foreground"
       >
         <X className="h-3.5 w-3.5" />
       </button>

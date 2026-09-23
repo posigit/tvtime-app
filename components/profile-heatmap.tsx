@@ -7,7 +7,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const LEVEL_CLASS: Record<0 | 1 | 2 | 3 | 4, string> = {
-  0: "bg-white/5",
+  0: "bg-secondary",
   1: "bg-primary/25",
   2: "bg-primary/45",
   3: "bg-primary/70",
@@ -57,8 +57,8 @@ export function ProfileHeatmap({
           <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
             Watch activity
           </p>
-          <p className="mt-0.5 text-sm text-white/80">
-            <span className="font-bold text-white">{totalActive}</span> active
+          <p className="mt-0.5 text-sm text-foreground/80">
+            <span className="font-bold text-foreground">{totalActive}</span> active
             days · last {Math.round(days / 30)} mo
           </p>
         </div>
@@ -69,7 +69,7 @@ export function ProfileHeatmap({
           </span>
           <span>
             Best{" "}
-            <span className="font-bold text-white">{longestStreak}d</span>
+            <span className="font-bold text-foreground">{longestStreak}d</span>
           </span>
         </div>
       </div>
@@ -95,7 +95,7 @@ export function ProfileHeatmap({
                   className={cn(
                     "aspect-square w-full rounded-[2px]",
                     LEVEL_CLASS[level],
-                    cell.key === dayKey(new Date()) && "ring-1 ring-white/40"
+                    cell.key === dayKey(new Date()) && "ring-1 ring-border"
                   )}
                 />
               );

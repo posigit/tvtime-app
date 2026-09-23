@@ -120,6 +120,111 @@
   --sidebar-ring: #f5c518;
 }
 
+/* ── Themes: AMOLED (default, pure black) / Soft dark / Light ──────────────
+   :root stays AMOLED so first paint + no-JS is pure black. */
+:root,
+html[data-theme="amoled"] {
+  color-scheme: dark;
+}
+
+html[data-theme="soft"] {
+  color-scheme: dark;
+  --background: #101014;
+  --foreground: #ffffff;
+  --card: #1a1a20;
+  --card-foreground: #ffffff;
+  --popover: #1a1a20;
+  --popover-foreground: #ffffff;
+  --primary: #f5c518;
+  --primary-foreground: #000000;
+  --secondary: #24242c;
+  --secondary-foreground: #ffffff;
+  --muted: #3a3a44;
+  --muted-foreground: #9a9aa5;
+  --accent: #f5c518;
+  --accent-foreground: #000000;
+  --destructive: #ff453a;
+  --success: #7ed321;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #f5c518;
+  --sidebar: #101014;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #f5c518;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #24242c;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #f5c518;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+  --background: #f4f4f6;
+  --foreground: #101014;
+  --card: #ffffff;
+  --card-foreground: #101014;
+  --popover: #ffffff;
+  --popover-foreground: #101014;
+  --primary: #eab308;
+  --primary-foreground: #000000;
+  --secondary: #e9e9ee;
+  --secondary-foreground: #101014;
+  --muted: #e0e0e6;
+  --muted-foreground: #63636b;
+  --accent: #eab308;
+  --accent-foreground: #000000;
+  --destructive: #e02424;
+  --success: #3d8b00;
+  --border: rgba(0, 0, 0, 0.1);
+  --input: rgba(0, 0, 0, 0.12);
+  --ring: #eab308;
+  --chart-1: #eab308;
+  --chart-2: #63636b;
+  --chart-3: #d4d4da;
+  --chart-4: #e9e9ee;
+  --chart-5: #ffffff;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #101014;
+  --sidebar-primary: #eab308;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #e9e9ee;
+  --sidebar-accent-foreground: #101014;
+  --sidebar-border: rgba(0, 0, 0, 0.1);
+  --sidebar-ring: #eab308;
+}
+
+/* Theme switch shouldn't flash; respect reduced motion. */
+html,
+body {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body {
+    transition: none;
+  }
+}
+
+/* Light-theme readability for surfaces that stay frosted/dark by design. */
+html[data-theme="light"] .glass-panel {
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+html[data-theme="light"] .top-ten-rank {
+  color: rgba(0, 0, 0, 0.05);
+  -webkit-text-stroke: 2.5px rgba(0, 0, 0, 0.55);
+}
+html[data-theme="light"] .top-ten-rank-gold {
+  color: rgba(234, 179, 8, 0.14);
+  -webkit-text-stroke: 2.5px #b8860b;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -235,5 +340,25 @@
   /** Profile banner under status bar (base h-44 = 11rem) */
   .h-profile-hero {
     height: calc(11rem + env(safe-area-inset-top, 0px));
+  }
+
+  /** Up-next toast entrance */
+  @keyframes up-next-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  .animate-up-next-in {
+    animation: up-next-in 0.25s ease-out both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-up-next-in {
+      animation: none;
+    }
   }
 }

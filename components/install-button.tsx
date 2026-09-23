@@ -46,7 +46,7 @@ export function InstallButton() {
           .catch(() => {})
           .finally(() => setDeferred(null));
       }}
-      className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-medium text-white hover:bg-secondary"
+      className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-secondary"
     >
       <ArrowDownToLine className="h-4 w-4" />
       Install app

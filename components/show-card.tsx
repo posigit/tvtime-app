@@ -31,7 +31,8 @@ export function ShowCard({ show }: { show: ShowCardData }) {
             fill
             sizes="(max-width: 768px) 33vw, 200px"
             className="object-cover"
-            unoptimized
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-muted-foreground">

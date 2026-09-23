@@ -92,7 +92,7 @@ export function UpcomingList({ groups }: { groups: UpcomingGroup[] }) {
               return (
                 <div
                   key={`${item.tmdbId}-${item.seasonNumber}-${item.episodeNumber}`}
-                  className="flex items-center gap-3 rounded-xl bg-[#101011] p-2.5"
+                  className="flex items-center gap-3 rounded-xl bg-card p-2.5"
                 >
                   <Link
                     href={`/show/${item.tmdbId}`}
@@ -105,7 +105,8 @@ export function UpcomingList({ groups }: { groups: UpcomingGroup[] }) {
                         fill
                         sizes="116px"
                         className="object-cover"
-                        unoptimized
+                        loading="lazy"
+                        decoding="async"
                       />
                     ) : poster ? (
                       <Image
@@ -114,7 +115,8 @@ export function UpcomingList({ groups }: { groups: UpcomingGroup[] }) {
                         fill
                         sizes="116px"
                         className="object-cover"
-                        unoptimized
+                        loading="lazy"
+                        decoding="async"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
@@ -127,16 +129,16 @@ export function UpcomingList({ groups }: { groups: UpcomingGroup[] }) {
                     href={`/show/${item.tmdbId}`}
                     className="min-w-0 flex-1 py-0.5"
                   >
-                    <div className="mb-1.5 inline-flex max-w-full items-center gap-0.5 rounded-full border border-white/90 px-2.5 py-[3px]">
-                      <span className="truncate text-[11px] font-bold uppercase tracking-wide text-white">
+                    <div className="mb-1.5 inline-flex max-w-full items-center gap-0.5 rounded-full border border-foreground/30 px-2.5 py-[3px]">
+                      <span className="truncate text-[11px] font-bold uppercase tracking-wide text-foreground">
                         {item.title}
                       </span>
                       <ChevronRight
-                        className="h-3 w-3 flex-shrink-0 text-white"
+                        className="h-3 w-3 flex-shrink-0 text-foreground"
                         strokeWidth={2.5}
                       />
                     </div>
-                    <p className="text-[15px] font-bold leading-tight text-white">
+                    <p className="text-[15px] font-bold leading-tight text-foreground">
                       S{String(item.seasonNumber).padStart(2, "0")} | E
                       {String(item.episodeNumber).padStart(2, "0")}
                     </p>
@@ -146,12 +148,12 @@ export function UpcomingList({ groups }: { groups: UpcomingGroup[] }) {
                     {(item.isPremiere || item.isLatest) && (
                       <div className="mt-1.5 flex flex-wrap gap-1.5">
                         {item.isPremiere && (
-                          <span className="rounded-md bg-white px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-black">
+                          <span className="rounded-md bg-foreground px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-background">
                             Premiere
                           </span>
                         )}
                         {item.isLatest && (
-                          <span className="rounded-md bg-white px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-black">
+                          <span className="rounded-md bg-foreground px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-background">
                             Latest
                           </span>
                         )}
@@ -184,7 +186,7 @@ export function UpcomingList({ groups }: { groups: UpcomingGroup[] }) {
                           : `${item.daysUntil} day${item.daysUntil === 1 ? "" : "s"}`
                       }
                     >
-                      <span className="text-2xl font-black leading-none text-white">
+                      <span className="text-2xl font-black leading-none text-foreground">
                         {item.daysUntil}
                       </span>
                       <span className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">

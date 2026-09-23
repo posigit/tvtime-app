@@ -67,7 +67,7 @@ export function DiscoverRail({
                     </span>
                   )}
                 </div>
-                <p className="truncate px-1.5 py-1.5 text-[11px] font-medium text-white/90">
+                <p className="truncate px-1.5 py-1.5 text-[11px] font-medium text-foreground/90">
                   {item.title}
                 </p>
               </Link>

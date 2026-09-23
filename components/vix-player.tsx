@@ -1117,14 +1117,13 @@ export function VixPlayer({
 
   // ---------- source switching ----------
   // Picker order: cinesrc, vidfast, mapple, vidlink, vidnest, 2embed, then vix.
-  // goated stays last and disabled (degraded backend).
+  // Goated is a first-class native source (Valenox → Orbit cascade).
   const ALL_SOURCES: StreamSource[] = [
     ...EMBED_SOURCES.map((s) => s.key as StreamSource),
     "vix",
     "goated",
   ];
   const disabledSources: StreamSource[] = [
-    "goated",
     ...(type === "tv"
       ? EMBED_SOURCES.filter((s) => !s.tvUrl(0, 1, 1)).map(
           (s) => s.key as StreamSource

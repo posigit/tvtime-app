@@ -170,11 +170,11 @@ export function DownloadButton({
         title={stateLabel(rec)}
         aria-label={stateLabel(rec)}
         className={cn(
-          "flex w-full items-center gap-3 rounded-full bg-white/[0.08] px-4 py-3 text-sm font-bold text-white ring-1 ring-white/15 backdrop-blur-xl transition hover:bg-white/[0.12] active:scale-[0.99]",
+          "flex w-full items-center gap-3 rounded-full bg-secondary px-4 py-3 text-sm font-bold text-foreground ring-1 ring-border backdrop-blur-xl transition hover:bg-secondary active:scale-[0.99]",
           className
         )}
       >
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/[0.14] ring-1 ring-white/25">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-secondary ring-1 ring-border">
           {rec?.state === "done" ? (
             <Check className="h-4 w-4 text-success" strokeWidth={3} />
           ) : busy ? (
@@ -199,12 +199,12 @@ export function DownloadButton({
                   : "Download for offline"}
         </span>
         {rec && rec.state !== "done" && rec.estimateBytes > 0 && (
-          <span className="shrink-0 text-xs font-semibold text-white/50">
+          <span className="shrink-0 text-xs font-semibold text-foreground/50">
             ~{formatBytes(rec.estimateBytes)}
           </span>
         )}
         {rec?.state === "done" && rec.sizeBytes > 0 && (
-          <span className="shrink-0 text-xs font-semibold text-white/50">
+          <span className="shrink-0 text-xs font-semibold text-foreground/50">
             {formatBytes(rec.sizeBytes)}
           </span>
         )}
@@ -223,7 +223,7 @@ export function DownloadButton({
                 cancelDownload(key);
               }
             }}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-bold text-white/70 hover:bg-white/20"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-bold text-foreground/70 hover:bg-secondary"
           >
             ×
           </span>
@@ -242,7 +242,7 @@ export function DownloadButton({
         "flex h-8 w-8 shrink-0 items-center justify-center rounded-full ring-1 backdrop-blur-xl transition-all active:scale-95",
         rec?.state === "done"
           ? "bg-success/20 text-success ring-success/50"
-          : "bg-white/[0.08] text-white/80 ring-white/15 hover:bg-white/20",
+          : "bg-secondary text-foreground/80 ring-border hover:bg-secondary",
         className
       )}
     >

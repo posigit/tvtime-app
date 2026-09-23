@@ -118,17 +118,17 @@ export default async function CalendarPage({
   }
 
   return (
-    <div className="min-h-dvh bg-black px-4 pb-nav-page">
-      <div className="sticky top-0 z-40 -mx-4 bg-black/85 px-4 pb-2 pt-safe-float backdrop-blur">
+    <div className="min-h-dvh bg-background px-4 pb-nav-page">
+      <div className="sticky top-0 z-40 -mx-4 bg-background/85 px-4 pb-2 pt-safe-float backdrop-blur">
         <div className="flex items-center justify-between">
           <Link
             href={backHref}
             aria-label="Back"
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.06] text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-foreground"
           >
             <ChevronLeft className="h-5 w-5" />
           </Link>
-          <h1 className="flex items-center gap-2 text-base font-black uppercase tracking-wide text-white">
+          <h1 className="flex items-center gap-2 text-base font-black uppercase tracking-wide text-foreground">
             <CalendarDays className="h-4 w-4 text-primary" />
             Calendar
           </h1>

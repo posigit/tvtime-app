@@ -72,7 +72,7 @@ export function TopTenRail({
           </p>
           <h2
             className={cn(
-              "mt-1 font-black tracking-tight text-white",
+              "mt-1 font-black tracking-tight text-foreground",
               featured ? "text-[1.85rem] leading-none" : "text-xl leading-tight"
             )}
           >
@@ -137,7 +137,7 @@ export function TopTenRail({
               <div
                 className={cn(
                   "relative z-10 mb-0 ml-[2.35rem] overflow-hidden rounded-xl bg-card shadow-[0_12px_28px_rgba(0,0,0,0.55)] ring-1",
-                  first ? "ring-primary/50" : "ring-white/12",
+                  first ? "ring-primary/50" : "ring-border",
                   posterW
                 )}
               >
@@ -174,12 +174,12 @@ export function TopTenRail({
         })}
         <Link
           href={href}
-          className="mb-1 ml-1 flex w-[4.5rem] flex-shrink-0 snap-end flex-col items-center justify-center gap-1 self-center rounded-xl bg-white/5 py-8 text-center ring-1 ring-white/10"
+          className="mb-1 ml-1 flex w-[4.5rem] flex-shrink-0 snap-end flex-col items-center justify-center gap-1 self-center rounded-xl bg-secondary py-8 text-center ring-1 ring-border"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-black">
             <ChevronRight className="h-5 w-5" strokeWidth={2.5} />
           </span>
-          <span className="text-[10px] font-black uppercase tracking-wide text-white/80">
+          <span className="text-[10px] font-black uppercase tracking-wide text-foreground/80">
             Full
             <br />
             list

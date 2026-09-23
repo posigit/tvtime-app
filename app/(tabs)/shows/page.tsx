@@ -392,7 +392,7 @@ export default async function ShowsPage({
     });
 
   return (
-    <div className="min-h-dvh bg-black px-4 pb-nav-page">
+    <div className="min-h-dvh bg-background px-4 pb-nav-page">
       <StickyChrome contentClassName="pt-2">
         <div className="relative">
           <ShowTabs
@@ -404,7 +404,7 @@ export default async function ShowsPage({
           <Link
             href="/calendar"
             aria-label="Calendar"
-            className="absolute right-0 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-white/60 transition hover:text-white"
+            className="absolute right-0 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition hover:text-foreground"
           >
             <CalendarDays className="h-5 w-5" />
           </Link>
@@ -481,7 +481,7 @@ export default async function ShowsPage({
               </Link>
               <Link
                 href="/import"
-                className="mt-2.5 rounded-full px-6 py-2.5 text-sm font-bold text-white/70 ring-1 ring-white/20 transition hover:bg-white/10 hover:text-white"
+                className="mt-2.5 rounded-full px-6 py-2.5 text-sm font-bold text-muted-foreground ring-1 ring-border transition hover:bg-secondary hover:text-foreground"
               >
                 Import your data
               </Link>

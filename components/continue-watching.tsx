@@ -95,7 +95,8 @@ function ResumeCard({ item }: { item: ContinueWatchingItem }) {
             fill
             sizes="184px"
             className="object-cover transition duration-300 group-hover:scale-105"
-            unoptimized
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="flex h-full items-center justify-center p-3 text-center text-xs text-muted-foreground">
@@ -116,7 +117,7 @@ function ResumeCard({ item }: { item: ContinueWatchingItem }) {
         )}
       </div>
       <div className="p-2.5">
-        <p className="truncate text-sm font-bold text-white">{item.title}</p>
+        <p className="truncate text-sm font-bold text-foreground">{item.title}</p>
         <p className="mt-0.5 truncate text-[11px] font-semibold text-muted-foreground">
           {episodeCode ? `${episodeCode}${item.episodeTitle ? ` · ${item.episodeTitle}` : ""}` : "Movie"}
         </p>

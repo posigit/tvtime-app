@@ -111,13 +111,13 @@ export function DownloadRow({
   };
 
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.07] px-3.5 py-3 shadow-lg shadow-black/30 backdrop-blur-xl">
+    <div className="flex items-center gap-3 rounded-2xl border border-border bg-secondary px-3.5 py-3 shadow-lg shadow-black/30 backdrop-blur-xl">
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-bold tracking-tight text-white">{r.title}</p>
+        <p className="truncate text-sm font-bold tracking-tight text-foreground">{r.title}</p>
         {r.subtitle && (
-          <p className="truncate text-xs text-white/45">{r.subtitle}</p>
+          <p className="truncate text-xs text-foreground/45">{r.subtitle}</p>
         )}
-        <p className="mt-1 text-[11px] font-semibold tabular-nums text-white/40">
+        <p className="mt-1 text-[11px] font-semibold tabular-nums text-foreground/40">
           {r.state === "done" && r.sizeBytes > 0
             ? `${formatBytes(r.sizeBytes)} · ${qualityLabel(r)}`
             : busy
@@ -131,7 +131,7 @@ export function DownloadRow({
                     : "Waiting…"}
         </p>
         {busy && (
-          <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-white/10">
+          <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-secondary">
             <div
               className="h-full rounded-full bg-primary transition-all"
               style={{ width: `${Math.round(progress * 100)}%` }}
@@ -158,7 +158,7 @@ export function DownloadRow({
             onClick={tryResume}
             aria-label="Resume download"
             title={!online ? "Needs connection" : undefined}
-            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-white/[0.08] text-white ring-1 ring-white/15 transition hover:bg-white/15 active:scale-95 disabled:opacity-40"
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-secondary text-foreground ring-1 ring-border transition hover:bg-secondary active:scale-95 disabled:opacity-40"
           >
             {r.state === "paused" ? (
               <Play className="h-4 w-4 fill-current" />
@@ -172,7 +172,7 @@ export function DownloadRow({
             type="button"
             onClick={() => void pauseDownload(r.key)}
             aria-label="Pause download"
-            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-white/[0.08] text-white ring-1 ring-white/15 transition hover:bg-white/15 active:scale-95"
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-secondary text-foreground ring-1 ring-border transition hover:bg-secondary active:scale-95"
           >
             <Pause className="h-4 w-4" />
           </button>
@@ -187,7 +187,7 @@ export function DownloadRow({
             );
           }}
           aria-label={`Delete ${r.title}`}
-          className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-white/[0.08] text-white/60 ring-1 ring-white/15 transition hover:bg-white/15 hover:text-white active:scale-95"
+          className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-secondary text-foreground/60 ring-1 ring-border transition hover:bg-secondary hover:text-foreground active:scale-95"
         >
           <Trash2 className="h-4 w-4" />
         </button>

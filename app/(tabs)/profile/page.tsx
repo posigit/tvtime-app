@@ -71,7 +71,7 @@ function SectionHeader({
           <Heart className="h-3.5 w-3.5 fill-white text-white" />
         </span>
       )}
-      <h2 className="text-xl font-bold text-white">{title}</h2>
+      <h2 className="text-xl font-bold text-foreground">{title}</h2>
     </div>
   );
 
@@ -114,7 +114,7 @@ function StatCell({
 
 function BigVal({ value }: { value: number }) {
   return (
-    <p className="text-xl font-bold text-white">
+    <p className="text-xl font-bold text-foreground">
       {value.toLocaleString("en-US")}
     </p>
   );
@@ -123,7 +123,7 @@ function BigVal({ value }: { value: number }) {
 function DurationCompact({ minutes }: { minutes: number }) {
   const { months, days, hours } = splitDuration(minutes);
   return (
-    <p className="text-xl font-bold text-white">
+    <p className="text-xl font-bold text-foreground">
       {months > 0 && (
         <>
           {months}
@@ -274,7 +274,7 @@ function CaptionedRail({ items }: { items: RailItem[] }) {
             rewatchQueued={item.rewatchQueued}
           />
           <div style={TILE_STYLE}>
-            <p className="mt-1.5 truncate text-xs font-semibold text-white">
+            <p className="mt-1.5 truncate text-xs font-semibold text-foreground">
               {item.title}
             </p>
             {item.rating != null && item.rating > 0 ? (
@@ -1227,7 +1227,7 @@ export default async function ProfilePage() {
   perfLog("profile:totalFetch", pageStart);
 
   return (
-    <div className="min-h-dvh bg-black pb-nav-page">
+    <div className="min-h-dvh bg-background pb-nav-page">
       {/*
         Hero + identity in one relative stack so the avatar can overlap the
         banner without being clipped by overflow-hidden on the image box.
@@ -1301,7 +1301,7 @@ export default async function ProfilePage() {
           <div className="rounded-2xl bg-card p-4">
             <div className="grid grid-cols-2 gap-x-3 gap-y-5">
               <StatCell label="Day streak">
-                <p className="flex items-center gap-1.5 text-xl font-bold text-white">
+                <p className="flex items-center gap-1.5 text-xl font-bold text-foreground">
                   <Flame
                     className={cn(
                       "h-5 w-5",
@@ -1384,7 +1384,7 @@ export default async function ProfilePage() {
                 const body = (
                   <>
                     <div className="mb-3 flex items-center justify-between gap-3">
-                      <p className="font-medium text-white">{list.name}</p>
+                      <p className="font-medium text-foreground">{list.name}</p>
                       <div className="flex items-center gap-1 text-muted-foreground">
                         <span className="text-xs">
                           {list.count} item{list.count === 1 ? "" : "s"}

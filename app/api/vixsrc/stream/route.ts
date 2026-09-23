@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { VIX_LANG } from "@/lib/vixsrc";
+import { getResolverBases } from "@/lib/resolver-env";
 
 /**
  * VixSrc native stream resolver.
@@ -58,22 +59,32 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const resolver = process.env.VIX_RESOLVER_URL?.replace(/\/+$/, "");
+  // Validated base URLs only — a placeholder/garbage value must fail loud
+  // (resolver_misconfigured) instead of attempting a doomed fetch.
+  // Multiple resolvers fail over in order: first 2xx wins, so one burned
+  // host never takes down native playback while others are healthy.
+  const resolvers = getResolverBases();
+  const resolverRaw = [process.env.VIX_RESOLVER_URLS, process.env.VIX_RESOLVER_URL]
+    .filter(Boolean)
+    .join(",")
+    .trim();
   const stages: { resolver?: string; direct?: string } = {};
+  if (resolverRaw && resolvers.length === 0) {
+    stages.resolver =
+      "VIX_RESOLVER_URL(S) is set but holds no valid http(s) base URL — check for a redaction placeholder or a pasted path/tunnel URL";
+  }
 
   // Deployed path: resolve from a non-blocked service, then enrich with IMDb.
-  if (resolver) {
+  const rp = new URLSearchParams({ type, id });
+  if (season != null) rp.set("season", season);
+  if (episode != null) rp.set("episode", episode);
+  for (const resolver of resolvers) {
     try {
-      const rp = new URLSearchParams({
-        type,
-        id,
-      });
-      if (season != null) rp.set("season", season);
-      if (episode != null) rp.set("episode", episode);
-      // Railway cold starts can exceed 15s — match the client's 30s ceiling.
+      // Cold starts can be slow — per-host budget stays tight so one dead
+      // host can't eat the whole client window before failover/direct.
       const res = await fetch(`${resolver}/stream?${rp.toString()}`, {
         cache: "no-store",
-        signal: AbortSignal.timeout(30_000),
+        signal: AbortSignal.timeout(12_000),
       });
       if (res.ok) {
         const data = await res.json();
@@ -88,10 +99,11 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({
           ...data,
           playlistUrl,
+          resolverHost: new URL(resolver).hostname,
           imdbId: await fetchImdbId(type, id),
         });
       }
-      // Capture a snippet of the resolver's error body — Railway's own
+      // Capture a snippet of the resolver's error body — the host's own
       // "Application not found" vs the resolver's JSON tells you whether the
       // SERVICE is dead vs the source blocking it.
       let bodyHint = "";
@@ -100,12 +112,11 @@ export async function GET(req: NextRequest) {
       } catch {
         /* ignore */
       }
-      stages.resolver = `resolver ${res.status}${bodyHint ? ` — ${bodyHint}` : ""}`;
-      // Non-2xx from the resolver: fall through to the direct attempt.
+      stages.resolver = `${new URL(resolver).hostname}: ${res.status}${bodyHint ? ` — ${bodyHint}` : ""}`;
+      // Non-2xx from this resolver: try the next one.
     } catch (err) {
-      stages.resolver =
-        err instanceof Error ? `resolver: ${err.message}` : "resolver failed";
-      // Resolver unreachable/error: fall through to the direct attempt.
+      stages.resolver = `${new URL(resolver).hostname}: ${err instanceof Error ? err.message : "resolver failed"}`;
+      // Resolver unreachable/error: try the next one.
     }
   }
 
@@ -169,16 +180,23 @@ export async function GET(req: NextRequest) {
     // Machine-readable codes so clients can tell "no stream exists" apart
     // from "this deployment can't reach the source". Direct Vercel → vixsrc
     // requests are Cloudflare-blocked (403); production depends on the
-    // standalone resolver (VIX_RESOLVER_URL).
-    const code = !resolver ? "resolver_unconfigured" : "resolution_failed";
+    // standalone resolver (VIX_RESOLVER_URL / VIX_RESOLVER_URLS).
+    const code = !resolverRaw
+      ? "resolver_unconfigured"
+      : resolvers.length === 0
+        ? "resolver_misconfigured"
+        : "resolution_failed";
     return NextResponse.json(
       {
         error: directErr,
         code,
-        detail: !resolver
+        detail: !resolverRaw
           ? "VIX_RESOLVER_URL is not set on this deployment and vixsrc blocks direct requests from it. Streaming still works via embeds, but native playback and downloads need the resolver."
-          : `Resolver and direct paths both failed (resolver: ${stages.resolver ?? "n/a"}; direct: ${directErr}). The resolver service may be down or blocked.`,
-        resolverConfigured: !!resolver,
+          : resolvers.length === 0
+            ? "VIX_RESOLVER_URL(S) is set but holds no valid http(s) base URL (placeholder or malformed). Paste the resolver service's public root URL with no trailing slash or path, then redeploy."
+            : `Resolver and direct paths both failed (resolver: ${stages.resolver ?? "n/a"}; direct: ${directErr}). The resolver service may be down or blocked.`,
+        resolverConfigured: resolvers.length > 0,
+        resolverCount: resolvers.length,
         stages,
       },
       { status: 502 }

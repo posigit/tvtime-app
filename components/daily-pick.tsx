@@ -27,7 +27,7 @@ export function DailyPickCard({
       <p className="mb-2.5 text-[11px] font-black uppercase tracking-wider text-primary">
         Daily pick
       </p>
-      <article className="relative overflow-hidden rounded-2xl bg-card ring-1 ring-white/10">
+      <article className="relative overflow-hidden rounded-2xl bg-card ring-1 ring-border">
         <Link href={href} className="block">
           <div className="relative h-52 w-full">
             {bg ? (

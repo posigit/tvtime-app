@@ -124,7 +124,7 @@ export function DetailHeroSkeleton() {
 export function ShowsPageSkeleton() {
   return (
     <div
-      className="min-h-dvh bg-black px-4 pb-nav-page"
+      className="min-h-dvh bg-background px-4 pb-nav-page"
       role="status"
       aria-label="Loading shows"
     >
@@ -155,7 +155,7 @@ export function ShowsPageSkeleton() {
 export function MoviesPageSkeleton() {
   return (
     <div
-      className="min-h-dvh bg-black px-4 pb-nav-page"
+      className="min-h-dvh bg-background px-4 pb-nav-page"
       role="status"
       aria-label="Loading movies"
     >
@@ -178,7 +178,7 @@ export function MoviesPageSkeleton() {
 export function ExplorePageSkeleton() {
   return (
     <div
-      className="min-h-dvh bg-black pb-nav-page"
+      className="min-h-dvh bg-background pb-nav-page"
       role="status"
       aria-label="Loading explore"
     >
@@ -220,7 +220,7 @@ export function ExplorePageSkeleton() {
 export function ProfilePageSkeleton() {
   return (
     <div
-      className="min-h-dvh bg-black pb-nav-page"
+      className="min-h-dvh bg-background pb-nav-page"
       role="status"
       aria-label="Loading profile"
     >
@@ -271,7 +271,7 @@ export function ProfilePageSkeleton() {
 export function ShowDetailSkeleton() {
   return (
     <div
-      className="min-h-dvh bg-black pb-safe-page"
+      className="min-h-dvh bg-background pb-safe-page"
       role="status"
       aria-label="Loading show"
     >
@@ -305,7 +305,7 @@ export function ShowDetailSkeleton() {
 export function MovieDetailSkeleton() {
   return (
     <div
-      className="min-h-dvh bg-black pb-safe-page"
+      className="min-h-dvh bg-background pb-safe-page"
       role="status"
       aria-label="Loading movie"
     >

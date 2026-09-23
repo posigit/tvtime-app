@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { pingDb } from "@/lib/db";
+import { resolverEnvState } from "@/lib/resolver-env";
 
 /**
  * Lightweight health + DB keep-alive endpoint.
@@ -26,11 +27,15 @@ export async function GET(request: Request) {
   const started = Date.now();
   // Integration presence (flags only, never values) so a dashboard can tell
   // "not configured" apart from "down" — e.g. OpenSubtitles 501s.
+  // vixResolver is VALIDATED (a placeholder like "[SENSITIVE]" counts as
+  // down, not configured); vixResolverState splits unset/valid/invalid.
+  const vixState = resolverEnvState();
   const integrations = {
     tmdb: Boolean(
       process.env.TMDB_API_KEY || process.env.NEXT_PUBLIC_TMDB_API_KEY
     ),
-    vixResolver: Boolean(process.env.VIX_RESOLVER_URL),
+    vixResolver: vixState === "valid",
+    vixResolverState: vixState,
     openSubtitles:
       Boolean(process.env.OPENSUBTITLES_API_KEY) &&
       Boolean(process.env.OPENSUBTITLES_USERNAME) &&

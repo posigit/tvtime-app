@@ -2,7 +2,7 @@
  * Embed-source registry for the player's iframe fallback.
  *
  * Picker order: cinesrc, vidfast, mapple, vidlink, vidnest, 2embed.
- * Native vix + goated are appended in vix-player (goated last, disabled).
+ * Native vix + goated are appended in vix-player (both selectable).
  * Mapple + VidFast + VidLink post PLAYER_EVENT (progress saves); VidFast also
  * accepts {command} control messages. CineSrc posts cinesrc:* events, not
  * PLAYER_EVENT — vix-player adapts those. CineSrc embeds use controls=false

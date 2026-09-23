@@ -38,7 +38,7 @@ export function LayoutToggle({
       aria-label={isGrid ? "Switch to list view" : "Switch to grid view"}
       className={cn(
         "p-1 transition-colors",
-        isGrid ? "text-primary" : "text-white"
+        isGrid ? "text-primary" : "text-foreground"
       )}
     >
       <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">

@@ -19,7 +19,7 @@ export function TonightStrip({ items }: { items: TonightItem[] }) {
             <Link
               key={`${item.tmdbId}-${item.seasonNumber}-${item.episodeNumber}`}
               href={`/show/${item.tmdbId}`}
-              className="flex w-[13.5rem] flex-shrink-0 items-center gap-2.5 rounded-xl bg-card p-2 ring-1 ring-white/10"
+              className="flex w-[13.5rem] flex-shrink-0 items-center gap-2.5 rounded-xl bg-card p-2 ring-1 ring-border"
             >
               <div className="relative h-14 w-10 flex-shrink-0 overflow-hidden rounded-md bg-secondary">
                 {item.posterPath ? (
@@ -33,7 +33,7 @@ export function TonightStrip({ items }: { items: TonightItem[] }) {
                 ) : null}
               </div>
               <div className="min-w-0">
-                <p className="truncate text-[13px] font-bold text-white">
+                <p className="truncate text-[13px] font-bold text-foreground">
                   {item.title}
                 </p>
                 <p className="truncate text-[11px] font-semibold text-primary">

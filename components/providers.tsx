@@ -15,6 +15,33 @@ function SettingsHydrator() {
   return null;
 }
 
+/** Re-asserts the saved appearance theme on mount + across tabs. */
+function ThemeHydrator() {
+  useEffect(() => {
+    try {
+      const t = localStorage.getItem("tv-theme");
+      if (t === "light" || t === "soft" || t === "amoled") {
+        document.documentElement.dataset.theme = t;
+      }
+    } catch {
+      /* ignore */
+    }
+    const onStorage = (e: StorageEvent) => {
+      if (
+        e.key === "tv-theme" &&
+        (e.newValue === "light" ||
+          e.newValue === "soft" ||
+          e.newValue === "amoled")
+      ) {
+        document.documentElement.dataset.theme = e.newValue;
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+  return null;
+}
+
 export function Providers({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Replay offline playback saves when connectivity returns.
@@ -61,6 +88,7 @@ export function Providers({ children }: { children: ReactNode }) {
       refetchInterval={0}
     >
       <SettingsHydrator />
+      <ThemeHydrator />
       <ToastProvider>{children}</ToastProvider>
     </SessionProvider>
   );

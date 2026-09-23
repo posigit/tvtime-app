@@ -69,7 +69,7 @@ export function CustomListHeader({ id, name }: { id: string; name: string }) {
           }}
           maxLength={60}
           aria-label="List name"
-          className="h-9 min-w-0 flex-1 rounded-full bg-white/10 px-3.5 text-base font-bold text-white focus:outline-none focus:ring-1 focus:ring-primary/60"
+          className="h-9 min-w-0 flex-1 rounded-full bg-secondary px-3.5 text-base font-bold text-foreground focus:outline-none focus:ring-1 focus:ring-primary/60"
         />
         <button
           type="button"
@@ -93,7 +93,7 @@ export function CustomListHeader({ id, name }: { id: string; name: string }) {
           setEditing(true);
         }}
         aria-label="Rename list"
-        className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.06] text-white/70 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white"
+        className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-foreground/70 ring-1 ring-border transition hover:bg-secondary hover:text-foreground"
       >
         <Pencil className="h-4 w-4" />
       </button>
@@ -113,7 +113,7 @@ export function CustomListHeader({ id, name }: { id: string; name: string }) {
           type="button"
           onClick={() => setConfirming(true)}
           aria-label="Delete list"
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.06] text-white/70 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white"
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-foreground/70 ring-1 ring-border transition hover:bg-secondary hover:text-foreground"
         >
           <Trash2 className="h-4 w-4" />
         </button>

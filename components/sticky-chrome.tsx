@@ -17,7 +17,7 @@ export function StickyChrome({
   return (
     <div
       className={cn(
-        "sticky top-0 z-20 border-b border-white/10 bg-black pb-1 pt-safe",
+        "sticky top-0 z-20 border-b border-border bg-background pb-1 pt-safe",
         className
       )}
     >

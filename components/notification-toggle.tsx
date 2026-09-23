@@ -142,11 +142,11 @@ export function NotificationToggle() {
           : "Push alerts are not supported in this browser";
     return (
       <div className="flex items-center gap-3 rounded-xl bg-card px-4 py-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-white/50">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground/50">
           <BellOff className="h-4 w-4" />
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-white">Episode alerts</p>
+          <p className="text-sm font-semibold text-foreground">Episode alerts</p>
           <p className="text-xs text-muted-foreground">{message}</p>
         </div>
       </div>
@@ -161,13 +161,13 @@ export function NotificationToggle() {
         <div
           className={cn(
             "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
-            on ? "bg-primary/15 text-primary" : "bg-white/[0.06] text-white/50"
+            on ? "bg-primary/15 text-primary" : "bg-secondary text-foreground/50"
           )}
         >
           {on ? <Bell className="h-4 w-4" /> : <BellOff className="h-4 w-4" />}
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-white">Episode alerts</p>
+          <p className="text-sm font-semibold text-foreground">Episode alerts</p>
           <p className="truncate text-xs text-muted-foreground">
             {state === "denied"
               ? "Blocked — allow notifications in browser settings"
@@ -184,7 +184,7 @@ export function NotificationToggle() {
           onClick={on ? disable : enable}
           className={cn(
             "flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-xs font-black uppercase tracking-wide transition active:scale-95 disabled:opacity-40",
-            on ? "bg-white/10 text-white" : "bg-primary text-black"
+            on ? "bg-secondary text-foreground" : "bg-primary text-black"
           )}
         >
           {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}

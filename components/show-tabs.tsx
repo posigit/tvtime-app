@@ -27,12 +27,12 @@ export function ShowTabs({ tabs }: { tabs: Tab[] }) {
             }}
             className={cn(
               "relative flex-1 pb-3 pt-2 text-center text-sm font-bold tracking-wide transition-colors active:scale-[0.98]",
-              active ? "text-white" : "text-muted-foreground hover:text-white"
+              active ? "text-foreground" : "text-muted-foreground hover:text-foreground"
             )}
           >
             {tab.label}
             {active && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-white" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
             )}
           </button>
         );

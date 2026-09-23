@@ -39,11 +39,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      data-theme="amoled"
+      suppressHydrationWarning
+      className={`${geistSans.variable} h-full antialiased`}
+    >
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link rel="preconnect" href="https://image.tmdb.org" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://image.tmdb.org" />
+        <script
+          // Apply saved theme before first paint (no FOUC). Defaults to AMOLED.
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("tv-theme");if(t!=="light"&&t!=="soft"&&t!=="amoled"){t="amoled"}document.documentElement.dataset.theme=t;var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#f4f4f6":"#000000")}catch(e){document.documentElement.dataset.theme="amoled"}})()`,
+          }}
+        />
       </head>
-      <body className="min-h-full min-h-dvh bg-black text-white">
+      <body className="min-h-full min-h-dvh bg-background text-foreground">
         <Providers>
           <DownloadDoneNotifier />
           {children}

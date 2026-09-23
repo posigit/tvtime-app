@@ -123,7 +123,7 @@ function ProfileStreamTile({
   }
 
   return (
-    <div className="group/card relative w-[15rem] shrink-0 overflow-hidden rounded-[1.1rem] bg-[#1d1d1f] text-left ring-1 ring-white/[0.06] transition hover:ring-white/20">
+    <div className="group/card relative w-[15rem] shrink-0 overflow-hidden rounded-[1.1rem] bg-card text-left ring-1 ring-border transition hover:ring-border">
       <button
         type="button"
         onClick={() => setOpen(true)}
@@ -158,10 +158,10 @@ function ProfileStreamTile({
         )}
       </div>
       <div className="px-3.5 pb-3.5 pt-3">
-        <p className="truncate text-[15px] font-bold tracking-[-0.01em] text-white">
+        <p className="truncate text-[15px] font-bold tracking-[-0.01em] text-foreground">
           {item.title}
         </p>
-        <p className="mt-1 truncate text-xs font-medium text-white/45">
+        <p className="mt-1 truncate text-xs font-medium text-foreground/45">
           {itemLabel(item)}
         </p>
         <p className="mt-3 text-sm font-bold text-primary">
@@ -224,7 +224,7 @@ function StreamRow({ item }: { item: WatchHistoryItem }) {
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-bold text-white">{item.title}</p>
+        <p className="truncate text-sm font-bold text-foreground">{item.title}</p>
         <p className="mt-0.5 truncate text-xs font-semibold text-muted-foreground">
           {itemLabel(item)}
         </p>
@@ -326,13 +326,13 @@ export function ProfilePlaybackShelf({
               Pick up where you left off
             </p>
           )}
-          <h2 className="text-[1.35rem] font-black tracking-[-0.025em] text-white">
+          <h2 className="text-[1.35rem] font-black tracking-[-0.025em] text-foreground">
             {hasProgress ? "Continue watching" : "Recently played"}
           </h2>
         </div>
         <Link
           href="/profile/history"
-          className="text-xs font-bold text-white/55 transition hover:text-white"
+          className="text-xs font-bold text-foreground/55 transition hover:text-foreground"
         >
           History
         </Link>
