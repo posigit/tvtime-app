@@ -8,7 +8,7 @@ import {
   Check,
   Crop,
   Gauge,
-  Lock,
+  LockOpen,
   MoonStar,
   MoreHorizontal,
   SkipForward,
@@ -1030,7 +1030,7 @@ export function PlayerTopChrome({
             aria-label="Lock player controls"
             className="flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/80"
           >
-            <Lock className="h-5 w-5" />
+            <LockOpen className="h-5 w-5" />
           </button>
           <button
             type="button"
