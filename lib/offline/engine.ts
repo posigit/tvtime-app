@@ -79,6 +79,55 @@ function abortError(): Error {
 const PIECE_TIMEOUT_MS = 30000;
 /** No completed piece for this long with work remaining = stalled. */
 const STALL_TIMEOUT_MS = 60000;
+/** Upstream rate limits (429s from loupeandlattice-style hosts) back off here. */
+const RETRYABLE_STATUS = (status: number) => status === 429 || status >= 500;
+const RETRY_TRIES = 5;
+const RETRY_BASE_MS = 800;
+
+/**
+ * fetchPiece with bounded retries for retryable statuses (429/5xx).
+ * Honors Retry-After when served, else exponential backoff + jitter.
+ * Returns the LAST response so callers keep their specific error messages;
+ * aborts still throw AbortError immediately (pause/cancel path untouched).
+ */
+async function fetchPieceRetry(
+  input: string,
+  signal: AbortSignal,
+  tries = RETRY_TRIES
+): Promise<Response> {
+  let last: Response | null = null;
+  for (let attempt = 0; ; attempt++) {
+    if (signal.aborted) throw abortError();
+    const res = await fetchPiece(input, signal);
+    if (res.ok) return res;
+    last = res;
+    // Free the connection before backing off or bailing.
+    try {
+      await res.arrayBuffer();
+    } catch {
+      /* body already consumed or errored — nothing to free */
+    }
+    if (!RETRYABLE_STATUS(res.status) || attempt + 1 >= tries) break;
+    const retryAfter = Number(res.headers.get("retry-after"));
+    const wait =
+      Number.isFinite(retryAfter) && retryAfter > 0
+        ? Math.min(retryAfter * 1000, 15000)
+        : Math.min(RETRY_BASE_MS * 2 ** attempt, 8000) + Math.random() * 400;
+    // Abort-aware backoff: pause/cancel during the wait stops immediately.
+    await new Promise<void>((resolve, reject) => {
+      const t = setTimeout(resolve, wait);
+      signal.addEventListener(
+        "abort",
+        () => {
+          clearTimeout(t);
+          reject(abortError());
+        },
+        { once: true }
+      );
+    });
+  }
+  return last as Response;
+}
 
 /**
  * fetch with a timeout that never masquerades as a user pause/cancel:
@@ -337,7 +386,7 @@ async function runDownload(
     resolved.playlistUrl,
     window.location.origin
   ).toString();
-  const masterRes = await fetchPiece(playlistBase, signal);
+  const masterRes = await fetchPieceRetry(playlistBase, signal);
   if (!masterRes.ok) throw new Error(`Stream lookup failed (${masterRes.status})`);
   const masterText = await masterRes.text();
   throwIfAborted();
@@ -351,7 +400,7 @@ async function runDownload(
     const variants = parseMasterVariants(masterText, playlistBase);
     pickedVariant = pickVariant(variants, rec.quality);
     if (!pickedVariant) throw new Error("No playable quality found for this title.");
-    const vRes = await fetchPiece(pickedVariant.url, signal);
+    const vRes = await fetchPieceRetry(pickedVariant.url, signal);
     if (!vRes.ok) throw new Error(`Quality fetch failed (${vRes.status})`);
     mediaText = await vRes.text();
     mediaUrl = pickedVariant.url;
@@ -384,7 +433,7 @@ async function runDownload(
       matchLang
     );
     if (audioEntry) {
-      const aRes = await fetchPiece(audioEntry.url, signal);
+      const aRes = await fetchPieceRetry(audioEntry.url, signal);
       if (!aRes.ok) throw new Error(`Audio track fetch failed (${aRes.status})`);
       let aText = await aRes.text();
       audioUrl = audioEntry.url;
@@ -394,7 +443,7 @@ async function runDownload(
           throw new Error("No audio track found for this title.");
         }
         const aPicked = aVars[0]!;
-        const avRes = await fetchPiece(aPicked.url, signal);
+        const avRes = await fetchPieceRetry(aPicked.url, signal);
         if (!avRes.ok) throw new Error(`Audio track fetch failed (${avRes.status})`);
         aText = await avRes.text();
         audioUrl = aPicked.url;
@@ -516,7 +565,7 @@ async function runDownload(
           }
           continue;
         }
-        const res = await fetchPiece(job.original, signal);
+        const res = await fetchPieceRetry(job.original, signal, 3);
         if (!res.ok) throw new Error(`${label} piece failed.`);
         const buf = await res.arrayBuffer();
         if (buf.byteLength === 0) throw new Error(`${label} piece was empty.`);

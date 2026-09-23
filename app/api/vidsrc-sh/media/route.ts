@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { gunzipSync } from "zlib";
 import {
   applyVidsrcToken,
   signProxyUrl,
@@ -147,8 +148,14 @@ export async function GET(req: NextRequest) {
       cache: "no-store",
     });
     if (!upstream.ok) {
+      const retryAfter = upstream.headers.get("retry-after");
       return NextResponse.json(
-        { error: `upstream ${upstream.status}` },
+        {
+          error: `upstream ${upstream.status}`,
+          retryable:
+            upstream.status === 429 || upstream.status >= 500,
+          ...(retryAfter ? { retryAfterSeconds: Number(retryAfter) || null } : {}),
+        },
         {
           status:
             upstream.status >= 400 && upstream.status < 600
@@ -164,7 +171,22 @@ export async function GET(req: NextRequest) {
       contentType.includes("text") ||
       contentType === "";
     if (couldBePlaylist) {
-      const buf = Buffer.from(await upstream.arrayBuffer());
+      let buf = Buffer.from(await upstream.arrayBuffer());
+      // Variant hosts sometimes serve gzipped playlist bytes (gzip magic
+      // 1F 8B) with a generic content-type. Gunzip first — otherwise the
+      // #EXTM3U sniff fails, the body passes through raw, and clients chase
+      // direct (token IP-bound, residentially dead) URLs.
+      if (
+        buf.length > 2 &&
+        buf[0] === 0x1f &&
+        buf[1] === 0x8b
+      ) {
+        try {
+          buf = gunzipSync(buf);
+        } catch {
+          /* corrupt gzip — fall through to raw handling below */
+        }
+      }
       const isPlaylist =
         buf.length > 6 && buf.subarray(0, 7).toString("latin1") === "#EXTM3U";
       if (isPlaylist) {

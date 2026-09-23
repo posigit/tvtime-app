@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { gunzipSync } from "zlib";
 import { GOATED_ORIGIN } from "@/lib/goated";
 
 /**
@@ -116,15 +117,30 @@ export async function GET(req: NextRequest) {
       cache: "no-store",
     });
     if (!upstream.ok) {
+      const retryAfter = upstream.headers.get("retry-after");
       return NextResponse.json(
-        { error: `upstream ${upstream.status}` },
+        {
+          error: `upstream ${upstream.status}`,
+          retryable: upstream.status === 429 || upstream.status >= 500,
+          ...(retryAfter ? { retryAfterSeconds: Number(retryAfter) || null } : {}),
+        },
         { status: upstream.status >= 400 && upstream.status < 600 ? upstream.status : 502 }
       );
     }
 
     const contentType = upstream.headers.get("content-type") ?? "";
     if (isPlaylistContentType(contentType)) {
-      const text = await upstream.text();
+      let text: string;
+      try {
+        const buf = Buffer.from(await upstream.arrayBuffer());
+        const bytes =
+          buf.length > 2 && buf[0] === 0x1f && buf[1] === 0x8b
+            ? gunzipSync(buf)
+            : buf;
+        text = bytes.toString("utf8");
+      } catch {
+        text = await upstream.text().catch(() => "");
+      }
       const rewritten = rewriteBody(text, parsed);
       return new NextResponse(rewritten, {
         status: 200,
