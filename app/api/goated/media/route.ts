@@ -35,21 +35,52 @@ function isPlaylistContentType(ct: string | null): boolean {
   return !!ct && ct.includes("mpegurl");
 }
 
-function rewriteBody(body: string): string {
-  // Rewrite every absolute URL on a tracked host to the proxy. Also make
-  // protocol-relative (//) and any quoted URL safe.
-  return body.replace(
-    /https?:\/\/[a-z0-9.-]+(\/[^\s"']+)/gi,
-    (full: string) => {
-      try {
-        const u = new URL(full);
-        if (!REWRITE_HOSTS.has(u.hostname)) return full;
-        return `/api/goated/media?url=${encodeURIComponent(full)}`;
-      } catch {
-        return full;
-      }
+function toProxy(full: string): string | null {
+  try {
+    const u = new URL(full);
+    if (!REWRITE_HOSTS.has(u.hostname)) return null;
+    return `/api/goated/media?url=${encodeURIComponent(full)}`;
+  } catch {
+    return null;
+  }
+}
+
+function rewriteBody(body: string, base: URL): string {
+  const proxied = (ref: string): string | null => {
+    try {
+      return toProxy(new URL(ref, base).toString());
+    } catch {
+      return null;
+    }
+  };
+  // Quoted URI attributes (EXT-X-KEY, EXT-X-MAP, EXT-X-MEDIA ...).
+  let out = body.replace(
+    /(URI=")([^"]*)(")/g,
+    (full: string, pre: string, ref: string, post: string) => {
+      if (!ref || ref.startsWith("data:")) return full;
+      const p = proxied(ref);
+      return p ? `${pre}${p}${post}` : full;
     }
   );
+  // Rewrite every absolute URL on a tracked host to the proxy. Also make
+  // protocol-relative (//) and any quoted URL safe.
+  out = out.replace(
+    /https?:\/\/[a-z0-9.-]+(\/[^\s"']+)/gi,
+    (full: string) => toProxy(full) ?? full
+  );
+  // Bare non-# URI lines (relative variant/segment/key names), resolved
+  // against the TRUE target — never our own proxy path (no such route).
+  out = out
+    .split("\n")
+    .map((line) => {
+      const t = line.trim();
+      if (!t || t.startsWith("#")) return line;
+      if (t.startsWith("/api/")) return line;
+      if (/^[a-z][a-z0-9+.-]*:/i.test(t) && !t.startsWith("/")) return line;
+      return proxied(t) ?? line;
+    })
+    .join("\n");
+  return out;
 }
 
 export async function GET(req: NextRequest) {
@@ -94,7 +125,7 @@ export async function GET(req: NextRequest) {
     const contentType = upstream.headers.get("content-type") ?? "";
     if (isPlaylistContentType(contentType)) {
       const text = await upstream.text();
-      const rewritten = rewriteBody(text);
+      const rewritten = rewriteBody(text, parsed);
       return new NextResponse(rewritten, {
         status: 200,
         headers: {

@@ -35,19 +35,61 @@ function isPlaylistContentType(ct: string | null): boolean {
   return !!ct && ct.includes("mpegurl");
 }
 
-function rewriteBody(body: string): string {
-  return body.replace(
-    /https?:\/\/[a-z0-9.-]+(\/[^\s"']+)/gi,
-    (full: string) => {
-      try {
-        const u = new URL(full);
-        if (u.protocol !== "https:" || isBlockedHost(u.hostname)) return full;
-        return `/api/vidsrc-sh/media?url=${encodeURIComponent(full)}`;
-      } catch {
-        return full;
-      }
+function toProxy(full: string): string | null {
+  try {
+    const u = new URL(full);
+    if (u.protocol !== "https:" || isBlockedHost(u.hostname)) return null;
+    return `/api/vidsrc-sh/media?url=${encodeURIComponent(full)}`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Rewrite every playlist reference through this proxy, resolved against the
+ * TRUE target (the ?url= param) — not our own proxy URL. Covers:
+ *  1. absolute https URLs,
+ *  2. absolute-path URIs (URI="/storage/enc.key") → target origin,
+ *  3. bare relative lines (variant/segment file names) → target directory.
+ * Without (2)+(3), hls.js and the download engine resolve relatives against
+ * /api/vidsrc-sh/… (no such route) and die with 404s.
+ */
+function rewriteBody(body: string, base: URL): string {
+  const proxied = (ref: string): string | null => {
+    try {
+      return toProxy(new URL(ref, base).toString());
+    } catch {
+      return null;
+    }
+  };
+  // 2. Quoted URI attributes (EXT-X-KEY, EXT-X-MAP, EXT-X-MEDIA ...).
+  let out = body.replace(
+    /(URI=")([^"]*)(")/g,
+    (full: string, pre: string, ref: string, post: string) => {
+      if (!ref || ref.startsWith("data:")) return full;
+      const p = proxied(ref);
+      return p ? `${pre}${p}${post}` : full;
     }
   );
+  // 1. Absolute URLs anywhere (also re-covers absolute results of step 2).
+  out = out.replace(
+    /https?:\/\/[a-z0-9.-]+(\/[^\s"']+)/gi,
+    (full: string) => toProxy(full) ?? full
+  );
+  // 3. Bare non-# URI lines (relative variant/segment/key names).
+  out = out
+    .split("\n")
+    .map((line) => {
+      const t = line.trim();
+      if (!t || t.startsWith("#")) return line;
+      // Already rewritten above — never re-proxy (double-proxy corruption).
+      if (t.startsWith("/api/")) return line;
+      // Absolute URLs already handled above; skip other schemes (data:, etc).
+      if (/^[a-z][a-z0-9+.-]*:/i.test(t) && !t.startsWith("/")) return line;
+      return proxied(t) ?? line;
+    })
+    .join("\n");
+  return out;
 }
 
 export async function GET(req: NextRequest) {
@@ -115,7 +157,7 @@ export async function GET(req: NextRequest) {
       const isPlaylist =
         buf.length > 6 && buf.subarray(0, 7).toString("latin1") === "#EXTM3U";
       if (isPlaylist) {
-        return new NextResponse(rewriteBody(buf.toString("utf8")), {
+        return new NextResponse(rewriteBody(buf.toString("utf8"), parsed), {
           status: 200,
           headers: {
             "Content-Type": "application/vnd.apple.mpegurl",
