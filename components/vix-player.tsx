@@ -3546,6 +3546,7 @@ export function VixPlayer({
           type="button"
           onClick={() => {
             navigator.vibrate?.(10);
+            sessionLocked = false;
             setLocked(false);
             setChromeVisible(true);
           }}
