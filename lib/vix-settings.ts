@@ -70,6 +70,8 @@ export type VixSettings = {
   subBgBlur: "none" | "sm" | "md" | "lg";
   /** Dialogue boost (WebAudio gain) for quiet mixes. Native mode only. */
   audioBoost: boolean;
+  /** Ambilight glow behind native video. Auto-off on reduced motion. */
+  ambilight: boolean;
   /** Native aspect mode (object-fit). */
   videoFit: "fit" | "cover" | "stretch";
   /** Iframe zoom (CSS scale crop) — cross-origin frames lack aspect APIs. */
@@ -114,6 +116,7 @@ export const DEFAULT_VIX_SETTINGS: VixSettings = {
   subBgOpacity: 0.35,
   subBgBlur: "md",
   audioBoost: false,
+  ambilight: true,
   videoFit: "fit",
   embedZoom: 1,
   downloadMode: false,
@@ -152,6 +155,7 @@ function clampSettings(merged: VixSettings): VixSettings {
     next.speedByShow = clean;
   }
   next.audioBoost = next.audioBoost === true;
+  next.ambilight = next.ambilight !== false;
   const SOURCE_VALUES = [
     "vix",
     "goated",

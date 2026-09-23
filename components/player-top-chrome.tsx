@@ -4,6 +4,7 @@ import type { MutableRefObject, RefObject } from "react";
 import {
   AudioLines,
   Captions,
+  Cast,
   Check,
   Crop,
   Gauge,
@@ -11,6 +12,7 @@ import {
   MoonStar,
   MoreHorizontal,
   SkipForward,
+  Sparkles,
   Volume2,
   X,
 } from "lucide-react";
@@ -110,6 +112,13 @@ type PlayerTopChromeProps = {
   /** Dialogue boost on/off (native mode only). */
   audioBoost?: boolean;
   onToggleBoost?: () => void;
+  /** Chromecast (native + framework ready). */
+  castReady?: boolean;
+  casting?: boolean;
+  onToggleCast?: () => void;
+  /** Ambilight glow toggle (native mode only). */
+  ambilight?: boolean;
+  onToggleAmbilight?: () => void;
 };
 
 /**
@@ -176,6 +185,11 @@ export function PlayerTopChrome({
   onPickSleep,
   audioBoost = false,
   onToggleBoost,
+  castReady = false,
+  casting = false,
+  onToggleCast,
+  ambilight = false,
+  onToggleAmbilight,
 }: PlayerTopChromeProps) {
   const [sourceMenuOpen, setSourceMenuOpen] = useState(false);
   const [sleepExpanded, setSleepExpanded] = useState(false);
@@ -791,6 +805,26 @@ export function PlayerTopChrome({
               )}
             </div>
           )}
+          {mode === "native" && castReady && onToggleCast && (
+            <button
+              type="button"
+              onClick={() => {
+                onKeepChrome();
+                onToggleCast();
+              }}
+              aria-label={casting ? "Stop casting" : "Cast to TV"}
+              aria-pressed={casting}
+              title={casting ? "Casting — tap to stop" : "Cast to TV"}
+              className={cn(
+                "flex h-9 w-9 items-center justify-center rounded-full ring-1 backdrop-blur transition",
+                casting
+                  ? "bg-primary/25 text-primary ring-primary/50 hover:bg-primary/35"
+                  : "bg-black/60 text-white ring-white/20 hover:bg-black/80"
+              )}
+            >
+              <Cast className="h-4 w-4" />
+            </button>
+          )}
           {showAutoplayToggle && onToggleAutoplayNext && (
             <button
               type="button"
@@ -901,6 +935,23 @@ export function PlayerTopChrome({
                     Dialogue boost
                     <span className="ml-auto text-white/60">
                       {audioBoost ? "On" : "Off"}
+                    </span>
+                  </button>
+                )}
+                {mode === "native" && onToggleAmbilight && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      onKeepChrome();
+                      onToggleAmbilight();
+                    }}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-bold text-white transition hover:bg-white/10"
+                  >
+                    <Sparkles className="h-4 w-4 text-white/60" />
+                    Ambilight glow
+                    <span className="ml-auto text-white/60">
+                      {ambilight ? "On" : "Off"}
                     </span>
                   </button>
                 )}

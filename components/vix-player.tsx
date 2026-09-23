@@ -300,6 +300,33 @@ export function VixPlayer({
     ctx: AudioContext;
     gain: GainNode;
   } | null>(null);
+  /** Screen brightness (gesture). 1 = full. Session-only, native mode. */
+  const [brightness, setBrightness] = useState(1);
+  /** Transient gesture hint bubble. */
+  const [gestureHint, setGestureHint] = useState<string | null>(null);
+  const gestureRef = useRef<{
+    startX: number;
+    startY: number;
+    startVol: number;
+    startTime: number;
+    active: "seek" | "brightness" | "volume" | null;
+  } | null>(null);
+  const gestureHintTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Suppress tap-chrome toggle right after a swipe gesture. */
+  const gestureSuppressUntil = useRef(0);
+  /** Ambilight glow (persisted). Auto-off on reduced motion. */
+  const [ambilight, setAmbilight] = useState(
+    () => loadVixSettings().ambilight !== false
+  );
+  const ambilightCanvasRef = useRef<HTMLCanvasElement>(null);
+  /** Chromecast: framework ready + active session. Native mode only. */
+  const [castReady, setCastReady] = useState(false);
+  const [casting, setCasting] = useState(false);
+  const castingRef = useRef(false);
+  const castPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  useEffect(() => {
+    castingRef.current = casting;
+  }, [casting]);
   const [videoFit, setVideoFit] = useState<VixSettings["videoFit"]>(
     () => loadVixSettings().videoFit
   );
@@ -797,6 +824,8 @@ export function VixPlayer({
   const handleTap = useCallback(
     (e: React.TouchEvent) => {
       if (locked) return;
+      // A swipe gesture just ended — don't also flip the chrome.
+      if (performance.now() - gestureSuppressUntil.current < 350) return;
       if (mode !== "native" && !isDrivenEmbed) {
         return;
       }
@@ -1187,6 +1216,17 @@ export function VixPlayer({
     }
     saveVixSettings({ preferredSource: next });
     setActiveSource(next);
+    // Casting follows the old media — end it so the receiver never plays stale.
+    if (castingRef.current) {
+      try {
+        window.chrome?.framework.CastContext.getInstance()
+          .getCurrentSession()
+          ?.endSession(true);
+      } catch {
+        /* ignore */
+      }
+      setCasting(false);
+    }
     // Reset playback state so the resolution effect re-runs fresh.
     setPlaylistUrl(null);
     setThumbnailsUrl(null);
@@ -1872,6 +1912,10 @@ export function VixPlayer({
   }, []);
 
   const togglePlay = useCallback(() => {
+    if (castingRef.current) {
+      castPlayPause();
+      return;
+    }
     if (isDrivenEmbed) {
       sendDrivenPlay(iframePausedRef.current);
       bumpChrome();
@@ -1887,6 +1931,10 @@ export function VixPlayer({
   const seekBySeconds = useCallback(
     (delta: number) => {
       navigator.vibrate?.(10);
+      if (castingRef.current && castSeekBy(delta)) {
+        bumpChrome();
+        return;
+      }
       if (isDrivenEmbed) {
         sendEmbedSeek(
           clampEmbedTime(remotePositionRef.current + delta)
@@ -1907,6 +1955,23 @@ export function VixPlayer({
 
   const seekRatio = useCallback(
     (ratio: number) => {
+      if (castingRef.current) {
+        try {
+          const framework = window.chrome?.framework;
+          if (framework) {
+            const remote = new framework.RemotePlayer();
+            const dur = remote.duration;
+            if (dur > 0) {
+              remote.currentTime = Math.max(0, Math.min(dur, ratio * dur));
+              new framework.RemotePlayerController(remote).seek();
+            }
+          }
+        } catch {
+          /* ignore */
+        }
+        bumpChrome();
+        return;
+      }
       if (isDrivenEmbed) {
         const dur = remoteDurationRef.current;
         if (!(dur > 0)) return;
@@ -2156,6 +2221,348 @@ export function VixPlayer({
   const toggleBoost = useCallback(() => {
     applyAudioBoost(!audioBoost);
   }, [applyAudioBoost, audioBoost]);
+  const toggleAmbilight = useCallback(() => {
+    setAmbilight((prev) => {
+      const next = !prev;
+      saveVixSettings({ ambilight: next });
+      return next;
+    });
+    bumpChrome();
+  }, [bumpChrome]);
+
+  /** Transient gesture hint bubble (auto-hides). */
+  const showGestureHint = useCallback((text: string) => {
+    setGestureHint(text);
+    if (gestureHintTimer.current) clearTimeout(gestureHintTimer.current);
+    gestureHintTimer.current = setTimeout(() => setGestureHint(null), 900);
+  }, []);
+  useEffect(
+    () => () => {
+      if (gestureHintTimer.current) clearTimeout(gestureHintTimer.current);
+    },
+    []
+  );
+
+  /**
+   * Touch gestures (native mode, unlocked, single touch only):
+   * horizontal = seek, left-half vertical = brightness, right-half = volume.
+   * Engages past 14px of travel so taps/double-taps still reach handleTap.
+   */
+  const onVideoTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (locked || mode !== "native" || e.touches.length !== 1) {
+        gestureRef.current = null;
+        return;
+      }
+      const t = e.touches[0];
+      const v = videoRef.current;
+      gestureRef.current = {
+        startX: t.clientX,
+        startY: t.clientY,
+        startVol: v ? v.volume : 1,
+        startTime: v && Number.isFinite(v.currentTime) ? v.currentTime : 0,
+        active: null,
+      };
+    },
+    [locked, mode]
+  );
+  const onVideoTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      const g = gestureRef.current;
+      const v = videoRef.current;
+      if (!g || locked || mode !== "native" || !v || e.touches.length !== 1) {
+        return;
+      }
+      const t = e.touches[0];
+      const dx = t.clientX - g.startX;
+      const dy = t.clientY - g.startY;
+      if (!g.active) {
+        if (Math.abs(dx) < 14 && Math.abs(dy) < 14) return;
+        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        g.active =
+          Math.abs(dx) >= Math.abs(dy)
+            ? "seek"
+            : t.clientX < rect.left + rect.width / 2
+              ? "brightness"
+              : "volume";
+      }
+      const dur = Number.isFinite(v.duration) && v.duration > 0 ? v.duration : 0;
+      if (g.active === "seek" && dur > 0) {
+        const target = Math.max(0, Math.min(dur, g.startTime + dx / 4));
+        v.currentTime = target;
+        const m = Math.floor(target / 60);
+        const s = Math.floor(target % 60);
+        showGestureHint(`${m}:${String(s).padStart(2, "0")}`);
+      } else if (g.active === "brightness") {
+        const next = Math.min(1, Math.max(0.3, 1 + dy / 300));
+        setBrightness(next);
+        showGestureHint(`Brightness ${Math.round(next * 100)}%`);
+      } else if (g.active === "volume") {
+        const next = Math.min(1, Math.max(0, g.startVol - dy / 300));
+        setVolume(next);
+        showGestureHint(next === 0 ? "Muted" : `Volume ${Math.round(next * 100)}%`);
+      }
+    },
+    [locked, mode, setVolume, showGestureHint]
+  );
+  const onVideoTouchEnd = useCallback(() => {
+    if (gestureRef.current?.active) {
+      gestureSuppressUntil.current = performance.now();
+      bumpChrome();
+    }
+    gestureRef.current = null;
+  }, [bumpChrome]);
+
+  // ---------- ambilight (sampled glow behind native video) ----------
+  useEffect(() => {
+    if (
+      mode !== "native" ||
+      !ambilight ||
+      !mediaReady ||
+      typeof window === "undefined" ||
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+    const canvas = ambilightCanvasRef.current;
+    const v = videoRef.current;
+    if (!canvas || !v) return;
+    const ctx = canvas.getContext("2d", { alpha: false });
+    if (!ctx) return;
+    let raf = 0;
+    let last = 0;
+    let stopped = false;
+    const tick = (now: number) => {
+      if (stopped) return;
+      raf = requestAnimationFrame(tick);
+      if (now - last < 120) return;
+      if (document.hidden || v.paused || v.readyState < 2) return;
+      last = now;
+      try {
+        ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+      } catch {
+        /* cross-origin frame — glow stays on last paint */
+      }
+    };
+    raf = requestAnimationFrame(tick);
+    return () => {
+      stopped = true;
+      cancelAnimationFrame(raf);
+    };
+  }, [mode, ambilight, mediaReady, playlistUrl]);
+
+  // ---------- lockscreen / bluetooth controls (Media Session API) ----------
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.MediaMetadata === "undefined") {
+      return;
+    }
+    const ms = navigator.mediaSession;
+    if (!ms) return;
+    try {
+      const label =
+        type === "tv" && season != null && episode != null
+          ? `${title} — S${season}E${episode}`
+          : title;
+      ms.metadata = new window.MediaMetadata({
+        title: label,
+        artist: "TV Time",
+        album: "TV Time",
+      });
+      ms.setActionHandler("play", () => {
+        const v = videoRef.current;
+        if (v && mode === "native") void v.play().catch(() => {});
+      });
+      ms.setActionHandler("pause", () => {
+        const v = videoRef.current;
+        if (v && mode === "native") v.pause();
+      });
+      ms.setActionHandler("previoustrack", () => seekBySeconds(-10));
+      ms.setActionHandler("nexttrack", () => seekBySeconds(10));
+    } catch {
+      /* Media Session unsupported — lockscreen falls back to OS default */
+    }
+    return () => {
+      try {
+        ms.setActionHandler("play", null);
+        ms.setActionHandler("pause", null);
+        ms.setActionHandler("previoustrack", null);
+        ms.setActionHandler("nexttrack", null);
+      } catch {
+        /* ignore */
+      }
+    };
+  }, [title, type, season, episode, mode, seekBySeconds]);
+  // Lockscreen position (throttled by the transport clock).
+  useEffect(() => {
+    try {
+      const ms = navigator.mediaSession;
+      const d = transport.duration;
+      const p = transport.currentTime;
+      if (ms?.setPositionState && d > 0 && p >= 0) {
+        ms.setPositionState({
+          duration: d,
+          position: Math.min(p, d),
+          playbackRate: playbackSpeed,
+        });
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [transport.currentTime, transport.duration, playbackSpeed]);
+
+  // ---------- chromecast (sender SDK, native mode only) ----------
+  // Load the Cast sender SDK once; readiness gates the chrome button.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.chrome?.framework) {
+      setCastReady(true);
+      return;
+    }
+    if (document.querySelector('script[data-cast-sender="1"]')) return;
+    let cancelled = false;
+    window.__onGCastApiAvailable = (available: boolean) => {
+      if (cancelled || !available) return;
+      try {
+        window.chrome?.framework.CastContext.getInstance().setOptions({
+          receiverApplicationId:
+            window.chrome?.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+          autoJoinPolicy: window.chrome?.cast.AutoJoinPolicy.ORIGIN_SCOPED,
+        });
+        setCastReady(true);
+      } catch {
+        /* Cast init failed — button stays hidden */
+      }
+    };
+    const s = document.createElement("script");
+    s.dataset.castSender = "1";
+    s.src =
+      "https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1";
+    s.async = true;
+    s.onerror = () => {
+      if (!cancelled) setCastReady(false);
+    };
+    document.head.appendChild(s);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  const stopCastPoll = useCallback(() => {
+    if (castPollRef.current) {
+      clearInterval(castPollRef.current);
+      castPollRef.current = null;
+    }
+  }, []);
+  useEffect(() => () => stopCastPoll(), [stopCastPoll]);
+  /** Load current media on the Cast receiver and mirror transport to it. */
+  const startCast = useCallback(async () => {
+    if (mode !== "native" || !playlistUrl) return;
+    const framework = window.chrome?.framework;
+    const castMedia = window.chrome?.cast.media;
+    if (!framework || !castMedia) return;
+    try {
+      const context = framework.CastContext.getInstance();
+      let session = context.getCurrentSession();
+      if (!session) {
+        await context.requestSession();
+        session = context.getCurrentSession();
+      }
+      if (!session) return;
+      const absoluteUrl = new URL(playlistUrl, window.location.origin).toString();
+      const metadata = new castMedia.GenericMediaMetadata();
+      metadata.metadataType = castMedia.MetadataType.GENERIC;
+      metadata.title = title;
+      const mediaInfo = new castMedia.MediaInfo(
+        absoluteUrl,
+        "application/x-mpegurl"
+      );
+      mediaInfo.streamType = castMedia.StreamType.BUFFERED;
+      mediaInfo.metadata = metadata;
+      const v = videoRef.current;
+      const pos =
+        v && Number.isFinite(v.currentTime) && v.currentTime > 0
+          ? v.currentTime
+          : transport.currentTime;
+      const req = new castMedia.LoadRequest(mediaInfo);
+      req.autoplay = true;
+      req.currentTime = Math.max(0, pos);
+      await session.loadMedia(req);
+      try {
+        v?.pause();
+      } catch {
+        /* ignore */
+      }
+      setCasting(true);
+      bumpChrome();
+      stopCastPoll();
+      // Mirror receiver clock into our transport (progress saves keep working).
+      const remote = new framework.RemotePlayer();
+      const controller = new framework.RemotePlayerController(remote);
+      castPollRef.current = setInterval(() => {
+        try {
+          if (!castingRef.current) return;
+          setTransport((t) => ({
+            ...t,
+            currentTime:
+              Number.isFinite(remote.currentTime) && remote.currentTime >= 0
+                ? remote.currentTime
+                : t.currentTime,
+            duration:
+              Number.isFinite(remote.duration) && remote.duration > 0
+                ? remote.duration
+                : t.duration,
+            paused: remote.isPaused,
+          }));
+          void controller;
+        } catch {
+          /* receiver quiet — keep last known clock */
+        }
+      }, 1000);
+    } catch {
+      /* picker dismissed or load failed — stay local */
+      bumpChrome();
+    }
+  }, [mode, playlistUrl, title, transport.currentTime, stopCastPoll, bumpChrome]);
+  const stopCast = useCallback(() => {
+    try {
+      window.chrome?.framework.CastContext.getInstance()
+        .getCurrentSession()
+        ?.endSession(true);
+    } catch {
+      /* ignore */
+    }
+    stopCastPoll();
+    setCasting(false);
+    bumpChrome();
+  }, [stopCastPoll, bumpChrome]);
+  /** Remote play/pause while casting (transport intercepts below). */
+  const castPlayPause = useCallback(() => {
+    try {
+      const framework = window.chrome?.framework;
+      if (!framework) return;
+      const remote = new framework.RemotePlayer();
+      new framework.RemotePlayerController(remote).playOrPause();
+    } catch {
+      /* ignore */
+    }
+    bumpChrome();
+  }, [bumpChrome]);
+  const castSeekBy = useCallback((delta: number) => {
+    try {
+      const framework = window.chrome?.framework;
+      if (!framework) return false;
+      const remote = new framework.RemotePlayer();
+      const dur = remote.duration;
+      const target = remote.currentTime + delta;
+      remote.currentTime = Math.max(
+        0,
+        Number.isFinite(dur) && dur > 0 ? Math.min(target, dur) : target
+      );
+      new framework.RemotePlayerController(remote).seek();
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
 
   /** Cycle playback speed (native + CineSrc — the only embed with a rate API). */
   const cycleSpeed = useCallback(() => {
@@ -2840,14 +3247,29 @@ export function VixPlayer({
       className="fixed inset-0 z-[100] flex touch-manipulation flex-col bg-black"
     >
       {mode === "native" && (
-        <video
+        <>
+          {ambilight && (
+            <canvas
+              ref={ambilightCanvasRef}
+              aria-hidden="true"
+              width={32}
+              height={18}
+              className="pointer-events-none absolute inset-0 z-[5] h-full w-full scale-110 opacity-30 blur-[80px] mix-blend-screen"
+            />
+          )}
+          <video
           ref={videoRef}
           // Custom chrome only — native controls caused dual-layer lock UI.
           controls={false}
           autoPlay
           playsInline
           disablePictureInPicture={false}
-          onTouchEnd={handleTap}
+          onTouchStart={onVideoTouchStart}
+          onTouchMove={onVideoTouchMove}
+          onTouchEnd={(e) => {
+            onVideoTouchEnd();
+            handleTap(e);
+          }}
           onClick={handleVideoClick}
           className={`h-full w-full touch-manipulation bg-black ${
             videoFit === "cover"
@@ -2856,7 +3278,23 @@ export function VixPlayer({
                 ? "object-fill"
                 : "object-contain"
           }`}
-        />
+          />
+          {brightness < 1 && (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 z-10 bg-black"
+              style={{ opacity: 1 - brightness }}
+            />
+          )}
+          {gestureHint && (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute left-1/2 top-16 z-30 -translate-x-1/2 rounded-full bg-black/70 px-4 py-2 text-sm font-bold tabular-nums text-white backdrop-blur"
+            >
+              {gestureHint}
+            </div>
+          )}
+        </>
       )}
 
       {mode === "native" && (
@@ -3056,6 +3494,14 @@ export function VixPlayer({
           onPickSleep={pickSleep}
           audioBoost={audioBoost}
           onToggleBoost={toggleBoost}
+          castReady={castReady}
+          casting={casting}
+          onToggleCast={() => {
+            if (casting) stopCast();
+            else void startCast();
+          }}
+          ambilight={ambilight}
+          onToggleAmbilight={toggleAmbilight}
             onLock={() => {
               navigator.vibrate?.(10);
             setLocked(true);
