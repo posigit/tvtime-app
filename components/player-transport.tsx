@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   Check,
   Maximize,
@@ -37,6 +37,8 @@ type PlayerTransportProps = {
   showSpeed?: boolean;
   playbackSpeed?: number;
   onCycleSpeed?: () => void;
+  /** Exact-rate presets (preferred over cycling when provided). */
+  onPickSpeed?: (rate: number) => void;
   /**
    * CineSrc sub-server picker (bottom bar, so the top chrome stays uncrowded).
    * Rendered only when provided (CineSrc driven embed).
@@ -57,7 +59,145 @@ type PlayerTransportProps = {
   opaqueBottom?: boolean;
   /** IntroDB segments painted as colored ranges behind the scrubber. */
   segments?: IntroDbSegments | null;
+  /** Vix seek-preview thumbnails (VTT URL). No bubble when absent/unparseable. */
+  thumbnailsUrl?: string | null;
 };
+
+type ThumbCue = {
+  start: number;
+  end: number;
+  /** Image URL (resolved against the VTT URL). */
+  url: string;
+  /** Sprite crop within the image, if the VTT uses #xywh=. */
+  crop?: { x: number; y: number; w: number; h: number };
+};
+
+function parseTimestamp(ts: string): number | null {
+  const m = ts.trim().match(/(?:(\d+):)?(\d{1,2}):(\d{2})[.,](\d{1,3})/);
+  if (!m) return null;
+  const h = m[1] ? Number(m[1]) : 0;
+  const min = Number(m[2]);
+  const sec = Number(m[3]);
+  const ms = Number((m[4] + "000").slice(0, 3));
+  if (![h, min, sec, ms].every(Number.isFinite)) return null;
+  return h * 3600 + min * 60 + sec + ms / 1000;
+}
+
+/** Minimal WebVTT cue parser for thumbnail tracks (sprite or plain URLs). */
+function parseThumbVtt(text: string, baseUrl: string): ThumbCue[] {
+  const cues: ThumbCue[] = [];
+  const blocks = text.replace(/^\uFEFF/, "").split(/\r?\n\r?\n/);
+  for (const block of blocks) {
+    const lines = block
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean)
+      .filter((l) => !l.startsWith("WEBVTT") && !l.startsWith("NOTE"));
+    if (lines.length < 2) continue;
+    const timing = lines.find((l) => l.includes("-->"));
+    const payload = [...lines].reverse().find((l) => !l.includes("-->"));
+    if (!timing || !payload) continue;
+    const [startRaw, endRaw] = timing.split("-->").map((s) => s.trim());
+    const start = parseTimestamp(startRaw);
+    const end = parseTimestamp(endRaw?.split(" ")[0] ?? "");
+    if (start == null || end == null || end <= start) continue;
+    const [urlRaw, frag] = payload.split("#");
+    let url: string;
+    try {
+      url = new URL(urlRaw, baseUrl).toString();
+    } catch {
+      continue;
+    }
+    let crop: ThumbCue["crop"];
+    const xywh = frag?.match(/xywh=(\d+),(\d+),(\d+),(\d+)/);
+    if (xywh) {
+      const [, x, y, w, h] = xywh.map(Number);
+      if ([x, y, w, h].every((n) => Number.isFinite(n) && n >= 0) && w > 0 && h > 0) {
+        crop = { x, y, w, h };
+      }
+    }
+    cues.push({ start, end, url, crop });
+  }
+  return cues.sort((a, b) => a.start - b.start);
+}
+
+const SPEED_PRESETS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+
+/** Scrub-hover thumbnail bubble (144×81, sprite-aware). */
+function ThumbBubble({
+  cue,
+  t,
+  x,
+  spriteDims,
+  onSpriteDims,
+}: {
+  cue: ThumbCue;
+  t: number;
+  x: number;
+  spriteDims: { url: string; w: number; h: number } | null;
+  onSpriteDims: (d: { url: string; w: number; h: number } | null) => void;
+}) {
+  useEffect(() => {
+    if (!cue.crop || spriteDims?.url === cue.url) return;
+    let live = true;
+    const img = new Image();
+    img.onload = () => {
+      if (live && img.naturalWidth > 0 && img.naturalHeight > 0) {
+        onSpriteDims({ url: cue.url, w: img.naturalWidth, h: img.naturalHeight });
+      }
+    };
+    img.onerror = () => {
+      if (live) onSpriteDims(null);
+    };
+    img.src = cue.url;
+    return () => {
+      live = false;
+    };
+  }, [cue.url, cue.crop, spriteDims?.url, onSpriteDims]);
+  const dims = spriteDims?.url === cue.url ? spriteDims : null;
+  const BW = 144;
+  const BH = 81;
+  let bgStyle: CSSProperties | null = null;
+  if (cue.crop && dims) {
+    const scale = BW / cue.crop.w;
+    const scaledH = cue.crop.h * scale;
+    const top = (BH - scaledH) / 2;
+    bgStyle = {
+      width: BW,
+      height: BH,
+      backgroundImage: `url("${cue.url}")`,
+      backgroundRepeat: "no-repeat",
+      backgroundSize: `${dims.w * scale}px ${dims.h * scale}px`,
+      backgroundPosition: `-${cue.crop.x * scale}px ${top - cue.crop.y * scale}px`,
+    };
+  }
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute bottom-4 z-30 -translate-x-1/2 overflow-hidden rounded-lg bg-black ring-1 ring-white/25 shadow-2xl"
+      style={{
+        left: `${Math.min(0.94, Math.max(0.06, x)) * 100}%`,
+        width: BW,
+        height: BH,
+      }}
+    >
+      {bgStyle ? (
+        <div style={bgStyle} />
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={cue.url}
+          alt=""
+          draggable={false}
+          className="h-full w-full object-cover"
+        />
+      )}
+      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-white">
+        {formatPlayerClock(t)}
+      </span>
+    </div>
+  );
+}
 
 /**
  * Custom native-player transport: center play/±10 + bottom scrubber/volume/FS.
@@ -83,12 +223,14 @@ export function PlayerTransport({
   showSpeed = false,
   playbackSpeed = 1,
   onCycleSpeed,
+  onPickSpeed,
   serverOptions,
   activeServer = "auto",
   onPickServer,
   onServerMenuOpenChange,
   opaqueBottom = false,
   segments = null,
+  thumbnailsUrl = null,
 }: PlayerTransportProps) {
   const safeDur = Number.isFinite(duration) && duration > 0 ? duration : 0;
   const ratio = safeDur > 0 ? Math.min(1, Math.max(0, currentTime / safeDur)) : 0;
@@ -130,6 +272,79 @@ export function PlayerTransport({
   const [volumeSupported] = useState(() => canControlVolume(null));
   const [serverMenuOpen, setServerMenuOpen] = useState(false);
   const serverMenuRef = useRef<HTMLDivElement>(null);
+  const [speedMenuOpen, setSpeedMenuOpen] = useState(false);
+  const speedMenuRef = useRef<HTMLDivElement>(null);
+  /** Parsed seek-preview cues (null = none/unparseable → no bubble). */
+  const [thumbCues, setThumbCues] = useState<ThumbCue[] | null>(null);
+  /** Scrub-hover preview: ratio 0..1 + anchor x fraction, or null. */
+  const [scrubPreview, setScrubPreview] = useState<{
+    ratio: number;
+    x: number;
+  } | null>(null);
+  const scrubBoxRef = useRef<HTMLDivElement>(null);
+  /** Natural dims per sprite URL (for #xywh= crops). */
+  const [spriteDims, setSpriteDims] = useState<{
+    url: string;
+    w: number;
+    h: number;
+  } | null>(null);
+  useEffect(() => {
+    if (!thumbnailsUrl) {
+      setThumbCues(null);
+      return;
+    }
+    let cancelled = false;
+    fetch(thumbnailsUrl)
+      .then((r) => {
+        if (!r.ok) throw new Error(`thumbs ${r.status}`);
+        return r.text();
+      })
+      .then((text) => {
+        if (cancelled) return;
+        const cues = parseThumbVtt(text, thumbnailsUrl);
+        setThumbCues(cues.length > 0 ? cues : null);
+      })
+      .catch(() => {
+        if (!cancelled) setThumbCues(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [thumbnailsUrl]);
+  const previewCue =
+    thumbCues && scrubPreview && safeDur > 0
+      ? (() => {
+          const t = scrubPreview.ratio * safeDur;
+          let lo = 0;
+          let hi = thumbCues.length - 1;
+          let hit: ThumbCue | null = null;
+          while (lo <= hi) {
+            const mid = (lo + hi) >> 1;
+            const c = thumbCues[mid];
+            if (t < c.start) hi = mid - 1;
+            else if (t >= c.end) lo = mid + 1;
+            else {
+              hit = c;
+              break;
+            }
+          }
+          return hit ? { cue: hit, t } : null;
+        })()
+      : null;
+  const updateScrubPreview = (clientX: number) => {
+    const box = scrubBoxRef.current;
+    if (!box || !thumbCues || safeDur <= 0) {
+      setScrubPreview(null);
+      return;
+    }
+    const rect = box.getBoundingClientRect();
+    if (rect.width <= 0) {
+      setScrubPreview(null);
+      return;
+    }
+    const x = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    setScrubPreview({ ratio: x, x });
+  };
   // Keep parent chrome awake while the menu is open (matches top menus).
   useEffect(() => {
     onServerMenuOpenChange?.(serverMenuOpen);
@@ -138,17 +353,23 @@ export function PlayerTransport({
     serverOptions?.find((s) => s.id === activeServer)?.name ?? "Auto";
   // Outside-dismiss + Escape for the sub-server menu (mirrors top chrome).
   useEffect(() => {
-    if (!serverMenuOpen) return;
+    if (!serverMenuOpen && !speedMenuOpen) return;
     const onPointer = (e: MouseEvent | TouchEvent) => {
       const node = e.target as Node | null;
-      if (serverMenuRef.current && node && !serverMenuRef.current.contains(node)) {
+      const inServer =
+        serverMenuRef.current && node && serverMenuRef.current.contains(node);
+      const inSpeed =
+        speedMenuRef.current && node && speedMenuRef.current.contains(node);
+      if (!inServer && !inSpeed) {
         setServerMenuOpen(false);
+        setSpeedMenuOpen(false);
       }
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.stopPropagation();
         setServerMenuOpen(false);
+        setSpeedMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", onPointer);
@@ -159,7 +380,7 @@ export function PlayerTransport({
       document.removeEventListener("touchstart", onPointer);
       document.removeEventListener("keydown", onKey, true);
     };
-  }, [serverMenuOpen]);
+  }, [serverMenuOpen, speedMenuOpen]);
 
   return (
     <div
@@ -222,7 +443,31 @@ export function PlayerTransport({
           <label className="sr-only" htmlFor="player-seek">
             Seek
           </label>
-          <div className="relative h-1.5 w-full">
+          <div
+            ref={scrubBoxRef}
+            className="relative h-1.5 w-full"
+            onMouseMove={(e) => updateScrubPreview(e.clientX)}
+            onMouseLeave={() => setScrubPreview(null)}
+            onTouchStart={(e) => {
+              const t = e.touches[0];
+              if (t) updateScrubPreview(t.clientX);
+            }}
+            onTouchMove={(e) => {
+              const t = e.touches[0];
+              if (t) updateScrubPreview(t.clientX);
+            }}
+            onTouchEnd={() => setScrubPreview(null)}
+          >
+            {/* Seek-preview bubble (parsed VTT thumbnails only). */}
+            {previewCue && scrubPreview && (
+              <ThumbBubble
+                cue={previewCue.cue}
+                t={previewCue.t}
+                x={scrubPreview.x}
+                spriteDims={spriteDims}
+                onSpriteDims={setSpriteDims}
+              />
+            )}
             {/* Segment layer behind the native input: track + fill + marks.
                 The input stays fully interactive on top (drag/touch/keys). */}
             <div
@@ -273,19 +518,54 @@ export function PlayerTransport({
               -{formatPlayerClock(remaining)}
             </span>
             <div className="ml-auto flex items-center gap-1.5">
-              {showSpeed && onCycleSpeed && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onCycleSpeed();
-                  }}
-                  aria-label="Playback speed"
-                  title={`Speed: ${playbackSpeed}×`}
-                  className="flex h-9 items-center rounded-full bg-black/50 px-3 text-xs font-bold text-white ring-1 ring-white/15 backdrop-blur transition hover:bg-black/70"
-                >
-                  {playbackSpeed}×
-                </button>
+              {showSpeed && (onPickSpeed ?? onCycleSpeed) && (
+                <div ref={speedMenuRef} className="relative">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onPickSpeed) setSpeedMenuOpen((v) => !v);
+                      else onCycleSpeed?.();
+                    }}
+                    aria-label="Playback speed"
+                    aria-expanded={onPickSpeed ? speedMenuOpen : undefined}
+                    aria-haspopup={onPickSpeed ? "menu" : undefined}
+                    title={`Speed: ${playbackSpeed}×`}
+                    className="flex h-9 items-center rounded-full bg-black/50 px-3 text-xs font-bold text-white ring-1 ring-white/15 backdrop-blur transition hover:bg-black/70"
+                  >
+                    {playbackSpeed}×
+                  </button>
+                  {onPickSpeed && speedMenuOpen && (
+                    <div
+                      role="menu"
+                      aria-label="Playback speed"
+                      className="absolute bottom-full right-0 z-30 mb-2 w-32 overflow-hidden rounded-xl border border-white/15 bg-card py-1 shadow-2xl"
+                    >
+                      {SPEED_PRESETS.map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          role="menuitemradio"
+                          aria-checked={playbackSpeed === s}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSpeedMenuOpen(false);
+                            onPickSpeed(s);
+                          }}
+                          className={cn(
+                            "flex w-full items-center justify-between px-4 py-2 text-left text-sm font-semibold text-white transition hover:bg-white/10",
+                            playbackSpeed === s && "text-primary"
+                          )}
+                        >
+                          {s}×
+                          {playbackSpeed === s && (
+                            <Check className="h-3.5 w-3.5 flex-shrink-0" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               )}
               {serverOptions && onPickServer && (
                 <div ref={serverMenuRef} className="relative">

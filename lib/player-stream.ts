@@ -13,6 +13,8 @@ import type { StreamSource } from "@/lib/player-native-types";
 export type StreamResolveResult = {
   playlistUrl: string | null;
   imdbId: string | null;
+  /** Vix seek-preview thumbnails (VTT URL) — dropped when the source has none. */
+  thumbnailsUrl?: string | null;
   failed: boolean;
   errorMessage?: string;
   /** Machine-readable failure code from the stream route (if any). */
@@ -69,6 +71,7 @@ async function resolveOne(
 ): Promise<{
   playlistUrl: string | null;
   imdbId: string | null;
+  thumbnailsUrl?: string | null;
   error?: string;
   code?: string;
   detail?: string;
@@ -111,9 +114,13 @@ async function resolveOne(
       url?: string;
       playlistUrl?: string;
       imdbId?: string | null;
+      thumbnailsUrl?: string | null;
     };
     const imdbId = data?.imdbId ?? null;
-    if (data?.playlistUrl) return { playlistUrl: data.playlistUrl, imdbId };
+    const thumbnailsUrl =
+      typeof data?.thumbnailsUrl === "string" ? data.thumbnailsUrl : null;
+    if (data?.playlistUrl)
+      return { playlistUrl: data.playlistUrl, imdbId, thumbnailsUrl };
     if (data?.url) {
       return {
         playlistUrl: `/api/goated/media?url=${encodeURIComponent(data.url)}`,
@@ -160,6 +167,7 @@ export async function resolveStreamPlaylist(opts: {
     return {
       playlistUrl: r.playlistUrl,
       imdbId: r.imdbId,
+      thumbnailsUrl: r.thumbnailsUrl ?? null,
       failed: !r.playlistUrl,
       errorMessage: r.error,
       code: r.code,
@@ -222,6 +230,7 @@ export async function resolveStreamPlaylist(opts: {
     return {
       playlistUrl: v.playlistUrl,
       imdbId: v.imdbId ?? imdbId,
+      thumbnailsUrl: v.thumbnailsUrl ?? null,
       failed: false,
       usedSource: "vix",
       fellBackToVix: true,

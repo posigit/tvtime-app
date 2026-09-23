@@ -2,11 +2,13 @@
 
 import type { MutableRefObject, RefObject } from "react";
 import {
+  AudioLines,
   Captions,
   Check,
   Crop,
   Gauge,
   Lock,
+  MoonStar,
   MoreHorizontal,
   SkipForward,
   Volume2,
@@ -99,6 +101,15 @@ type PlayerTopChromeProps = {
    * awake while it is open (same as the other menus).
    */
   onMoreMenuOpenChange?: (open: boolean) => void;
+  /** Sleep timer end (ms epoch) or null. */
+  sleepUntil?: number | null;
+  /** Stop-after-episode armed. */
+  sleepAfterEpisode?: boolean;
+  /** Set sleep: minutes, "episode", or null to clear. Native mode only. */
+  onPickSleep?: (opt: number | "episode" | null) => void;
+  /** Dialogue boost on/off (native mode only). */
+  audioBoost?: boolean;
+  onToggleBoost?: () => void;
 };
 
 /**
@@ -160,8 +171,14 @@ export function PlayerTopChrome({
   setHlsAudioTrackRef,
   setHlsQualityRef,
   onMoreMenuOpenChange,
+  sleepUntil = null,
+  sleepAfterEpisode = false,
+  onPickSleep,
+  audioBoost = false,
+  onToggleBoost,
 }: PlayerTopChromeProps) {
   const [sourceMenuOpen, setSourceMenuOpen] = useState(false);
+  const [sleepExpanded, setSleepExpanded] = useState(false);
   const sourceMenuRef = useRef<HTMLDivElement>(null);
   // Outside-dismiss + Escape + scroll — mirrors the sub/audio/quality menus.
   useEffect(() => {
@@ -739,6 +756,9 @@ export function PlayerTopChrome({
                 >
                   {sourceOptions.map((key) => {
                     const disabled = disabledSources.includes(key);
+                    // Parked backends name their outage; the generic "Off"
+                    // covers the rest (e.g. tv-incompatible embeds).
+                    const disabledLabel = key === "goated" ? "Down" : "Off";
                     return (
                       <button
                         key={key}
@@ -758,7 +778,7 @@ export function PlayerTopChrome({
                         {sourceLabel(key)}
                         {disabled && (
                           <span className="text-[10px] font-semibold uppercase tracking-wide text-white/50">
-                            Off
+                            {disabledLabel}
                           </span>
                         )}
                         {!disabled && activeSource === key && (
@@ -866,6 +886,89 @@ export function PlayerTopChrome({
                       {autoplayNext ? "On" : "Off"}
                     </span>
                   </button>
+                )}
+                {mode === "native" && onToggleBoost && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      onKeepChrome();
+                      onToggleBoost();
+                    }}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-bold text-white transition hover:bg-white/10"
+                  >
+                    <AudioLines className="h-4 w-4 text-white/60" />
+                    Dialogue boost
+                    <span className="ml-auto text-white/60">
+                      {audioBoost ? "On" : "Off"}
+                    </span>
+                  </button>
+                )}
+                {mode === "native" && onPickSleep && (
+                  <>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      aria-expanded={sleepExpanded}
+                      onClick={() => {
+                        onKeepChrome();
+                        setSleepExpanded((v) => !v);
+                      }}
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-bold text-white transition hover:bg-white/10"
+                    >
+                      <MoonStar className="h-4 w-4 text-white/60" />
+                      Sleep timer
+                      <span className="ml-auto text-white/60">
+                        {sleepAfterEpisode
+                          ? "After episode"
+                          : sleepUntil != null
+                            ? `${Math.max(1, Math.ceil((sleepUntil - Date.now()) / 60000))}m left`
+                            : "Off"}
+                      </span>
+                    </button>
+                    {sleepExpanded && (
+                      <div className="border-t border-white/10 py-1">
+                        {(
+                          [
+                            { label: "Off", value: null },
+                            { label: "15 minutes", value: 15 },
+                            { label: "30 minutes", value: 30 },
+                            { label: "45 minutes", value: 45 },
+                            { label: "60 minutes", value: 60 },
+                            { label: "End of episode", value: "episode" },
+                          ] as const
+                        ).map((opt) => {
+                          const active =
+                            opt.value === "episode"
+                              ? sleepAfterEpisode
+                              : opt.value == null
+                                ? sleepUntil == null && !sleepAfterEpisode
+                                : sleepUntil != null && !sleepAfterEpisode;
+                          return (
+                            <button
+                              key={opt.label}
+                              type="button"
+                              role="menuitemradio"
+                              aria-checked={active}
+                              onClick={() => {
+                                onPickSleep(opt.value);
+                                setSleepExpanded(false);
+                              }}
+                              className={cn(
+                                "flex w-full items-center justify-between py-2.5 pl-11 pr-4 text-left text-sm font-medium text-white transition hover:bg-white/10",
+                                active && "text-primary"
+                              )}
+                            >
+                              {opt.label}
+                              {active && (
+                                <Check className="h-4 w-4 flex-shrink-0" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             )}

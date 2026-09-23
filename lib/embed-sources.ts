@@ -1,13 +1,16 @@
 /**
  * Embed-source registry for the player's iframe fallback.
  *
- * Picker order: cinesrc, vidfast, mapple, vidlink, vidnest, 2embed.
- * Native vix + goated are appended in vix-player (both selectable).
+ * Picker order: cinesrc, vidfast, mapple, vidlink, vidnest, 2embed, vidapi.
+ * Native vix + goated are appended in vix-player (goated parked: backend down).
  * Mapple + VidFast + VidLink post PLAYER_EVENT (progress saves); VidFast also
  * accepts {command} control messages. CineSrc posts cinesrc:* events, not
- * PLAYER_EVENT — vix-player adapts those. CineSrc embeds use controls=false
- * and VidNest embeds hide their transport chrome by query param, so lock mode
- * cannot leak embed chrome (host chrome + postMessage instead).
+ * PLAYER_EVENT — vix-player adapts those. VidAPI posts PLAYER_EVENT in its own
+ * shape ({player_status, player_progress}) — adapted in vix-player. CineSrc
+ * embeds use controls=false and VidNest embeds hide their transport chrome by
+ * query param, so lock mode cannot leak embed chrome (host chrome +
+ * postMessage instead). VidAPI/Mapple/VidLink/2Embed keep their own chrome;
+ * the host only syncs progress for those.
  */
 export type EmbedSourceDef = {
   /** Stable key — persisted as preferredSource. */
@@ -95,6 +98,20 @@ export const EMBED_SOURCES: EmbedSourceDef[] = [
     movieUrl: (tmdbId) => `https://www.2embed.cc/embed/${tmdbId}`,
     tvUrl: (tmdbId, season, episode) =>
       `https://www.2embed.cc/embedtv/${tmdbId}&s=${season}&e=${episode}`,
+  },
+  {
+    key: "vidapi",
+    name: "VidAPI",
+    base: "https://vaplayer.ru",
+    host: "vaplayer.ru",
+    // Documented params (vidapi.to/api): autoplay, showTitle, resumeAt,
+    // sub_url, ds_lang. No inbound command channel, so like Mapple the
+    // embed keeps its chrome and the host only syncs progress via its
+    // PLAYER_EVENT variant (adapted in vix-player).
+    movieUrl: (tmdbId) =>
+      `https://vaplayer.ru/embed/movie/${tmdbId}?autoplay=1&showTitle=false`,
+    tvUrl: (tmdbId, season, episode) =>
+      `https://vaplayer.ru/embed/tv/${tmdbId}/${season}/${episode}?autoplay=1&showTitle=false`,
   },
 ];
 

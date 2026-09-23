@@ -194,6 +194,8 @@ export function VixPlayer({
   const remoteDurationRef = useRef(0);
   const iframePausedRef = useRef(true);
   const iframeMutedRef = useRef(false);
+  /** VidAPI posts "playing" every ~5s — true while its last status was playing. */
+  const vidapiPlayingRef = useRef(false);
   /** Parsed VDRK cues rendered over the CineSrc iframe (no <video> track). */
   const [iframeCues, setIframeCues] = useState<VttCue[]>([]);
   /** Resume override for CineSrc quality switches (reload keeps position). */
@@ -280,6 +282,24 @@ export function VixPlayer({
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(
     () => loadVixSettings().speed
   );
+  /** Vix seek-preview thumbnails (VTT URL). Set on resolve, cleared per attempt. */
+  const [thumbnailsUrl, setThumbnailsUrl] = useState<string | null>(null);
+  /** Per-show speed key ("tv:123" / "movie:456"). */
+  const showSpeedKey =
+    type != null && tmdbId != null ? `${type}:${tmdbId}` : null;
+  /** Sleep timer end (ms epoch) or null. Session-only, never persisted. */
+  const [sleepUntil, setSleepUntil] = useState<number | null>(null);
+  const sleepTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Stop after this episode (autoplay off once). Session-only. */
+  const [sleepAfterEpisode, setSleepAfterEpisode] = useState(false);
+  /** Dialogue boost (WebAudio gain). Persisted; native mode only. */
+  const [audioBoost, setAudioBoost] = useState(
+    () => loadVixSettings().audioBoost === true
+  );
+  const audioGraphRef = useRef<{
+    ctx: AudioContext;
+    gain: GainNode;
+  } | null>(null);
   const [videoFit, setVideoFit] = useState<VixSettings["videoFit"]>(
     () => loadVixSettings().videoFit
   );
@@ -1116,14 +1136,16 @@ export function VixPlayer({
   }, [offlineOverride, mode, initialPosition, seekAndArmSaves]);
 
   // ---------- source switching ----------
-  // Picker order: cinesrc, vidfast, mapple, vidlink, vidnest, 2embed, then vix.
-  // Goated is a first-class native source (Valenox → Orbit cascade).
+  // Picker order: cinesrc, vidfast, mapple, vidlink, vidnest, 2embed,
+  // vidapi, then vix. Goated is parked (backend DNS dead 2026-09-23) —
+  // swap GOATED_RESOLVER in lib/goated.ts to resurrect.
   const ALL_SOURCES: StreamSource[] = [
     ...EMBED_SOURCES.map((s) => s.key as StreamSource),
     "vix",
     "goated",
   ];
   const disabledSources: StreamSource[] = [
+    "goated",
     ...(type === "tv"
       ? EMBED_SOURCES.filter((s) => !s.tvUrl(0, 1, 1)).map(
           (s) => s.key as StreamSource
@@ -1167,6 +1189,7 @@ export function VixPlayer({
     setActiveSource(next);
     // Reset playback state so the resolution effect re-runs fresh.
     setPlaylistUrl(null);
+    setThumbnailsUrl(null);
     setStreamFailed(false);
     setStreamError(null);
     setBuffering(false);
@@ -1180,6 +1203,7 @@ export function VixPlayer({
     setOpenSubItems([]);
     openSubListKeyRef.current = null;
     setCineSrcT(null);
+    vidapiPlayingRef.current = false;
     setServerMenuOpen(false);
     setMoreMenuOpen(false);
     // Keep ended/nearEnd so binge overlays don't double-fire after a switch.
@@ -1189,6 +1213,7 @@ export function VixPlayer({
   /** Error-card Retry: re-run stream resolution for the same source. */
   const retryStream = useCallback(() => {
     setPlaylistUrl(null);
+    setThumbnailsUrl(null);
     setStreamFailed(false);
     setStreamError(null);
     setBuffering(false);
@@ -1434,6 +1459,7 @@ export function VixPlayer({
       imdbIdRef.current = result.imdbId;
       if (result.playlistUrl) {
         setPlaylistUrl(result.playlistUrl);
+        setThumbnailsUrl(result.thumbnailsUrl ?? null);
         setStreamError(null);
         return;
       }
@@ -1960,6 +1986,177 @@ export function VixPlayer({
     bumpChrome();
   }, [mode, videoFit, embedZoom, bumpChrome]);
 
+  /** Pick an exact rate (speed presets). Saves global + per-show memory. */
+  const pickSpeed = useCallback(
+    (rate: number) => {
+      const next =
+        Number.isFinite(rate) ? Math.min(4, Math.max(0.25, rate)) : 1;
+      setPlaybackSpeed(next);
+      saveVixSettings(
+        showSpeedKey
+          ? {
+              speed: next,
+              speedByShow: {
+                ...loadVixSettings().speedByShow,
+                [showSpeedKey]: next,
+              },
+            }
+          : { speed: next }
+      );
+      const cinesrc = mode === "iframe" && activeSource === "cinesrc";
+      if (cinesrc) {
+        sendCineSrcCommand(iframeRef.current, "setPlaybackRate", [next]);
+      } else {
+        const v = videoRef.current;
+        if (v) v.playbackRate = next;
+      }
+      bumpChrome();
+    },
+    [mode, activeSource, showSpeedKey, bumpChrome]
+  );
+
+  // Per-show speed memory: when media is ready, a stored show rate wins.
+  useEffect(() => {
+    if (!mediaReady || !showSpeedKey) return;
+    const remembered = loadVixSettings().speedByShow?.[showSpeedKey];
+    if (remembered == null) return;
+    setPlaybackSpeed((prev) => {
+      if (prev === remembered) return prev;
+      const cinesrc = mode === "iframe" && activeSource === "cinesrc";
+      if (cinesrc) {
+        sendCineSrcCommand(iframeRef.current, "setPlaybackRate", [remembered]);
+      } else {
+        const v = videoRef.current;
+        if (v) v.playbackRate = remembered;
+      }
+      return remembered;
+    });
+  }, [mediaReady, showSpeedKey, mode, activeSource]);
+
+  // ---------- sleep timer (session-only) ----------
+  const clearSleep = useCallback(() => {
+    if (sleepTimerRef.current) {
+      clearTimeout(sleepTimerRef.current);
+      sleepTimerRef.current = null;
+    }
+    setSleepUntil(null);
+  }, []);
+  const fireSleep = useCallback(() => {
+    clearSleep();
+    if (isDrivenEmbed) {
+      sendDrivenPlay(false);
+    } else {
+      const v = videoRef.current;
+      if (v && Number.isFinite(v.currentTime)) {
+        savePosition(
+          v.currentTime,
+          Number.isFinite(v.duration) ? v.duration : 0,
+          true
+        );
+        v.pause();
+      }
+    }
+    bumpChrome();
+  }, [clearSleep, isDrivenEmbed, sendDrivenPlay, savePosition, bumpChrome]);
+  const pickSleep = useCallback(
+    (opt: number | "episode" | null) => {
+      clearSleep();
+      setSleepAfterEpisode(false);
+      if (opt === "episode") {
+        // Up Next reads autoplayNext live from settings at episode end.
+        setSleepAfterEpisode(true);
+        setAutoplayNext(false);
+        saveVixSettings({ autoplayNext: false });
+        bumpChrome();
+        return;
+      }
+      if (opt == null) {
+        bumpChrome();
+        return;
+      }
+      setSleepUntil(Date.now() + opt * 60_000);
+      sleepTimerRef.current = setTimeout(fireSleep, opt * 60_000);
+      bumpChrome();
+    },
+    [clearSleep, fireSleep, bumpChrome]
+  );
+  useEffect(
+    () => () => {
+      if (sleepTimerRef.current) clearTimeout(sleepTimerRef.current);
+    },
+    []
+  );
+
+  // ---------- dialogue boost (WebAudio gain, native mode only) ----------
+  // One MediaElementSource per element ever — build once, bypass at unity.
+  const ensureAudioGraph = useCallback(() => {
+    const v = videoRef.current;
+    if (!v || audioGraphRef.current) return audioGraphRef.current;
+    try {
+      const Ctx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext?: typeof AudioContext })
+          .webkitAudioContext;
+      if (!Ctx) return null;
+      const ctx = new Ctx();
+      const src = ctx.createMediaElementSource(v);
+      const gain = ctx.createGain();
+      gain.gain.value = 1;
+      src.connect(gain);
+      gain.connect(ctx.destination);
+      audioGraphRef.current = { ctx, gain };
+      return audioGraphRef.current;
+    } catch {
+      return null;
+    }
+  }, []);
+  const applyAudioBoost = useCallback(
+    (on: boolean) => {
+      setAudioBoost(on);
+      saveVixSettings({ audioBoost: on });
+      if (!on || mode !== "native") {
+        if (audioGraphRef.current) {
+          try {
+            audioGraphRef.current.gain.gain.value = 1;
+          } catch {
+            /* ignore */
+          }
+        }
+        bumpChrome();
+        return;
+      }
+      const g = ensureAudioGraph();
+      if (g) {
+        try {
+          if (g.ctx.state === "suspended") void g.ctx.resume();
+          g.gain.gain.value = 1.6;
+        } catch {
+          /* ignore */
+        }
+      }
+      bumpChrome();
+    },
+    [mode, ensureAudioGraph, bumpChrome]
+  );
+
+  // Restore persisted dialogue boost once native media is ready (graph is
+  // per-mount; toggle rebuilds it later).
+  useEffect(() => {
+    if (!mediaReady || mode !== "native" || !audioBoost) return;
+    const g = ensureAudioGraph();
+    if (g) {
+      try {
+        if (g.ctx.state === "suspended") void g.ctx.resume();
+        g.gain.gain.value = 1.6;
+      } catch {
+        /* ignore */
+      }
+    }
+  }, [mediaReady, mode, audioBoost, ensureAudioGraph]);
+  const toggleBoost = useCallback(() => {
+    applyAudioBoost(!audioBoost);
+  }, [applyAudioBoost, audioBoost]);
+
   /** Cycle playback speed (native + CineSrc — the only embed with a rate API). */
   const cycleSpeed = useCallback(() => {
     const cinesrc = mode === "iframe" && activeSource === "cinesrc";
@@ -2102,6 +2299,54 @@ export function VixPlayer({
         typeof data === "object" &&
         data !== null &&
         (data as { type?: unknown }).type === "PLAYER_EVENT";
+      // VidAPI (vaplayer.ru) posts PLAYER_EVENT in its own shape
+      // ({player_status: playing|paused|completed|seeked, player_progress,
+      // player_duration}). Normalize to the vix-style events below. Its
+      // "playing" fires on start AND every ~5s as a progress tick, so only
+      // the paused→playing transition becomes "play" (each "play" bumps the
+      // chrome — mapping every tick would pin it visible forever); repeats
+      // become "timeupdate" (clock + progress saves, no chrome bump).
+      if (
+        isPlayerEvent &&
+        (e.origin === "https://vaplayer.ru" ||
+          e.origin.endsWith(".vaplayer.ru"))
+      ) {
+        const body = (data as { data?: unknown }).data as
+          | {
+              player_status?: unknown;
+              player_progress?: unknown;
+              player_duration?: unknown;
+            }
+          | null
+          | undefined;
+        const status =
+          body && typeof body.player_status === "string"
+            ? body.player_status
+            : null;
+        const asNum = (v: unknown) =>
+          typeof v === "number" && Number.isFinite(v) ? v : undefined;
+        const mapped =
+          status === "playing"
+            ? "play"
+            : status === "paused"
+              ? "pause"
+              : status === "completed"
+                ? "ended"
+                : status === "seeked"
+                  ? "seeked"
+                  : null;
+        if (!mapped) return;
+        const ev = mapped === "play" && vidapiPlayingRef.current ? "timeupdate" : mapped;
+        vidapiPlayingRef.current = status === "playing";
+        data = {
+          type: "PLAYER_EVENT",
+          data: {
+            event: ev,
+            currentTime: asNum(body?.player_progress),
+            duration: asNum(body?.player_duration),
+          },
+        };
+      }
       // Nested player frames post from inner windows, so trust any registered
       // embed player origin instead of requiring the exact embed frame/source.
       if (!isEmbedPlayerOrigin(e.origin)) {
@@ -2711,12 +2956,14 @@ export function VixPlayer({
           showSpeed={mode === "native" || cineSrcEmbed}
           playbackSpeed={playbackSpeed}
           onCycleSpeed={cycleSpeed}
+          onPickSpeed={pickSpeed}
           serverOptions={cineSrcEmbed ? buildCineSrcServerOptions(cineSrcKnownServers) : undefined}
           activeServer={liveCineSrcServer ?? cineSrcServer}
           onPickServer={cineSrcEmbed ? handleCineSrcServer : undefined}
           onServerMenuOpenChange={setServerMenuOpen}
           opaqueBottom={activeSource === "vidfast"}
           segments={segments}
+          thumbnailsUrl={mode === "native" ? thumbnailsUrl : null}
         />
       )}
 
@@ -2804,6 +3051,11 @@ export function VixPlayer({
               return next;
             });
           }}
+          sleepUntil={sleepUntil}
+          sleepAfterEpisode={sleepAfterEpisode}
+          onPickSleep={pickSleep}
+          audioBoost={audioBoost}
+          onToggleBoost={toggleBoost}
             onLock={() => {
               navigator.vibrate?.(10);
             setLocked(true);

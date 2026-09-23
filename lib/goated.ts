@@ -16,6 +16,9 @@
 
 export const GOATED_RESOLVER = "https://api.reallyfast.xyz";
 export const GOATED_ORIGIN = "https://goated.cx";
+// PARKED 2026-09-23: api/cdn.reallyfast.xyz are NXDOMAIN (backend gone, not
+// blocked). Picker shows Goated as Down. To resurrect, point GOATED_RESOLVER
+// at the new backend base URL — no other code changes needed.
 
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";

@@ -22,6 +22,8 @@ export type VixSettings = {
   quality: "auto" | number;
   /** Playback rate multiplier. */
   speed: number;
+  /** Per-show speed memory: "tv:123" | "movie:456" -> rate. Falls back to speed. */
+  speedByShow: Record<string, number>;
   /** 0..1 */
   volume: number;
   /**
@@ -66,6 +68,8 @@ export type VixSettings = {
   subBgOpacity: number;
   /** Cue background blur (liquid-glass pill). Off when background is off. */
   subBgBlur: "none" | "sm" | "md" | "lg";
+  /** Dialogue boost (WebAudio gain) for quiet mixes. Native mode only. */
+  audioBoost: boolean;
   /** Native aspect mode (object-fit). */
   videoFit: "fit" | "cover" | "stretch";
   /** Iframe zoom (CSS scale crop) — cross-origin frames lack aspect APIs. */
@@ -95,6 +99,7 @@ export const DEFAULT_VIX_SETTINGS: VixSettings = {
   subs: "en",
   quality: "auto",
   speed: 1,
+  speedByShow: {},
   volume: 1,
   muted: false,
   autoplayNext: true,
@@ -108,6 +113,7 @@ export const DEFAULT_VIX_SETTINGS: VixSettings = {
   subColor: "white",
   subBgOpacity: 0.35,
   subBgBlur: "md",
+  audioBoost: false,
   videoFit: "fit",
   embedZoom: 1,
   downloadMode: false,
@@ -132,6 +138,20 @@ function clampSettings(merged: VixSettings): VixSettings {
   const next = { ...merged, v: VIX_SETTINGS_VERSION, muted: false };
   if (isBannedSubLang(next.subs)) next.subs = "en";
   if (isBannedSubLang(next.audio)) next.audio = "en";
+  // Per-show speed memory: finite rates in a sane range, capped entries.
+  if (next.speedByShow == null || typeof next.speedByShow !== "object") {
+    next.speedByShow = {};
+  } else {
+    const clean: Record<string, number> = {};
+    for (const [k, v] of Object.entries(next.speedByShow)) {
+      if (typeof k === "string" && k.length > 0 && k.length <= 32 && typeof v === "number" && Number.isFinite(v) && v >= 0.25 && v <= 4) {
+        clean[k] = v;
+      }
+      if (Object.keys(clean).length >= 200) break;
+    }
+    next.speedByShow = clean;
+  }
+  next.audioBoost = next.audioBoost === true;
   const SOURCE_VALUES = [
     "vix",
     "goated",
@@ -141,6 +161,7 @@ function clampSettings(merged: VixSettings): VixSettings {
     "cinesrc",
     "2embed",
     "mapple",
+    "vidapi",
   ] as const;
   if (!(SOURCE_VALUES as readonly string[]).includes(next.preferredSource)) {
     next.preferredSource = "vix";
