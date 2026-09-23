@@ -24,7 +24,7 @@ export type StreamResolveResult = {
   /** False when the deployment has no VIX resolver configured. */
   resolverConfigured?: boolean;
   /** Which backend actually produced the playlist (diagnostics). */
-  usedSource?: "valenox" | "orbit" | "vix";
+  usedSource?: "valenox" | "orbit" | "vix" | "vidsrc-sh";
   /** True when the goated cascade exhausted and vix was tried as the last native fallback. */
   fellBackToVix?: boolean;
   /** Per-attempt outcomes (diagnostics / console). */
@@ -160,20 +160,65 @@ export async function resolveStreamPlaylist(opts: {
     r: { playlistUrl: string | null; error?: string }
   ) => attempts!.push({ source, ok: !!r.playlistUrl, error: r.error });
 
-  // Vix: single attempt — unchanged behavior.
+  // Vix: single attempt — unchanged behavior, plus the vidsrc-sh last
+  // resort on failure (prod: vix blocked, vidsrc-sh may answer).
   if (opts.source === "vix") {
     const r = await resolveOne("vix", base, opts.signal);
     record("vix", r);
+    if (r.playlistUrl) {
+      return {
+        playlistUrl: r.playlistUrl,
+        imdbId: r.imdbId,
+        thumbnailsUrl: r.thumbnailsUrl ?? null,
+        failed: false,
+        usedSource: "vix",
+        attempts,
+      };
+    }
+    if (!opts.signal?.aborted) {
+      try {
+        const res = await fetchWithTimeout(
+          `/api/vidsrc-sh/stream?${base.toString()}`,
+          opts.signal
+        );
+        if (res.ok) {
+          const data = (await res.json()) as {
+            playlistUrl?: string;
+            imdbId?: string | null;
+            thumbnailsUrl?: string | null;
+          };
+          if (data?.playlistUrl) {
+            record("vidsrc-sh", { playlistUrl: data.playlistUrl });
+            return {
+              playlistUrl: data.playlistUrl,
+              imdbId: data.imdbId ?? r.imdbId,
+              thumbnailsUrl: data.thumbnailsUrl ?? null,
+              failed: false,
+              usedSource: "vidsrc-sh",
+              attempts,
+            };
+          }
+        }
+        record("vidsrc-sh", { playlistUrl: null, error: `route ${res.status}` });
+      } catch (err) {
+        if (!(err instanceof Error && opts.signal?.aborted)) {
+          record("vidsrc-sh", {
+            playlistUrl: null,
+            error: err instanceof Error ? err.message : String(err),
+          });
+        }
+      }
+    }
     return {
-      playlistUrl: r.playlistUrl,
+      playlistUrl: null,
       imdbId: r.imdbId,
-      thumbnailsUrl: r.thumbnailsUrl ?? null,
-      failed: !r.playlistUrl,
+      thumbnailsUrl: null,
+      failed: true,
       errorMessage: r.error,
       code: r.code,
       detail: r.detail,
       resolverConfigured: r.resolverConfigured,
-      usedSource: r.playlistUrl ? "vix" : undefined,
+      usedSource: undefined,
       attempts,
     };
   }
@@ -238,6 +283,45 @@ export async function resolveStreamPlaylist(opts: {
     };
   }
   const lastErr = attempts.find((a) => !a.ok)?.error;
+  // Last resort native: data.vidsrc.sh (WASM-decrypted direct HLS, tokenized
+  // + proxied through /api/vidsrc-sh/media). Runs only when vix + goated
+  // both failed, so it never slows the working paths — and in prod it may be
+  // the ONLY reachable native backend.
+  if (!opts.signal?.aborted) {
+    try {
+      const res = await fetchWithTimeout(
+        `/api/vidsrc-sh/stream?${base.toString()}`,
+        opts.signal
+      );
+      if (res.ok) {
+        const data = (await res.json()) as {
+          playlistUrl?: string;
+          imdbId?: string | null;
+          thumbnailsUrl?: string | null;
+        };
+        if (data?.playlistUrl) {
+          record("vidsrc-sh", { playlistUrl: data.playlistUrl });
+          return {
+            playlistUrl: data.playlistUrl,
+            imdbId: data.imdbId ?? imdbId,
+            thumbnailsUrl: data.thumbnailsUrl ?? null,
+            failed: false,
+            usedSource: "vidsrc-sh",
+            fellBackToVix: true,
+            attempts,
+          };
+        }
+      }
+      record("vidsrc-sh", { playlistUrl: null, error: `route ${res.status}` });
+    } catch (err) {
+      if (!(err instanceof Error && opts.signal?.aborted)) {
+        record("vidsrc-sh", {
+          playlistUrl: null,
+          error: err instanceof Error ? err.message : String(err),
+        });
+      }
+    }
+  }
   return {
     playlistUrl: null,
     imdbId: v.imdbId ?? imdbId,

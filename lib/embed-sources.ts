@@ -1,7 +1,8 @@
 /**
  * Embed-source registry for the player's iframe fallback.
  *
- * Picker order: cinesrc, vidfast, mapple, vidlink, vidnest, 2embed, vidapi.
+ * Picker order: cinesrc, vidfast, mapple, vidlink, vidnest, 2embed, vidapi,
+ * ythd, xpass.
  * Native vix + goated are appended in vix-player (goated parked: backend down).
  * Mapple + VidFast + VidLink post PLAYER_EVENT (progress saves); VidFast also
  * accepts {command} control messages. CineSrc posts cinesrc:* events, not
@@ -113,6 +114,30 @@ export const EMBED_SOURCES: EmbedSourceDef[] = [
     tvUrl: (tmdbId, season, episode) =>
       `https://vaplayer.ru/embed/tv/${tmdbId}/${season}/${episode}?autoplay=1&showTitle=false`,
   },
+  {
+    key: "ythd",
+    name: "YTHD",
+    base: "https://ythd.org",
+    host: "cloudorchestranova.com",
+    // Signed cloudorchestranova embeds minted per play via /api/ythd/mint
+    // (the iframe follows the 302 to the fresh signed URL). Unknown event
+    // shape — playable with host progress only where posted.
+    movieUrl: (tmdbId) => `/api/ythd/mint?type=movie&id=${tmdbId}`,
+    tvUrl: (tmdbId, season, episode) =>
+      `/api/ythd/mint?type=tv&id=${tmdbId}&season=${season}&episode=${episode}`,
+  },
+  {
+    key: "xpass",
+    name: "XPass",
+    base: "https://play.xpass.top",
+    host: "play.xpass.top",
+    // Minimal loader pages with TMDB ids. Ships sandbox detection — our
+    // iframes are unsandboxed, matching what its player expects.
+    movieUrl: (tmdbId) =>
+      `https://play.xpass.top/e/movie/${tmdbId}?autostart=true`,
+    tvUrl: (tmdbId, season, episode) =>
+      `https://play.xpass.top/e/tv/${tmdbId}/${season}/${episode}?autostart=true`,
+  },
 ];
 
 /** Origins that must keep accepting PLAYER_EVENT: the vixsrc iframe fallback,
@@ -121,6 +146,7 @@ export const EMBED_SOURCES: EmbedSourceDef[] = [
 const LEGACY_PLAYER_ORIGINS = [
   "vixsrc.to",
   "mapple.tv",
+  "mapple.fun",
   "vidfast.pro",
   "vidfast.in",
   "vidfast.io",

@@ -17,7 +17,10 @@ export type StreamSource =
   | "vidnest"
   | "cinesrc"
   | "2embed"
-  | "mapple";
+  | "mapple"
+  | "vidapi"
+  | "ythd"
+  | "xpass";
 
 export type AudioTrackInfo = { id: number; lang: string; name: string };
 export type QualityLevelInfo = { height: number; index: number };

@@ -293,7 +293,7 @@ async function runDownload(
   rec.state = "active";
   await upsertRecord(rec);
 
-  // 1. Resolve a native playlist (vix/goated cascade covers vix fallback).
+  // 1. Resolve a native playlist (vix/goated/vidsrc-sh cascade).
   const preferred = loadVixSettings().preferredSource;
   const source = preferred === "vix" || preferred === "goated" ? preferred : "goated";
   const resolved = await resolveStreamPlaylist({
