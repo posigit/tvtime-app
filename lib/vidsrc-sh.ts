@@ -16,6 +16,8 @@
  * Runs in Node (Vercel) and Workers unchanged — only WebAssembly + fetch.
  */
 
+import { createHmac, timingSafeEqual } from "crypto";
+
 const VIDSRC_SH_API = "https://data.vidsrc.sh/api.php";
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
@@ -80,6 +82,7 @@ function moduleFor(vs: NonNullable<VsApiResponse["vs"]>): Promise<WebAssembly.Mo
         const res = await fetch(vs.wasm_url as string, {
           headers: { "User-Agent": UA, Referer: "https://vidsrc.sh/" },
           cache: "no-store",
+          signal: AbortSignal.timeout(15_000),
         });
         if (!res.ok) throw new Error(`wasm ${res.status}`);
         // compileStreaming first (falls back to buffer compile).
@@ -154,6 +157,7 @@ export async function vidsrcShResolve(opts: {
       Accept: "application/json",
     },
     cache: "no-store",
+    signal: AbortSignal.timeout(15_000),
   });
   if (!res.ok) throw new Error(`vidsrc.sh api ${res.status}`);
   const j = (await res.json()) as VsApiResponse;
@@ -216,6 +220,7 @@ export async function vidsrcShToken(origin: string): Promise<string> {
   const res = await fetch(`${origin}/generate.php`, {
     headers: { "User-Agent": UA, Referer: "https://cloudorchestranova.com/" },
     cache: "no-store",
+    signal: AbortSignal.timeout(10_000),
   });
   if (!res.ok) throw new Error(`token endpoint ${res.status}`);
   const token = (await res.text()).trim();
@@ -229,4 +234,43 @@ export function applyVidsrcToken(url: string, token: string): string {
   if (!token) return url;
   if (url.includes("__TOKEN__")) return url.split("__TOKEN__").join(token);
   return url + (url.includes("?") ? "&" : "?") + "token=" + token;
+}
+
+// ---------- proxy URL signing (abuse guard) ----------
+// /api/vidsrc-sh/media would otherwise be an open https fetch proxy —
+// anyone could burn our bandwidth. Stream + media routes sign every URL
+// they mint with AUTH_SECRET, so only OUR chain validates. Cross-instance
+// safe (shared env secret, no shared memory).
+
+let warnedNoSecret = false;
+
+function proxySecret(): string {
+  const s = process.env.AUTH_SECRET;
+  if (s && s.length >= 16) return s;
+  if (!warnedNoSecret) {
+    warnedNoSecret = true;
+    console.warn(
+      "[vidsrc-sh] AUTH_SECRET missing/short — proxy URLs signed with an insecure dev fallback"
+    );
+  }
+  return "dev-only-insecure-proxy-key";
+}
+
+/** Build a signed /api/vidsrc-sh/media URL for a target. */
+export function signProxyUrl(target: string): string {
+  const sig = createHmac("sha256", proxySecret())
+    .update(target)
+    .digest("base64url");
+  return `/api/vidsrc-sh/media?url=${encodeURIComponent(target)}&sig=${sig}`;
+}
+
+/** True when sig matches target (constant-time). */
+export function verifyProxyUrl(target: string, sig: string | null): boolean {
+  if (!sig) return false;
+  const expected = createHmac("sha256", proxySecret())
+    .update(target)
+    .digest("base64url");
+  const a = new TextEncoder().encode(sig);
+  const b = new TextEncoder().encode(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
 }

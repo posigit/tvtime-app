@@ -44,6 +44,7 @@ export async function GET(req: NextRequest) {
         Accept: "application/json",
       },
       cache: "no-store",
+      signal: AbortSignal.timeout(12_000),
     });
     if (!res.ok) throw new Error(`ythd minter ${res.status}`);
     const data = (await res.json()) as { src?: string };

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { vidsrcShResolve } from "@/lib/vidsrc-sh";
+import { signProxyUrl, vidsrcShResolve } from "@/lib/vidsrc-sh";
 
 /**
  * data.vidsrc.sh resolver endpoint.
@@ -51,10 +51,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       // Proxied master: tokens are IP-bound to this deployment, so the
       // browser must go through /api/vidsrc-sh/media (which mints + proxies).
-      playlistUrl: `/api/vidsrc-sh/media?url=${encodeURIComponent(r.urls[0])}`,
-      playlistUrls: r.urls.map(
-        (u) => `/api/vidsrc-sh/media?url=${encodeURIComponent(u)}`
-      ),
+      // Signed: the media route only serves URLs minted here (abuse guard).
+      playlistUrl: signProxyUrl(r.urls[0]),
+      playlistUrls: r.urls.map((u) => signProxyUrl(u)),
       title: r.title,
       imdbId: r.imdbId,
       fileName: r.fileName,

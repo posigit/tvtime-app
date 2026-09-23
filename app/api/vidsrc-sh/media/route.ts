@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { applyVidsrcToken, vidsrcShOrigin, vidsrcShToken } from "@/lib/vidsrc-sh";
+import {
+  applyVidsrcToken,
+  signProxyUrl,
+  verifyProxyUrl,
+  vidsrcShOrigin,
+  vidsrcShToken,
+} from "@/lib/vidsrc-sh";
 
 /**
  * vidsrc-sh media proxy.
@@ -39,7 +45,7 @@ function toProxy(full: string): string | null {
   try {
     const u = new URL(full);
     if (u.protocol !== "https:" || isBlockedHost(u.hostname)) return null;
-    return `/api/vidsrc-sh/media?url=${encodeURIComponent(full)}`;
+    return signProxyUrl(full);
   } catch {
     return null;
   }
@@ -96,6 +102,11 @@ export async function GET(req: NextRequest) {
   const target = req.nextUrl.searchParams.get("url");
   if (!target) {
     return NextResponse.json({ error: "url required" }, { status: 400 });
+  }
+  // Only URLs minted by our own stream route (HMAC) are served — otherwise
+  // this would be an open fetch proxy burning our bandwidth.
+  if (!verifyProxyUrl(target, req.nextUrl.searchParams.get("sig"))) {
+    return NextResponse.json({ error: "bad signature" }, { status: 403 });
   }
   let parsed: URL;
   try {
