@@ -1417,7 +1417,10 @@ export function ShowDetailClient({
       {/* ---------- VixSrc streaming player ---------- */}
       {playerEp && (
         <VixPlayer
-          key={`${show.tmdbId}-${playerEp.seasonNumber}-${playerEp.episodeNumber}`}
+          // Keyed on show only: episode advance swaps props on the SAME mount
+          // so fullscreen (and the lock, audio graph, cast session) survives.
+          // The player's src-change path resets per-episode state.
+          key={`${show.tmdbId}`}
           overlaySlot={
             <>
               {/* Up-next autoplay overlay — inside the shell: fullscreen-safe. */}

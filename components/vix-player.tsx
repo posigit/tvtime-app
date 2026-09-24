@@ -608,6 +608,13 @@ export function VixPlayer({
     setSegments(EMPTY_SEGMENTS);
     setStreamError(null);
     setBuffering(false);
+    // Episode advance (same mount — the shell, and therefore fullscreen,
+    // survives): drop the old stream so the previous episode never lingers
+    // behind the fresh resolution. First mount is already null — harmless.
+    setPlaylistUrl(null);
+    setThumbnailsUrl(null);
+    setStreamFailed(false);
+    setIframeError(false);
     // Fresh title/episode: drop transient gesture state (no strand-over).
     setBrightness(1);
     setTapCue(null);
