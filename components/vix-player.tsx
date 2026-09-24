@@ -2516,7 +2516,8 @@ export function VixPlayer({
         const s = Math.floor(target % 60);
         showGestureHint(`${m}:${String(s).padStart(2, "0")}`);
       } else if (g.active === "brightness") {
-        const next = Math.min(1, Math.max(0.3, 1 + dy / 300));
+        // Swipe up = brighter (VLC/MX convention): dy is negative going up.
+        const next = Math.min(1, Math.max(0.3, 1 - dy / 300));
         setBrightness(next);
         showGestureHint(`Brightness ${Math.round(next * 100)}%`);
       } else if (g.active === "volume") {
@@ -2524,14 +2525,23 @@ export function VixPlayer({
         // on touch end — never localStorage-write per move event.
         const next = Math.min(1, Math.max(0, g.startVol - dy / 300));
         v.volume = next;
-        v.muted = next === 0;
-        setTransport((t) =>
-          t.volume === next && t.muted === (next === 0)
-            ? t
-            : { ...t, volume: next, muted: next === 0 }
-        );
-        gestureDirtyVolume.current = next;
-        showGestureHint(next === 0 ? "Muted" : `Volume ${Math.round(next * 100)}%`);
+        // iPhone Safari ignores programmatic volume (hardware buttons only):
+        // detect the locked control and say so instead of faking movement.
+        if (
+          Math.abs(v.volume - next) > 0.02 &&
+          Math.abs(next - g.startVol) > 0.02
+        ) {
+          showGestureHint("Use side buttons for volume");
+        } else {
+          v.muted = next === 0;
+          setTransport((t) =>
+            t.volume === next && t.muted === (next === 0)
+              ? t
+              : { ...t, volume: next, muted: next === 0 }
+          );
+          gestureDirtyVolume.current = next;
+          showGestureHint(next === 0 ? "Muted" : `Volume ${Math.round(next * 100)}%`);
+        }
       }
     },
     [locked, mode, setVolume, showGestureHint]
