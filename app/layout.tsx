@@ -52,8 +52,10 @@ export default function RootLayout({
         <script
           // Apply saved theme before first paint (no FOUC). Defaults to AMOLED.
           // Also toggles .dark (Tailwind dark: variant) and theme-color meta.
+          // Light is unlisted (see VISIBLE_THEMES): stored "light" migrates
+          // to soft so nobody strands on a theme with no picker entry.
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("tv-theme");if(t!=="light"&&t!=="soft"&&t!=="amoled"){t="amoled"}var d=document.documentElement;d.dataset.theme=t;if(t!=="light"){d.classList.add("dark")}else{d.classList.remove("dark")}var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#f4f4f6":t==="soft"?"#101014":"#000000")}catch(e){document.documentElement.dataset.theme="amoled"}})()`,
+            __html: `(function(){try{var t=localStorage.getItem("tv-theme");if(t!=="soft"&&t!=="amoled"){t=t==="light"?"soft":"amoled";try{localStorage.setItem("tv-theme",t)}catch(e){}}var d=document.documentElement;d.dataset.theme=t;if(t!=="light"){d.classList.add("dark")}else{d.classList.remove("dark")}var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#f4f4f6":t==="soft"?"#101014":"#000000")}catch(e){document.documentElement.dataset.theme="amoled"}})()`,
           }}
         />
       </head>

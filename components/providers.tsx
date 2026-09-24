@@ -22,8 +22,10 @@ function ThemeHydrator() {
   useEffect(() => {
     // Layout script owns first paint; re-assert here for late mounts and
     // route the single cross-tab / same-tab subscription through applyTheme
-    // (dataset + .dark class + theme-color stay in sync).
-    applyTheme(getSavedTheme());
+    // (dataset + .dark class + theme-color stay in sync). Stored "light"
+    // migrates to soft (unlisted — see VISIBLE_THEMES).
+    const saved = getSavedTheme();
+    applyTheme(saved === "light" ? "soft" : saved);
     return subscribeTheme(applyTheme);
   }, []);
   return null;

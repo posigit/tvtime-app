@@ -14,6 +14,12 @@ export type ThemeId = "amoled" | "soft" | "light";
 
 export const THEMES: readonly ThemeId[] = ["amoled", "soft", "light"];
 
+/**
+ * Themes listed in the UI. Light stays valid (stored prefs, tokens, meta)
+ * but is hidden until it gets a proper pass — AMOLED + Soft dark only.
+ */
+export const VISIBLE_THEMES: readonly ThemeId[] = ["amoled", "soft"];
+
 export const THEME_META_COLOR: Record<ThemeId, string> = {
   amoled: "#000000",
   soft: "#101014",
