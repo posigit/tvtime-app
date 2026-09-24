@@ -324,6 +324,18 @@ html[data-theme="light"] .top-ten-rank-gold {
     padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
   }
 
+  /**
+   * Sticky tab chrome crispness (Safari): stuck sticky layers composite, and
+   * Safari drops subpixel antialiasing on composited text — small uppercase
+   * tab labels read as blurred/smeared. A dedicated layer plus standard
+   * smoothing keeps them crisp. No visual change in browsers without the bug.
+   */
+  .sticky-chrome-crisp {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-font-smoothing: auto;
+  }
+
   /** Full-bleed detail hero taller under the status bar so title block stays readable */
   .h-detail-hero {
     height: calc(18rem + env(safe-area-inset-top, 0px));

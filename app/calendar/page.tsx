@@ -128,7 +128,7 @@ export default async function CalendarPage({
 
   return (
     <div className="min-h-dvh bg-background px-4 pb-nav-page">
-      <div className="sticky top-0 z-40 -mx-4 bg-background/85 px-4 pb-2 pt-safe-float backdrop-blur">
+      <div className="sticky-chrome-crisp sticky top-0 z-40 -mx-4 bg-background/85 px-4 pb-2 pt-safe-float backdrop-blur">
         <div className="flex items-center justify-between">
           <Link
             href={backHref}

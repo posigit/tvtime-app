@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 /**
  * Shared sticky app chrome for tab pages.
  * Solid black under the status bar so scrolled content never bleeds through.
+ * sticky-chrome-crisp keeps tab labels sharp in Safari (see globals.css).
  */
 export function StickyChrome({
   children,
@@ -17,7 +18,7 @@ export function StickyChrome({
   return (
     <div
       className={cn(
-        "sticky top-0 z-20 border-b border-border bg-background pb-1 pt-safe",
+        "sticky-chrome-crisp sticky top-0 z-20 border-b border-border bg-background pb-1 pt-safe",
         className
       )}
     >

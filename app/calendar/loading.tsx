@@ -7,7 +7,7 @@ export default function CalendarLoading() {
       role="status"
       aria-label="Loading calendar"
     >
-      <div className="sticky top-0 z-40 -mx-4 bg-background/85 px-4 pb-2 pt-safe-float backdrop-blur">
+      <div className="sticky-chrome-crisp sticky top-0 z-40 -mx-4 bg-background/85 px-4 pb-2 pt-safe-float backdrop-blur">
         <div className="flex items-center justify-between">
           <Skeleton className="h-9 w-9 rounded-full" />
           <Skeleton className="h-5 w-32" />
