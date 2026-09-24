@@ -230,10 +230,13 @@ async function startDownloadInner(req: DownloadRequest, key: string): Promise<vo
     throw new Error("Download mode is off — enable it in Download settings.");
   }
   const existing = getRecordSync(key) ?? (await getManifest())[key];
-  if (existing && (existing.state === "active" || existing.state === "queued")) {
-    return; // already running
-  }
+  // A live loop in this instance owns the key — hands off.
   if (activeControllers.has(key)) return;
+  // NOTE: no early return for `queued`/`active` rows without a controller.
+  // Those are stale takeovers (a resume intent that just queued the row, an
+  // HMR reset, a lost map entry): fall through and adopt the row instead of
+  // stranding it forever. A rival loop in another tab is still fenced by the
+  // ownedHere handoff in the catch/finally below.
 
   const now = Date.now();
   // Quality switch orphans prior bytes (segment URLs differ): drop the old
