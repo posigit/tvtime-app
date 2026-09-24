@@ -107,8 +107,10 @@ type PlayerTopChromeProps = {
   sleepUntil?: number | null;
   /** Stop-after-episode armed. */
   sleepAfterEpisode?: boolean;
-  /** Set sleep: minutes, "episode", or null to clear. Native mode only. */
+  /** Set sleep: minutes, "episode", or null to clear. Native + driven embeds. */
   onPickSleep?: (opt: number | "episode" | null) => void;
+  /** True for iframe embeds we drive (sleep timer applies to them too). */
+  isDrivenEmbed?: boolean;
   /** Dialogue boost on/off (native mode only). */
   audioBoost?: boolean;
   onToggleBoost?: () => void;
@@ -183,6 +185,7 @@ export function PlayerTopChrome({
   sleepUntil = null,
   sleepAfterEpisode = false,
   onPickSleep,
+  isDrivenEmbed = false,
   audioBoost = false,
   onToggleBoost,
   castReady = false,
@@ -963,7 +966,7 @@ export function PlayerTopChrome({
                     </span>
                   </button>
                 )}
-                {mode === "native" && onPickSleep && (
+                {(mode === "native" || isDrivenEmbed) && onPickSleep && (
                   <>
                     <button
                       type="button"

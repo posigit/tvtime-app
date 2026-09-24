@@ -3812,6 +3812,7 @@ export function VixPlayer({
           sleepUntil={sleepUntil}
           sleepAfterEpisode={sleepAfterEpisode}
           onPickSleep={pickSleep}
+          isDrivenEmbed={isDrivenEmbed}
           audioBoost={audioBoost}
           onToggleBoost={toggleBoost}
           castReady={castReady}
