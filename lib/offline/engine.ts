@@ -38,6 +38,7 @@ import {
   dlPlaylistUrl,
   estimateBytes,
   isMasterPlaylist,
+  minVariantHeight,
   parseMasterAudio,
   parseMasterVariants,
   parseMediaPlaylist,
@@ -501,7 +502,16 @@ async function runDownload(
   if (isMaster) {
     const variants = parseMasterVariants(masterText, playlistBase);
     pickedVariant = pickVariant(variants, rec.quality);
-    if (!pickedVariant) throw new Error("No playable quality found for this title.");
+    if (!pickedVariant) {
+      // Quality gap (e.g. 480p requested, lowest rendition is 720p): say so
+      // plainly so the user can switch quality instead of guessing.
+      const lowest = minVariantHeight(variants);
+      throw new Error(
+        rec.quality === "best" || lowest == null
+          ? "No playable quality found for this title."
+          : `Not available in ${rec.quality}p (lowest is ${lowest}p) — switch quality in Download settings and retry.`
+      );
+    }
     const vRes = await fetchPieceRetry(pickedVariant.url, signal);
     if (!vRes.ok) throw new Error(`Quality fetch failed (${vRes.status})`);
     mediaText = await vRes.text();

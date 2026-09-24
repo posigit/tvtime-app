@@ -98,7 +98,9 @@ export function parseMasterVariants(
   return out.sort((a, b) => b.bandwidth - a.bandwidth);
 }
 
-/** Highest variant at or under the target height; "best" = top bandwidth. */
+/** Highest variant at or under the target height; "best" = top bandwidth.
+ * Returns null when nothing fits (callers report the gap so the user can
+ * switch quality) — never silently upscales to a heavier rendition. */
 export function pickVariant(
   variants: VariantInfo[],
   quality: 480 | 720 | 1080 | "best"
@@ -111,9 +113,16 @@ export function pickVariant(
     .filter((v) => v.height <= quality)
     .sort((a, b) => b.height - a.height);
   if (fitting.length > 0) return fitting[0] ?? null;
-  return (
-    [...withHeight].sort((a, b) => a.height - b.height)[0] ?? null
-  );
+  return null;
+}
+
+/** Smallest known rendition height (for "not available in …" messages). */
+export function minVariantHeight(variants: VariantInfo[]): number | null {
+  const heights = variants
+    .map((v) => v.height)
+    .filter((h) => Number.isFinite(h) && h > 0)
+    .sort((a, b) => a - b);
+  return heights[0] ?? null;
 }
 
 export type MediaParts = {
