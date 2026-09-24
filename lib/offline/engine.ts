@@ -580,6 +580,10 @@ async function runDownload(
   rec.totalSegments =
     parts.segments.length + (audioParts?.segments.length ?? 0);
   rec.estimateBytes = estimateBytes(bandwidth, parts.durationSec);
+  // Single-variant playlists hide bandwidth (0): the estimate is a quality
+  // guess and drifts (e.g. vidsrc-sh). Refine it from measured bytes once
+  // enough segments land (see reportProgress); real bandwidth estimates stay.
+  const refineEstimate = bandwidth <= 0;
   await upsertRecord(rec);
 
   // 4. Quota: device headroom + the 950MB-style self cap (LRU-evict to fit).
@@ -647,12 +651,35 @@ async function runDownload(
     // counts every piece, so the final totals stay exact either way.
     rec.bytesDone = Math.max(rec.bytesDone, measuredBytes);
     rec.doneSegments = Math.max(rec.doneSegments, doneSeg);
+    // Fallback estimates (bandwidth unknown) converge on measured reality:
+    // total ≈ measured / fraction-complete, adopted once past warmup and
+    // only when it disagrees by >20% (avoids jitter on uniform segments).
+    let estimatePatch: number | null = null;
+    if (
+      refineEstimate &&
+      doneSeg >= 6 &&
+      rec.totalSegments > 0 &&
+      rec.estimateBytes > 0
+    ) {
+      const frac = doneSeg / rec.totalSegments;
+      if (frac >= 0.08 && frac < 1) {
+        const refined = Math.round(measuredBytes / frac);
+        if (
+          refined > 0 &&
+          Math.abs(refined - rec.estimateBytes) / rec.estimateBytes > 0.2
+        ) {
+          rec.estimateBytes = refined;
+          estimatePatch = refined;
+        }
+      }
+    }
     // Track owned files continuously so a mid-flight pause/cancel/delete
     // removes partial bytes instead of orphaning them.
     rec.fileUrls = [...fileUrls];
     await updateProgress(rec.key, {
       bytesDone: rec.bytesDone,
       doneSegments: doneSeg,
+      ...(estimatePatch != null ? { estimateBytes: estimatePatch } : {}),
     });
   };
 
