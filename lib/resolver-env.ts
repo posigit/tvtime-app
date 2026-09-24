@@ -15,8 +15,15 @@ function normalizeBase(raw: string): string | null {
   try {
     const u = new URL(base);
     if (u.protocol !== "http:" && u.protocol !== "https:") return null;
-    if (!u.hostname || u.hostname === "[SENSITIVE]") return null;
-    return base;
+    const host = u.hostname.toLowerCase();
+    if (!host || host === "[sensitive]" || host === "redacted" || host === "xxx" || host === "your-url" || host === "example.com") return null;
+    // Reject userinfo (credentials in fetch), non-root paths, and single-label hosts.
+    if (u.username || u.password) return null;
+    if (u.pathname !== "/" && u.pathname !== "") return null;
+    if (u.search || u.hash) return null;
+    if (!host.includes(".")) return null;
+    if (host === "localhost" || host.endsWith(".local")) return null;
+    return `${u.protocol}//${u.host}`;
   } catch {
     return null;
   }

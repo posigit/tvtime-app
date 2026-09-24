@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { VIX_LANG } from "@/lib/vixsrc";
 import { getResolverBases } from "@/lib/resolver-env";
+import { fetchWithTimeout, parseMediaParams, SHARED_UA } from "@/lib/stream-proxy";
 
 /**
  * VixSrc native stream resolver.
@@ -23,19 +24,21 @@ import { getResolverBases } from "@/lib/resolver-env";
  */
 export const dynamic = "force-dynamic";
 
-const UA =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
+const UA = SHARED_UA;
 
-async function fetchImdbId(type: string, id: string): Promise<string | null> {
+async function fetchImdbId(type: string, id: number): Promise<string | null> {
   if (!process.env.TMDB_API_KEY) return null;
   const extPath =
     type === "tv" ? `/tv/${id}/external_ids` : `/movie/${id}/external_ids`;
   try {
-    const extRes = await fetch(
+    const extRes = await fetchWithTimeout(
       `https://api.themoviedb.org/3${extPath}?api_key=${process.env.TMDB_API_KEY}`,
-      { cache: "no-store" }
+      { cache: "no-store" },
+      8_000
     );
     if (extRes.ok) {
+      const ct = extRes.headers.get("content-type") ?? "";
+      if (!ct.includes("json")) return null;
       const ext = (await extRes.json()) as { imdb_id?: string | null };
       if (ext.imdb_id) return ext.imdb_id;
     }
@@ -46,18 +49,16 @@ async function fetchImdbId(type: string, id: string): Promise<string | null> {
 }
 
 export async function GET(req: NextRequest) {
-  const sp = req.nextUrl.searchParams;
-  const type = sp.get("type"); // "movie" | "tv"
-  const id = sp.get("id");
-  const season = sp.get("season");
-  const episode = sp.get("episode");
-
-  if ((type !== "movie" && type !== "tv") || !id) {
+  let params: ReturnType<typeof parseMediaParams>;
+  try {
+    params = parseMediaParams(req.nextUrl.searchParams);
+  } catch (err) {
     return NextResponse.json(
-      { error: "type (movie|tv) and id are required" },
+      { error: err instanceof Error ? err.message : "bad request" },
       { status: 400 }
     );
   }
+  const { type, id, season, episode } = params;
 
   // Validated base URLs only — a placeholder/garbage value must fail loud
   // (resolver_misconfigured) instead of attempting a doomed fetch.
@@ -68,26 +69,37 @@ export async function GET(req: NextRequest) {
     .filter(Boolean)
     .join(",")
     .trim();
-  const stages: { resolver?: string; direct?: string } = {};
+  const resolverStages: string[] = [];
   if (resolverRaw && resolvers.length === 0) {
-    stages.resolver =
-      "VIX_RESOLVER_URL(S) is set but holds no valid http(s) base URL — check for a redaction placeholder or a pasted path/tunnel URL";
+    resolverStages.push(
+      "VIX_RESOLVER_URL(S) is set but holds no valid http(s) base URL — check for a redaction placeholder or a pasted path/tunnel URL"
+    );
   }
 
   // Deployed path: resolve from a non-blocked service, then enrich with IMDb.
-  const rp = new URLSearchParams({ type, id });
-  if (season != null) rp.set("season", season);
-  if (episode != null) rp.set("episode", episode);
+  // Aggregate deadline: 2 hosts x 8s max — never exceed the client's window.
+  const deadline = Date.now() + 18_000;
+  const rp = new URLSearchParams({ type, id: String(id) });
+  if (season != null) rp.set("season", String(season));
+  if (episode != null) rp.set("episode", String(episode));
   for (const resolver of resolvers) {
+    const remaining = deadline - Date.now();
+    if (remaining <= 1000) break;
     try {
       // Cold starts can be slow — per-host budget stays tight so one dead
       // host can't eat the whole client window before failover/direct.
-      const res = await fetch(`${resolver}/stream?${rp.toString()}`, {
-        cache: "no-store",
-        signal: AbortSignal.timeout(12_000),
-      });
+      const res = await fetchWithTimeout(
+        `${resolver}/stream?${rp.toString()}`,
+        { cache: "no-store" },
+        Math.min(8_000, remaining)
+      );
       if (res.ok) {
-        const data = await res.json();
+        const ct = res.headers.get("content-type") ?? "";
+        if (!ct.includes("json")) {
+          resolverStages.push(`${new URL(resolver).hostname}: non-JSON resolver reply`);
+          continue;
+        }
+        const data = (await res.json()) as { playlistUrl?: unknown } & Record<string, unknown>;
         // The resolver hands back a RELATIVE /media?url=... (it proxies the
         // playlist + segments through itself). Prefix the resolver base so
         // hls.js fetches the whole chain from the resolver, which vixsrc
@@ -96,29 +108,35 @@ export async function GET(req: NextRequest) {
         if (typeof playlistUrl === "string" && playlistUrl.startsWith("/media")) {
           playlistUrl = `${resolver}${playlistUrl}`;
         }
-        return NextResponse.json({
-          ...data,
-          playlistUrl,
-          resolverHost: new URL(resolver).hostname,
-          imdbId: await fetchImdbId(type, id),
-        });
+        if (typeof playlistUrl === "string" && playlistUrl.startsWith("https://")) {
+          return NextResponse.json({
+            ...data,
+            playlistUrl,
+            resolverHost: new URL(resolver).hostname,
+            imdbId: await fetchImdbId(type, id),
+          });
+        }
+        resolverStages.push(`${new URL(resolver).hostname}: invalid playlistUrl`);
+        continue;
       }
       // Capture a snippet of the resolver's error body — the host's own
       // "Application not found" vs the resolver's JSON tells you whether the
       // SERVICE is dead vs the source blocking it.
       let bodyHint = "";
       try {
-        bodyHint = (await res.text()).slice(0, 160);
+        bodyHint = (await res.text()).slice(0, 160).replace(/\s+/g, " ");
       } catch {
         /* ignore */
       }
-      stages.resolver = `${new URL(resolver).hostname}: ${res.status}${bodyHint ? ` — ${bodyHint}` : ""}`;
+      resolverStages.push(`${new URL(resolver).hostname}: ${res.status}${bodyHint ? ` — ${bodyHint}` : ""}`);
       // Non-2xx from this resolver: try the next one.
     } catch (err) {
-      stages.resolver = `${new URL(resolver).hostname}: ${err instanceof Error ? err.message : "resolver failed"}`;
+      resolverStages.push(`${new URL(resolver).hostname}: ${err instanceof Error ? err.message.slice(0, 160) : "resolver failed"}`);
       // Resolver unreachable/error: try the next one.
     }
   }
+  const stages: { resolver?: string; direct?: string } = {};
+  if (resolverStages.length > 0) stages.resolver = resolverStages.join(" | ");
 
   const mediaPath =
     type === "tv" ? `tv/${id}/${season}/${episode}` : `movie/${id}`;
@@ -126,19 +144,29 @@ export async function GET(req: NextRequest) {
 
   try {
     // 1. API route -> signed embed src (no CF challenge on JSON endpoints)
-    const apiRes = await fetch(`https://vixsrc.to/api/${mediaPath}`, {
-      headers: { "User-Agent": UA, Referer: referer, Accept: "application/json" },
-      cache: "no-store",
-    });
+    const apiRes = await fetchWithTimeout(
+      `https://vixsrc.to/api/${mediaPath}`,
+      {
+        headers: { "User-Agent": UA, Referer: referer, Accept: "application/json" },
+        cache: "no-store",
+      },
+      10_000
+    );
     if (!apiRes.ok) throw new Error(`vixsrc api ${apiRes.status}`);
+    const apiCt = apiRes.headers.get("content-type") ?? "";
+    if (!apiCt.includes("json")) throw new Error("vixsrc api returned non-JSON");
     const apiJson = (await apiRes.json()) as { src?: string };
-    if (!apiJson.src) throw new Error("vixsrc api returned no src");
+    if (!apiJson.src || !apiJson.src.startsWith("/")) throw new Error("vixsrc api returned no src");
 
     // 2. Embed page -> master playlist url + signed params
-    const embedRes = await fetch(`https://vixsrc.to${apiJson.src}`, {
-      headers: { "User-Agent": UA, Referer: referer },
-      cache: "no-store",
-    });
+    const embedRes = await fetchWithTimeout(
+      `https://vixsrc.to${apiJson.src}`,
+      {
+        headers: { "User-Agent": UA, Referer: referer },
+        cache: "no-store",
+      },
+      10_000
+    );
     if (!embedRes.ok) throw new Error(`vixsrc embed ${embedRes.status}`);
     const html = await embedRes.text();
 
@@ -163,8 +191,10 @@ export async function GET(req: NextRequest) {
     params.set("lang", VIX_LANG);
 
     // masterPlaylist.url may already carry a query (e.g. ?b=1) — append via
-    // URLSearchParams so the existing query survives.
-    const playlist = new URL(urlMatch[1]);
+    // URLSearchParams so the existing query survives. Resolve relative
+    // masters against the vixsrc origin (never crash on /playlist/...).
+    const playlist = new URL(urlMatch[1], "https://vixsrc.to");
+    if (playlist.protocol !== "https:") throw new Error("invalid master playlist url");
     for (const [k, v] of params) playlist.searchParams.set(k, v);
 
     return NextResponse.json({

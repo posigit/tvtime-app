@@ -18,9 +18,11 @@ export async function tmdbFetch<T>(
   url.searchParams.append("api_key", getApiKey());
   Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, v));
 
+  const ctrl = AbortSignal.timeout(10_000);
   const res = await fetch(url.toString(), {
     // Default 1h; hot paths (trending) can pass a shorter window
     next: { revalidate: opts?.revalidate ?? 3600 },
+    signal: ctrl,
   });
   if (!res.ok) {
     throw new Error(`TMDB API error: ${res.status} ${res.statusText}`);
@@ -579,12 +581,20 @@ export async function discoverUpcomingMovies(
   minReleaseDate: string,
   page = 1
 ): Promise<TmdbMovieCard[]> {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(minReleaseDate)) {
+    throw new Error("invalid minReleaseDate (expected YYYY-MM-DD)");
+  }
+  if (!Number.isSafeInteger(page) || page < 1 || page > 500) {
+    throw new Error("invalid page");
+  }
   const data = await tmdbFetch<{
     results: Array<TmdbListItem & { release_date?: string; overview?: string }>;
   }>("/discover/movie", {
     sort_by: "popularity.desc",
     "primary_release_date.gte": minReleaseDate,
     page: String(page),
+    include_adult: "false",
+    "vote_count.gte": "10",
   });
   return mapMovieCards(data.results ?? []);
 }

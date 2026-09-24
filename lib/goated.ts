@@ -47,10 +47,18 @@ type Challenge = { challenge: string; difficulty: number; expiresIn: number };
 
 async function fetchJson<T>(
   url: string,
-  init: RequestInit = {}
+  init: RequestInit = {},
+  timeoutMs = 12_000
 ): Promise<T> {
+  const timeoutSignal = AbortSignal.timeout(timeoutMs);
+  const outer = init.signal ?? null;
+  const signal =
+    outer && typeof (AbortSignal as unknown as { any?: (s: AbortSignal[]) => AbortSignal }).any === "function"
+      ? (AbortSignal as unknown as { any: (s: AbortSignal[]) => AbortSignal }).any([outer, timeoutSignal])
+      : (outer ?? timeoutSignal);
   const res = await fetch(url, {
     ...init,
+    signal,
     headers: {
       "User-Agent": UA,
       "Content-Type": "application/json",
@@ -59,9 +67,11 @@ async function fetchJson<T>(
     cache: "no-store",
   });
   if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    throw new Error(`reallyfast ${res.status}: ${body.slice(0, 200)}`);
+    // Map to code — never reflect upstream body to clients.
+    throw new Error(`reallyfast_unreachable_${res.status}`);
   }
+  const ct = res.headers.get("content-type") ?? "";
+  if (!ct.includes("json")) throw new Error("reallyfast returned non-JSON");
   return res.json() as Promise<T>;
 }
 
@@ -77,22 +87,32 @@ async function getChallenge(): Promise<Challenge> {
 /**
  * Find nonce where SHA-256(challenge + nonce) hex starts with `difficulty`
  * zeros. WebCrypto (crypto.subtle) is available in Next server runtime.
+ * Capped: difficulty >6 or attempts >200k aborts — prevents CPU DoS when
+ * the server raises difficulty. Callers fall through to next backend.
  */
 async function solvePoW(
   challenge: string,
   difficulty: number,
-  maxAttempts = 3_000_000
+  maxAttempts = 200_000
 ): Promise<string> {
+  if (!Number.isInteger(difficulty) || difficulty < 0 || difficulty > 6) {
+    throw new Error("proof-of-work difficulty out of range");
+  }
+  if (typeof challenge !== "string" || challenge.length === 0 || challenge.length > 256) {
+    throw new Error("invalid proof-of-work challenge");
+  }
+  const deadline = Date.now() + 8_000;
   const prefix = "0".repeat(difficulty);
   const enc = new TextEncoder();
   for (let i = 0; i < maxAttempts; i++) {
+    if (Date.now() > deadline) throw new Error("proof-of-work deadline exceeded");
     const buf = await crypto.subtle.digest(
       "SHA-256",
       enc.encode(`${challenge}${i}`)
     );
-    const hex = [...new Uint8Array(buf)]
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
+    const bytes = new Uint8Array(buf);
+    let hex = "";
+    for (let j = 0; j < bytes.length; j++) hex += bytes[j].toString(16).padStart(2, "0");
     if (hex.startsWith(prefix)) return String(i);
   }
   throw new Error("proof-of-work timed out");
@@ -111,6 +131,19 @@ const resolveCache = new Map<
   { t: GoatedResolve; at: number }
 >();
 const RESOLVE_TTL_MS = 60_000;
+const RESOLVE_CACHE_MAX = 128;
+
+function cachePrune(): void {
+  const now = Date.now();
+  for (const [k, v] of resolveCache) {
+    if (now - v.at > RESOLVE_TTL_MS) resolveCache.delete(k);
+  }
+  while (resolveCache.size > RESOLVE_CACHE_MAX) {
+    const oldest = resolveCache.keys().next().value;
+    if (oldest == null) break;
+    resolveCache.delete(oldest);
+  }
+}
 
 function mediaKey(opts: {
   type: "movie" | "tv";
@@ -129,9 +162,14 @@ export async function goatedResolve(opts: {
   episode?: number;
   source?: GoatedSource;
 }): Promise<GoatedResolve> {
+  if (!Number.isSafeInteger(opts.id) || opts.id <= 0) throw new Error("invalid id");
   const key = mediaKey(opts);
   const hit = resolveCache.get(key);
-  if (hit && Date.now() - hit.at < RESOLVE_TTL_MS) return hit.t;
+  if (hit && Date.now() - hit.at < RESOLVE_TTL_MS) {
+    resolveCache.delete(key);
+    resolveCache.set(key, hit);
+    return hit.t;
+  }
 
   const { challenge, nonce } = await solveToken();
   const body: Record<string, string | number> = {
@@ -155,7 +193,9 @@ export async function goatedResolve(opts: {
     body: JSON.stringify(body),
   });
 
-  if (!raw.url) throw new Error("reallyfast resolve returned no url");
+  if (!raw.url || typeof raw.url !== "string" || !raw.url.startsWith("https://")) {
+    throw new Error("reallyfast resolve returned no url");
+  }
 
   const resolved: GoatedResolve = {
     url: raw.url,
@@ -164,7 +204,9 @@ export async function goatedResolve(opts: {
     availableSources: (raw.availableSources as GoatedSource[]) ?? GOATED_SOURCES,
     subtitles: raw.subtitles ?? [],
   };
+  resolveCache.delete(key);
   resolveCache.set(key, { t: resolved, at: Date.now() });
+  cachePrune();
   return resolved;
 }
 

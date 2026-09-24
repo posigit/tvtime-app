@@ -1,26 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { gunzipSync } from "zlib";
 import { GOATED_ORIGIN } from "@/lib/goated";
+import {
+  SHARED_UA,
+  couldBePlaylistContentType,
+  fetchWithTimeout,
+  isPlaylistBytes,
+  parseRetryAfterSeconds,
+  rewritePlaylistBody,
+} from "@/lib/stream-proxy";
 
 /**
  * goated media proxy.
  *
  * goated's playlists (cdn.reallyfast.xyz) and segments (hls.cdn8012.workers.dev)
-  * are referer + CORS locked to https://goated.cx. This route re-hosts them on
-  * the app's own origin so hls.js can play them same-origin.
-  * Valenox backend serves through hls-proxy.cdn8012.workers.dev (same family,
-  * allowlisted too — 2026-08-09).
+ * are referer + CORS locked to https://goated.cx. This route re-hosts them on
+ * the app's own origin so hls.js can play them same-origin.
+ * Valenox backend serves through hls-proxy.cdn8012.workers.dev (same family,
+ * allowlisted too — 2026-08-09).
  *
  * Contract (stream route hands OUT these URLs):
  *   /api/goated/media?url=<enc(https://cdn.reallyfast.xyz/playlist/xxx.m3u8?t=..&s=..)>
  *
  * Behavior:
- *   - Fetch the target with Referer: https://goated.cxy, forward Range headers.
- *   - If the body is a playlist (text m3u8), rewrite EVERY absolute .m3u8 /
- *     segment URL to a new /api/goated/media?url=... proxy path so hls.js
- *     follows the whole chain through us.
- *   - Otherwise (fMP4 segments .m4s / init / audio) pass bytes through with
- *     Range support (Accept-Ranges: bytes — scrubbing works).
+ *   - Fetch the target with Referer: https://goated.cx, forward validated Range.
+ *   - If the body is a playlist (m3u8 OR sniffed #EXTM3U incl. gzipped),
+ *     rewrite EVERY absolute URL through this proxy.
+ *   - Otherwise pass bytes through with Range support.
  */
 
 export const dynamic = "force-dynamic";
@@ -32,13 +38,10 @@ const REWRITE_HOSTS = new Set([
   "hls-proxy.cdn8012.workers.dev", // Valenox backend (same reallyfast family)
 ]);
 
-function isPlaylistContentType(ct: string | null): boolean {
-  return !!ct && ct.includes("mpegurl");
-}
-
 function toProxy(full: string): string | null {
   try {
     const u = new URL(full);
+    if (u.protocol !== "https:") return null;
     if (!REWRITE_HOSTS.has(u.hostname)) return null;
     return `/api/goated/media?url=${encodeURIComponent(full)}`;
   } catch {
@@ -47,41 +50,7 @@ function toProxy(full: string): string | null {
 }
 
 function rewriteBody(body: string, base: URL): string {
-  const proxied = (ref: string): string | null => {
-    try {
-      return toProxy(new URL(ref, base).toString());
-    } catch {
-      return null;
-    }
-  };
-  // Quoted URI attributes (EXT-X-KEY, EXT-X-MAP, EXT-X-MEDIA ...).
-  let out = body.replace(
-    /(URI=")([^"]*)(")/g,
-    (full: string, pre: string, ref: string, post: string) => {
-      if (!ref || ref.startsWith("data:")) return full;
-      const p = proxied(ref);
-      return p ? `${pre}${p}${post}` : full;
-    }
-  );
-  // Rewrite every absolute URL on a tracked host to the proxy. Also make
-  // protocol-relative (//) and any quoted URL safe.
-  out = out.replace(
-    /https?:\/\/[a-z0-9.-]+(\/[^\s"']+)/gi,
-    (full: string) => toProxy(full) ?? full
-  );
-  // Bare non-# URI lines (relative variant/segment/key names), resolved
-  // against the TRUE target — never our own proxy path (no such route).
-  out = out
-    .split("\n")
-    .map((line) => {
-      const t = line.trim();
-      if (!t || t.startsWith("#")) return line;
-      if (t.startsWith("/api/")) return line;
-      if (/^[a-z][a-z0-9+.-]*:/i.test(t) && !t.startsWith("/")) return line;
-      return proxied(t) ?? line;
-    })
-    .join("\n");
-  return out;
+  return rewritePlaylistBody(body, base, toProxy);
 }
 
 export async function GET(req: NextRequest) {
@@ -96,66 +65,93 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "invalid url" }, { status: 400 });
   }
   // Only proxy the hosts we intend to — never an open redirect.
-  if (!REWRITE_HOSTS.has(parsed.hostname)) {
+  // NOTE: open-proxy residual — anyone can proxy these 3 hosts. This is
+  // intentional (same-origin playback) but rate-limit at edge (Vercel Firewall
+  // / middleware) to avoid bandwidth burn.
+  if (parsed.protocol !== "https:" || !REWRITE_HOSTS.has(parsed.hostname)) {
     return NextResponse.json(
       { error: "host not allowed" },
       { status: 403 }
     );
   }
 
-  const range = req.headers.get("range");
+  const rawRange = req.headers.get("range");
+  let safeRange: string | null = null;
+  if (rawRange) {
+    const r = rawRange.trim().slice(0, 128);
+    if (/^bytes=\d*-\d*$/.test(r)) safeRange = r;
+  }
+
   try {
-    const upstream = await fetch(target, {
-      headers: {
-        Referer: GOATED_ORIGIN + "/",
-        Origin: GOATED_ORIGIN,
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
-        Accept: "*/*",
-        ...(range ? { Range: range } : {}),
+    const upstream = await fetchWithTimeout(
+      target,
+      {
+        headers: {
+          Referer: GOATED_ORIGIN + "/",
+          Origin: GOATED_ORIGIN,
+          "User-Agent": SHARED_UA,
+          Accept: "*/*",
+          ...(safeRange ? { Range: safeRange } : {}),
+        },
+        cache: "no-store",
       },
-      cache: "no-store",
-    });
+      15_000
+    );
     if (!upstream.ok) {
-      const retryAfter = upstream.headers.get("retry-after");
+      const retryAfter = parseRetryAfterSeconds(upstream.headers.get("retry-after"));
       return NextResponse.json(
         {
           error: `upstream ${upstream.status}`,
           retryable: upstream.status === 429 || upstream.status >= 500,
-          ...(retryAfter ? { retryAfterSeconds: Number(retryAfter) || null } : {}),
+          ...(retryAfter != null ? { retryAfterSeconds: retryAfter } : {}),
         },
         { status: upstream.status >= 400 && upstream.status < 600 ? upstream.status : 502 }
       );
     }
 
     const contentType = upstream.headers.get("content-type") ?? "";
-    if (isPlaylistContentType(contentType)) {
-      let text: string;
-      try {
-        const buf = Buffer.from(await upstream.arrayBuffer());
-        const bytes =
-          buf.length > 2 && buf[0] === 0x1f && buf[1] === 0x8b
-            ? gunzipSync(buf)
-            : buf;
-        text = bytes.toString("utf8");
-      } catch {
-        text = await upstream.text().catch(() => "");
+    if (couldBePlaylistContentType(contentType)) {
+      const raw = new Uint8Array(await upstream.arrayBuffer());
+      let bytes = raw;
+      if (raw.length > 2 && raw[0] === 0x1f && raw[1] === 0x8b) {
+        try {
+          const out = gunzipSync(Buffer.from(raw));
+          bytes = new Uint8Array(out.buffer, out.byteOffset, out.byteLength);
+        } catch {
+          // Corrupt gzip: fall through to raw bytes (do NOT serve empty).
+        }
       }
-      const rewritten = rewriteBody(text, parsed);
-      return new NextResponse(rewritten, {
+      if (isPlaylistBytes(bytes)) {
+        const text = Buffer.from(bytes).toString("utf8");
+        const rewritten = rewriteBody(text, parsed);
+        return new NextResponse(rewritten, {
+          status: 200,
+          headers: {
+            "Content-Type": "application/vnd.apple.mpegurl",
+            "Cache-Control": "no-store",
+          },
+        });
+      }
+      // Sniffed non-playlist: pass exact bytes, never empty-string fallback.
+      const ct = contentType.includes("html") ? "application/octet-stream" : contentType || "application/octet-stream";
+      return new NextResponse(bytes, {
         status: 200,
         headers: {
-          "Content-Type": "application/vnd.apple.mpegurl",
+          "Content-Type": ct,
+          "Content-Length": String(bytes.length),
+          "Accept-Ranges": "bytes",
           "Cache-Control": "no-store",
         },
       });
     }
 
-    // Binary pass-through (segments/init/aes key). Forward Range reply / ACC-Ranges.
+    // Binary pass-through (segments/init/aes key). Forward Range reply.
+    const isPartial = upstream.status === 206;
     const headers = new Headers({
       "Content-Type": contentType || "application/octet-stream",
-      "Cache-Control": "public, max-age=86400",
+      "Cache-Control": isPartial ? "private, no-store" : "public, max-age=86400",
       "Accept-Ranges": "bytes",
+      Vary: "Range",
     });
     if (upstream.headers.get("content-range")) {
       headers.set("Content-Range", upstream.headers.get("content-range")!);

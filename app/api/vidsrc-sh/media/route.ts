@@ -7,6 +7,15 @@ import {
   vidsrcShOrigin,
   vidsrcShToken,
 } from "@/lib/vidsrc-sh";
+import {
+  SHARED_UA,
+  couldBePlaylistContentType,
+  fetchWithTimeout,
+  isBlockedHost,
+  isPlaylistBytes,
+  parseRetryAfterSeconds,
+  rewritePlaylistBody,
+} from "@/lib/stream-proxy";
 
 /**
  * vidsrc-sh media proxy.
@@ -17,86 +26,58 @@ import {
  * the app's own origin so hls.js plays same-origin (and downloads work).
  *
  * Contract (stream route hands OUT these URLs):
- *   /api/vidsrc-sh/media?url=<enc(https://<host>/pl/<gzip-blob>)>
+ *   /api/vidsrc-sh/media?url=<enc(https://<host>/pl/<gzip-blob>)>&exp=..&sig=..
  *
  * Behavior:
+ *   - Require expiring HMAC (no open proxy).
  *   - Ensure ?token= (mint per-origin, cached ~1h) before fetching.
  *   - Playlists (m3u8 by content-type OR #EXTM3U sniffing): rewrite EVERY
- *     absolute https URL through this proxy (SSRF-guarded, see below).
- *   - Segments / init / keys: byte pass-through with Range support.
+ *     absolute https URL through this proxy (SSRF-guarded).
+ *   - Segments / init / keys: byte pass-through with strict Range support.
  */
 export const dynamic = "force-dynamic";
 
-function isBlockedHost(hostname: string): boolean {
-  const h = hostname.toLowerCase();
-  if (h === "localhost" || h === "[::1]") return true;
-  if (/^127\./.test(h) || /^0\./.test(h)) return true;
-  if (/^10\./.test(h) || /^192\.168\./.test(h)) return true;
-  if (/^172\.(1[6-9]|2\d|3[01])\./.test(h)) return true;
-  if (/^169\.254\./.test(h)) return true;
-  if (/^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\./.test(h)) return true;
-  return false;
-}
+const UPSTREAM_TIMEOUT_MS = 15_000;
 
-function isPlaylistContentType(ct: string | null): boolean {
-  return !!ct && ct.includes("mpegurl");
-}
-
-function toProxy(full: string): string | null {
-  try {
-    const u = new URL(full);
-    if (u.protocol !== "https:" || isBlockedHost(u.hostname)) return null;
-    return signProxyUrl(full);
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Rewrite every playlist reference through this proxy, resolved against the
- * TRUE target (the ?url= param) — not our own proxy URL. Covers:
- *  1. absolute https URLs,
- *  2. absolute-path URIs (URI="/storage/enc.key") → target origin,
- *  3. bare relative lines (variant/segment file names) → target directory.
- * Without (2)+(3), hls.js and the download engine resolve relatives against
- * /api/vidsrc-sh/… (no such route) and die with 404s.
- */
-function rewriteBody(body: string, base: URL): string {
-  const proxied = (ref: string): string | null => {
+/** Collect absolute refs, sign them, then rewrite — async WebCrypto signing. */
+async function rewriteBodySigned(body: string, base: URL): Promise<string> {
+  const refs = new Set<string>();
+  const collect = (ref: string) => {
     try {
-      return toProxy(new URL(ref, base).toString());
+      const abs = ref.startsWith("//")
+        ? `${base.protocol}${ref}`
+        : new URL(ref, base).toString();
+      const u = new URL(abs);
+      if (u.protocol === "https:" && !isBlockedHost(u.hostname)) refs.add(abs);
     } catch {
-      return null;
+      /* skip */
     }
   };
-  // 2. Quoted URI attributes (EXT-X-KEY, EXT-X-MAP, EXT-X-MEDIA ...).
-  let out = body.replace(
-    /(URI=")([^"]*)(")/g,
-    (full: string, pre: string, ref: string, post: string) => {
-      if (!ref || ref.startsWith("data:")) return full;
-      const p = proxied(ref);
-      return p ? `${pre}${p}${post}` : full;
+  // Quoted URI attrs
+  for (const m of body.matchAll(/URI="([^"]*)"/g)) {
+    const ref = m[1];
+    if (ref && !ref.startsWith("data:")) collect(ref);
+  }
+  // Absolute URLs (port-aware)
+  for (const m of body.matchAll(/https?:\/\/[a-z0-9.-]+(?::\d+)?(\/[^\s"'<>]*)/gi)) {
+    collect(m[0]);
+  }
+  // Bare relative lines
+  for (const line of body.split("\n")) {
+    const t = line.trim();
+    if (!t || t.startsWith("#") || t.startsWith("/api/")) continue;
+    if (/^[a-z][a-z0-9+.-]*:/i.test(t) && !t.startsWith("/")) continue;
+    collect(t);
+  }
+  const signed = new Map<string, string>();
+  for (const ref of refs) {
+    try {
+      signed.set(ref, await signProxyUrl(ref));
+    } catch {
+      /* leave unsigned — line passes through */
     }
-  );
-  // 1. Absolute URLs anywhere (also re-covers absolute results of step 2).
-  out = out.replace(
-    /https?:\/\/[a-z0-9.-]+(\/[^\s"']+)/gi,
-    (full: string) => toProxy(full) ?? full
-  );
-  // 3. Bare non-# URI lines (relative variant/segment/key names).
-  out = out
-    .split("\n")
-    .map((line) => {
-      const t = line.trim();
-      if (!t || t.startsWith("#")) return line;
-      // Already rewritten above — never re-proxy (double-proxy corruption).
-      if (t.startsWith("/api/")) return line;
-      // Absolute URLs already handled above; skip other schemes (data:, etc).
-      if (/^[a-z][a-z0-9+.-]*:/i.test(t) && !t.startsWith("/")) return line;
-      return proxied(t) ?? line;
-    })
-    .join("\n");
-  return out;
+  }
+  return rewritePlaylistBody(body, base, (abs) => signed.get(abs) ?? null);
 }
 
 export async function GET(req: NextRequest) {
@@ -104,9 +85,13 @@ export async function GET(req: NextRequest) {
   if (!target) {
     return NextResponse.json({ error: "url required" }, { status: 400 });
   }
-  // Only URLs minted by our own stream route (HMAC) are served — otherwise
-  // this would be an open fetch proxy burning our bandwidth.
-  if (!verifyProxyUrl(target, req.nextUrl.searchParams.get("sig"))) {
+  // Only URLs minted by our own stream route (expiring HMAC) are served.
+  const ok = await verifyProxyUrl(
+    target,
+    req.nextUrl.searchParams.get("sig"),
+    req.nextUrl.searchParams.get("exp")
+  ).catch(() => false);
+  if (!ok) {
     return NextResponse.json({ error: "bad signature" }, { status: 403 });
   }
   let parsed: URL;
@@ -135,26 +120,35 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const range = req.headers.get("range");
+  const range = req.nextUrl.searchParams.get("range") ?? req.headers.get("range");
+  // Strict Range: bytes=<start>-<end>, suffix, or open-ended. Reject garbage.
+  let safeRange: string | null = null;
+  if (range) {
+    const r = range.trim().slice(0, 128);
+    if (/^bytes=\d*-\d*$/.test(r) || /^\d+-\d*$/.test(r)) safeRange = r.startsWith("bytes=") ? r : `bytes=${r}`;
+  }
+
   try {
-    const upstream = await fetch(fetchUrl, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
-        Referer: "https://cloudorchestranova.com/",
-        Accept: "*/*",
-        ...(range ? { Range: range } : {}),
+    const upstream = await fetchWithTimeout(
+      fetchUrl,
+      {
+        headers: {
+          "User-Agent": SHARED_UA,
+          Referer: "https://cloudorchestranova.com/",
+          Accept: "*/*",
+          ...(safeRange ? { Range: safeRange } : {}),
+        },
+        cache: "no-store",
       },
-      cache: "no-store",
-    });
+      UPSTREAM_TIMEOUT_MS
+    );
     if (!upstream.ok) {
-      const retryAfter = upstream.headers.get("retry-after");
+      const retryAfter = parseRetryAfterSeconds(upstream.headers.get("retry-after"));
       return NextResponse.json(
         {
           error: `upstream ${upstream.status}`,
-          retryable:
-            upstream.status === 429 || upstream.status >= 500,
-          ...(retryAfter ? { retryAfterSeconds: Number(retryAfter) || null } : {}),
+          retryable: upstream.status === 429 || upstream.status >= 500,
+          ...(retryAfter != null ? { retryAfterSeconds: retryAfter } : {}),
         },
         {
           status:
@@ -166,31 +160,18 @@ export async function GET(req: NextRequest) {
     }
 
     const contentType = upstream.headers.get("content-type") ?? "";
-    const couldBePlaylist =
-      isPlaylistContentType(contentType) ||
-      contentType.includes("text") ||
-      contentType === "";
-    if (couldBePlaylist) {
+    if (couldBePlaylistContentType(contentType)) {
       let buf = Buffer.from(await upstream.arrayBuffer());
-      // Variant hosts sometimes serve gzipped playlist bytes (gzip magic
-      // 1F 8B) with a generic content-type. Gunzip first — otherwise the
-      // #EXTM3U sniff fails, the body passes through raw, and clients chase
-      // direct (token IP-bound, residentially dead) URLs.
-      if (
-        buf.length > 2 &&
-        buf[0] === 0x1f &&
-        buf[1] === 0x8b
-      ) {
+      if (buf.length > 2 && buf[0] === 0x1f && buf[1] === 0x8b) {
         try {
           buf = gunzipSync(buf);
         } catch {
           /* corrupt gzip — fall through to raw handling below */
         }
       }
-      const isPlaylist =
-        buf.length > 6 && buf.subarray(0, 7).toString("latin1") === "#EXTM3U";
-      if (isPlaylist) {
-        return new NextResponse(rewriteBody(buf.toString("utf8"), parsed), {
+      if (isPlaylistBytes(new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength))) {
+        const rewritten = await rewriteBodySigned(buf.toString("utf8"), parsed);
+        return new NextResponse(rewritten, {
           status: 200,
           headers: {
             "Content-Type": "application/vnd.apple.mpegurl",
@@ -198,20 +179,27 @@ export async function GET(req: NextRequest) {
           },
         });
       }
-      return new NextResponse(buf, {
+      // Non-playlist bytes behind a text content-type (e.g. HTML challenge):
+      // never serve as HTML same-origin — force download type.
+      const ct = contentType.includes("html") ? "application/octet-stream" : contentType || "application/octet-stream";
+      return new NextResponse(new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength), {
         status: 200,
         headers: {
-          "Content-Type": contentType || "application/octet-stream",
+          "Content-Type": ct,
           "Content-Length": String(buf.length),
           "Accept-Ranges": "bytes",
+          "Cache-Control": "no-store",
         },
       });
     }
 
+    const isPartial = upstream.status === 206;
     const headers = new Headers({
       "Content-Type": contentType || "application/octet-stream",
-      "Cache-Control": "public, max-age=86400",
+      // 206 partials must not be cached publicly — poison risk.
+      "Cache-Control": isPartial ? "private, no-store" : "public, max-age=86400",
       "Accept-Ranges": "bytes",
+      Vary: "Range",
     });
     if (upstream.headers.get("content-range")) {
       headers.set("Content-Range", upstream.headers.get("content-range")!);

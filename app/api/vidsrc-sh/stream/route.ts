@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { signProxyUrl, vidsrcShResolve } from "@/lib/vidsrc-sh";
+import { parseMediaParams } from "@/lib/stream-proxy";
 
 /**
  * data.vidsrc.sh resolver endpoint.
@@ -13,30 +14,18 @@ import { signProxyUrl, vidsrcShResolve } from "@/lib/vidsrc-sh";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-  const sp = req.nextUrl.searchParams;
-  const type = sp.get("type");
-  const idRaw = sp.get("id");
-  const season = sp.get("season");
-  const episode = sp.get("episode");
-
-  if ((type !== "movie" && type !== "tv") || !idRaw) {
+  let params: ReturnType<typeof parseMediaParams>;
+  try {
+    params = parseMediaParams(req.nextUrl.searchParams);
+  } catch (err) {
     return NextResponse.json(
-      { error: "type (movie|tv) and id are required" },
+      { error: err instanceof Error ? err.message : "bad request" },
       { status: 400 }
     );
   }
-  const id = Number(idRaw);
-  if (!Number.isFinite(id)) {
-    return NextResponse.json({ error: "invalid id" }, { status: 400 });
-  }
 
   try {
-    const r = await vidsrcShResolve({
-      type,
-      id,
-      season: season != null ? Number(season) : undefined,
-      episode: episode != null ? Number(episode) : undefined,
-    });
+    const r = await vidsrcShResolve(params);
     if (r.urls.length === 0) {
       return NextResponse.json(
         {
@@ -48,12 +37,26 @@ export async function GET(req: NextRequest) {
         { status: 404 }
       );
     }
+    const playlistUrls: string[] = [];
+    for (const u of r.urls) {
+      try {
+        playlistUrls.push(await signProxyUrl(u));
+      } catch {
+        /* skip unsignable */
+      }
+    }
+    if (playlistUrls.length === 0) {
+      return NextResponse.json(
+        { error: "failed to sign streams", code: "sign_failed" },
+        { status: 502 }
+      );
+    }
     return NextResponse.json({
       // Proxied master: tokens are IP-bound to this deployment, so the
       // browser must go through /api/vidsrc-sh/media (which mints + proxies).
-      // Signed: the media route only serves URLs minted here (abuse guard).
-      playlistUrl: signProxyUrl(r.urls[0]),
-      playlistUrls: r.urls.map((u) => signProxyUrl(u)),
+      // Signed with expiry: the media route only serves URLs minted here.
+      playlistUrl: playlistUrls[0],
+      playlistUrls,
       title: r.title,
       imdbId: r.imdbId,
       fileName: r.fileName,

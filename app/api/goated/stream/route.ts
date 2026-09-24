@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { goatedResolve } from "@/lib/goated";
+import { fetchWithTimeout, parseMediaParams } from "@/lib/stream-proxy";
 
 /**
  * goated.cx stream resolver endpoint.
@@ -24,11 +25,14 @@ async function fetchImdbId(type: "movie" | "tv", id: number): Promise<string | n
   if (!process.env.TMDB_API_KEY) return null;
   const extPath = type === "tv" ? `/tv/${id}/external_ids` : `/movie/${id}/external_ids`;
   try {
-    const extRes = await fetch(
+    const extRes = await fetchWithTimeout(
       `https://api.themoviedb.org/3${extPath}?api_key=${process.env.TMDB_API_KEY}`,
-      { cache: "no-store" }
+      { cache: "no-store" },
+      8_000
     );
     if (extRes.ok) {
+      const ct = extRes.headers.get("content-type") ?? "";
+      if (!ct.includes("json")) return null;
       const ext = (await extRes.json()) as { imdb_id?: string | null };
       if (ext.imdb_id) return ext.imdb_id;
     }
@@ -39,30 +43,23 @@ async function fetchImdbId(type: "movie" | "tv", id: number): Promise<string | n
 }
 
 export async function GET(req: NextRequest) {
-  const sp = req.nextUrl.searchParams;
-  const type = sp.get("type");
-  const idRaw = sp.get("id");
-  const season = sp.get("season");
-  const episode = sp.get("episode");
-  const source = sp.get("source") || "Orbit";
-
-  if ((type !== "movie" && type !== "tv") || !idRaw) {
+  let params: ReturnType<typeof parseMediaParams>;
+  try {
+    params = parseMediaParams(req.nextUrl.searchParams);
+  } catch (err) {
     return NextResponse.json(
-      { error: "type (movie|tv) and id are required" },
+      { error: err instanceof Error ? err.message : "bad request" },
       { status: 400 }
     );
   }
-  const id = Number(idRaw);
-  if (!Number.isFinite(id)) {
-    return NextResponse.json({ error: "invalid id" }, { status: 400 });
-  }
+  const source = req.nextUrl.searchParams.get("source") || "Orbit";
 
   try {
     const resolved = await goatedResolve({
-      type,
-      id,
-      season: season != null ? Number(season) : undefined,
-      episode: episode != null ? Number(episode) : undefined,
+      type: params.type,
+      id: params.id,
+      season: params.season,
+      episode: params.episode,
       source: source === "Valenox" ? "Valenox" : "Orbit",
     });
 
@@ -72,7 +69,7 @@ export async function GET(req: NextRequest) {
       url: resolved.url,
       source: resolved.source,
       availableSources: resolved.availableSources,
-      imdbId: await fetchImdbId(type, id),
+      imdbId: await fetchImdbId(params.type, params.id),
       sourceApi: "goated",
     });
   } catch (err) {
