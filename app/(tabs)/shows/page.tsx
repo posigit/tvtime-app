@@ -45,6 +45,13 @@ function dateKey(airDate: string): string {
   return toYmd(airDate) ?? airDate.slice(0, 10);
 }
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Shows — TV Time",
+  description: "Your followed shows, watch next, and upcoming episodes.",
+};
+
 export default async function ShowsPage({
   searchParams,
 }: {
@@ -150,12 +157,13 @@ export default async function ShowsPage({
       );
       allEpisodes = allEpisodes.concat(filled.flat());
 
-      // Background: fill remaining missing shows without blocking the response
+      // Background: fill remaining missing shows without blocking the response.
+      // Rejection-guarded: mapPool itself must never reject unobserved.
       const rest = missing.slice(12);
       if (rest.length > 0) {
         void mapPool(rest, 2, (show) =>
           ensureEpisodes(show.tmdbId, show.numberOfSeasons).catch(() => [])
-        );
+        ).catch(() => {});
       }
     }
 

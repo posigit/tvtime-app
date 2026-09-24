@@ -1,35 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { Contrast, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  applyTheme,
+  useTheme,
+  type ThemeId,
+} from "@/lib/theme";
 
-export type ThemeId = "amoled" | "soft" | "light";
-
-const STORAGE_KEY = "tv-theme";
-
-export function getSavedTheme(): ThemeId {
-  try {
-    const t = localStorage.getItem(STORAGE_KEY);
-    if (t === "light" || t === "soft" || t === "amoled") return t;
-  } catch {
-    /* ignore */
-  }
-  return "amoled";
-}
-
-export function applyTheme(theme: ThemeId) {
-  document.documentElement.dataset.theme = theme;
-  try {
-    localStorage.setItem(STORAGE_KEY, theme);
-  } catch {
-    /* ignore */
-  }
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) {
-    meta.setAttribute("content", theme === "light" ? "#f4f4f6" : "#000000");
-  }
-}
+export type { ThemeId };
 
 const OPTIONS: Array<{ id: ThemeId; label: string; Icon: typeof Moon }> = [
   { id: "amoled", label: "AMOLED", Icon: Moon },
@@ -46,21 +26,11 @@ export function ThemeToggle({
   /** "stacked" = full-width vertical rows (fits narrow menus / small screens). */
   layout?: "segmented" | "stacked";
 }) {
-  const [theme, setTheme] = useState<ThemeId>("amoled");
-
-  useEffect(() => {
-    setTheme(getSavedTheme());
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY && (e.newValue === "light" || e.newValue === "soft" || e.newValue === "amoled")) {
-        setTheme(e.newValue);
-      }
-    };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
+  // Live theme from the DOM (layout script owns first paint) — no mount
+  // correction, no flash of the wrong segment.
+  const theme = useTheme();
 
   const pick = useCallback((id: ThemeId) => {
-    setTheme(id);
     applyTheme(id);
     try {
       navigator.vibrate?.(8);

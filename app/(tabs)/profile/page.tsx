@@ -50,6 +50,13 @@ import {
 
 // Playback and watch-history shelves are user-specific and must be read fresh
 // after the player closes or another device updates the account.
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Profile — TV Time",
+  description: "Your stats, taste, yearly recap, lists, and playback history.",
+};
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 

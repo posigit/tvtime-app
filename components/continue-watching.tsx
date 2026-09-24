@@ -85,7 +85,7 @@ function ResumeCard({ item }: { item: ContinueWatchingItem }) {
     <button
       type="button"
       onClick={() => setOpen(true)}
-      className="group w-[11.5rem] shrink-0 overflow-hidden rounded-xl bg-card text-left ring-1 ring-white/[0.08] transition hover:ring-primary/60 active:scale-[0.98]"
+      className="group w-[11.5rem] shrink-0 overflow-hidden rounded-xl bg-card text-left ring-1 ring-border transition hover:ring-primary/60 active:scale-[0.98]"
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-secondary">
         {poster ? (
@@ -108,7 +108,7 @@ function ResumeCard({ item }: { item: ContinueWatchingItem }) {
           <Play className="h-4 w-4 fill-current" />
         </span>
         {item.progressPercent != null && (
-          <span className="absolute inset-x-0 bottom-0 h-1 bg-white/20">
+          <span className="absolute inset-x-0 bottom-0 h-1 bg-foreground/20">
             <span
               className="block h-full bg-primary"
               style={{ width: `${item.progressPercent}%` }}
@@ -144,7 +144,7 @@ export function ContinueWatchingRail({
           <p className="text-[10px] font-black uppercase tracking-[0.18em] text-primary">
             Pick up where you left off
           </p>
-          <h2 className="mt-1 text-xl font-black text-white">Continue watching</h2>
+          <h2 className="mt-1 text-xl font-black text-foreground">Continue watching</h2>
         </div>
       </div>
       <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

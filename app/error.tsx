@@ -18,9 +18,9 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-black px-6 text-center">
-      <p className="text-lg font-black text-white">Something broke</p>
-      <p className="max-w-xs text-sm text-white/50">
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-background px-6 text-center">
+      <p className="text-lg font-black text-foreground">Something broke</p>
+      <p className="max-w-xs text-sm text-muted-foreground">
         This screen ran into a problem. Your library and downloads are safe.
       </p>
       <button

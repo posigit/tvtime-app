@@ -38,9 +38,9 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 pb-safe"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border pb-safe"
       style={{
-        backgroundColor: "rgb(var(--theme-deep, 10 10 12) / 0.72)",
+        backgroundColor: "rgb(var(--theme-deep) / 0.72)",
         backdropFilter: "blur(20px) saturate(1.4)",
         WebkitBackdropFilter: "blur(20px) saturate(1.4)",
       }}
@@ -73,7 +73,7 @@ export function BottomNav() {
               }}
               className={cn(
                 "flex min-h-11 min-w-[3.25rem] flex-1 flex-col items-center justify-center gap-0.5 px-2 py-1.5 text-xs transition-colors active:scale-95",
-                active ? "text-white" : "text-muted-foreground"
+                active ? "text-foreground" : "text-muted-foreground"
               )}
             >
               <Icon

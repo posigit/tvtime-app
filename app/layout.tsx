@@ -51,8 +51,9 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://image.tmdb.org" />
         <script
           // Apply saved theme before first paint (no FOUC). Defaults to AMOLED.
+          // Also toggles .dark (Tailwind dark: variant) and theme-color meta.
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("tv-theme");if(t!=="light"&&t!=="soft"&&t!=="amoled"){t="amoled"}document.documentElement.dataset.theme=t;var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#f4f4f6":"#000000")}catch(e){document.documentElement.dataset.theme="amoled"}})()`,
+            __html: `(function(){try{var t=localStorage.getItem("tv-theme");if(t!=="light"&&t!=="soft"&&t!=="amoled"){t="amoled"}var d=document.documentElement;d.dataset.theme=t;if(t!=="light"){d.classList.add("dark")}else{d.classList.remove("dark")}var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#f4f4f6":t==="soft"?"#101014":"#000000")}catch(e){document.documentElement.dataset.theme="amoled"}})()`,
           }}
         />
       </head>

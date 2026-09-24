@@ -11,6 +11,7 @@ import { RatingBadge } from "@/components/star-rating";
 import { PosterBadges } from "@/components/poster-badges";
 import { timed, perfLog, perfStart } from "@/lib/perf";
 import { posterUrl, discoverUpcomingMovies } from "@/lib/tmdb";
+import { appTodayYmd } from "@/lib/app-time";
 import {
   isUnreleased,
   splitWatchNextAndLater,
@@ -319,12 +320,14 @@ function DiscoverUpcomingGrid({
   return (
     <div className="grid grid-cols-3 gap-x-2 gap-y-4">
       {items.map((movie) => (
-        <Link
+        <div
           key={movie.tmdbId}
-          href={`/movie/${movie.tmdbId}`}
-          className="overflow-visible rounded-md bg-card"
+          className="relative overflow-visible rounded-md bg-card"
         >
-          <div className="relative overflow-hidden rounded-md">
+          <Link
+            href={`/movie/${movie.tmdbId}`}
+            className="block overflow-hidden rounded-md"
+          >
             {movie.posterPath ? (
               <div style={{ aspectRatio: "2 / 3" }} className="relative w-full bg-secondary">
                 <Image
@@ -345,20 +348,28 @@ function DiscoverUpcomingGrid({
                 <span className="text-xs font-medium text-muted-foreground">{movie.title}</span>
               </div>
             )}
-            <div className="absolute right-1.5 top-1.5 z-10">
-              <MovieWatchButton tmdbId={movie.tmdbId} initialStatus={null} variant="overlay" />
-            </div>
+          </Link>
+          {/* Sibling of the Link (never nested): tap + never navigates. */}
+          <div className="absolute right-1.5 top-1.5 z-10">
+            <MovieWatchButton tmdbId={movie.tmdbId} initialStatus={null} variant="overlay" />
           </div>
           {movie.releaseDate && (
             <p className="px-1.5 py-1.5 text-center text-[10px] font-bold uppercase tracking-wide text-primary">
               {formatReleaseDate(movie.releaseDate)}
             </p>
           )}
-        </Link>
+        </div>
       ))}
     </div>
   );
 }
+
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Movies — TV Time",
+  description: "Your movie watchlist, upcoming releases, and theatrical pipeline.",
+};
 
 export default async function MoviesPage({
   searchParams,
@@ -480,11 +491,15 @@ export default async function MoviesPage({
     rewatchCount: rewatchCounts.get(m.tmdbId) ?? (m.status === "watched" ? 1 : null),
   }));
 
-  // Exclude anything already in the library (watched or listed) from Surprise
+  // Exclude anything already in the library (watched or listed) from Surprise.
+  // Watchlist view only — the upcoming view never reads it (no wasted TMDB call).
   const libraryIds = new Set(withCounts.map((m) => m.tmdbId));
-  const surprisePool = await timed("movies:surprise", () =>
-    getUnseenGreatMoviesPool(libraryIds).catch(() => [])
-  );
+  const surprisePool =
+    currentView === "watchlist"
+      ? await timed("movies:surprise", () =>
+          getUnseenGreatMoviesPool(libraryIds).catch(() => [])
+        )
+      : [];
   perfLog("movies:totalFetch", pageStart);
 
   const wantToWatchAll = withCounts.filter(
@@ -515,7 +530,8 @@ export default async function MoviesPage({
   let theatricalUpcoming: { tmdbId: number; title: string; posterPath: string | null; releaseDate: string | null }[] = [];
   if (currentView === "upcoming") {
     try {
-      const today = new Date().toISOString().slice(0, 10);
+      // Civil date (app timezone), not UTC — no off-by-one for non-UTC users.
+      const today = appTodayYmd();
       const cards = await timed("movies:theatrical", () => discoverUpcomingMovies(today));
       theatricalUpcoming = cards
         .filter((c) => (c.release_date ?? "") >= today && !libraryIds.has(c.id))

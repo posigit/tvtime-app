@@ -45,6 +45,10 @@ import {
   NEXT_FAB_RATIO,
   RESUME_MIN_SECONDS,
 } from "@/lib/player-constants";
+import type {
+  CastPlayerControllerLike,
+  CastRemotePlayerLike,
+} from "@/lib/cast-types";
   import {
     addStartAt,
     isFinishedPosition,
@@ -86,9 +90,37 @@ let loggedRejectedOrigin = false;
 /**
  * Lock survives episode auto-advance within a session. Advancing remounts the
  * player (key change) which would otherwise drop a pocket-lock mid-binge.
- * Cleared on close/unlock; a fresh page load starts unlocked.
+ *
+ * Mount-counted handoff (no context, no extra renders): each mount cancels a
+ * pending clear scheduled by the previous unmount, so an advance-remount
+ * keeps the lock while a real unmount (navigate away / close) releases it on
+ * the next macrotask. A fresh page load starts unlocked.
  */
 let sessionLocked = false;
+let lockMounts = 0;
+let pendingLockClear: ReturnType<typeof setTimeout> | null = null;
+
+/** Permanent teardown for a WebAudio graph slot (unmount only). */
+function destroyAudioGraph(
+  slot: React.MutableRefObject<{
+    ctx: AudioContext;
+    gain: GainNode;
+  } | null>
+): void {
+  const g = slot.current;
+  slot.current = null;
+  if (!g) return;
+  try {
+    g.gain.disconnect();
+  } catch {
+    /* already torn down */
+  }
+  try {
+    void g.ctx.close().catch(() => {});
+  } catch {
+    /* already closed */
+  }
+}
 
 /**
  * Full-screen VixSrc player overlay.
@@ -258,10 +290,11 @@ export function VixPlayer({
   const [resumePosition, setResumePosition] = useState<number | null>(null);
   const [resumeKey, setResumeKey] = useState<string | null>(null);
   const [locked, setLocked] = useState(sessionLocked);
-  // Persist lock across episode-advance remounts (same session only).
-  useEffect(() => {
-    sessionLocked = locked;
-  }, [locked]);
+  /** Persist lock across episode-advance remounts (same session only). */
+  const setLockedPersisted = useCallback((next: boolean) => {
+    sessionLocked = next;
+    setLocked(next);
+  }, []);
   /** Custom chrome only — native <video controls> are off (dual-layer fix). */
   const [chromeVisible, setChromeVisible] = useState(true);
   /** True once the media element can actually play (not just playlist resolved). */
@@ -479,6 +512,21 @@ export function VixPlayer({
     null
   );
   const tapCueTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Deferred single-tap chrome toggle (cancelled by double-tap / unmount). */
+  const singleTapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Latest gesture volume, persisted once on touch end (not per move). */
+  const gestureDirtyVolume = useRef<number | null>(null);
+  /** Shared Cast receiver handle — one RemotePlayer per mount, never per call. */
+  const castRemoteRef = useRef<{
+    remote: CastRemotePlayerLike;
+    controller: CastPlayerControllerLike;
+  } | null>(null);
+  /** Show-speed already applied for a show key (guards the memory effect). */
+  const appliedShowSpeedRef = useRef<string | null>(null);
+  /** Last lockscreen position push (throttles MediaSession IPC). */
+  const lastPosStateRef = useRef<{ at: number; dur: number }>({ at: 0, dur: -1 });
+  /** True once the iPhone video fullscreen hooks are attached. */
+  const webkitFsHooked = useRef(false);
 
   // Embed sources have no native resolver — always play as iframe.
   // (Registered embed keys count even when they have no URL for this media
@@ -542,6 +590,12 @@ export function VixPlayer({
     iframePausedRef.current = true;
     bookmarkClearedRef.current = false;
     lastTapRef.current = null;
+    vidapiPlayingRef.current = false;
+    gestureDirtyVolume.current = null;
+    if (singleTapTimerRef.current) {
+      clearTimeout(singleTapTimerRef.current);
+      singleTapTimerRef.current = null;
+    }
     setMediaReady(false);
     setIframeCues([]);
     setOpenSubFileId(null);
@@ -554,12 +608,66 @@ export function VixPlayer({
     setSegments(EMPTY_SEGMENTS);
     setStreamError(null);
     setBuffering(false);
+    // Fresh title/episode: drop transient gesture state (no strand-over).
+    setBrightness(1);
+    setTapCue(null);
     if (tapCueTimerRef.current) {
       clearTimeout(tapCueTimerRef.current);
       tapCueTimerRef.current = null;
     }
-    if (tapCueTimerRef.current) clearTimeout(tapCueTimerRef.current);
   }, [src]);
+
+  // Single mount lifecycle: lock handoff across episode-advance remounts +
+  // full teardown on real unmount (timers, audio graph, cast poll). The lock
+  // clear is deferred one macrotask so a synchronous advance-remount can
+  // cancel it; a genuine unmount (navigate away) lets it fire.
+  useEffect(() => {
+    lockMounts += 1;
+    if (pendingLockClear) {
+      clearTimeout(pendingLockClear);
+      pendingLockClear = null;
+    }
+    return () => {
+      if (chromeHideTimerRef.current) {
+        clearTimeout(chromeHideTimerRef.current);
+        chromeHideTimerRef.current = null;
+      }
+      if (tapCueTimerRef.current) {
+        clearTimeout(tapCueTimerRef.current);
+        tapCueTimerRef.current = null;
+      }
+      if (singleTapTimerRef.current) {
+        clearTimeout(singleTapTimerRef.current);
+        singleTapTimerRef.current = null;
+      }
+      if (gestureHintTimer.current) {
+        clearTimeout(gestureHintTimer.current);
+        gestureHintTimer.current = null;
+      }
+      if (sleepTimerRef.current) {
+        clearTimeout(sleepTimerRef.current);
+        sleepTimerRef.current = null;
+      }
+      if (safariTimerRef.current) {
+        window.clearTimeout(safariTimerRef.current);
+        safariTimerRef.current = null;
+      }
+      if (castPollRef.current) {
+        clearInterval(castPollRef.current);
+        castPollRef.current = null;
+      }
+      castRemoteRef.current = null;
+      destroyAudioGraph(audioGraphRef);
+      lockMounts = Math.max(0, lockMounts - 1);
+      if (lockMounts === 0) {
+        if (pendingLockClear) clearTimeout(pendingLockClear);
+        pendingLockClear = setTimeout(() => {
+          sessionLocked = false;
+          pendingLockClear = null;
+        }, 0);
+      }
+    };
+  }, []);
 
   const emit = useCallback((event: string) => {
     if (event === "ended") {
@@ -838,12 +946,20 @@ export function VixPlayer({
       const prev = lastTapRef.current;
       if (prev && prev.side === side && now - prev.time <= 350) {
         lastTapRef.current = null;
+        if (singleTapTimerRef.current) {
+          clearTimeout(singleTapTimerRef.current);
+          singleTapTimerRef.current = null;
+        }
         seekBy(side);
         bumpChrome();
       } else {
         lastTapRef.current = { time: now, side };
         // Defer single-tap chrome toggle so a double-tap can cancel it.
-        window.setTimeout(() => {
+        // Tracked (unlike before) so unmount / src-change clears it — never
+        // setState on an unmounted tree.
+        if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
+        singleTapTimerRef.current = setTimeout(() => {
+          singleTapTimerRef.current = null;
           if (lastTapRef.current?.time === now) {
             lastTouchChromeRef.current = performance.now();
             setChromeVisible((v) => !v);
@@ -1244,6 +1360,14 @@ export function VixPlayer({
     openSubListKeyRef.current = null;
     setCineSrcT(null);
     vidapiPlayingRef.current = false;
+    gestureDirtyVolume.current = null;
+    // Source switch (same mount): drop transient gesture state too.
+    setBrightness(1);
+    setTapCue(null);
+    if (tapCueTimerRef.current) {
+      clearTimeout(tapCueTimerRef.current);
+      tapCueTimerRef.current = null;
+    }
     setServerMenuOpen(false);
     setMoreMenuOpen(false);
     // Keep ended/nearEnd so binge overlays don't double-fire after a switch.
@@ -1860,17 +1984,103 @@ export function VixPlayer({
     };
   }, [mode, emit, savePosition, clearPosition, bumpChrome]);
 
+  type WebkitVideoElement = HTMLVideoElement & {
+    webkitEnterFullscreen?: () => void;
+    webkitExitFullscreen?: () => void;
+  };
+
+  /** Enter fullscreen with an iPhone Safari video-element fallback. */
+  const enterFullscreen = useCallback(() => {
+    const root = shellRef.current;
+    if (!root || document.fullscreenElement) return;
+    try {
+      if (root.requestFullscreen) {
+        void root.requestFullscreen().catch(() => {
+          // Standard request rejected (often iPhone) — try the video element.
+          try {
+            (videoRef.current as WebkitVideoElement | null)?.webkitEnterFullscreen?.();
+          } catch {
+            /* no fullscreen available */
+          }
+        });
+        hookWebkitVideoFullscreen();
+        return;
+      }
+    } catch {
+      /* fall through to webkit */
+    }
+    try {
+      (videoRef.current as WebkitVideoElement | null)?.webkitEnterFullscreen?.();
+    } catch {
+      /* no fullscreen available */
+    }
+    hookWebkitVideoFullscreen();
+  }, []);
+
+  /** Exit fullscreen on every engine (standard + iPhone video). */
+  const exitFullscreen = useCallback(() => {
+    try {
+      if (document.fullscreenElement) {
+        void document.exitFullscreen().catch(() => {});
+        return;
+      }
+    } catch {
+      /* fall through */
+    }
+    try {
+      (videoRef.current as WebkitVideoElement | null)?.webkitExitFullscreen?.();
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  /** iPhone Safari fires begin/end on the video element (no bubbling). */
+  const hookWebkitVideoFullscreen = useCallback(() => {
+    if (webkitFsHooked.current) return;
+    const v = videoRef.current as (WebkitVideoElement & {
+      addEventListener?: unknown;
+    }) | null;
+    if (!v || typeof v.addEventListener !== "function") return;
+    webkitFsHooked.current = true;
+    const onBegin = () => setIsFullscreen(true);
+    const onEnd = () => setIsFullscreen(false);
+    try {
+      (v.addEventListener as EventTarget["addEventListener"]).call(
+        v,
+        "webkitbeginfullscreen",
+        onBegin as EventListener
+      );
+      (v.addEventListener as EventTarget["addEventListener"]).call(
+        v,
+        "webkitendfullscreen",
+        onEnd as EventListener
+      );
+    } catch {
+      webkitFsHooked.current = false;
+    }
+  }, []);
+
   useEffect(() => {
     const onFs = () => {
       const shell = shellRef.current;
+      const doc = document as Document & {
+        webkitFullscreenElement?: Element | null;
+      };
+      const active =
+        document.fullscreenElement ?? doc.webkitFullscreenElement ?? null;
       setIsFullscreen(
-        !!document.fullscreenElement &&
-          (document.fullscreenElement === shell ||
-            shell?.contains(document.fullscreenElement) === true)
+        !!active &&
+          (active === shell ||
+            shell?.contains(active) === true ||
+            active === videoRef.current)
       );
     };
     document.addEventListener("fullscreenchange", onFs);
-    return () => document.removeEventListener("fullscreenchange", onFs);
+    document.addEventListener("webkitfullscreenchange", onFs);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFs);
+      document.removeEventListener("webkitfullscreenchange", onFs);
+    };
   }, []);
 
   // Netflix-style auto-landscape while fullscreen. Android-only in practice
@@ -1957,13 +2167,13 @@ export function VixPlayer({
     (ratio: number) => {
       if (castingRef.current) {
         try {
-          const framework = window.chrome?.framework;
-          if (framework) {
-            const remote = new framework.RemotePlayer();
+          const pair = getCastRemote();
+          const remote = pair?.remote;
+          if (remote) {
             const dur = remote.duration;
             if (dur > 0) {
               remote.currentTime = Math.max(0, Math.min(dur, ratio * dur));
-              new framework.RemotePlayerController(remote).seek();
+              pair?.controller.seek();
             }
           }
         } catch {
@@ -2081,21 +2291,28 @@ export function VixPlayer({
   );
 
   // Per-show speed memory: when media is ready, a stored show rate wins.
+  // Pure updater (no side effects inside setState): StrictMode-safe.
   useEffect(() => {
     if (!mediaReady || !showSpeedKey) return;
+    if (appliedShowSpeedRef.current === showSpeedKey) return;
     const remembered = loadVixSettings().speedByShow?.[showSpeedKey];
     if (remembered == null) return;
-    setPlaybackSpeed((prev) => {
-      if (prev === remembered) return prev;
-      const cinesrc = mode === "iframe" && activeSource === "cinesrc";
-      if (cinesrc) {
-        sendCineSrcCommand(iframeRef.current, "setPlaybackRate", [remembered]);
-      } else {
-        const v = videoRef.current;
-        if (v) v.playbackRate = remembered;
+    appliedShowSpeedRef.current = showSpeedKey;
+    const cinesrc = mode === "iframe" && activeSource === "cinesrc";
+    if (!cinesrc) {
+      const v = videoRef.current;
+      if (v && v.playbackRate === remembered) {
+        setPlaybackSpeed(remembered);
+        return;
       }
-      return remembered;
-    });
+    }
+    setPlaybackSpeed(remembered);
+    if (cinesrc) {
+      sendCineSrcCommand(iframeRef.current, "setPlaybackRate", [remembered]);
+    } else {
+      const v = videoRef.current;
+      if (v) v.playbackRate = remembered;
+    }
   }, [mediaReady, showSpeedKey, mode, activeSource]);
 
   // ---------- sleep timer (session-only) ----------
@@ -2222,13 +2439,11 @@ export function VixPlayer({
     applyAudioBoost(!audioBoost);
   }, [applyAudioBoost, audioBoost]);
   const toggleAmbilight = useCallback(() => {
-    setAmbilight((prev) => {
-      const next = !prev;
-      saveVixSettings({ ambilight: next });
-      return next;
-    });
+    const next = !ambilight;
+    setAmbilight(next);
+    saveVixSettings({ ambilight: next });
     bumpChrome();
-  }, [bumpChrome]);
+  }, [ambilight, bumpChrome]);
 
   /** Transient gesture hint bubble (auto-hides). */
   const showGestureHint = useCallback((text: string) => {
@@ -2298,8 +2513,17 @@ export function VixPlayer({
         setBrightness(next);
         showGestureHint(`Brightness ${Math.round(next * 100)}%`);
       } else if (g.active === "volume") {
+        // Gestures are native-only (guarded above): apply live, persist once
+        // on touch end — never localStorage-write per move event.
         const next = Math.min(1, Math.max(0, g.startVol - dy / 300));
-        setVolume(next);
+        v.volume = next;
+        v.muted = next === 0;
+        setTransport((t) =>
+          t.volume === next && t.muted === (next === 0)
+            ? t
+            : { ...t, volume: next, muted: next === 0 }
+        );
+        gestureDirtyVolume.current = next;
         showGestureHint(next === 0 ? "Muted" : `Volume ${Math.round(next * 100)}%`);
       }
     },
@@ -2311,6 +2535,11 @@ export function VixPlayer({
       bumpChrome();
     }
     gestureRef.current = null;
+    // Persist a gesture-adjusted volume once (see move handler).
+    if (gestureDirtyVolume.current != null) {
+      saveVixSettings({ volume: gestureDirtyVolume.current });
+      gestureDirtyVolume.current = null;
+    }
   }, [bumpChrome]);
 
   // ---------- ambilight (sampled glow behind native video) ----------
@@ -2352,6 +2581,23 @@ export function VixPlayer({
   }, [mode, ambilight, mediaReady, playlistUrl]);
 
   // ---------- lockscreen / bluetooth controls (Media Session API) ----------
+  /** One shared Cast receiver handle per mount (never a fresh RemotePlayer per call). */
+  const getCastRemote = () => {
+    try {
+      const framework = window.chrome?.framework;
+      if (!framework) return null;
+      if (!castRemoteRef.current) {
+        const remote = new framework.RemotePlayer();
+        castRemoteRef.current = {
+          remote,
+          controller: new framework.RemotePlayerController(remote),
+        };
+      }
+      return castRemoteRef.current;
+    } catch {
+      return null;
+    }
+  };
   useEffect(() => {
     if (typeof window === "undefined" || typeof window.MediaMetadata === "undefined") {
       return;
@@ -2369,10 +2615,34 @@ export function VixPlayer({
         album: "TV Time",
       });
       ms.setActionHandler("play", () => {
+        if (castingRef.current) {
+          try {
+            getCastRemote()?.controller.playOrPause();
+          } catch {
+            /* ignore */
+          }
+          return;
+        }
+        if (isDrivenEmbed) {
+          sendDrivenPlay(true);
+          return;
+        }
         const v = videoRef.current;
         if (v && mode === "native") void v.play().catch(() => {});
       });
       ms.setActionHandler("pause", () => {
+        if (castingRef.current) {
+          try {
+            getCastRemote()?.controller.playOrPause();
+          } catch {
+            /* ignore */
+          }
+          return;
+        }
+        if (isDrivenEmbed) {
+          sendDrivenPlay(false);
+          return;
+        }
         const v = videoRef.current;
         if (v && mode === "native") v.pause();
       });
@@ -2391,19 +2661,25 @@ export function VixPlayer({
         /* ignore */
       }
     };
-  }, [title, type, season, episode, mode, seekBySeconds]);
-  // Lockscreen position (throttled by the transport clock).
+  }, [title, type, season, episode, mode, isDrivenEmbed, sendDrivenPlay, seekBySeconds]);
+  // Lockscreen position: transport ticks ~4Hz, but lockscreen IPC is gated
+  // to 5s / duration / rate changes.
   useEffect(() => {
     try {
       const ms = navigator.mediaSession;
       const d = transport.duration;
       const p = transport.currentTime;
       if (ms?.setPositionState && d > 0 && p >= 0) {
-        ms.setPositionState({
-          duration: d,
-          position: Math.min(p, d),
-          playbackRate: playbackSpeed,
-        });
+        const now = Date.now();
+        const last = lastPosStateRef.current;
+        if (now - last.at >= 5000 || last.dur !== d) {
+          lastPosStateRef.current = { at: now, dur: d };
+          ms.setPositionState({
+            duration: d,
+            position: Math.min(p, d),
+            playbackRate: playbackSpeed,
+          });
+        }
       }
     } catch {
       /* ignore */
@@ -2412,6 +2688,8 @@ export function VixPlayer({
 
   // ---------- chromecast (sender SDK, native mode only) ----------
   // Load the Cast sender SDK once; readiness gates the chrome button.
+  // Restores the previous __onGCastApiAvailable on unmount and subscribes to
+  // externally-initiated session ends (receiver stop, second sender).
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.chrome?.framework) {
@@ -2420,19 +2698,44 @@ export function VixPlayer({
     }
     if (document.querySelector('script[data-cast-sender="1"]')) return;
     let cancelled = false;
-    window.__onGCastApiAvailable = (available: boolean) => {
+    const prev = window.__onGCastApiAvailable;
+    const ours = (available: boolean) => {
       if (cancelled || !available) return;
       try {
-        window.chrome?.framework.CastContext.getInstance().setOptions({
+        const framework = window.chrome?.framework;
+        if (!framework) return;
+        framework.CastContext.getInstance().setOptions({
           receiverApplicationId:
             window.chrome?.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
           autoJoinPolicy: window.chrome?.cast.AutoJoinPolicy.ORIGIN_SCOPED,
         });
+        try {
+          framework.CastContext.getInstance().addEventListener(
+            "sessionstatechanged",
+            () => {
+              try {
+                if (!framework.CastContext.getInstance().getCurrentSession()) {
+                  if (castPollRef.current) {
+                    clearInterval(castPollRef.current);
+                    castPollRef.current = null;
+                  }
+                  castRemoteRef.current = null;
+                  setCasting(false);
+                }
+              } catch {
+                /* ignore */
+              }
+            }
+          );
+        } catch {
+          /* session listener unsupported — poll still detects local ends */
+        }
         setCastReady(true);
       } catch {
         /* Cast init failed — button stays hidden */
       }
     };
+    window.__onGCastApiAvailable = ours;
     const s = document.createElement("script");
     s.dataset.castSender = "1";
     s.src =
@@ -2444,6 +2747,9 @@ export function VixPlayer({
     document.head.appendChild(s);
     return () => {
       cancelled = true;
+      if (window.__onGCastApiAvailable === ours) {
+        window.__onGCastApiAvailable = prev;
+      }
     };
   }, []);
   const stopCastPoll = useCallback(() => {
@@ -2467,7 +2773,12 @@ export function VixPlayer({
         session = context.getCurrentSession();
       }
       if (!session) return;
-      const absoluteUrl = new URL(playlistUrl, window.location.origin).toString();
+      let absoluteUrl: string;
+      try {
+        absoluteUrl = new URL(playlistUrl, window.location.origin).toString();
+      } catch {
+        return;
+      }
       const metadata = new castMedia.GenericMediaMetadata();
       metadata.metadataType = castMedia.MetadataType.GENERIC;
       metadata.title = title;
@@ -2481,7 +2792,7 @@ export function VixPlayer({
       const pos =
         v && Number.isFinite(v.currentTime) && v.currentTime > 0
           ? v.currentTime
-          : transport.currentTime;
+          : remotePositionRef.current;
       const req = new castMedia.LoadRequest(mediaInfo);
       req.autoplay = true;
       req.currentTime = Math.max(0, pos);
@@ -2495,8 +2806,10 @@ export function VixPlayer({
       bumpChrome();
       stopCastPoll();
       // Mirror receiver clock into our transport (progress saves keep working).
-      const remote = new framework.RemotePlayer();
-      const controller = new framework.RemotePlayerController(remote);
+      // Reuses the single shared RemotePlayer — never a fresh one per tick.
+      const pair = getCastRemote();
+      if (!pair) return;
+      const { remote } = pair;
       castPollRef.current = setInterval(() => {
         try {
           if (!castingRef.current) return;
@@ -2512,7 +2825,6 @@ export function VixPlayer({
                 : t.duration,
             paused: remote.isPaused,
           }));
-          void controller;
         } catch {
           /* receiver quiet — keep last known clock */
         }
@@ -2521,7 +2833,7 @@ export function VixPlayer({
       /* picker dismissed or load failed — stay local */
       bumpChrome();
     }
-  }, [mode, playlistUrl, title, transport.currentTime, stopCastPoll, bumpChrome]);
+  }, [mode, playlistUrl, title, stopCastPoll, bumpChrome]);
   const stopCast = useCallback(() => {
     try {
       window.chrome?.framework.CastContext.getInstance()
@@ -2537,10 +2849,7 @@ export function VixPlayer({
   /** Remote play/pause while casting (transport intercepts below). */
   const castPlayPause = useCallback(() => {
     try {
-      const framework = window.chrome?.framework;
-      if (!framework) return;
-      const remote = new framework.RemotePlayer();
-      new framework.RemotePlayerController(remote).playOrPause();
+      getCastRemote()?.controller.playOrPause();
     } catch {
       /* ignore */
     }
@@ -2548,16 +2857,16 @@ export function VixPlayer({
   }, [bumpChrome]);
   const castSeekBy = useCallback((delta: number) => {
     try {
-      const framework = window.chrome?.framework;
-      if (!framework) return false;
-      const remote = new framework.RemotePlayer();
+      const pair = getCastRemote();
+      if (!pair) return false;
+      const { remote, controller } = pair;
       const dur = remote.duration;
       const target = remote.currentTime + delta;
       remote.currentTime = Math.max(
         0,
         Number.isFinite(dur) && dur > 0 ? Math.min(target, dur) : target
       );
-      new framework.RemotePlayerController(remote).seek();
+      controller.seek();
       return true;
     } catch {
       return false;
@@ -2568,31 +2877,27 @@ export function VixPlayer({
   const cycleSpeed = useCallback(() => {
     const cinesrc = mode === "iframe" && activeSource === "cinesrc";
     const speeds = [0.75, 1, 1.25, 1.5, 2];
-    setPlaybackSpeed((prev) => {
-      const idx = speeds.indexOf(prev);
-      const next =
-        idx >= 0
-          ? (speeds[(idx + 1) % speeds.length] ?? 1)
-          : (speeds.find((s) => s > prev) ?? 1);
-      saveVixSettings({ speed: next });
-      if (cinesrc) {
-        sendCineSrcCommand(iframeRef.current, "setPlaybackRate", [next]);
-      } else {
-        const v = videoRef.current;
-        if (v) v.playbackRate = next;
-      }
-      return next;
-    });
+    const idx = speeds.indexOf(playbackSpeed);
+    const next =
+      idx >= 0
+        ? (speeds[(idx + 1) % speeds.length] ?? 1)
+        : (speeds.find((s) => s > playbackSpeed) ?? 1);
+    setPlaybackSpeed(next);
+    saveVixSettings({ speed: next });
+    if (cinesrc) {
+      sendCineSrcCommand(iframeRef.current, "setPlaybackRate", [next]);
+    } else {
+      const v = videoRef.current;
+      if (v) v.playbackRate = next;
+    }
     bumpChrome();
-  }, [mode, activeSource, bumpChrome]);
+  }, [mode, activeSource, playbackSpeed, bumpChrome]);
 
   const toggleFullscreen = useCallback(() => {
-    const root = shellRef.current;
-    if (!root) return;
-    if (document.fullscreenElement) void document.exitFullscreen();
-    else void root.requestFullscreen?.();
+    if (document.fullscreenElement) exitFullscreen();
+    else enterFullscreen();
     bumpChrome();
-  }, [bumpChrome]);
+  }, [enterFullscreen, exitFullscreen, bumpChrome]);
 
   // ---------- iframe fallback: postMessage bridge ----------
   useEffect(() => {
@@ -3005,7 +3310,7 @@ export function VixPlayer({
       // First Escape exits fullscreen; second closes the player.
       if (document.fullscreenElement) {
         e.preventDefault();
-        void document.exitFullscreen();
+        exitFullscreen();
         return;
       }
       void flushPosition().then(() => {
@@ -3014,7 +3319,7 @@ export function VixPlayer({
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [flushPosition, subMenuOpen, audioMenuOpen, qualityMenuOpen]);
+  }, [flushPosition, subMenuOpen, audioMenuOpen, qualityMenuOpen, exitFullscreen]);
 
   // Desktop keyboard shortcuts (native + driven embeds via command channels).
   // Custom chrome owns transport — no native <video controls> to
@@ -3054,10 +3359,8 @@ export function VixPlayer({
       } else if (key === "f") {
         e.preventDefault();
         e.stopPropagation();
-        const root = shellRef.current;
-        if (!root) return;
-        if (document.fullscreenElement) void document.exitFullscreen();
-        else void root.requestFullscreen?.();
+        if (document.fullscreenElement) exitFullscreen();
+        else enterFullscreen();
         bumpChrome();
       }
     };
@@ -3075,6 +3378,8 @@ export function VixPlayer({
     seekBySeconds,
     toggleMute,
     cycleScreenFill,
+    enterFullscreen,
+    exitFullscreen,
   ]);
 
   const adjustSubDelay = useCallback((delta: number) => {
@@ -3288,7 +3593,7 @@ export function VixPlayer({
           )}
           {gestureHint && (
             <div
-              aria-hidden="true"
+              role="status"
               className="pointer-events-none absolute left-1/2 top-16 z-30 -translate-x-1/2 rounded-full bg-black/70 px-4 py-2 text-sm font-bold tabular-nums text-white backdrop-blur"
             >
               {gestureHint}
@@ -3483,11 +3788,9 @@ export function VixPlayer({
           showAutoplayToggle={type === "tv"}
           autoplayNext={autoplayNext}
           onToggleAutoplayNext={() => {
-            setAutoplayNext((prev) => {
-              const next = !prev;
-              saveVixSettings({ autoplayNext: next });
-              return next;
-            });
+            const next = !autoplayNext;
+            setAutoplayNext(next);
+            saveVixSettings({ autoplayNext: next });
           }}
           sleepUntil={sleepUntil}
           sleepAfterEpisode={sleepAfterEpisode}
@@ -3504,10 +3807,10 @@ export function VixPlayer({
           onToggleAmbilight={toggleAmbilight}
             onLock={() => {
               navigator.vibrate?.(10);
-            setLocked(true);
+            setLockedPersisted(true);
           }}
           onClose={() => {
-            sessionLocked = false;
+            setLockedPersisted(false);
             void flushPosition().then(() => {
               onClose();
             });
@@ -3546,8 +3849,7 @@ export function VixPlayer({
           type="button"
           onClick={() => {
             navigator.vibrate?.(10);
-            sessionLocked = false;
-            setLocked(false);
+            setLockedPersisted(false);
             setChromeVisible(true);
           }}
           aria-label="Unlock player controls"
@@ -3561,6 +3863,8 @@ export function VixPlayer({
 
       {(mode === "native" || isDrivenEmbed) && tapCue && (
         <div
+          role="status"
+          aria-label={tapCue.side === "right" ? "Skipped forward 10 seconds" : "Skipped back 10 seconds"}
           className={`pointer-events-none absolute inset-y-0 z-40 flex items-center ${
             tapCue.side === "right" ? "justify-end pr-6" : "justify-start pl-6"
           }`}

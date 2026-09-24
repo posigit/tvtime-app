@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 import { StickyChrome } from "@/components/sticky-chrome";
 
-/** Base pulse block — matches card surfaces on the AMOLED shell */
+/** Base pulse block — matches card surfaces in every theme */
 export function Skeleton({
   className,
   style,
@@ -12,7 +12,7 @@ export function Skeleton({
 }) {
   return (
     <div
-      className={cn("animate-pulse rounded-md bg-[#2c2c2e]", className)}
+      className={cn("animate-pulse rounded-md bg-secondary", className)}
       style={style}
       aria-hidden
     />
@@ -22,13 +22,13 @@ export function Skeleton({
 /** Watch-list row: still thumb + title pill + episode line + check circle */
 export function ShowListRowSkeleton() {
   return (
-    <div className="flex items-center gap-3 rounded-xl bg-[#101011] p-2.5">
+    <div className="flex items-center gap-3 rounded-xl bg-card p-2.5">
       <Skeleton className="h-[72px] w-[116px] flex-shrink-0 rounded-lg" />
       <div className="min-w-0 flex-1 space-y-2 py-0.5">
         <Skeleton className="h-6 w-28 rounded-full" />
         <Skeleton className="h-4 w-36" />
       </div>
-      <Skeleton className="h-11 w-11 flex-shrink-0 rounded-full bg-[#3a3a3c]" />
+      <Skeleton className="h-11 w-11 flex-shrink-0 rounded-full bg-muted" />
     </div>
   );
 }
@@ -66,7 +66,7 @@ export function TabsHeaderSkeleton() {
     <div className="relative flex">
       <div className="relative flex-1 pb-3 pt-2">
         <Skeleton className="mx-auto h-4 w-24" />
-        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/40" />
+        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground/40" />
       </div>
       <div className="flex-1 pb-3 pt-2">
         <Skeleton className="mx-auto h-4 w-20 opacity-50" />
@@ -79,14 +79,14 @@ export function TabsHeaderSkeleton() {
 export function SectionLabelSkeleton({ className }: { className?: string }) {
   return (
     <div className={cn("mb-3 mt-2 flex justify-center", className)}>
-      <Skeleton className="h-7 w-28 rounded-full bg-[#3a3a3c]" />
+      <Skeleton className="h-7 w-28 rounded-full bg-muted" />
     </div>
   );
 }
 
 /** Explore search input */
 export function SearchBarSkeleton() {
-  return <Skeleton className="mb-4 h-11 w-full rounded-xl bg-[#1c1c1e]" />;
+  return <Skeleton className="mb-4 h-11 w-full rounded-xl bg-card" />;
 }
 
 /** Horizontal poster rail */
@@ -106,14 +106,14 @@ export function PosterRailSkeleton({ count = 4 }: { count?: number }) {
 /** Show/movie detail backdrop + title block */
 export function DetailHeroSkeleton() {
   return (
-    <div className="relative h-detail-hero w-full overflow-hidden bg-[#1c1c1e]">
-      <div className="absolute inset-0 animate-pulse bg-[#2c2c2e]" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/30" />
-      <div className="absolute left-4 top-safe-float h-9 w-9 rounded-full bg-black/50" />
-      <div className="absolute right-4 top-safe-float h-9 w-9 rounded-full bg-black/50" />
+    <div className="relative h-detail-hero w-full overflow-hidden bg-card">
+      <div className="absolute inset-0 animate-pulse bg-secondary" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-background/30" />
+      <div className="absolute left-4 top-safe-float h-9 w-9 rounded-full bg-background/50" />
+      <div className="absolute right-4 top-safe-float h-9 w-9 rounded-full bg-background/50" />
       <div className="absolute bottom-3 left-4 right-4 space-y-2">
-        <Skeleton className="h-7 w-48 max-w-[75%] bg-white/15" />
-        <Skeleton className="h-4 w-40 bg-white/10" />
+        <Skeleton className="h-7 w-48 max-w-[75%] bg-foreground/15" />
+        <Skeleton className="h-4 w-40 bg-foreground/10" />
       </div>
     </div>
   );
@@ -187,7 +187,7 @@ export function ExplorePageSkeleton() {
       </StickyChrome>
       <div className="px-4 pt-1">
         <div className="mb-5 flex gap-2 overflow-hidden pt-3">
-          <Skeleton className="h-10 w-20 flex-shrink-0 rounded-full bg-white/15" />
+          <Skeleton className="h-10 w-20 flex-shrink-0 rounded-full bg-foreground/15" />
           <Skeleton className="h-10 w-24 flex-shrink-0 rounded-full" />
         </div>
         <section className="mb-7">
@@ -201,13 +201,13 @@ export function ExplorePageSkeleton() {
         </section>
         <section className="mb-6">
           <div className="mb-3">
-            <Skeleton className="h-7 w-28 rounded-full bg-[#3a3a3c]" />
+            <Skeleton className="h-7 w-28 rounded-full bg-muted" />
           </div>
           <PosterRailSkeleton count={5} />
         </section>
         <section className="mb-6">
           <div className="mb-3">
-            <Skeleton className="h-7 w-36 rounded-full bg-[#3a3a3c]" />
+            <Skeleton className="h-7 w-36 rounded-full bg-muted" />
           </div>
           <PosterRailSkeleton count={6} />
         </section>
@@ -225,12 +225,12 @@ export function ProfilePageSkeleton() {
       aria-label="Loading profile"
     >
       <div className="relative mb-6">
-        <div className="relative h-profile-hero w-full overflow-hidden bg-[#1c1c1e]">
-          <div className="absolute inset-0 animate-pulse bg-[#2c2c2e]" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20" />
+        <div className="relative h-profile-hero w-full overflow-hidden bg-card">
+          <div className="absolute inset-0 animate-pulse bg-secondary" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-background/20" />
         </div>
         <div className="relative z-10 -mt-12 flex items-end gap-3 px-4">
-          <Skeleton className="h-24 w-24 flex-shrink-0 rounded-full ring-4 ring-black overflow-hidden" />
+          <Skeleton className="h-24 w-24 flex-shrink-0 rounded-full ring-4 ring-background overflow-hidden" />
           <div className="min-w-0 flex-1 space-y-2 pb-1">
             <Skeleton className="h-7 w-36" />
             <Skeleton className="h-3 w-48" />
@@ -279,11 +279,11 @@ export function ShowDetailSkeleton() {
 
       <div className="px-4 pt-4">
         {/* About / Episodes tabs */}
-        <div className="mb-4 flex gap-6 border-b border-white/10 pb-3">
+        <div className="mb-4 flex gap-6 border-b border-border pb-3">
           <Skeleton className="h-4 w-16 opacity-50" />
           <div className="relative">
             <Skeleton className="h-4 w-20" />
-            <span className="absolute -bottom-3 left-0 right-0 h-0.5 bg-white/40" />
+            <span className="absolute -bottom-3 left-0 right-0 h-0.5 bg-foreground/40" />
           </div>
         </div>
 

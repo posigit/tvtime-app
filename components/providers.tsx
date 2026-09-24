@@ -5,6 +5,8 @@ import { ReactNode, useEffect } from "react";
 import { ToastProvider } from "@/components/toast";
 import { hydrateVixSettings } from "@/lib/vix-settings";
 import { initPlaybackOutbox } from "@/lib/offline/store";
+import { initDownloadAutoRetry } from "@/lib/offline/engine";
+import { applyTheme, getSavedTheme, subscribeTheme } from "@/lib/theme";
 
 /** Hydrates player settings once the session is known (per-user data). */
 function SettingsHydrator() {
@@ -15,29 +17,14 @@ function SettingsHydrator() {
   return null;
 }
 
-/** Re-asserts the saved appearance theme on mount + across tabs. */
+/** Re-asserts the saved appearance theme on mount + across tabs (single subscriber). */
 function ThemeHydrator() {
   useEffect(() => {
-    try {
-      const t = localStorage.getItem("tv-theme");
-      if (t === "light" || t === "soft" || t === "amoled") {
-        document.documentElement.dataset.theme = t;
-      }
-    } catch {
-      /* ignore */
-    }
-    const onStorage = (e: StorageEvent) => {
-      if (
-        e.key === "tv-theme" &&
-        (e.newValue === "light" ||
-          e.newValue === "soft" ||
-          e.newValue === "amoled")
-      ) {
-        document.documentElement.dataset.theme = e.newValue;
-      }
-    };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    // Layout script owns first paint; re-assert here for late mounts and
+    // route the single cross-tab / same-tab subscription through applyTheme
+    // (dataset + .dark class + theme-color stay in sync).
+    applyTheme(getSavedTheme());
+    return subscribeTheme(applyTheme);
   }, []);
   return null;
 }
@@ -46,6 +33,8 @@ export function Providers({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Replay offline playback saves when connectivity returns.
     initPlaybackOutbox();
+    // Resume downloads interrupted by connectivity loss.
+    initDownloadAutoRetry();
     if (!("serviceWorker" in navigator)) return;
     // Production: full offline shell. Dev (?dev=1): /api/dl ONLY, so
     // offline-download playback works in dev without the worker touching

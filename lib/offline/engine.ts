@@ -64,6 +64,13 @@ const CONCURRENCY = 4;
 const activeControllers = new Map<string, AbortController>();
 const pauseIntents = new Set<string>();
 const cancelIntents = new Set<string>();
+/**
+ * In-flight start guard: two concurrent startDownload(same key) calls both
+ * pass the queued/active checks before either registers a controller. The
+ * Set is touched synchronously at entry so the race window is closed;
+ * cross-tab duplicates still rely on the ownedHere handoff below.
+ */
+const startingKeys = new Set<string>();
 
 export function isDownloadActive(key: string): boolean {
   return activeControllers.has(key);
@@ -85,6 +92,26 @@ const RETRY_TRIES = 5;
 const RETRY_BASE_MS = 800;
 
 /**
+ * Parse Retry-After (seconds or HTTP-date) → milliseconds, or null.
+ * Local copy (client-safe): mirrors lib/stream-proxy for the offline engine.
+ */
+function retryAfterMs(header: string | null): number | null {
+  if (!header) return null;
+  const h = header.trim();
+  if (/^\d+$/.test(h)) {
+    const n = Number(h);
+    if (Number.isSafeInteger(n) && n >= 0 && n <= 120) return n * 1000;
+    return null;
+  }
+  const t = Date.parse(h);
+  if (!Number.isNaN(t)) {
+    const diff = t - Date.now();
+    if (diff >= 0 && diff <= 120_000) return diff;
+  }
+  return null;
+}
+
+/**
  * fetchPiece with bounded retries for retryable statuses (429/5xx).
  * Honors Retry-After when served, else exponential backoff + jitter.
  * Returns the LAST response so callers keep their specific error messages;
@@ -101,29 +128,30 @@ async function fetchPieceRetry(
     const res = await fetchPiece(input, signal);
     if (res.ok) return res;
     last = res;
-    // Free the connection before backing off or bailing.
+    if (!RETRYABLE_STATUS(res.status) || attempt + 1 >= tries) break;
+    // Drain only when actually backing off — a terminal 404 must not pay
+    // for a body nobody reads.
     try {
       await res.arrayBuffer();
     } catch {
       /* body already consumed or errored — nothing to free */
     }
-    if (!RETRYABLE_STATUS(res.status) || attempt + 1 >= tries) break;
-    const retryAfter = Number(res.headers.get("retry-after"));
     const wait =
-      Number.isFinite(retryAfter) && retryAfter > 0
-        ? Math.min(retryAfter * 1000, 15000)
-        : Math.min(RETRY_BASE_MS * 2 ** attempt, 8000) + Math.random() * 400;
+      retryAfterMs(res.headers.get("retry-after")) ??
+      Math.min(RETRY_BASE_MS * 2 ** attempt, 8000) + Math.random() * 400;
     // Abort-aware backoff: pause/cancel during the wait stops immediately.
+    // Listener is removed on every path (no accumulation across retries).
     await new Promise<void>((resolve, reject) => {
-      const t = setTimeout(resolve, wait);
-      signal.addEventListener(
-        "abort",
-        () => {
-          clearTimeout(t);
-          reject(abortError());
-        },
-        { once: true }
-      );
+      const t = setTimeout(() => {
+        signal.removeEventListener("abort", onAbort);
+        resolve();
+      }, wait);
+      const onAbort = () => {
+        clearTimeout(t);
+        signal.removeEventListener("abort", onAbort);
+        reject(abortError());
+      };
+      signal.addEventListener("abort", onAbort, { once: true });
     });
   }
   return last as Response;
@@ -186,6 +214,21 @@ export async function startDownload(req: DownloadRequest): Promise<void> {
     req.season,
     req.episode
   );
+  // Synchronous duplicate-start guard (see startingKeys).
+  if (startingKeys.has(key)) return;
+  startingKeys.add(key);
+  try {
+    return await startDownloadInner(req, key);
+  } finally {
+    startingKeys.delete(key);
+  }
+}
+
+async function startDownloadInner(req: DownloadRequest, key: string): Promise<void> {
+  const settings = loadVixSettings();
+  if (!settings.downloadMode) {
+    throw new Error("Download mode is off — enable it in Download settings.");
+  }
   const existing = getRecordSync(key) ?? (await getManifest())[key];
   if (existing && (existing.state === "active" || existing.state === "queued")) {
     return; // already running
@@ -193,6 +236,12 @@ export async function startDownload(req: DownloadRequest): Promise<void> {
   if (activeControllers.has(key)) return;
 
   const now = Date.now();
+  // Quality switch orphans prior bytes (segment URLs differ): drop the old
+  // files and restart counters instead of leaking unreferenced cache entries.
+  const sameQuality = (existing?.quality ?? settings.downloadQuality) === settings.downloadQuality;
+  if (existing && existing.fileUrls.length > 0 && !sameQuality) {
+    await deleteRecordFiles(existing);
+  }
   const rec: DownloadRecord = {
     key,
     type: req.type === "movie" ? "movie" : "episode",
@@ -209,17 +258,23 @@ export async function startDownload(req: DownloadRequest): Promise<void> {
     // Resume seeds the bar where the last run left off (capped at known
     // totals) instead of visibly restarting at 0%. Verification still runs
     // over every piece, so evicted bytes re-download and the final counts
-    // stay honest.
-    bytesDone: Math.min(
-      existing?.bytesDone ?? 0,
-      existing?.estimateBytes || Number.POSITIVE_INFINITY
-    ),
-    totalSegments: existing?.totalSegments ?? 0,
-    doneSegments: Math.min(
-      existing?.doneSegments ?? 0,
-      existing?.totalSegments || Number.POSITIVE_INFINITY
-    ),
-    fileUrls: [],
+    // stay honest. A quality switch restarts from zero (see above).
+    bytesDone: sameQuality
+      ? Math.min(
+          existing?.bytesDone ?? 0,
+          existing?.estimateBytes || Number.POSITIVE_INFINITY
+        )
+      : 0,
+    totalSegments: sameQuality ? (existing?.totalSegments ?? 0) : 0,
+    doneSegments: sameQuality
+      ? Math.min(
+          existing?.doneSegments ?? 0,
+          existing?.totalSegments || Number.POSITIVE_INFINITY
+        )
+      : 0,
+    // Same quality resumes against existing cache entries (verified per
+    // piece below); a switch starts with no owned files.
+    fileUrls: sameQuality ? [...(existing?.fileUrls ?? [])] : [],
     state: "queued",
     error: undefined,
     subVtt: existing?.subVtt ?? null,
@@ -260,10 +315,16 @@ export async function startDownload(req: DownloadRequest): Promise<void> {
     }
     // Another live loop owns this key now — hands off, don't clobber it.
     if (!ownedHere) return;
+    // Offline interruption (not a real failure): flag for online auto-retry
+    // instead of stranding in error. navigator.onLine is advisory — the flag
+    // only gates a resume attempt, which re-verifies everything anyway.
+    const offline =
+      typeof navigator !== "undefined" && navigator.onLine === false;
     await commitRecord({
       ...rec,
       state: "error",
       error: err instanceof Error ? err.message : "Download failed",
+      interruptedOffline: offline || undefined,
     });
   } finally {
     if (activeControllers.get(key) === controller) activeControllers.delete(key);
@@ -303,6 +364,44 @@ export async function resumeDownload(req: DownloadRequest): Promise<void> {
     await upsertRecord({ ...rec, state: "queued", error: undefined });
   }
   return startDownload(req);
+}
+
+let autoRetryInit = false;
+
+/**
+ * Resume offline-interrupted downloads when connectivity returns. Only rows
+ * flagged interruptedOffline (failed while navigator.onLine === false) are
+ * retried — genuine errors still need a manual tap. Idempotent.
+ */
+export function initDownloadAutoRetry(): void {
+  if (autoRetryInit || typeof window === "undefined") return;
+  autoRetryInit = true;
+  const retry = () => {
+    void (async () => {
+      if (typeof navigator !== "undefined" && navigator.onLine === false) return;
+      const all = getAllSync();
+      for (const rec of all) {
+        if (rec.state !== "error" || !rec.interruptedOffline) continue;
+        if (activeControllers.has(rec.key) || startingKeys.has(rec.key)) continue;
+        try {
+          await resumeDownload({
+            type: rec.type === "movie" ? "movie" : "tv",
+            tmdbId: rec.tmdbId,
+            season: rec.season,
+            episode: rec.episode,
+            title: rec.title,
+            subtitle: rec.subtitle,
+          });
+        } catch {
+          /* next reconnect retries again */
+        }
+      }
+    })();
+  };
+  window.addEventListener("online", retry);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) retry();
+  });
 }
 
 export function cancelDownload(key: string) {
@@ -475,7 +574,39 @@ async function runDownload(
 
   // 5. Fetch everything into the cache (resume skips what's already there).
   const cache = await caches.open(DL_CACHE);
-  const fileUrls = new Set<string>();
+  // Seeded from the record: same-quality resumes keep owned files so nothing
+  // verified earlier is ever orphaned.
+  const fileUrls = new Set<string>(rec.fileUrls);
+  // Subtitles overlap the segment downloads (same 30s total budget as a
+  // sequential fetch, but off the critical path): a hung subs fetch resolves
+  // to null instead of parking a finished video at 99%.
+  const subsSignal = AbortSignal.any([signal, AbortSignal.timeout(30000)]);
+  const subsPromise = (async () => {
+    const sub = await fetchDownloadSubs(req, resolved.imdbId, subsSignal);
+    let alts: { vtt: string; label: string }[] = [];
+    const subOpts = loadVixSettings().subSource;
+    if (subOpts === "vdrk" || subOpts === "auto" || subOpts === "opensub") {
+      const fetched = await fetchDownloadSubAlts(
+        req,
+        resolved.imdbId,
+        sub?.fileId,
+        subsSignal
+      );
+      alts = fetched;
+    }
+    const entries = [
+      ...(sub ? [{ vtt: sub.vtt, label: sub.label }] : []),
+      ...alts,
+    ].slice(0, 3);
+    return {
+      subVtt: sub?.vtt ?? null,
+      subLabel: sub?.label ?? null,
+      subAlts: entries,
+    };
+  })();
+  // Observed on every path (avoids unhandled rejections when an abort below
+  // skips the later await); the awaited copy still surfaces user aborts.
+  void subsPromise.catch(() => {});
   let doneSeg = 0;
   let measuredBytes = 0;
 
@@ -566,7 +697,7 @@ async function runDownload(
           continue;
         }
         const res = await fetchPieceRetry(job.original, signal, 3);
-        if (!res.ok) throw new Error(`${label} piece failed.`);
+        if (!res.ok) throw new Error(`${label} piece failed (${res.status}).`);
         const buf = await res.arrayBuffer();
         if (buf.byteLength === 0) throw new Error(`${label} piece was empty.`);
         const stored = new Response(buf, {
@@ -639,28 +770,15 @@ async function runDownload(
   // 7. Auto-subtitles: same cascade the player uses (VDRK → OpenSubs),
   // plus spares (best-first, up to 3 total) for offline switching when the
   // default misaligns. Skipped entirely when subs are off/stream-only.
-  // Bounded: a hung subtitle fetch must not park a finished video at 99%.
+  // Overlapped with the segment downloads above: this await only collects an
+  // already-running fetch, so completion never parks at 99% on slow subs.
   try {
-    const subsSignal = AbortSignal.any([signal, AbortSignal.timeout(30000)]);
-    const sub = await fetchDownloadSubs(req, resolved.imdbId, subsSignal);
-    if (sub) {
-      rec.subVtt = sub.vtt;
-      rec.subLabel = sub.label;
+    const subs = await subsPromise;
+    if (subs.subVtt) {
+      rec.subVtt = subs.subVtt;
+      rec.subLabel = subs.subLabel;
     }
-    const subOpts = loadVixSettings().subSource;
-    if (subOpts === "vdrk" || subOpts === "auto" || subOpts === "opensub") {
-      const alts = await fetchDownloadSubAlts(
-        req,
-        resolved.imdbId,
-        sub?.fileId,
-        subsSignal
-      );
-      const entries = [
-        ...(sub ? [{ vtt: sub.vtt, label: sub.label }] : []),
-        ...alts,
-      ].slice(0, 3);
-      if (entries.length > 0) rec.subAlts = entries;
-    }
+    if (subs.subAlts.length > 0) rec.subAlts = subs.subAlts;
   } catch (e) {
     // User pause/cancel (parent signal) still stops the download; a subs
     // timeout just completes the video without subtitles.
@@ -771,13 +889,36 @@ async function fetchDownloadSubAlts(
   return out;
 }
 
+/** Conservative bitrate per quality when the playlist hides bandwidth (single-variant). */
+function fallbackBitrateBps(quality: DownloadRecord["quality"]): number {
+  switch (quality) {
+    case 480:
+      return 2_000_000;
+    case 720:
+      return 4_000_000;
+    case 1080:
+    case "best":
+      return 8_000_000;
+  }
+}
+
 async function enforceQuota(rec: DownloadRecord, signal: AbortSignal): Promise<void> {
   const settings = loadVixSettings();
   const capBytes = settings.downloadCapMb * 1024 * 1024;
   const all = getAllSync();
-  const need = rec.estimateBytes;
+  // Zero estimate (single-variant playlist) must not skip accounting: fall
+  // back to quality × duration so LRU + headroom still apply.
+  const need =
+    rec.estimateBytes > 0
+      ? rec.estimateBytes
+      : rec.durationSec > 0
+        ? Math.round((fallbackBitrateBps(rec.quality) * rec.durationSec) / 8)
+        : 0;
 
   // LRU: evict oldest finished downloads until the estimate fits the cap.
+  // `used` counts finished bytes PLUS in-progress partials (bytesDone of
+  // active/paused/queued/error rows approximates their cache footprint), so
+  // concurrent downloads can't overshoot the cap together.
   if (need > 0) {
     let used = usedBytes(all);
     const victims = all

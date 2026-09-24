@@ -83,6 +83,8 @@
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: rgba(255, 255, 255, 0.1);
   --sidebar-ring: #f5c518;
+  /* Floating nav base — also on :root so pre-paint no-JS has a value. */
+  --theme-deep: 10 10 12;
 }
 
 .dark {
@@ -118,6 +120,8 @@
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: rgba(255, 255, 255, 0.1);
   --sidebar-ring: #f5c518;
+  /* Floating nav base — also on :root so pre-paint no-JS has a value. */
+  --theme-deep: 10 10 12;
 }
 
 /* ── Themes: AMOLED (default, pure black) / Soft dark / Light ──────────────
@@ -148,6 +152,11 @@ html[data-theme="soft"] {
   --border: rgba(255, 255, 255, 0.1);
   --input: rgba(255, 255, 255, 0.15);
   --ring: #f5c518;
+  --chart-1: #f5c518;
+  --chart-2: #9a9aa5;
+  --chart-3: #3a3a44;
+  --chart-4: #24242c;
+  --chart-5: #1a1a20;
   --sidebar: #101014;
   --sidebar-foreground: #ffffff;
   --sidebar-primary: #f5c518;
@@ -156,6 +165,8 @@ html[data-theme="soft"] {
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: rgba(255, 255, 255, 0.1);
   --sidebar-ring: #f5c518;
+  /* Floating nav base (space-separated channels for rgb() alpha mixing). */
+  --theme-deep: 16 16 20;
 }
 
 html[data-theme="light"] {
@@ -192,9 +203,12 @@ html[data-theme="light"] {
   --sidebar-accent-foreground: #101014;
   --sidebar-border: rgba(0, 0, 0, 0.1);
   --sidebar-ring: #eab308;
+  /* Floating nav base (space-separated channels for rgb() alpha mixing). */
+  --theme-deep: 244 244 246;
 }
 
-/* Theme switch shouldn't flash; respect reduced motion. */
+/* Theme switch fades the shell (html/body only — descendant tokens snap by
+   design; animating every token would jank on low-end devices). */
 html,
 body {
   transition:
@@ -343,16 +357,6 @@ html[data-theme="light"] .top-ten-rank-gold {
   }
 
   /** Up-next toast entrance */
-  @keyframes up-next-in {
-    from {
-      opacity: 0;
-      transform: translateY(12px) scale(0.98);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
   .animate-up-next-in {
     animation: up-next-in 0.25s ease-out both;
   }
@@ -360,5 +364,17 @@ html[data-theme="light"] .top-ten-rank-gold {
     .animate-up-next-in {
       animation: none;
     }
+  }
+}
+
+/* Plain-CSS keyframes (outside @layer so minify/purge can never drop them). */
+@keyframes up-next-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }

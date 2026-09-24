@@ -138,20 +138,20 @@ export function CalendarMonth({
               className={cn(
                 "relative flex aspect-[0.72] flex-col overflow-hidden rounded-lg p-1 text-left ring-1 transition",
                 day.inMonth
-                  ? "bg-[#101011] ring-white/[0.06] active:scale-[0.97]"
+                  ? "bg-card ring-border active:scale-[0.97]"
                   : "bg-transparent ring-transparent",
                 isSelected && day.inMonth && "ring-2 ring-primary",
-                isToday && !isSelected && day.inMonth && "ring-1 ring-white/50"
+                isToday && !isSelected && day.inMonth && "ring-1 ring-foreground/50"
               )}
             >
               <span
                 className={cn(
                   "text-[10px] font-bold leading-none",
                   !day.inMonth
-                    ? "text-white/15"
+                    ? "text-foreground/15"
                     : isToday
                       ? "text-primary"
-                      : "text-white/60"
+                      : "text-foreground/60"
                 )}
               >
                 {day.day}
@@ -167,7 +167,7 @@ export function CalendarMonth({
                       <div
                         key={epKey(ep)}
                         className={cn(
-                          "relative w-full flex-1 overflow-hidden rounded-[4px] bg-[#2c2c2e]",
+                          "relative w-full flex-1 overflow-hidden rounded-[4px] bg-secondary",
                           watchedNow && "opacity-35"
                         )}
                       >
@@ -178,14 +178,15 @@ export function CalendarMonth({
                             fill
                             sizes="44px"
                             className="object-cover"
-                            unoptimized
+                            loading="lazy"
+                            decoding="async"
                           />
                         ) : null}
                       </div>
                     );
                   })}
                   {extra > 0 && (
-                    <span className="text-[8px] font-black leading-none text-white/50">
+                    <span className="text-[8px] font-black leading-none text-foreground/50">
                       +{extra}
                     </span>
                   )}
@@ -214,11 +215,11 @@ export function CalendarMonth({
               return (
                 <div
                   key={epKey(ep)}
-                  className="flex items-center gap-3 rounded-xl bg-[#101011] p-2.5"
+                  className="flex items-center gap-3 rounded-xl bg-card p-2.5"
                 >
                   <Link
                     href={`/show/${ep.tmdbId}`}
-                    className="relative h-[72px] w-[116px] flex-shrink-0 overflow-hidden rounded-lg bg-[#2c2c2e]"
+                    className="relative h-[72px] w-[116px] flex-shrink-0 overflow-hidden rounded-lg bg-secondary"
                   >
                     {still ? (
                       <Image
@@ -227,7 +228,8 @@ export function CalendarMonth({
                         fill
                         sizes="116px"
                         className="object-cover"
-                        unoptimized
+                        loading="lazy"
+                        decoding="async"
                       />
                     ) : poster ? (
                       <Image
@@ -236,7 +238,8 @@ export function CalendarMonth({
                         fill
                         sizes="116px"
                         className="object-cover"
-                        unoptimized
+                        loading="lazy"
+                        decoding="async"
                       />
                     ) : null}
                   </Link>
@@ -245,16 +248,16 @@ export function CalendarMonth({
                     href={`/show/${ep.tmdbId}`}
                     className="min-w-0 flex-1 py-0.5"
                   >
-                    <div className="mb-1.5 inline-flex max-w-full items-center gap-0.5 rounded-full border border-white/90 px-2.5 py-[3px]">
-                      <span className="truncate text-[11px] font-bold uppercase tracking-wide text-white">
+                    <div className="mb-1.5 inline-flex max-w-full items-center gap-0.5 rounded-full border border-foreground/90 px-2.5 py-[3px]">
+                      <span className="truncate text-[11px] font-bold uppercase tracking-wide text-foreground">
                         {ep.showTitle}
                       </span>
                       <ChevronRight
-                        className="h-3 w-3 flex-shrink-0 text-white"
+                        className="h-3 w-3 flex-shrink-0 text-foreground"
                         strokeWidth={2.5}
                       />
                     </div>
-                    <p className="text-[15px] font-bold leading-tight text-white">
+                    <p className="text-[15px] font-bold leading-tight text-foreground">
                       S{String(ep.seasonNumber).padStart(2, "0")} | E
                       {String(ep.episodeNumber).padStart(2, "0")}
                     </p>
@@ -262,7 +265,7 @@ export function CalendarMonth({
                       {ep.episodeTitle}
                     </p>
                     {ep.isPremiere && (
-                      <span className="mt-1.5 inline-block rounded-md bg-white px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-black">
+                      <span className="mt-1.5 inline-block rounded-md bg-foreground px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-background">
                         Premiere
                       </span>
                     )}
@@ -300,7 +303,7 @@ export function CalendarMonth({
                           : `${ep.daysUntil} day${ep.daysUntil === 1 ? "" : "s"}`
                       }
                     >
-                      <span className="text-2xl font-black leading-none text-white">
+                      <span className="text-2xl font-black leading-none text-foreground">
                         {ep.daysUntil}
                       </span>
                       <span className="mt-1 inline-flex items-center gap-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -317,11 +320,11 @@ export function CalendarMonth({
               return (
                 <div
                   key={movieKey(mv)}
-                  className="flex items-center gap-3 rounded-xl bg-[#101011] p-2.5"
+                  className="flex items-center gap-3 rounded-xl bg-card p-2.5"
                 >
                   <Link
                     href={`/movie/${mv.tmdbId}`}
-                    className="relative h-[72px] w-[48px] flex-shrink-0 overflow-hidden rounded-lg bg-[#2c2c2e]"
+                    className="relative h-[72px] w-[48px] flex-shrink-0 overflow-hidden rounded-lg bg-secondary"
                   >
                     {poster ? (
                       <Image
@@ -330,7 +333,8 @@ export function CalendarMonth({
                         fill
                         sizes="48px"
                         className="object-cover"
-                        unoptimized
+                        loading="lazy"
+                        decoding="async"
                       />
                     ) : null}
                   </Link>
@@ -344,7 +348,7 @@ export function CalendarMonth({
                         Movie
                       </span>
                     </div>
-                    <p className="truncate text-[15px] font-bold leading-tight text-white">
+                    <p className="truncate text-[15px] font-bold leading-tight text-foreground">
                       {mv.title}
                     </p>
                     <p className="text-[13px] leading-tight text-muted-foreground">

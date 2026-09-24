@@ -193,6 +193,14 @@ export function PlayerTopChrome({
 }: PlayerTopChromeProps) {
   const [sourceMenuOpen, setSourceMenuOpen] = useState(false);
   const [sleepExpanded, setSleepExpanded] = useState(false);
+  /** Wall clock for the sleep countdown label (ticks only while visible). */
+  const [sleepNow, setSleepNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!sleepExpanded || sleepUntil == null) return;
+    setSleepNow(Date.now());
+    const t = setInterval(() => setSleepNow(Date.now()), 15_000);
+    return () => clearInterval(t);
+  }, [sleepExpanded, sleepUntil]);
   const sourceMenuRef = useRef<HTMLDivElement>(null);
   // Outside-dismiss + Escape + scroll — mirrors the sub/audio/quality menus.
   useEffect(() => {
@@ -961,6 +969,7 @@ export function PlayerTopChrome({
                       type="button"
                       role="menuitem"
                       aria-expanded={sleepExpanded}
+                      aria-controls="player-sleep-options"
                       onClick={() => {
                         onKeepChrome();
                         setSleepExpanded((v) => !v);
@@ -973,12 +982,12 @@ export function PlayerTopChrome({
                         {sleepAfterEpisode
                           ? "After episode"
                           : sleepUntil != null
-                            ? `${Math.max(1, Math.ceil((sleepUntil - Date.now()) / 60000))}m left`
+                            ? `${Math.max(1, Math.ceil((sleepUntil - sleepNow) / 60000))}m left`
                             : "Off"}
                       </span>
                     </button>
                     {sleepExpanded && (
-                      <div className="border-t border-white/10 py-1">
+                      <div id="player-sleep-options" className="border-t border-white/10 py-1">
                         {(
                           [
                             { label: "Off", value: null },

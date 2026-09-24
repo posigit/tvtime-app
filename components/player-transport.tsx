@@ -73,13 +73,16 @@ type ThumbCue = {
 };
 
 function parseTimestamp(ts: string): number | null {
-  const m = ts.trim().match(/(?:(\d+):)?(\d{1,2}):(\d{2})[.,](\d{1,3})/);
+  // Accepts H:MM:SS.mmm, MM:SS.mmm, MM:SS,mmm, and whole-second MM:SS —
+  // thumbnail VTTs in the wild omit millis; never silently drop those cues.
+  const m = ts.trim().match(/(?:(\d+):)?(\d{1,2}):(\d{2})(?:[.,](\d{1,3}))?/);
   if (!m) return null;
   const h = m[1] ? Number(m[1]) : 0;
   const min = Number(m[2]);
   const sec = Number(m[3]);
-  const ms = Number((m[4] + "000").slice(0, 3));
+  const ms = m[4] != null ? Number((m[4] + "000").slice(0, 3)) : 0;
   if (![h, min, sec, ms].every(Number.isFinite)) return null;
+  if (min > 59 || sec > 59) return null;
   return h * 3600 + min * 60 + sec + ms / 1000;
 }
 
@@ -123,6 +126,12 @@ function parseThumbVtt(text: string, baseUrl: string): ThumbCue[] {
 
 const SPEED_PRESETS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
+/** Resolved sprite dims by image URL (content-addressed; survives remounts). */
+const spriteDimsCache = new Map<
+  string,
+  { url: string; w: number; h: number } | null
+>;
+
 /** Scrub-hover thumbnail bubble (144×81, sprite-aware). */
 function ThumbBubble({
   cue,
@@ -139,15 +148,28 @@ function ThumbBubble({
 }) {
   useEffect(() => {
     if (!cue.crop || spriteDims?.url === cue.url) return;
+    // Dedupe: resolved dims (or known failures) are cached by URL so rapid
+    // scrubbing never re-probes the same sprite.
+    if (spriteDimsCache.has(cue.url)) {
+      onSpriteDims(spriteDimsCache.get(cue.url) ?? null);
+      return;
+    }
     let live = true;
     const img = new Image();
+    img.decoding = "async";
     img.onload = () => {
-      if (live && img.naturalWidth > 0 && img.naturalHeight > 0) {
-        onSpriteDims({ url: cue.url, w: img.naturalWidth, h: img.naturalHeight });
-      }
+      if (!live) return;
+      const dims =
+        img.naturalWidth > 0 && img.naturalHeight > 0
+          ? { url: cue.url, w: img.naturalWidth, h: img.naturalHeight }
+          : null;
+      spriteDimsCache.set(cue.url, dims);
+      onSpriteDims(dims);
     };
     img.onerror = () => {
-      if (live) onSpriteDims(null);
+      if (!live) return;
+      spriteDimsCache.set(cue.url, null);
+      onSpriteDims(null);
     };
     img.src = cue.url;
     return () => {
@@ -293,22 +315,25 @@ export function PlayerTransport({
       setThumbCues(null);
       return;
     }
-    let cancelled = false;
-    fetch(thumbnailsUrl)
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 10_000);
+    fetch(thumbnailsUrl, { signal: ctrl.signal })
       .then((r) => {
         if (!r.ok) throw new Error(`thumbs ${r.status}`);
         return r.text();
       })
       .then((text) => {
-        if (cancelled) return;
+        if (ctrl.signal.aborted) return;
         const cues = parseThumbVtt(text, thumbnailsUrl);
         setThumbCues(cues.length > 0 ? cues : null);
       })
       .catch(() => {
-        if (!cancelled) setThumbCues(null);
-      });
+        if (!ctrl.signal.aborted) setThumbCues(null);
+      })
+      .finally(() => clearTimeout(timer));
     return () => {
-      cancelled = true;
+      ctrl.abort();
+      clearTimeout(timer);
     };
   }, [thumbnailsUrl]);
   const previewCue =
@@ -468,6 +493,12 @@ export function PlayerTransport({
                 onSpriteDims={setSpriteDims}
               />
             )}
+            {/* Screen-reader scrub position (the bubble itself is visual-only). */}
+            <span className="sr-only" role="status">
+              {previewCue
+                ? `Preview ${formatPlayerClock(previewCue.t)} of ${formatPlayerClock(safeDur)}`
+                : ""}
+            </span>
             {/* Segment layer behind the native input: track + fill + marks.
                 The input stays fully interactive on top (drag/touch/keys). */}
             <div
@@ -505,7 +536,14 @@ export function PlayerTransport({
               max={1000}
               step={1}
               value={Math.round(ratio * 1000)}
-              onChange={(e) => onSeekRatio(Number(e.target.value) / 1000)}
+              aria-valuetext={`${formatPlayerClock(currentTime)} of ${formatPlayerClock(safeDur)}`}
+              onChange={(e) => {
+                const r = Number(e.target.value) / 1000;
+                // Keyboard scrub gets the same preview bubble + announcement.
+                setScrubPreview({ ratio: r, x: r });
+                onSeekRatio(r);
+              }}
+              onBlur={() => setScrubPreview(null)}
               onClick={(e) => e.stopPropagation()}
               className="absolute inset-0 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-transparent accent-primary [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
             />

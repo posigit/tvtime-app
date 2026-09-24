@@ -238,6 +238,13 @@ async function DiscoverBody({ userId }: { userId: string }) {
   );
 }
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Explore — TV Time",
+  description: "Discover trending shows, top 10, and tonight's premieres.",
+};
+
 export default async function ExplorePage({
   searchParams,
 }: {

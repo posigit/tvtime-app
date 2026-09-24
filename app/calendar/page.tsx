@@ -14,6 +14,13 @@ import {
 import Link from "next/link";
 import { ChevronLeft, CalendarDays } from "lucide-react";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Calendar — TV Time",
+  description: "Every premiere and finale on each day for shows you follow.",
+};
+
 export const dynamic = "force-dynamic";
 
 function monthKey(ymd: string): string {
@@ -59,9 +66,11 @@ export default async function CalendarPage({
   const lastDay = new Date(Date.UTC(y, m, 0)).getUTCDate();
   const monthEnd = `${key}-${String(lastDay).padStart(2, "0")}`;
 
-  const { following, episodesByShow, watchedByShow } =
-    await loadFollowedEpisodeData(userId);
-  const unreleasedMovies = await loadUnreleasedMovies(userId);
+  const [{ following, episodesByShow, watchedByShow }, unreleasedMovies] =
+    await Promise.all([
+      loadFollowedEpisodeData(userId),
+      loadUnreleasedMovies(userId),
+    ]);
 
   // Episodes landing inside this month (watched history included)
   const byDay = new Map<string, CalendarEpisode[]>();

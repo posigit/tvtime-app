@@ -56,6 +56,11 @@ export type DownloadRecord = {
   downloadedAt: number;
   /** Touch on play/finish — drives LRU eviction. */
   lastUsedAt: number;
+  /**
+   * True when the last failure happened while the browser was offline.
+   * Cleared on the next manual start; drives online auto-retry only.
+   */
+  interruptedOffline?: boolean;
 };
 
 export function downloadKey(
@@ -103,11 +108,42 @@ async function load(): Promise<Record<string, DownloadRecord>> {
 
 function scheduleSave() {
   if (typeof window === "undefined") return;
+  hookPersistence();
   if (saveTimer) clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     saveTimer = null;
     if (cache) set(MANIFEST_IDB_KEY, cache).catch(() => {});
   }, 400);
+}
+
+/** Immediate manifest write (crash/shutdown paths). */
+export function flushManifest(): void {
+  if (typeof window === "undefined") return;
+  if (saveTimer) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+  }
+  if (cache) set(MANIFEST_IDB_KEY, cache).catch(() => {});
+}
+
+let persistHooked = false;
+
+/**
+ * Flush the debounced manifest when the page hides — a crash or OS kill
+ * inside the 400ms window must not lose the latest progress. Registered
+ * lazily on first save so non-offline pages pay nothing.
+ */
+function hookPersistence(): void {
+  if (persistHooked || typeof window === "undefined") return;
+  persistHooked = true;
+  try {
+    window.addEventListener("pagehide", flushManifest);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) flushManifest();
+    });
+  } catch {
+    /* ignore */
+  }
 }
 
 export async function getManifest(): Promise<Record<string, DownloadRecord>> {
@@ -210,10 +246,11 @@ export async function ensurePersisted(): Promise<boolean> {
   }
 }
 
-/** Sum of finished-download bytes (the cap counts these). */
+/** Finished bytes plus in-progress partials (bytesDone approximates cache footprint). */
 export function usedBytes(records: DownloadRecord[]): number {
   return records.reduce(
-    (sum, r) => sum + (r.state === "done" ? r.sizeBytes : 0),
+    (sum, r) =>
+      sum + (r.state === "done" ? r.sizeBytes : Math.max(0, r.bytesDone || 0)),
     0
   );
 }
@@ -229,9 +266,12 @@ export async function deleteRecordFiles(rec: DownloadRecord): Promise<void> {
 }
 
 /**
- * True when the finished download's playlist bytes are still in the cache.
- * The OS may evict origin storage; call on settings-open and before offline
- * play to flip stale `done` rows to `missing`.
+ * True when the finished download's bytes are still in the cache.
+ * Checks the playlist plus up to 2 sample segments — playlist-only checks
+ * miss OS-evicted segments. The OS may evict origin storage; call on
+ * settings-open and before offline play to flip stale `done` rows to
+ * `missing`. Exceptions (transient cache failure) stay healthy: never flip
+ * on inconclusive evidence.
  */
 export async function verifyRecordFiles(key: string): Promise<boolean> {
   const rec = getRecordSync(key) ?? (await load())[key];
@@ -242,6 +282,20 @@ export async function verifyRecordFiles(key: string): Promise<boolean> {
     if (!hit) {
       await upsertRecord({ ...rec, state: "missing" });
       return false;
+    }
+    // Sample up to 2 owned segment files (first + last): catches partial
+    // eviction without reading the whole set.
+    const owned = (rec.fileUrls ?? []).filter((u) => u !== dlPlaylistUrl(rec.key));
+    const samples = [
+      ...(owned.length > 0 ? [owned[0]!] : []),
+      ...(owned.length > 1 ? [owned[owned.length - 1]!] : []),
+    ];
+    for (const u of samples) {
+      const seg = await c.match(u);
+      if (!seg) {
+        await upsertRecord({ ...rec, state: "missing" });
+        return false;
+      }
     }
     return true;
   } catch {
