@@ -355,6 +355,16 @@ export async function vidsrcShToken(origin: string): Promise<string> {
   return token;
 }
 
+/**
+ * Drop the cached origin token and mint fresh. Call when upstream answers
+ * 401/403 on a token we minted: serverless egress IPs rotate, and a token
+ * bound to the old /24 dies with it. Never cached on failure (see above).
+ */
+export async function vidsrcShRefreshToken(origin: string): Promise<string> {
+  tokenCache.delete(origin);
+  return vidsrcShToken(origin);
+}
+
 /** Append ?token= like the embed player's applyToken (respects __TOKEN__). */
 export function applyVidsrcToken(url: string, token: string): string {
   if (!token) return url;

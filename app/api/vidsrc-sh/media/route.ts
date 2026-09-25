@@ -5,6 +5,7 @@ import {
   signProxyUrl,
   verifyProxyUrl,
   vidsrcShOrigin,
+  vidsrcShRefreshToken,
   vidsrcShToken,
 } from "@/lib/vidsrc-sh";
 import {
@@ -105,13 +106,17 @@ export async function GET(req: NextRequest) {
   }
 
   // Mint the playback token server-side (IP-bound to THIS deployment).
+  // Egress IPs rotate: a cached token dies with its old /24, so a 401/403 on
+  // a minted URL refreshes once instead of failing the whole download.
   let fetchUrl = target;
+  let mintedOrigin: string | null = null;
   try {
     if (!parsed.searchParams.has("token")) {
       const origin = vidsrcShOrigin(target);
       if (!origin) throw new Error("unparseable origin");
       const token = await vidsrcShToken(origin);
       fetchUrl = applyVidsrcToken(target, token);
+      mintedOrigin = origin;
     }
   } catch (err) {
     return NextResponse.json(
@@ -128,9 +133,9 @@ export async function GET(req: NextRequest) {
     if (/^bytes=\d*-\d*$/.test(r) || /^\d+-\d*$/.test(r)) safeRange = r.startsWith("bytes=") ? r : `bytes=${r}`;
   }
 
-  try {
-    const upstream = await fetchWithTimeout(
-      fetchUrl,
+  const doFetch = (url: string) =>
+    fetchWithTimeout(
+      url,
       {
         headers: {
           "User-Agent": SHARED_UA,
@@ -142,6 +147,26 @@ export async function GET(req: NextRequest) {
       },
       UPSTREAM_TIMEOUT_MS
     );
+
+  try {
+    let upstream = await doFetch(fetchUrl);
+    // Stale IP-bound token (egress rotated after mint): refresh once.
+    if (upstream.status === 401 || upstream.status === 403) {
+      if (mintedOrigin) {
+        try {
+          await upstream.arrayBuffer().catch(() => {});
+        } catch {
+          /* free the connection — best effort */
+        }
+        try {
+          const fresh = await vidsrcShRefreshToken(mintedOrigin);
+          fetchUrl = applyVidsrcToken(target, fresh);
+          upstream = await doFetch(fetchUrl);
+        } catch {
+          /* refresh failed — fall through to the error below */
+        }
+      }
+    }
     if (!upstream.ok) {
       const retryAfter = parseRetryAfterSeconds(upstream.headers.get("retry-after"));
       return NextResponse.json(
