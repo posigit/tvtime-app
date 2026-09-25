@@ -427,6 +427,12 @@ export function VixPlayer({
   const setHlsQualityRef = useRef<((next: "auto" | number) => void) | null>(
     null
   );
+  /** Effective rendition reporter (ABR transparency) — engine writes, pill reads. */
+  const setEffectiveQualityRef = useRef<((h: number | null) => void) | null>(
+    null
+  );
+  /** Current ABR rendition height (null = unknown). Never persisted. */
+  const [effectiveQuality, setEffectiveQuality] = useState<number | null>(null);
   const [subSource, setSubSource] = useState<SubSource>(() => {
     const s = loadVixSettings();
     // Repair bootstrap poison: Auto/stream/external must not keep subs:"off".
@@ -618,6 +624,8 @@ export function VixPlayer({
     setSegments(EMPTY_SEGMENTS);
     setStreamError(null);
     setBuffering(false);
+    // Stale rendition belongs to the old episode (pill shows Auto · 720p).
+    setEffectiveQuality(null);
     // Episode advance (same mount — the shell, and therefore fullscreen,
     // survives): drop the old stream so the previous episode never lingers
     // behind the fresh resolution. First mount is already null — harmless.
@@ -1375,6 +1383,7 @@ export function VixPlayer({
     setAudioTracks([]);
     setAudioTrackId(-1);
     setQualityLevels([]);
+    setEffectiveQuality(null);
     setMediaReady(false);
     setIframeCues([]);
     setOpenSubFileId(null);
@@ -1799,6 +1808,7 @@ export function VixPlayer({
       safariTimerRef,
       setHlsAudioTrackRef,
       setHlsQualityRef,
+      setEffectiveQualityRef,
       setAudioTracks,
       setAudioTrackId,
       setQualityLevels,
@@ -1883,6 +1893,13 @@ export function VixPlayer({
   }, [mode, savePosition]);
 
   // ---------- native video -> event bridge + transport UI ----------
+  // Effective rendition reporter (ABR transparency): engine writes the live
+  // height, the quality pill reads it. Assigned during render (idempotent —
+  // same closure identity per render is fine; engine only calls it).
+  setEffectiveQualityRef.current = (h: number | null) => {
+    setEffectiveQuality((prev) => (prev === h ? prev : h));
+  };
+
   useEffect(() => {
     if (mode !== "native" || !videoRef.current) return;
     const video = videoRef.current;
@@ -3828,6 +3845,7 @@ export function VixPlayer({
               : qualityLevels
           }
           qualitySelection={qualitySelection}
+          effectiveQuality={effectiveQuality}
           qualityMenuOpen={qualityMenuOpen}
           setQualityMenuOpen={setQualityMenuOpen}
           onPickQuality={cineSrcEmbed ? handleCineSrcQuality : undefined}

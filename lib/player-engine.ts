@@ -48,6 +48,13 @@ export type AttachNativePlaybackArgs = {
   safariTimerRef: MutableRefObject<number | null>;
   setHlsAudioTrackRef: MutableRefObject<((id: number) => void) | null>;
   setHlsQualityRef: MutableRefObject<((next: "auto" | number) => void) | null>;
+  /**
+   * Effective rendition reporter (ABR transparency): called with the current
+   * level height on every LEVEL_SWITCHED (hls.js) or video resize (Safari
+   * native), null when unknown. Never persisted — the saved pin stays the
+   * source of truth for what to play.
+   */
+  setEffectiveQualityRef: MutableRefObject<((h: number | null) => void) | null>;
   setAudioTracks: Dispatch<SetStateAction<AudioTrackInfo[]>>;
   setAudioTrackId: Dispatch<SetStateAction<number>>;
   setQualityLevels: Dispatch<SetStateAction<QualityLevelInfo[]>>;
@@ -95,6 +102,7 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
     safariTimerRef,
     setHlsAudioTrackRef,
     setHlsQualityRef,
+    setEffectiveQualityRef,
     setAudioTracks,
     setAudioTrackId,
     setQualityLevels,
@@ -542,8 +550,11 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
         // Don't persist ABR hops while Auto is selected — that used to turn
         // Auto into a sticky fixed height after the first switch.
         if (applying) return;
-        if (loadVixSettings().quality === "auto") return;
+        // Always report the effective rendition (powers the "Auto · 720p"
+        // pill) — reporting is read-only, never persisted.
         const lv = hls?.levels[data.level];
+        if (lv?.height) setEffectiveQualityRef.current?.(lv.height);
+        if (loadVixSettings().quality === "auto") return;
         if (lv?.height) setQualitySelection(lv.height);
       });
       hls.on(Hls.Events.MANIFEST_LOADED, () => {
@@ -819,11 +830,20 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
       // Persist volume only — muted is session-only (never sync / restore).
       saveVixSettings({ volume: video.volume });
     };
+    // Effective rendition for the Auto pill: hls.js reports LEVEL_SWITCHED;
+    // Safari native has no levels API, so videoHeight on resize is the source.
+    const onResize = () => {
+      if (Number.isFinite(video.videoHeight) && video.videoHeight > 0) {
+        setEffectiveQualityRef.current?.(video.videoHeight);
+      }
+    };
     video.addEventListener("ratechange", onRate);
     video.addEventListener("volumechange", onVol);
+    video.addEventListener("resize", onResize);
     cleanup.push(() => {
       video.removeEventListener("ratechange", onRate);
       video.removeEventListener("volumechange", onVol);
+      video.removeEventListener("resize", onResize);
     });
 
     return () => {
@@ -832,6 +852,7 @@ export function attachNativePlayback(args: AttachNativePlaybackArgs): () => void
       if (pendingSeekTimer != null) window.clearTimeout(pendingSeekTimer);
       setHlsAudioTrackRef.current = null;
       setHlsQualityRef.current = null;
+      setEffectiveQualityRef.current = null;
       setAudioTracks([]);
       setQualityLevels([]);
       // Disable + drop injected external tracks so an episode change (or an

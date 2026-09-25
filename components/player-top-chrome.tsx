@@ -48,6 +48,8 @@ type PlayerTopChromeProps = {
   setAudioMenuOpen: (open: boolean | ((v: boolean) => boolean)) => void;
   qualityLevels: QualityLevelInfo[];
   qualitySelection: "auto" | number;
+  /** Live ABR rendition height (null = unknown). Shown in Auto mode. */
+  effectiveQuality?: number | null;
   qualityMenuOpen: boolean;
   setQualityMenuOpen: (open: boolean | ((v: boolean) => boolean)) => void;
   /** Embed override (CineSrc): reloads the frame with a quality param. */
@@ -148,6 +150,7 @@ export function PlayerTopChrome({
   setAudioMenuOpen,
   qualityLevels,
   qualitySelection,
+  effectiveQuality = null,
   qualityMenuOpen,
   setQualityMenuOpen,
   onPickQuality,
@@ -378,7 +381,9 @@ export function PlayerTopChrome({
                 <Gauge className="h-4 w-4" />
                 <span className="hidden sm:inline">
                   {qualitySelection === "auto"
-                    ? "Auto"
+                    ? effectiveQuality != null
+                      ? `Auto · ${effectiveQuality}p`
+                      : "Auto"
                     : `${qualitySelection}p`}
                 </span>
               </button>
