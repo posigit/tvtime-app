@@ -29,6 +29,82 @@ import type {
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
+type SleepOption = number | "episode" | null;
+
+const SLEEP_OPTIONS = [
+  { label: "Off", value: null },
+  { label: "15 minutes", value: 15 },
+  { label: "30 minutes", value: 30 },
+  { label: "45 minutes", value: 45 },
+  { label: "60 minutes", value: 60 },
+  { label: "End of episode", value: "episode" },
+] as const;
+
+/** Short sleep status for pills ("Off" / "25m left" / "After episode"). */
+export function sleepStatusLabel(
+  sleepAfterEpisode: boolean,
+  sleepUntil: number | null,
+  now: number
+): string {
+  if (sleepAfterEpisode) return "After episode";
+  if (sleepUntil != null) {
+    return `${Math.max(1, Math.ceil((sleepUntil - now) / 60000))}m left`;
+  }
+  return "Off";
+}
+
+function isSleepOptionActive(
+  value: (typeof SLEEP_OPTIONS)[number]["value"],
+  sleepAfterEpisode: boolean,
+  sleepUntil: number | null
+): boolean {
+  if (value === "episode") return sleepAfterEpisode;
+  if (value == null) return sleepUntil == null && !sleepAfterEpisode;
+  return sleepUntil != null && !sleepAfterEpisode;
+}
+
+/** Sleep option rows shared by the More sheet and the inline sm+ dropdown. */
+function SleepOptionList({
+  sleepAfterEpisode,
+  sleepUntil,
+  onPick,
+  rowClassName,
+}: {
+  sleepAfterEpisode: boolean;
+  sleepUntil: number | null;
+  onPick: (opt: SleepOption) => void;
+  rowClassName?: string;
+}) {
+  return (
+    <>
+      {SLEEP_OPTIONS.map((opt) => {
+        const active = isSleepOptionActive(
+          opt.value,
+          sleepAfterEpisode,
+          sleepUntil
+        );
+        return (
+          <button
+            key={opt.label}
+            type="button"
+            role="menuitemradio"
+            aria-checked={active}
+            onClick={() => onPick(opt.value)}
+            className={cn(
+              "flex w-full items-center justify-between py-2.5 pl-11 pr-4 text-left text-sm font-medium text-white transition hover:bg-white/10",
+              active && "text-primary",
+              rowClassName
+            )}
+          >
+            {opt.label}
+            {active && <Check className="h-4 w-4 flex-shrink-0" />}
+          </button>
+        );
+      })}
+    </>
+  );
+}
+
 type PlayerTopChromeProps = {
   title: string;
   mode: PlayerMode;
@@ -196,14 +272,17 @@ export function PlayerTopChrome({
 }: PlayerTopChromeProps) {
   const [sourceMenuOpen, setSourceMenuOpen] = useState(false);
   const [sleepExpanded, setSleepExpanded] = useState(false);
+  /** Inline (sm+) sleep dropdown — the More sheet covers small portrait only. */
+  const [sleepMenuOpen, setSleepMenuOpen] = useState(false);
+  const sleepMenuRef = useRef<HTMLDivElement>(null);
   /** Wall clock for the sleep countdown label (ticks only while visible). */
   const [sleepNow, setSleepNow] = useState(() => Date.now());
   useEffect(() => {
-    if (!sleepExpanded || sleepUntil == null) return;
+    if ((!sleepExpanded && !sleepMenuOpen) || sleepUntil == null) return;
     setSleepNow(Date.now());
     const t = setInterval(() => setSleepNow(Date.now()), 15_000);
     return () => clearInterval(t);
-  }, [sleepExpanded, sleepUntil]);
+  }, [sleepExpanded, sleepMenuOpen, sleepUntil]);
   const sourceMenuRef = useRef<HTMLDivElement>(null);
   // Outside-dismiss + Escape + scroll — mirrors the sub/audio/quality menus.
   useEffect(() => {
@@ -236,6 +315,30 @@ export function PlayerTopChrome({
   // portrait screens). Same dismiss + keep-awake contract as other menus.
   const [moreOpen, setMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
+  // Inline sleep dropdown (sm+ screens where the More sheet doesn't render).
+  useEffect(() => {
+    if (!sleepMenuOpen) return;
+    const onPointer = (e: MouseEvent | TouchEvent) => {
+      const node = e.target as Node | null;
+      if (sleepMenuRef.current && node && !sleepMenuRef.current.contains(node)) {
+        setSleepMenuOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        setSleepMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("touchstart", onPointer, { passive: true });
+    document.addEventListener("keydown", onKey, true);
+    return () => {
+      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("touchstart", onPointer);
+      document.removeEventListener("keydown", onKey, true);
+    };
+  }, [sleepMenuOpen]);
   useEffect(() => {
     onMoreMenuOpenChange?.(moreOpen);
   }, [moreOpen, onMoreMenuOpenChange]);
@@ -867,6 +970,51 @@ export function PlayerTopChrome({
               </span>
             </button>
           )}
+          {/* Inline sleep (sm+ landscape/tablet/desktop): the More sheet only
+              renders below sm, so without this pill sleep is unreachable. */}
+          {(mode === "native" || isDrivenEmbed) && onPickSleep && (
+            <div ref={sleepMenuRef} className="relative hidden sm:block">
+              <button
+                type="button"
+                onClick={() => {
+                  onKeepChrome();
+                  setSleepMenuOpen((v) => !v);
+                }}
+                aria-label="Sleep timer"
+                aria-expanded={sleepMenuOpen}
+                aria-controls="player-sleep-options-inline"
+                title={`Sleep timer: ${sleepStatusLabel(sleepAfterEpisode, sleepUntil, sleepNow)}`}
+                className={cn(
+                  "hidden h-9 items-center gap-1.5 rounded-full px-3 text-xs font-bold ring-1 backdrop-blur transition sm:flex",
+                  sleepUntil != null || sleepAfterEpisode
+                    ? "bg-primary/20 text-primary ring-primary/40 hover:bg-primary/30"
+                    : "bg-black/60 text-white/50 ring-white/20 hover:bg-black/80 hover:text-white/80"
+                )}
+              >
+                <MoonStar className="h-4 w-4" />
+                <span className="hidden sm:inline">
+                  {sleepStatusLabel(sleepAfterEpisode, sleepUntil, sleepNow)}
+                </span>
+              </button>
+              {sleepMenuOpen && (
+                <div
+                  id="player-sleep-options-inline"
+                  role="menu"
+                  aria-label="Sleep timer"
+                  className="absolute bottom-auto right-0 top-full z-30 mt-2 w-48 overflow-hidden rounded-xl border border-white/15 bg-card py-1 shadow-2xl"
+                >
+                  <SleepOptionList
+                    sleepAfterEpisode={sleepAfterEpisode}
+                    sleepUntil={sleepUntil}
+                    onPick={(value) => {
+                      onPickSleep(value);
+                      setSleepMenuOpen(false);
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          )}
           {/* Mobile overflow: portrait phones can't fit every pill — fill and
               autoplay hide on small screens and live here with readable
               labels instead. Desktop keeps the full row. */}
@@ -982,53 +1130,19 @@ export function PlayerTopChrome({
                       <MoonStar className="h-4 w-4 text-white/60" />
                       Sleep timer
                       <span className="ml-auto text-white/60">
-                        {sleepAfterEpisode
-                          ? "After episode"
-                          : sleepUntil != null
-                            ? `${Math.max(1, Math.ceil((sleepUntil - sleepNow) / 60000))}m left`
-                            : "Off"}
+                        {sleepStatusLabel(sleepAfterEpisode, sleepUntil, sleepNow)}
                       </span>
                     </button>
                     {sleepExpanded && (
                       <div id="player-sleep-options" className="border-t border-white/10 py-1">
-                        {(
-                          [
-                            { label: "Off", value: null },
-                            { label: "15 minutes", value: 15 },
-                            { label: "30 minutes", value: 30 },
-                            { label: "45 minutes", value: 45 },
-                            { label: "60 minutes", value: 60 },
-                            { label: "End of episode", value: "episode" },
-                          ] as const
-                        ).map((opt) => {
-                          const active =
-                            opt.value === "episode"
-                              ? sleepAfterEpisode
-                              : opt.value == null
-                                ? sleepUntil == null && !sleepAfterEpisode
-                                : sleepUntil != null && !sleepAfterEpisode;
-                          return (
-                            <button
-                              key={opt.label}
-                              type="button"
-                              role="menuitemradio"
-                              aria-checked={active}
-                              onClick={() => {
-                                onPickSleep(opt.value);
-                                setSleepExpanded(false);
-                              }}
-                              className={cn(
-                                "flex w-full items-center justify-between py-2.5 pl-11 pr-4 text-left text-sm font-medium text-white transition hover:bg-white/10",
-                                active && "text-primary"
-                              )}
-                            >
-                              {opt.label}
-                              {active && (
-                                <Check className="h-4 w-4 flex-shrink-0" />
-                              )}
-                            </button>
-                          );
-                        })}
+                        <SleepOptionList
+                          sleepAfterEpisode={sleepAfterEpisode}
+                          sleepUntil={sleepUntil}
+                          onPick={(value) => {
+                            onPickSleep(value);
+                            setSleepExpanded(false);
+                          }}
+                        />
                       </div>
                     )}
                   </>

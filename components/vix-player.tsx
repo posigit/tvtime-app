@@ -270,6 +270,16 @@ export function VixPlayer({
     return preferred;
   });
   const [playlistUrl, setPlaylistUrl] = useState<string | null>(null);
+  /**
+   * Episode advance (same mount) must autoplay like a fresh open: the resume
+   * lookup can finish play() before HLS attaches the new stream, leaving the
+   * video parked on frame one. Armed on episode/source/ retry transitions
+   * (see src-change effect, switchSource, retryStream); consumed on first
+   * readiness (canplay path below). hasResolvedRef distinguishes first mount
+   * (autoPlay attribute owns it) from later transitions.
+   */
+  const advanceNeedsPlayRef = useRef(false);
+  const hasResolvedRef = useRef(false);
   // Structured resolve failure (code/detail) for the error card. Cleared on
   // every fresh attempt (mount, source switch, retry).
   const [streamError, setStreamError] = useState<{
@@ -611,6 +621,9 @@ export function VixPlayer({
     // Episode advance (same mount — the shell, and therefore fullscreen,
     // survives): drop the old stream so the previous episode never lingers
     // behind the fresh resolution. First mount is already null — harmless.
+    // Arm advance autoplay when leaving a live playlist (first mount has
+    // nothing resolved yet, so the autoPlay attribute owns that path).
+    if (hasResolvedRef.current) advanceNeedsPlayRef.current = true;
     setPlaylistUrl(null);
     setThumbnailsUrl(null);
     setStreamFailed(false);
@@ -1350,7 +1363,9 @@ export function VixPlayer({
       }
       setCasting(false);
     }
-    // Reset playback state so the resolution effect re-runs fresh.
+    // Reset playback state so the resolution effect re-runs fresh. The user
+    // picked a source to watch — autoplay when the new stream is ready.
+    advanceNeedsPlayRef.current = true;
     setPlaylistUrl(null);
     setThumbnailsUrl(null);
     setStreamFailed(false);
@@ -1383,6 +1398,8 @@ export function VixPlayer({
 
   /** Error-card Retry: re-run stream resolution for the same source. */
   const retryStream = useCallback(() => {
+    // Retry means "play it" — autoplay when the stream is ready.
+    advanceNeedsPlayRef.current = true;
     setPlaylistUrl(null);
     setThumbnailsUrl(null);
     setStreamFailed(false);
@@ -1629,7 +1646,9 @@ export function VixPlayer({
       if (cancelled) return;
       imdbIdRef.current = result.imdbId;
       if (result.playlistUrl) {
-        setPlaylistUrl(result.playlistUrl);
+        const next = result.playlistUrl;
+        hasResolvedRef.current = true;
+        setPlaylistUrl(next);
         setThumbnailsUrl(result.thumbnailsUrl ?? null);
         setStreamError(null);
         return;
@@ -1881,6 +1900,15 @@ export function VixPlayer({
 
     const markReady = () => {
       if (video.readyState >= 2) setMediaReady(true);
+      // Advance autoplay: the new stream is attached — play unless the resume
+      // hold owns the element (mid-episode bookmark prompt keeps priority and
+      // pauses us back via the hold listener).
+      if (advanceNeedsPlayRef.current) {
+        advanceNeedsPlayRef.current = false;
+        if (!holdForResumeRef.current && video.paused) {
+          void video.play().catch(() => {});
+        }
+      }
     };
 
     const onPlay = () => {
