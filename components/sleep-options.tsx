@@ -27,39 +27,35 @@ export function sleepStatusLabel(
   return "Off";
 }
 
-function isSleepOptionActive(
-  value: (typeof SLEEP_OPTIONS)[number]["value"],
-  sleepAfterEpisode: boolean,
-  sleepUntil: number | null
-): boolean {
-  if (value === "episode") return sleepAfterEpisode;
-  if (value == null) return sleepUntil == null && !sleepAfterEpisode;
-  return sleepUntil != null && !sleepAfterEpisode;
-}
-
 /**
  * Sleep option rows shared by the transport bottom-bar dropdown and the
  * mobile More sheet. Module-level (no remount/focus loss on parent renders).
+ * The minute check matches the PICKED duration exactly (sleepMinutes) — never
+ * derived from remaining time, so countdown drift can't multi-tick rows.
  */
 export function SleepOptionList({
   sleepAfterEpisode,
   sleepUntil,
+  sleepMinutes,
   onPick,
   rowClassName,
 }: {
   sleepAfterEpisode: boolean;
   sleepUntil: number | null;
+  /** Picked minutes (null = off / after-episode). Owns the minute check. */
+  sleepMinutes: number | null;
   onPick: (opt: SleepOption) => void;
   rowClassName?: string;
 }) {
   return (
     <>
       {SLEEP_OPTIONS.map((opt) => {
-        const active = isSleepOptionActive(
-          opt.value,
-          sleepAfterEpisode,
-          sleepUntil
-        );
+        const active =
+          opt.value === "episode"
+            ? sleepAfterEpisode
+            : opt.value == null
+              ? sleepUntil == null && !sleepAfterEpisode
+              : opt.value === sleepMinutes;
         return (
           <button
             key={opt.label}

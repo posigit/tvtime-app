@@ -2351,12 +2351,16 @@ export function VixPlayer({
   }, [mediaReady, showSpeedKey, mode, activeSource]);
 
   // ---------- sleep timer (session-only) ----------
+  /** Picked duration in minutes (null = off / after-episode). Drives the
+      option check — exact match on choice, immune to countdown drift. */
+  const [sleepMinutes, setSleepMinutes] = useState<number | null>(null);
   const clearSleep = useCallback(() => {
     if (sleepTimerRef.current) {
       clearTimeout(sleepTimerRef.current);
       sleepTimerRef.current = null;
     }
     setSleepUntil(null);
+    setSleepMinutes(null);
   }, []);
   const fireSleep = useCallback(() => {
     clearSleep();
@@ -2392,6 +2396,7 @@ export function VixPlayer({
         return;
       }
       setSleepUntil(Date.now() + opt * 60_000);
+      setSleepMinutes(opt);
       sleepTimerRef.current = setTimeout(fireSleep, opt * 60_000);
       bumpChrome();
     },
@@ -3754,6 +3759,7 @@ export function VixPlayer({
           thumbnailsUrl={mode === "native" ? thumbnailsUrl : null}
           showSleep={mode === "native" || isDrivenEmbed}
           sleepUntil={sleepUntil}
+          sleepMinutes={sleepMinutes}
           sleepAfterEpisode={sleepAfterEpisode}
           onPickSleep={pickSleep}
         />
@@ -3842,6 +3848,7 @@ export function VixPlayer({
             saveVixSettings({ autoplayNext: next });
           }}
           sleepUntil={sleepUntil}
+          sleepMinutes={sleepMinutes}
           sleepAfterEpisode={sleepAfterEpisode}
           onPickSleep={pickSleep}
           isDrivenEmbed={isDrivenEmbed}

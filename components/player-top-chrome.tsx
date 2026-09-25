@@ -109,6 +109,8 @@ type PlayerTopChromeProps = {
   onMoreMenuOpenChange?: (open: boolean) => void;
   /** Sleep timer end (ms epoch) or null. */
   sleepUntil?: number | null;
+  /** Picked minutes — owns the option check (exact, drift-proof). */
+  sleepMinutes?: number | null;
   /** Stop-after-episode armed. */
   sleepAfterEpisode?: boolean;
   /** Set sleep: minutes, "episode", or null to clear. Native + driven embeds. */
@@ -187,6 +189,7 @@ export function PlayerTopChrome({
   setHlsQualityRef,
   onMoreMenuOpenChange,
   sleepUntil = null,
+  sleepMinutes = null,
   sleepAfterEpisode = false,
   onPickSleep,
   isDrivenEmbed = false,
@@ -995,6 +998,7 @@ export function PlayerTopChrome({
                         <SleepOptionList
                           sleepAfterEpisode={sleepAfterEpisode}
                           sleepUntil={sleepUntil}
+                          sleepMinutes={sleepMinutes}
                           onPick={(value) => {
                             onPickSleep(value);
                             setSleepExpanded(false);

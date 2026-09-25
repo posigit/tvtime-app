@@ -73,6 +73,8 @@ type PlayerTransportProps = {
    */
   showSleep?: boolean;
   sleepUntil?: number | null;
+  /** Picked minutes — owns the option check (exact, drift-proof). */
+  sleepMinutes?: number | null;
   sleepAfterEpisode?: boolean;
   onPickSleep?: (opt: SleepOption) => void;
 };
@@ -269,6 +271,7 @@ export function PlayerTransport({
   thumbnailsUrl = null,
   showSleep = false,
   sleepUntil = null,
+  sleepMinutes = null,
   sleepAfterEpisode = false,
   onPickSleep,
 }: PlayerTransportProps) {
@@ -726,6 +729,7 @@ export function PlayerTransport({
                       <SleepOptionList
                         sleepAfterEpisode={sleepAfterEpisode}
                         sleepUntil={sleepUntil}
+                        sleepMinutes={sleepMinutes}
                         onPick={(value) => {
                           onPickSleep(value);
                           setSleepMenuOpen(false);
