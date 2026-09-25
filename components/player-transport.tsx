@@ -5,6 +5,7 @@ import {
   Check,
   Maximize,
   Minimize,
+  MoonStar,
   Pause,
   Play,
   RotateCcw,
@@ -12,6 +13,11 @@ import {
   Volume2,
   VolumeX,
 } from "lucide-react";
+import {
+  SleepOptionList,
+  sleepStatusLabel,
+  type SleepOption,
+} from "@/components/sleep-options";
 import { formatPlayerClock } from "@/lib/player-progress";
 import { NEXT_FAB_RATIO } from "@/lib/player-constants";
 import { canControlVolume } from "@/lib/player-seek";
@@ -61,6 +67,14 @@ type PlayerTransportProps = {
   segments?: IntroDbSegments | null;
   /** Vix seek-preview thumbnails (VTT URL). No bubble when absent/unparseable. */
   thumbnailsUrl?: string | null;
+  /**
+   * Sleep timer (bottom bar, so the top chrome stays uncrowded on every
+   * viewport). Rendered only when provided (native + driven embeds).
+   */
+  showSleep?: boolean;
+  sleepUntil?: number | null;
+  sleepAfterEpisode?: boolean;
+  onPickSleep?: (opt: SleepOption) => void;
 };
 
 type ThumbCue = {
@@ -253,6 +267,10 @@ export function PlayerTransport({
   opaqueBottom = false,
   segments = null,
   thumbnailsUrl = null,
+  showSleep = false,
+  sleepUntil = null,
+  sleepAfterEpisode = false,
+  onPickSleep,
 }: PlayerTransportProps) {
   const safeDur = Number.isFinite(duration) && duration > 0 ? duration : 0;
   const ratio = safeDur > 0 ? Math.min(1, Math.max(0, currentTime / safeDur)) : 0;
@@ -296,6 +314,16 @@ export function PlayerTransport({
   const serverMenuRef = useRef<HTMLDivElement>(null);
   const [speedMenuOpen, setSpeedMenuOpen] = useState(false);
   const speedMenuRef = useRef<HTMLDivElement>(null);
+  const [sleepMenuOpen, setSleepMenuOpen] = useState(false);
+  const sleepMenuRef = useRef<HTMLDivElement>(null);
+  /** Wall clock for the sleep countdown label (ticks only while visible). */
+  const [sleepNow, setSleepNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!sleepMenuOpen || sleepUntil == null) return;
+    setSleepNow(Date.now());
+    const t = setInterval(() => setSleepNow(Date.now()), 15_000);
+    return () => clearInterval(t);
+  }, [sleepMenuOpen, sleepUntil]);
   /** Parsed seek-preview cues (null = none/unparseable → no bubble). */
   const [thumbCues, setThumbCues] = useState<ThumbCue[] | null>(null);
   /** Scrub-hover preview: ratio 0..1 + anchor x fraction, or null. */
@@ -376,18 +404,21 @@ export function PlayerTransport({
   }, [serverMenuOpen, onServerMenuOpenChange]);
   const activeServerLabel =
     serverOptions?.find((s) => s.id === activeServer)?.name ?? "Auto";
-  // Outside-dismiss + Escape for the sub-server menu (mirrors top chrome).
+  // Outside-dismiss + Escape for the bottom-bar menus (mirrors top chrome).
   useEffect(() => {
-    if (!serverMenuOpen && !speedMenuOpen) return;
+    if (!serverMenuOpen && !speedMenuOpen && !sleepMenuOpen) return;
     const onPointer = (e: MouseEvent | TouchEvent) => {
       const node = e.target as Node | null;
       const inServer =
         serverMenuRef.current && node && serverMenuRef.current.contains(node);
       const inSpeed =
         speedMenuRef.current && node && speedMenuRef.current.contains(node);
-      if (!inServer && !inSpeed) {
+      const inSleep =
+        sleepMenuRef.current && node && sleepMenuRef.current.contains(node);
+      if (!inServer && !inSpeed && !inSleep) {
         setServerMenuOpen(false);
         setSpeedMenuOpen(false);
+        setSleepMenuOpen(false);
       }
     };
     const onKey = (e: KeyboardEvent) => {
@@ -395,6 +426,7 @@ export function PlayerTransport({
         e.stopPropagation();
         setServerMenuOpen(false);
         setSpeedMenuOpen(false);
+        setSleepMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", onPointer);
@@ -405,7 +437,7 @@ export function PlayerTransport({
       document.removeEventListener("touchstart", onPointer);
       document.removeEventListener("keydown", onKey, true);
     };
-  }, [serverMenuOpen, speedMenuOpen]);
+  }, [serverMenuOpen, speedMenuOpen, sleepMenuOpen]);
 
   return (
     <div
@@ -656,6 +688,49 @@ export function PlayerTransport({
                           )}
                         </button>
                       ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              {showSleep && onPickSleep && (
+                <div ref={sleepMenuRef} className="relative">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSleepMenuOpen((v) => !v);
+                    }}
+                    aria-label="Sleep timer"
+                    aria-expanded={sleepMenuOpen}
+                    aria-controls="player-sleep-options-bottom"
+                    title={`Sleep timer: ${sleepStatusLabel(sleepAfterEpisode, sleepUntil, sleepNow)}`}
+                    className={cn(
+                      "flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-bold ring-1 backdrop-blur transition",
+                      sleepUntil != null || sleepAfterEpisode
+                        ? "bg-primary/20 text-primary ring-primary/40 hover:bg-primary/30"
+                        : "bg-black/50 text-white ring-white/15 hover:bg-black/70"
+                    )}
+                  >
+                    <MoonStar className="h-4 w-4" />
+                    <span className="hidden sm:inline">
+                      {sleepStatusLabel(sleepAfterEpisode, sleepUntil, sleepNow)}
+                    </span>
+                  </button>
+                  {sleepMenuOpen && (
+                    <div
+                      id="player-sleep-options-bottom"
+                      role="menu"
+                      aria-label="Sleep timer"
+                      className="absolute bottom-full right-0 z-30 mb-2 w-48 overflow-hidden rounded-xl border border-white/15 bg-card py-1 shadow-2xl"
+                    >
+                      <SleepOptionList
+                        sleepAfterEpisode={sleepAfterEpisode}
+                        sleepUntil={sleepUntil}
+                        onPick={(value) => {
+                          onPickSleep(value);
+                          setSleepMenuOpen(false);
+                        }}
+                      />
                     </div>
                   )}
                 </div>

@@ -3752,6 +3752,10 @@ export function VixPlayer({
           opaqueBottom={activeSource === "vidfast"}
           segments={segments}
           thumbnailsUrl={mode === "native" ? thumbnailsUrl : null}
+          showSleep={mode === "native" || isDrivenEmbed}
+          sleepUntil={sleepUntil}
+          sleepAfterEpisode={sleepAfterEpisode}
+          onPickSleep={pickSleep}
         />
       )}
 
