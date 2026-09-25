@@ -26,6 +26,12 @@ export type EmbedSourceDef = {
   movieUrl: (tmdbId: number) => string;
   /** Build a TV embed URL. */
   tvUrl: (tmdbId: number, season: number, episode: number) => string;
+  /**
+   * Iframe referrer policy override. Default (omitted) is "no-referrer"
+   * (strips Vercel/app origins that trip source WAFs). Sources whose player
+   * refuses an empty referrer set "origin". One-line flip per source.
+   */
+  referrerPolicy?: "no-referrer" | "origin";
 };
 
 export const EMBED_SOURCES: EmbedSourceDef[] = [

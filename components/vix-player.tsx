@@ -3535,6 +3535,24 @@ export function VixPlayer({
   if (cinesrcFrame && effectiveCineSrcServer !== "auto") {
     iframeSrc = withCineSrcServer(iframeSrc, effectiveCineSrcServer);
   }
+  /**
+   * Iframe referrer policy per final frame URL. vixsrc's player refuses an
+   * empty referrer (plays for seconds, then walls) — it gets origin. Every
+   * other source keeps stripped referrers (WAF-safe default); a source that
+   * starts walling the same way flips with one referrerPolicy line in its def.
+   */
+  const iframeReferrerPolicy: "no-referrer" | "origin" = (() => {
+    try {
+      const host = new URL(iframeSrc, window.location.origin).hostname.toLowerCase();
+      if (host === "vixsrc.to" || host.endsWith(".vixsrc.to")) return "origin";
+    } catch {
+      /* relative/unparseable — fall through to the source default */
+    }
+    return (
+      EMBED_SOURCES.find((s) => s.key === activeSource)?.referrerPolicy ??
+      "no-referrer"
+    );
+  })();
   const handleCineSrcQuality = useCallback(
     (next: "auto" | number) => {
       setQualitySelection(next);
@@ -3682,9 +3700,10 @@ export function VixPlayer({
             ref={iframeRef}
             src={iframeSrc}
             title={title}
-            // vixsrc.to WAF blocks referers from *.vercel.app — strip it so the
-            // fallback embed can load on Vercel-hosted prod.
-            referrerPolicy="no-referrer"
+            // vixsrc.to WAF blocks full referers from *.vercel.app, so most
+            // sources strip it — except players that refuse an empty referrer
+            // (vixsrc itself: use origin). Per-frame policy above.
+            referrerPolicy={iframeReferrerPolicy}
             allow="autoplay; fullscreen; encrypted-media; picture-in-picture; clipboard-write"
             allowFullScreen
             // NOTE: no sandbox attribute on purpose — every source gates
