@@ -809,7 +809,21 @@ async function runDownload(
           continue;
         }
         const res = await fetchPieceRetry(job.original, signal, 3);
-        if (!res.ok) throw new Error(`${label} piece failed (${res.status}).`);
+        if (!res.ok) {
+          // Same-origin pieces fail with JSON bodies ("bad signature" = our
+          // layer, "upstream N" = theirs) — surface it so a 403 is instantly
+          // attributable instead of a bare status. Body is single-read.
+          let detail = "";
+          try {
+            const data = (await res.json()) as { error?: unknown };
+            if (typeof data?.error === "string" && data.error.length > 0) {
+              detail = `: ${data.error.slice(0, 120)}`;
+            }
+          } catch {
+            /* binary upstream body — status alone */
+          }
+          throw new Error(`${label} piece failed (${res.status}${detail}).`);
+        }
         const buf = await res.arrayBuffer();
         if (buf.byteLength === 0) throw new Error(`${label} piece was empty.`);
         const stored = new Response(buf, {

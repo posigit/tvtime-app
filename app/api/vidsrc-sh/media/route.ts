@@ -48,6 +48,9 @@ const UPSTREAM_TIMEOUT_MS = 15_000;
  */
 const REFERER_OVERRIDES: Record<string, string> = {};
 
+/** Pre-change global default, kept as the 403 fallback below. */
+const LEGACY_REFERER = "https://cloudorchestranova.com/";
+
 function refererFor(target: URL): string {
   const override = REFERER_OVERRIDES[target.hostname.toLowerCase()];
   if (override) return override;
@@ -147,13 +150,13 @@ export async function GET(req: NextRequest) {
     if (/^bytes=\d*-\d*$/.test(r) || /^\d+-\d*$/.test(r)) safeRange = r.startsWith("bytes=") ? r : `bytes=${r}`;
   }
 
-  const doFetch = (url: string) =>
+  const doFetch = (url: string, referer?: string) =>
     fetchWithTimeout(
       url,
       {
         headers: {
           "User-Agent": SHARED_UA,
-          Referer: refererFor(parsed),
+          Referer: referer ?? refererFor(parsed),
           Accept: "*/*",
           ...(safeRange ? { Range: safeRange } : {}),
         },
@@ -180,6 +183,17 @@ export async function GET(req: NextRequest) {
           /* refresh failed — fall through to the error below */
         }
       }
+    }
+    // Referer fallback: the default mirrors the vidsrc.sh embed player, but
+    // some segment hosts only accept the legacy cloudorchestranova value
+    // (which used to be the global default). One retry, 403-only, then out.
+    if (upstream.status === 403 && refererFor(parsed) !== LEGACY_REFERER) {
+      try {
+        await upstream.arrayBuffer().catch(() => {});
+      } catch {
+        /* free the connection — best effort */
+      }
+      upstream = await doFetch(fetchUrl, LEGACY_REFERER);
     }
     if (!upstream.ok) {
       const retryAfter = parseRetryAfterSeconds(upstream.headers.get("retry-after"));
