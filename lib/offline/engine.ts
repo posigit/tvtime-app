@@ -482,99 +482,171 @@ async function runDownload(
     }
   }
 
-  // 2. Master → variant at/below the quality setting. The resolver may
-  // hand back a relative same-origin proxy path — absolutize once so every
-  // URL resolution below (variants, segments, keys) actually works.
-  const playlistBase = new URL(
-    resolved.playlistUrl,
-    window.location.origin
-  ).toString();
-  const masterRes = await fetchPieceRetry(playlistBase, signal);
-  if (!masterRes.ok) throw new Error(`Stream lookup failed (${masterRes.status})`);
-  const masterText = await masterRes.text();
-  throwIfAborted();
-
-  let mediaUrl = playlistBase;
-  let mediaText = masterText;
-  let bandwidth = 0;
-  let pickedVariant: VariantInfo | null = null;
-  const isMaster = isMasterPlaylist(masterText);
-  if (isMaster) {
-    const variants = parseMasterVariants(masterText, playlistBase);
-    pickedVariant = pickVariant(variants, rec.quality);
-    if (!pickedVariant) {
-      // Quality gap (e.g. 480p requested, lowest rendition is 720p): say so
-      // plainly so the user can switch quality instead of guessing.
-      const lowest = minVariantHeight(variants);
-      throw new Error(
-        rec.quality === "best" || lowest == null
-          ? "No playable quality found for this title."
-          : `Not available in ${rec.quality}p (lowest is ${lowest}p) — switch quality in Download settings and retry.`
-      );
-    }
-    const vRes = await fetchPieceRetry(pickedVariant.url, signal);
-    if (!vRes.ok) throw new Error(`Quality fetch failed (${vRes.status})`);
-    mediaText = await vRes.text();
-    mediaUrl = pickedVariant.url;
-    bandwidth = pickedVariant.bandwidth;
+  // 2–3b across mirrors: vidsrc-sh hands back several signed mirrors
+  // (alternate hosts for the same title). A dead first mirror (403 farm)
+  // must not fail the title — walk them in order. Single-candidate sources
+  // behave exactly as before (one iteration).
+  const mirrorCandidates =
+    resolved.usedSource === "vidsrc-sh" &&
+    Array.isArray(resolved.playlistUrls) &&
+    resolved.playlistUrls.length > 1
+      ? resolved.playlistUrls
+      : [resolved.playlistUrl];
+  type MirrorParse = {
+    mediaUrl: string;
+    mediaText: string;
+    bandwidth: number;
+    pickedVariant: VariantInfo | null;
+    isMaster: boolean;
+    parts: MediaParts;
+    audioParts: MediaParts | null;
+    audioUrl: string | null;
+    audioText: string | null;
+    audioEntry: AudioEntry | null;
+  };
+  const tryMirror = async (candidate: string): Promise<MirrorParse> => {
+    // 2. Master → variant at/below the quality setting. The resolver may
+    // hand back a relative same-origin proxy path — absolutize once so every
+    // URL resolution below (variants, segments, keys) actually works.
+    const playlistBase = new URL(
+      candidate,
+      window.location.origin
+    ).toString();
+    const masterRes = await fetchPieceRetry(playlistBase, signal);
+    if (!masterRes.ok) throw new Error(`Stream lookup failed (${masterRes.status})`);
+    const masterText = await masterRes.text();
     throwIfAborted();
-  }
 
-  // 3. Segments + keys. Sample-AES can't be cached — refuse up front.
-  const parts = parseMediaPlaylist(mediaText, mediaUrl);
-  if (parts.sampleAes) {
-    throw new Error("This source is encrypted and can't be saved offline.");
-  }
-  if (parts.segments.length === 0) {
-    throw new Error("No video segments found in this stream.");
-  }
-
-  // 3b. Separate audio rendition. Vix-style masters pair each video variant
-  // with an EXT-X-MEDIA audio group — skip this and downloads play silent.
-  let audioParts: MediaParts | null = null;
-  let audioUrl: string | null = null;
-  let audioText: string | null = null;
-  let audioEntry: AudioEntry | null = null;
-  if (isMaster && pickedVariant?.audioGroup) {
-    const entries = parseMasterAudio(masterText, playlistBase).filter(
-      (e) => e.groupId === (pickedVariant as VariantInfo).audioGroup
-    );
-    audioEntry = pickAudioEntry(
-      entries,
-      loadVixSettings().audio || "en",
-      matchLang
-    );
-    if (audioEntry) {
-      const aRes = await fetchPieceRetry(audioEntry.url, signal);
-      if (!aRes.ok) throw new Error(`Audio track fetch failed (${aRes.status})`);
-      let aText = await aRes.text();
-      audioUrl = audioEntry.url;
-      if (isMasterPlaylist(aText)) {
-        const aVars = parseMasterVariants(aText, audioEntry.url);
-        if (aVars.length === 0) {
-          throw new Error("No audio track found for this title.");
-        }
-        const aPicked = aVars[0]!;
-        const avRes = await fetchPieceRetry(aPicked.url, signal);
-        if (!avRes.ok) throw new Error(`Audio track fetch failed (${avRes.status})`);
-        aText = await avRes.text();
-        audioUrl = aPicked.url;
+    let mediaUrl = playlistBase;
+    let mediaText = masterText;
+    let bandwidth = 0;
+    let pickedVariant: VariantInfo | null = null;
+    const isMaster = isMasterPlaylist(masterText);
+    if (isMaster) {
+      const variants = parseMasterVariants(masterText, playlistBase);
+      pickedVariant = pickVariant(variants, rec.quality);
+      if (!pickedVariant) {
+        // Quality gap (e.g. 480p requested, lowest rendition is 720p): say so
+        // plainly so the user can switch quality instead of guessing.
+        const lowest = minVariantHeight(variants);
+        throw new Error(
+          rec.quality === "best" || lowest == null
+            ? "No playable quality found for this title."
+            : `Not available in ${rec.quality}p (lowest is ${lowest}p) — switch quality in Download settings and retry.`
+        );
       }
-      const parsed = parseMediaPlaylist(aText, audioUrl);
-      if (parsed.sampleAes) {
-        throw new Error("This source is encrypted and can't be saved offline.");
-      }
-      if (parsed.segments.length === 0) {
-        // Audio declared but empty — video-only rather than a failure.
-        audioEntry = null;
-        audioUrl = null;
-      } else {
-        audioParts = parsed;
-        audioText = aText;
-      }
+      const vRes = await fetchPieceRetry(pickedVariant.url, signal);
+      if (!vRes.ok) throw new Error(`Quality fetch failed (${vRes.status})`);
+      mediaText = await vRes.text();
+      mediaUrl = pickedVariant.url;
+      bandwidth = pickedVariant.bandwidth;
       throwIfAborted();
     }
+
+    // 3. Segments + keys. Sample-AES can't be cached — refuse up front.
+    const parts = parseMediaPlaylist(mediaText, mediaUrl);
+    if (parts.sampleAes) {
+      throw new Error("This source is encrypted and can't be saved offline.");
+    }
+    if (parts.segments.length === 0) {
+      throw new Error("No video segments found in this stream.");
+    }
+
+    // 3b. Separate audio rendition. Vix-style masters pair each video variant
+    // with an EXT-X-MEDIA audio group — skip this and downloads play silent.
+    let audioParts: MediaParts | null = null;
+    let audioUrl: string | null = null;
+    let audioText: string | null = null;
+    let audioEntry: AudioEntry | null = null;
+    if (isMaster && pickedVariant?.audioGroup) {
+      const entries = parseMasterAudio(masterText, playlistBase).filter(
+        (e) => e.groupId === (pickedVariant as VariantInfo).audioGroup
+      );
+      audioEntry = pickAudioEntry(
+        entries,
+        loadVixSettings().audio || "en",
+        matchLang
+      );
+      if (audioEntry) {
+        const aRes = await fetchPieceRetry(audioEntry.url, signal);
+        if (!aRes.ok) throw new Error(`Audio track fetch failed (${aRes.status})`);
+        let aText = await aRes.text();
+        audioUrl = audioEntry.url;
+        if (isMasterPlaylist(aText)) {
+          const aVars = parseMasterVariants(aText, audioEntry.url);
+          if (aVars.length === 0) {
+            throw new Error("No audio track found for this title.");
+          }
+          const aPicked = aVars[0]!;
+          const avRes = await fetchPieceRetry(aPicked.url, signal);
+          if (!avRes.ok) throw new Error(`Audio track fetch failed (${avRes.status})`);
+          aText = await avRes.text();
+          audioUrl = aPicked.url;
+        }
+        const parsed = parseMediaPlaylist(aText, audioUrl);
+        if (parsed.sampleAes) {
+          throw new Error("This source is encrypted and can't be saved offline.");
+        }
+        if (parsed.segments.length === 0) {
+          // Audio declared but empty — video-only rather than a failure.
+          audioEntry = null;
+          audioUrl = null;
+        } else {
+          audioParts = parsed;
+          audioText = aText;
+        }
+        throwIfAborted();
+      }
+    }
+    return {
+      mediaUrl,
+      mediaText,
+      bandwidth,
+      pickedVariant,
+      isMaster,
+      parts,
+      audioParts,
+      audioUrl,
+      audioText,
+      audioEntry,
+    };
+  };
+  let parsed: MirrorParse | null = null;
+  let mirrorError: unknown = null;
+  for (let mi = 0; mi < mirrorCandidates.length; mi++) {
+    throwIfAborted();
+    try {
+      parsed = await tryMirror(mirrorCandidates[mi]!);
+      mirrorError = null;
+      break;
+    } catch (e) {
+      // Pause/cancel aborts the whole download, never the mirror.
+      if (signal.aborted) throw e;
+      mirrorError = e;
+    }
   }
+  if (!parsed) {
+    const err =
+      mirrorError instanceof Error
+        ? mirrorError
+        : new Error("Stream lookup failed.");
+    if (mirrorCandidates.length > 1) {
+      throw new Error(`${err.message} (tried ${mirrorCandidates.length} mirrors)`);
+    }
+    throw err;
+  }
+  const {
+    mediaUrl,
+    mediaText,
+    bandwidth,
+    pickedVariant,
+    isMaster,
+    parts,
+    audioParts,
+    audioUrl,
+    audioText,
+    audioEntry,
+  } = parsed;
 
   rec.durationSec = parts.durationSec;
   rec.totalSegments =

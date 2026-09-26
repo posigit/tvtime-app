@@ -40,6 +40,20 @@ export const dynamic = "force-dynamic";
 
 const UPSTREAM_TIMEOUT_MS = 15_000;
 
+/**
+ * Referer the real vidsrc.sh embed player sends when fetching segments.
+ * Segment CDNs hotlink-guard on this: the previous hardcoded
+ * cloudorchestranova.com value loaded playlists but 403'd segments on some
+ * hosts. Per-host overrides for future picky CDNs; default mirrors the embed.
+ */
+const REFERER_OVERRIDES: Record<string, string> = {};
+
+function refererFor(target: URL): string {
+  const override = REFERER_OVERRIDES[target.hostname.toLowerCase()];
+  if (override) return override;
+  return "https://vidsrc.sh/";
+}
+
 /** Collect absolute refs, sign them, then rewrite — async WebCrypto signing. */
 async function rewriteBodySigned(body: string, base: URL): Promise<string> {
   const refs = new Set<string>();
@@ -139,7 +153,7 @@ export async function GET(req: NextRequest) {
       {
         headers: {
           "User-Agent": SHARED_UA,
-          Referer: "https://cloudorchestranova.com/",
+          Referer: refererFor(parsed),
           Accept: "*/*",
           ...(safeRange ? { Range: safeRange } : {}),
         },

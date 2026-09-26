@@ -18,6 +18,11 @@ export type StreamResolveResult = {
   imdbId: string | null;
   /** Seek-preview thumbnails (VTT URL) — null when the source has none. */
   thumbnailsUrl?: string | null;
+  /**
+   * All signed vidsrc-sh mirrors (same title, alternate hosts). Downloads try
+   * them in order — a dead first mirror no longer fails the whole title.
+   */
+  playlistUrls?: string[];
   failed: boolean;
   /** True when the caller aborted (effect cleanup) — not a failure. */
   aborted?: boolean;
@@ -189,21 +194,30 @@ async function resolveVidsrcSh(
   playlistUrl: string | null;
   imdbId: string | null;
   thumbnailsUrl: string | null;
+  playlistUrls: string[];
   error?: string;
 }> {
+  const empty = { playlistUrl: null, imdbId: null, thumbnailsUrl: null, playlistUrls: [] as string[] };
   try {
     const res = await fetchWithTimeout(`/api/vidsrc-sh/stream?${base.toString()}`, signal, timeoutMs);
     if (res.ok) {
       const data = (await readJson(res)) as {
         playlistUrl?: string;
+        playlistUrls?: string[];
         imdbId?: string | null;
         thumbnailsUrl?: string | null;
       };
       if (data?.playlistUrl) {
+        const mirrors = Array.isArray(data.playlistUrls)
+          ? data.playlistUrls.filter((u): u is string => typeof u === "string" && u.length > 0)
+          : [];
+        // Primary first, then the rest (deduped) — downloads walk them all.
+        const playlistUrls = [data.playlistUrl, ...mirrors.filter((u) => u !== data.playlistUrl)];
         const out = {
           playlistUrl: data.playlistUrl,
           imdbId: data.imdbId ?? null,
           thumbnailsUrl: data.thumbnailsUrl ?? null,
+          playlistUrls,
         };
         record("vidsrc-sh", out);
         return out;
@@ -211,14 +225,14 @@ async function resolveVidsrcSh(
     }
     const err = `route ${res.status}`;
     record("vidsrc-sh", { playlistUrl: null, error: err });
-    return { playlistUrl: null, imdbId: null, thumbnailsUrl: null, error: err };
+    return { ...empty, error: err };
   } catch (err) {
     if (err instanceof Error && signal?.aborted) {
-      return { playlistUrl: null, imdbId: null, thumbnailsUrl: null };
+      return empty;
     }
     const msg = err instanceof Error ? err.message : String(err);
     record("vidsrc-sh", { playlistUrl: null, error: msg });
-    return { playlistUrl: null, imdbId: null, thumbnailsUrl: null, error: msg };
+    return { ...empty, error: msg };
   }
 }
 
@@ -284,6 +298,7 @@ export async function resolveStreamPlaylist(opts: {
           playlistUrl: s.playlistUrl,
           imdbId: s.imdbId ?? r.imdbId,
           thumbnailsUrl: s.thumbnailsUrl ?? null,
+          playlistUrls: s.playlistUrls,
           failed: false,
           usedSource: "vidsrc-sh",
           fellBackToVidsrcSh: true,
@@ -380,6 +395,7 @@ export async function resolveStreamPlaylist(opts: {
         playlistUrl: s.playlistUrl,
         imdbId: s.imdbId ?? imdbId,
         thumbnailsUrl: s.thumbnailsUrl ?? null,
+        playlistUrls: s.playlistUrls,
         failed: false,
         usedSource: "vidsrc-sh",
         fellBackToVix: attempts.some((a) => a.source === "vix"),
